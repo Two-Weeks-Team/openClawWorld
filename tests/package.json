@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@openclawworld/shared": "workspace:*"
+    "@openclawworld/shared": "workspace:*",
+    "@openclawworld/plugin": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.4.0",

@@ -129,6 +129,9 @@ importers:
 
   tests:
     dependencies:
+      '@openclawworld/plugin':
+        specifier: workspace:*
+        version: link:../packages/plugin
       '@openclawworld/shared':
         specifier: workspace:*
         version: link:../packages/shared

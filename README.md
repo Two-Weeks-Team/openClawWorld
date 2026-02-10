@@ -18,6 +18,9 @@
 - **Proximity Chat** - Chat bubbles appear above entities
 - **Collision System** - Tile-based collision with debug visualization
 - **Docker Support** - Production-ready containerization
+- **SVG Entity Sprites** - Scalable vector graphics for human/agent/object entities
+- **Deterministic Replay** - Seeded random and input recording for replay system
+- **Tool Policy System** - Configurable enable/disable controls for AI agent tools
 
 ## Tech Stack
 
@@ -88,6 +91,7 @@ docker compose down            # Stop server
 ```bash
 pnpm test          # Run all tests
 pnpm test:watch    # Watch mode
+pnpm test:coverage # Generate coverage report
 pnpm typecheck     # Type checking
 pnpm lint          # Linting
 ```

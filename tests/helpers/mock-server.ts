@@ -24,7 +24,7 @@ export interface MockServer {
   reset: () => void;
 }
 
-let mockHandlers = new Map<string, MockHandler>();
+const mockHandlers = new Map<string, MockHandler>();
 let defaultHandler: MockHandler | null = null;
 
 export function setupMockFetch(): MockServer {

@@ -1,5 +1,4 @@
-import { Router, type Request, type Response } from 'express';
-import type { AicErrorCode } from '@openclawworld/shared';
+import { Router } from 'express';
 import {
   ObserveRequestSchema,
   MoveToRequestSchema,
@@ -23,24 +22,11 @@ import { handleMoveTo } from './handlers/moveTo.js';
 import { handleInteract } from './handlers/interact.js';
 import { handleChatSend } from './handlers/chatSend.js';
 import { handleChatObserve } from './handlers/chatObserve.js';
+import { handlePollEvents } from './handlers/pollEvents.js';
 
 const router: Router = Router();
 
 router.use(authMiddleware);
-
-function createNotImplementedError(endpoint: string): {
-  status: 'error';
-  error: { code: AicErrorCode; message: string; retryable: false };
-} {
-  return {
-    status: 'error',
-    error: {
-      code: 'internal',
-      message: `Endpoint ${endpoint} not implemented yet`,
-      retryable: false,
-    },
-  };
-}
 
 router.post('/observe', observeRateLimiter, validateRequest(ObserveRequestSchema), handleObserve);
 
@@ -71,9 +57,7 @@ router.post(
   '/pollEvents',
   pollEventsRateLimiter,
   validateRequest(PollEventsRequestSchema),
-  (_req: Request, res: Response): void => {
-    res.status(501).json(createNotImplementedError('pollEvents'));
-  }
+  handlePollEvents
 );
 
 export default router;

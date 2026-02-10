@@ -1,5 +1,12 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
-import type { EntityKind, Facing, TileCoord, Vec2 } from '@openclawworld/shared';
+import type {
+  EntityKind,
+  Facing,
+  TileCoord,
+  Vec2,
+  UserStatus,
+  ZoneId,
+} from '@openclawworld/shared';
 
 export class Vector2Schema extends Schema {
   @type('number')
@@ -56,6 +63,24 @@ export class EntitySchema extends Schema {
   name: string = '';
 
   @type('string')
+  status: UserStatus = 'online';
+
+  @type('string')
+  statusMessage: string = '';
+
+  @type('string')
+  title: string = '';
+
+  @type('string')
+  department: string = '';
+
+  @type('string')
+  orgId: string = '';
+
+  @type('string')
+  teamId: string = '';
+
+  @type('string')
   roomId: string = '';
 
   @type(Vector2Schema)
@@ -66,6 +91,9 @@ export class EntitySchema extends Schema {
 
   @type('string')
   facing: Facing = 'down';
+
+  @type('string')
+  currentZone: ZoneId = 'lobby';
 
   @type('number')
   speed: number = 100;
@@ -92,5 +120,9 @@ export class EntitySchema extends Schema {
 
   setFacing(facing: Facing): void {
     this.facing = facing;
+  }
+
+  setZone(zone: ZoneId): void {
+    this.currentZone = zone;
   }
 }

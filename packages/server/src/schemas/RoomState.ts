@@ -1,6 +1,9 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
 import { EntitySchema } from './EntitySchema.js';
 import { GameMap } from './GameMap.js';
+import { OrganizationSchema } from './OrganizationSchema.js';
+import { TeamSchema } from './TeamSchema.js';
+import { ZoneSchema } from './ZoneSchema.js';
 
 export class RoomState extends Schema {
   @type('string')
@@ -23,6 +26,15 @@ export class RoomState extends Schema {
 
   @type({ map: EntitySchema })
   objects: MapSchema<EntitySchema> = new MapSchema<EntitySchema>();
+
+  @type({ map: ZoneSchema })
+  zones: MapSchema<ZoneSchema> = new MapSchema<ZoneSchema>();
+
+  @type({ map: OrganizationSchema })
+  organizations: MapSchema<OrganizationSchema> = new MapSchema<OrganizationSchema>();
+
+  @type({ map: TeamSchema })
+  teams: MapSchema<TeamSchema> = new MapSchema<TeamSchema>();
 
   constructor(roomId: string, mapId: string, tickRate?: number, gameMap?: GameMap) {
     super();

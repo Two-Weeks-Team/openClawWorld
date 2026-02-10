@@ -15,7 +15,11 @@ import {
 import { EventLog } from '../events/EventLog.js';
 import { MovementSystem } from '../movement/MovementSystem.js';
 import { ChatSystem } from '../chat/ChatSystem.js';
-import type { EntityKind } from '@openclawworld/shared';
+import { ProfileService } from '../profile/ProfileService.js';
+import { ZoneSystem, DEFAULT_ZONE_BOUNDS } from '../zone/ZoneSystem.js';
+import { PermissionService } from '../services/PermissionService.js';
+import { SafetyService } from '../services/SafetyService.js';
+import type { EntityKind, UserStatus } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 
 export class GameRoom extends Room<{ state: RoomState }> {
@@ -30,6 +34,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private proximitySystem: ProximitySystem | null = null;
   private movementSystem: MovementSystem | null = null;
   private chatSystem: ChatSystem | null = null;
+  private zoneSystem: ZoneSystem | null = null;
+  private profileService: ProfileService;
+  private permissionService!: PermissionService;
+  private safetyService: SafetyService;
   private recentProximityEvents: ProximityEvent[] = [];
   private mapLoader: MapLoader;
   private eventLog: EventLog;
@@ -46,6 +54,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.mapLoader = new MapLoader();
     this.eventLog = new EventLog(EVENT_RETENTION_MS, EVENT_LOG_MAX_SIZE);
     this.chatSystem = new ChatSystem();
+    this.profileService = new ProfileService();
   }
 
   override onCreate(options: { roomId?: string; mapId?: string; tickRate?: number }): void {
@@ -60,6 +69,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.collisionSystem = new CollisionSystem(parsedMap);
       this.proximitySystem = new ProximitySystem(DEFAULT_PROXIMITY_RADIUS, PROXIMITY_DEBOUNCE_MS);
       this.movementSystem = new MovementSystem(this.collisionSystem, DEFAULT_MOVE_SPEED);
+      this.zoneSystem = new ZoneSystem(DEFAULT_ZONE_BOUNDS);
       gameMap = new GameMap(parsedMap.mapId, parsedMap.width, parsedMap.height, parsedMap.tileSize);
 
       const spawnObj = parsedMap.objects.find(obj => {
@@ -88,6 +98,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     }
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
+    this.permissionService = new PermissionService(this.state);
     this.setSimulationInterval(() => this.onTick(), 1000 / tickRate);
 
     this.onMessage('move_to', (client, message: { tx: number; ty: number }) => {
@@ -125,6 +136,25 @@ export class GameRoom extends Room<{ state: RoomState }> {
       });
     });
 
+    this.onMessage(
+      'profile_update',
+      (client, data: { status?: UserStatus; statusMessage?: string }) => {
+        const entityId = this.clientEntities.get(client.sessionId);
+        if (!entityId) return;
+
+        const entity = this.state.getEntity(entityId);
+        if (!entity) return;
+
+        this.profileService.updateProfile(entity, data);
+
+        this.eventLog.append('profile.updated', this.state.roomId, {
+          entityId,
+          status: data.status,
+          statusMessage: data.statusMessage,
+        });
+      }
+    );
+
     // Set up periodic cleanup of expired events (every minute)
     this.cleanupInterval = setInterval(() => {
       const removed = this.eventLog.cleanup();
@@ -148,8 +178,20 @@ export class GameRoom extends Room<{ state: RoomState }> {
     return this.movementSystem;
   }
 
+  getZoneSystem(): ZoneSystem | null {
+    return this.zoneSystem;
+  }
+
   getChatSystem(): ChatSystem | null {
     return this.chatSystem;
+  }
+
+  getProfileService(): ProfileService {
+    return this.profileService;
+  }
+
+  getPermissionService(): PermissionService {
+    return this.permissionService;
   }
 
   getEventLog(): EventLog {
@@ -258,6 +300,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
           this.eventLog.append('proximity.exit', this.state.roomId, event.payload);
         }
       }
+    }
+
+    if (this.zoneSystem) {
+      const allEntities = this.state.getAllEntities();
+      this.zoneSystem.update(allEntities, this.eventLog, this.state.roomId);
     }
 
     const tickTime = performance.now() - tickStart;

@@ -1,0 +1,7 @@
+{
+  "name": "base",
+  "version": "1.0.0",
+  "description": "Work & Life World - Base Pack",
+  "zones": ["lobby", "office", "meeting-center", "lounge-cafe", "arcade"],
+  "entryZone": "lobby"
+}

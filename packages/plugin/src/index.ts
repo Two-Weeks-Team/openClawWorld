@@ -48,6 +48,18 @@ export const manifest: PluginManifest = {
         default: 500,
         description: 'Base delay in milliseconds for exponential backoff retries',
       },
+      enabledTools: {
+        type: 'array',
+        items: { type: 'string' },
+        description:
+          'Whitelist of enabled optional tools. Required tools are always enabled regardless of this setting.',
+      },
+      deniedTools: {
+        type: 'array',
+        items: { type: 'string' },
+        description:
+          'Explicit denylist of tools (takes precedence over enabledTools). Required tools cannot be denied.',
+      },
     },
   },
   tools: [
@@ -152,13 +164,17 @@ export const manifest: PluginManifest = {
 };
 
 export { OpenClawWorldClient } from './client.js';
-export type {
-  PluginConfig,
-  RetryConfig,
+export {
+  PluginConfigSchema,
   validateConfig,
   validateConfigSafe,
-  PluginConfigSchema,
+  getRetryConfig,
+  REQUIRED_TOOLS,
+  OPTIONAL_TOOLS,
+  isToolEnabled,
+  createForbiddenError,
 } from './config.js';
+export type { PluginConfig, RetryConfig, ToolName } from './config.js';
 
 export * from './tools/index.js';
 

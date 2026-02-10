@@ -5,6 +5,8 @@ import {
   createResultSchema,
 } from '@openclawworld/shared';
 import type { OpenClawWorldClient } from '../client.js';
+import type { PluginConfig } from '../config.js';
+import { isToolEnabled, createForbiddenError } from '../config.js';
 
 export type MoveToToolInput = MoveToRequest;
 export type MoveToToolOutput = AicResult<MoveToResponseData>;
@@ -15,13 +17,20 @@ export const MoveToToolOutputSchema = createResultSchema(MoveToResponseDataSchem
 export interface MoveToToolOptions {
   defaultRoomId?: string;
   defaultAgentId?: string;
+  config: PluginConfig;
 }
+
+const TOOL_NAME = 'ocw.move_to';
 
 export async function executeMoveToTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: MoveToToolOptions = {}
+  options: MoveToToolOptions
 ): Promise<MoveToToolOutput> {
+  if (!isToolEnabled(TOOL_NAME, options.config)) {
+    return createForbiddenError(TOOL_NAME);
+  }
+
   const parseResult = MoveToToolInputSchema.safeParse(input);
   if (!parseResult.success) {
     return {

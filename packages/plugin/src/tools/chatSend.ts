@@ -5,6 +5,8 @@ import {
   createResultSchema,
 } from '@openclawworld/shared';
 import type { OpenClawWorldClient } from '../client.js';
+import type { PluginConfig } from '../config.js';
+import { isToolEnabled, createForbiddenError } from '../config.js';
 
 export type ChatSendToolInput = ChatSendRequest;
 export type ChatSendToolOutput = AicResult<ChatSendResponseData>;
@@ -15,13 +17,20 @@ export const ChatSendToolOutputSchema = createResultSchema(ChatSendResponseDataS
 export interface ChatSendToolOptions {
   defaultRoomId?: string;
   defaultAgentId?: string;
+  config: PluginConfig;
 }
+
+const TOOL_NAME = 'ocw.chat_send';
 
 export async function executeChatSendTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: ChatSendToolOptions = {}
+  options: ChatSendToolOptions
 ): Promise<ChatSendToolOutput> {
+  if (!isToolEnabled(TOOL_NAME, options.config)) {
+    return createForbiddenError(TOOL_NAME);
+  }
+
   const parseResult = ChatSendToolInputSchema.safeParse(input);
   if (!parseResult.success) {
     return {

@@ -1,0 +1,37 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openclawworld-server
+    ports:
+      - '${PORT:-2567}:2567'
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=2567
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    env_file:
+      - .env
+    volumes:
+      - server-logs:/app/logs
+      - server-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:2567/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - openclawworld-network
+
+networks:
+  openclawworld-network:
+    driver: bridge
+
+volumes:
+  server-logs:
+    driver: local
+  server-data:
+    driver: local

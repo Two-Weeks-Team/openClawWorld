@@ -18,6 +18,7 @@ import {
   interactRateLimiter,
   chatObserveRateLimiter,
 } from './middleware/index.js';
+import { handleObserve } from './handlers/observe.js';
 
 const router: Router = Router();
 
@@ -37,14 +38,7 @@ function createNotImplementedError(endpoint: string): {
   };
 }
 
-router.post(
-  '/observe',
-  observeRateLimiter,
-  validateRequest(ObserveRequestSchema),
-  (_req: Request, res: Response): void => {
-    res.status(501).json(createNotImplementedError('observe'));
-  }
-);
+router.post('/observe', observeRateLimiter, validateRequest(ObserveRequestSchema), handleObserve);
 
 router.post(
   '/moveTo',

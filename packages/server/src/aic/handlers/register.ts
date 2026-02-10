@@ -1,10 +1,8 @@
 import type { Request, Response } from 'express';
-import colyseus from 'colyseus';
+import { matchMaker } from 'colyseus';
 import type { RegisterRequest, RegisterResponseData, AicErrorObject } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { EntitySchema } from '../../schemas/EntitySchema.js';
-
-const { matchMaker } = colyseus;
 
 let agentCounter = 0;
 

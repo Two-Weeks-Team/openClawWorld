@@ -1,7 +1,4 @@
-import colyseus from 'colyseus';
-import type { Client } from 'colyseus';
-
-const { Room } = colyseus;
+import { Room, type Client } from 'colyseus';
 import { RoomState } from '../schemas/RoomState.js';
 import { EntitySchema } from '../schemas/EntitySchema.js';
 import { GameMap } from '../schemas/GameMap.js';
@@ -21,7 +18,8 @@ import { ChatSystem } from '../chat/ChatSystem.js';
 import type { EntityKind } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 
-export class GameRoom extends Room<RoomState> {
+export class GameRoom extends Room {
+  declare state: RoomState;
   private clientEntities: Map<string, string> = new Map();
   private entityCounters: Map<EntityKind, number> = new Map([
     ['human', 0],
@@ -168,8 +166,9 @@ export class GameRoom extends Room<RoomState> {
     console.log(`[GameRoom] Client ${client.sessionId} joined as ${entityId} (${name})`);
   }
 
-  override async onLeave(client: Client, consented: boolean): Promise<void> {
+  override async onLeave(client: Client, code?: number): Promise<void> {
     const entityId = this.clientEntities.get(client.sessionId);
+    const consented = code === undefined;
 
     if (entityId) {
       this.state.removeEntity(entityId, 'human');

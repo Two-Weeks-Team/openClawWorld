@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import colyseus from 'colyseus';
+import { matchMaker } from 'colyseus';
 import type {
   PollEventsRequest,
   PollEventsResponseData,
@@ -7,8 +7,6 @@ import type {
   EventEnvelope,
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
-
-const { matchMaker } = colyseus;
 
 /** Maximum long-polling wait time in milliseconds (25 seconds) */
 const MAX_WAIT_MS = 25000;

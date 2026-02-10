@@ -1,4 +1,4 @@
-import * as Colyseus from 'colyseus.js';
+import { Client, Room } from '@colyseus/sdk';
 import type { EntityKind, Facing } from '@openclawworld/shared';
 
 export interface Vector2 {
@@ -52,17 +52,17 @@ export interface RoomState {
 }
 
 export class ColyseusClient {
-  private client: Colyseus.Client;
-  private room: Colyseus.Room<RoomState> | null = null;
+  private client: Client;
+  private room: Room<RoomState> | null = null;
   private _sessionId: string | null = null;
 
   constructor(endpoint: string = 'ws://localhost:2567') {
-    this.client = new Colyseus.Client(endpoint);
+    this.client = new Client(endpoint);
   }
 
-  async connect(name: string): Promise<Colyseus.Room<RoomState>> {
+  async connect(name: string): Promise<Room<RoomState>> {
     try {
-      this.room = await this.client.joinOrCreate<RoomState>('game_room', { name });
+      this.room = await this.client.joinOrCreate<RoomState>('game', { name });
       this._sessionId = this.room.sessionId;
       console.log('Joined room:', this.room.name, 'Session ID:', this.room.sessionId);
       return this.room;

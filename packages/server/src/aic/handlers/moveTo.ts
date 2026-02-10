@@ -1,10 +1,8 @@
 import type { Request, Response } from 'express';
-import colyseus from 'colyseus';
+import { matchMaker } from 'colyseus';
 import type { MoveToRequest, MoveToResponseData, AicErrorObject } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { moveToIdempotencyStore } from '../idempotency.js';
-
-const { matchMaker } = colyseus;
 
 function createErrorResponse(
   code: AicErrorObject['code'],

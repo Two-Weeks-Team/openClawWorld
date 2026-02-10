@@ -1,16 +1,13 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import colyseus from 'colyseus';
-import wsTransport from '@colyseus/ws-transport';
+import { Server as ColyseusServer } from 'colyseus';
+import { WebSocketTransport } from '@colyseus/ws-transport';
 import { createServer } from 'http';
 import { GameRoom } from './rooms/GameRoom.js';
 import { aicRouter, requestIdMiddleware, errorHandler, notFoundHandler } from './aic/index.js';
 import { getMetricsCollector } from './metrics/MetricsCollector.js';
 import { disposeAllIdempotencyStores } from './aic/idempotency.js';
-
-const { Server: ColyseusServer } = colyseus;
-const { WebSocketTransport } = wsTransport;
 
 const PORT = parseInt(process.env.PORT ?? '2567', 10);
 const NODE_ENV = process.env.NODE_ENV ?? 'development';

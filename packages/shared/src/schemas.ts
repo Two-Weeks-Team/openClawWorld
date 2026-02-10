@@ -26,7 +26,7 @@ export const IdMessageSchema = z
 
 export const CursorSchema = z.string().regex(/^[A-Za-z0-9=_-]{1,256}$/, 'Invalid cursor format');
 
-export const TsMsSchema = z.number().int().min(0);
+export const TsMsSchema = z.int().min(0);
 
 // ============================================================================
 // Core Schemas
@@ -38,8 +38,8 @@ export const Vec2Schema = z.object({
 });
 
 export const TileCoordSchema = z.object({
-  tx: z.number().int().min(0).max(100000),
-  ty: z.number().int().min(0).max(100000),
+  tx: z.int().min(0).max(100000),
+  ty: z.int().min(0).max(100000),
 });
 
 export const EntityKindSchema = z.enum(['human', 'agent', 'object']);
@@ -59,18 +59,18 @@ export const EntityBaseSchema = z.object({
   tile: TileCoordSchema.optional(),
   facing: FacingSchema.optional(),
   speed: z.number().min(0).max(1000).optional(),
-  meta: z.record(z.unknown()).optional(),
+  meta: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const AffordanceSchema = z.object({
   action: z.string().min(1).max(64),
   label: z.string().min(1).max(128),
-  paramsSchema: z.record(z.unknown()).optional(),
+  paramsSchema: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const ObjectStateSchema = z.object({
   objectType: z.string().min(1).max(64),
-  state: z.record(z.unknown()),
+  state: z.record(z.string(), z.unknown()),
 });
 
 export const ObservedEntitySchema = z.object({
@@ -103,10 +103,10 @@ export const AicErrorObjectSchema = z.object({
   code: AicErrorCodeSchema,
   message: z.string().min(1).max(2000),
   retryable: z.boolean(),
-  details: z.record(z.unknown()).optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
 });
 
-export function createResultSchema<T extends z.ZodTypeAny>(dataSchema: T) {
+export function createResultSchema<T extends z.ZodType>(dataSchema: T) {
   return z.union([
     z.object({
       status: z.literal('ok'),
@@ -145,7 +145,7 @@ export const InteractRequestSchema = z.object({
   txId: IdTxSchema,
   targetId: IdEntitySchema,
   action: z.string().min(1).max(64),
-  params: z.record(z.unknown()).optional(),
+  params: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const ChatSendRequestSchema = z.object({
@@ -159,7 +159,7 @@ export const ChatSendRequestSchema = z.object({
 export const ChatObserveRequestSchema = z.object({
   agentId: IdAgentSchema,
   roomId: IdRoomSchema,
-  windowSec: z.number().int().min(1).max(300),
+  windowSec: z.int().min(1).max(300),
   channel: ChatChannelSchema.optional(),
 });
 
@@ -167,8 +167,8 @@ export const PollEventsRequestSchema = z.object({
   agentId: IdAgentSchema,
   roomId: IdRoomSchema,
   sinceCursor: CursorSchema,
-  limit: z.number().int().min(1).max(200).optional(),
-  waitMs: z.number().int().min(0).max(25000).optional(),
+  limit: z.int().min(1).max(200).optional(),
+  waitMs: z.int().min(0).max(25000).optional(),
 });
 
 // ============================================================================
@@ -178,7 +178,7 @@ export const PollEventsRequestSchema = z.object({
 export const RoomInfoSchema = z.object({
   roomId: IdRoomSchema,
   mapId: z.string().min(1).max(64),
-  tickRate: z.number().int().min(1).max(60),
+  tickRate: z.int().min(1).max(60),
 });
 
 export const ObserveResponseDataSchema = z.object({
@@ -251,7 +251,7 @@ export const EventEnvelopeSchema = z.object({
   type: EventTypeSchema,
   roomId: IdRoomSchema,
   tsMs: TsMsSchema,
-  payload: z.record(z.unknown()),
+  payload: z.record(z.string(), z.unknown()),
 });
 
 export const PollEventsResponseDataSchema = z.object({
@@ -304,7 +304,7 @@ export const ObjectStateChangedPayloadSchema = z.object({
   objectId: IdEntitySchema,
   objectType: z.string().min(1).max(64),
   patch: z.array(JsonPatchOpSchema).min(1).max(100),
-  version: z.number().int().min(1).max(1000000000),
+  version: z.int().min(1).max(1000000000),
 });
 
 // ============================================================================
@@ -312,7 +312,7 @@ export const ObjectStateChangedPayloadSchema = z.object({
 // ============================================================================
 
 export const PluginConfigSchema = z.object({
-  baseUrl: z.string().url(),
+  baseUrl: z.url(),
   apiKey: z.string().optional(),
   defaultRoomId: z.string().optional(),
   defaultAgentId: z.string().optional(),
@@ -324,8 +324,8 @@ export const ToolDeclarationSchema = z.object({
   description: z.string(),
   sideEffects: z.enum(['none', 'world', 'chat']),
   defaultEnabled: z.boolean(),
-  inputSchema: z.record(z.unknown()),
-  outputSchema: z.record(z.unknown()),
+  inputSchema: z.record(z.string(), z.unknown()),
+  outputSchema: z.record(z.string(), z.unknown()),
 });
 
 export const PluginManifestSchema = z.object({
@@ -333,9 +333,9 @@ export const PluginManifestSchema = z.object({
   name: z.literal('openclawworld'),
   version: z.string(),
   description: z.string(),
-  homepage: z.string().url().optional(),
+  homepage: z.url().optional(),
   license: z.string().optional(),
-  configSchema: z.record(z.unknown()),
+  configSchema: z.record(z.string(), z.unknown()),
   tools: z.array(ToolDeclarationSchema),
 });
 
@@ -365,7 +365,7 @@ export const StatusRequestSchema = z.object({
 
 export const StatusResponseDataSchema = z.object({
   serverReachable: z.boolean(),
-  baseUrl: z.string().url(),
+  baseUrl: z.url(),
   serverTsMs: TsMsSchema,
   roomId: z.string().optional(),
   agentId: z.string().optional(),

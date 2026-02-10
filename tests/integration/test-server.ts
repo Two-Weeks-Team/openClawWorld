@@ -62,8 +62,8 @@ export async function startTestServer(): Promise<TestServer> {
   } catch (error) {
     serverProcess.kill('SIGTERM');
     throw new Error(
-      `Failed to start test server on port ${port}. ` +
-        `Stdout: ${stdout}\nStderr: ${stderr}\nError: ${error}`
+      `Failed to start test server on port ${port}. ` + `Stdout: ${stdout}\nStderr: ${stderr}`,
+      { cause: error }
     );
   }
 

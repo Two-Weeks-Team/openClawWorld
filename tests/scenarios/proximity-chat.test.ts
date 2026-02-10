@@ -6,6 +6,7 @@ import type {
   PollEventsResponseData,
   ChatSendResponseData,
   EventType,
+  EventEnvelope,
 } from '@openclawworld/shared';
 
 describe('Scenario B: Proximity Chat', () => {
@@ -281,8 +282,12 @@ describe('Scenario B: Proximity Chat', () => {
 
       expect(pollResult1.status).toBe('ok');
       if (pollResult1.status === 'ok') {
-        expect(pollResult1.data.events.some(e => e.type === 'presence.join')).toBe(true);
-        expect(pollResult1.data.events.some(e => e.type === 'proximity.enter')).toBe(true);
+        expect(pollResult1.data.events.some((e: EventEnvelope) => e.type === 'presence.join')).toBe(
+          true
+        );
+        expect(
+          pollResult1.data.events.some((e: EventEnvelope) => e.type === 'proximity.enter')
+        ).toBe(true);
 
         const pollResult2 = await agentClient.pollEvents({
           agentId: 'agent_helper',
@@ -292,7 +297,9 @@ describe('Scenario B: Proximity Chat', () => {
 
         expect(pollResult2.status).toBe('ok');
         if (pollResult2.status === 'ok') {
-          const chatEvent = pollResult2.data.events.find(e => e.type === 'chat.message');
+          const chatEvent = pollResult2.data.events.find(
+            (e: EventEnvelope) => e.type === 'chat.message'
+          );
           expect(chatEvent).toBeDefined();
           expect(chatEvent?.payload.message).toBe('Hi there!');
 

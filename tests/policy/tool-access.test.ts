@@ -1,31 +1,37 @@
 import { describe, it, expect } from 'vitest';
 import { manifest } from '@openclawworld/plugin';
+import type { ToolDeclaration } from '@openclawworld/shared';
+
+const findTool = (name: string): ToolDeclaration | undefined =>
+  manifest.tools.find((t: ToolDeclaration) => t.name === name);
+const filterTools = (predicate: (t: ToolDeclaration) => boolean): ToolDeclaration[] =>
+  manifest.tools.filter(predicate);
 
 describe('Tool Access Policy Tests', () => {
   describe('Required Tools', () => {
     it('has ocw.status as required tool', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.status');
+      const tool = findTool('ocw.status');
       expect(tool).toBeDefined();
       expect(tool?.required).toBe(true);
       expect(tool?.defaultEnabled).toBe(true);
     });
 
     it('has ocw.observe as required tool', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.observe');
+      const tool = findTool('ocw.observe');
       expect(tool).toBeDefined();
       expect(tool?.required).toBe(true);
       expect(tool?.defaultEnabled).toBe(true);
     });
 
     it('has ocw.poll_events as required tool', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.poll_events');
+      const tool = findTool('ocw.poll_events');
       expect(tool).toBeDefined();
       expect(tool?.required).toBe(true);
       expect(tool?.defaultEnabled).toBe(true);
     });
 
     it('ensures all required tools have correct metadata', () => {
-      const requiredTools = manifest.tools.filter(t => t.required);
+      const requiredTools = filterTools((t: ToolDeclaration) => t.required);
       expect(requiredTools).toHaveLength(3);
 
       for (const tool of requiredTools) {
@@ -38,7 +44,7 @@ describe('Tool Access Policy Tests', () => {
 
   describe('Optional Tools', () => {
     it('has ocw.move_to as optional tool', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.move_to');
+      const tool = findTool('ocw.move_to');
       expect(tool).toBeDefined();
       expect(tool?.required).toBe(false);
       expect(tool?.defaultEnabled).toBe(false);
@@ -46,7 +52,7 @@ describe('Tool Access Policy Tests', () => {
     });
 
     it('has ocw.interact as optional tool', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.interact');
+      const tool = findTool('ocw.interact');
       expect(tool).toBeDefined();
       expect(tool?.required).toBe(false);
       expect(tool?.defaultEnabled).toBe(false);
@@ -54,7 +60,7 @@ describe('Tool Access Policy Tests', () => {
     });
 
     it('has ocw.chat_send as optional tool', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.chat_send');
+      const tool = findTool('ocw.chat_send');
       expect(tool).toBeDefined();
       expect(tool?.required).toBe(false);
       expect(tool?.defaultEnabled).toBe(false);
@@ -62,7 +68,7 @@ describe('Tool Access Policy Tests', () => {
     });
 
     it('ensures optional tools have correct default state', () => {
-      const optionalTools = manifest.tools.filter(t => !t.required);
+      const optionalTools = filterTools((t: ToolDeclaration) => !t.required);
       expect(optionalTools).toHaveLength(3);
 
       for (const tool of optionalTools) {
@@ -97,8 +103,8 @@ describe('Tool Access Policy Tests', () => {
 
   describe('Tool Dependencies', () => {
     it('world effect tools depend on observe', () => {
-      const worldTools = manifest.tools.filter(t => t.sideEffects === 'world');
-      const observeTool = manifest.tools.find(t => t.name === 'ocw.observe');
+      const worldTools = filterTools((t: ToolDeclaration) => t.sideEffects === 'world');
+      const observeTool = findTool('ocw.observe');
 
       expect(observeTool).toBeDefined();
       expect(observeTool?.required).toBe(true);
@@ -106,8 +112,8 @@ describe('Tool Access Policy Tests', () => {
     });
 
     it('chat effect tools depend on poll_events', () => {
-      const chatTools = manifest.tools.filter(t => t.sideEffects === 'chat');
-      const pollEventsTool = manifest.tools.find(t => t.name === 'ocw.poll_events');
+      const chatTools = filterTools((t: ToolDeclaration) => t.sideEffects === 'chat');
+      const pollEventsTool = findTool('ocw.poll_events');
 
       expect(pollEventsTool).toBeDefined();
       expect(pollEventsTool?.required).toBe(true);
@@ -119,7 +125,7 @@ describe('Tool Access Policy Tests', () => {
     it('classifies read-only tools as sideEffects: none', () => {
       const readTools = ['ocw.status', 'ocw.observe', 'ocw.poll_events'];
       for (const toolName of readTools) {
-        const tool = manifest.tools.find(t => t.name === toolName);
+        const tool = findTool(toolName);
         expect(tool?.sideEffects).toBe('none');
       }
     });
@@ -127,13 +133,13 @@ describe('Tool Access Policy Tests', () => {
     it('classifies world modifying tools as sideEffects: world', () => {
       const worldTools = ['ocw.move_to', 'ocw.interact'];
       for (const toolName of worldTools) {
-        const tool = manifest.tools.find(t => t.name === toolName);
+        const tool = findTool(toolName);
         expect(tool?.sideEffects).toBe('world');
       }
     });
 
     it('classifies chat tools as sideEffects: chat', () => {
-      const chatTool = manifest.tools.find(t => t.name === 'ocw.chat_send');
+      const chatTool = findTool('ocw.chat_send');
       expect(chatTool?.sideEffects).toBe('chat');
     });
   });
@@ -159,7 +165,7 @@ describe('Tool Access Policy Tests', () => {
 
     it('lists all 6 tools in manifest', () => {
       expect(manifest.tools).toHaveLength(6);
-      const toolNames = manifest.tools.map(t => t.name).sort();
+      const toolNames = manifest.tools.map((t: ToolDeclaration) => t.name).sort();
       expect(toolNames).toEqual([
         'ocw.chat_send',
         'ocw.interact',

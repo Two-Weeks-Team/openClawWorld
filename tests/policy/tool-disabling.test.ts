@@ -1,22 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import { manifest } from '@openclawworld/plugin';
+import type { ToolDeclaration } from '@openclawworld/shared';
+
+const findTool = (name: string): ToolDeclaration | undefined =>
+  manifest.tools.find((t: ToolDeclaration) => t.name === name);
+const filterTools = (predicate: (t: ToolDeclaration) => boolean): ToolDeclaration[] =>
+  manifest.tools.filter(predicate);
 
 describe('Tool Disabling Policy Tests', () => {
   describe('Optional Tools Disabled by Default', () => {
     it('has move_to disabled by default', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.move_to');
+      const tool = findTool('ocw.move_to');
       expect(tool?.defaultEnabled).toBe(false);
       expect(tool?.required).toBe(false);
     });
 
     it('has interact disabled by default', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.interact');
+      const tool = findTool('ocw.interact');
       expect(tool?.defaultEnabled).toBe(false);
       expect(tool?.required).toBe(false);
     });
 
     it('has chat_send disabled by default', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.chat_send');
+      const tool = findTool('ocw.chat_send');
       expect(tool?.defaultEnabled).toBe(false);
       expect(tool?.required).toBe(false);
     });
@@ -24,19 +30,19 @@ describe('Tool Disabling Policy Tests', () => {
 
   describe('Required Tools Always Accessible', () => {
     it('ensures status cannot be disabled', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.status');
+      const tool = findTool('ocw.status');
       expect(tool?.required).toBe(true);
       expect(tool?.defaultEnabled).toBe(true);
     });
 
     it('ensures observe cannot be disabled', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.observe');
+      const tool = findTool('ocw.observe');
       expect(tool?.required).toBe(true);
       expect(tool?.defaultEnabled).toBe(true);
     });
 
     it('ensures poll_events cannot be disabled', () => {
-      const tool = manifest.tools.find(t => t.name === 'ocw.poll_events');
+      const tool = findTool('ocw.poll_events');
       expect(tool?.required).toBe(true);
       expect(tool?.defaultEnabled).toBe(true);
     });
@@ -44,8 +50,8 @@ describe('Tool Disabling Policy Tests', () => {
 
   describe('Tool Enablement Structure', () => {
     it('tracks required vs optional tool counts', () => {
-      const requiredCount = manifest.tools.filter(t => t.required).length;
-      const optionalCount = manifest.tools.filter(t => !t.required).length;
+      const requiredCount = filterTools((t: ToolDeclaration) => t.required).length;
+      const optionalCount = filterTools((t: ToolDeclaration) => !t.required).length;
 
       expect(requiredCount).toBe(3);
       expect(optionalCount).toBe(3);
@@ -53,14 +59,14 @@ describe('Tool Disabling Policy Tests', () => {
     });
 
     it('validates defaultEnabled matches required status for required tools', () => {
-      const requiredTools = manifest.tools.filter(t => t.required);
+      const requiredTools = filterTools((t: ToolDeclaration) => t.required);
       for (const tool of requiredTools) {
         expect(tool.defaultEnabled).toBe(true);
       }
     });
 
     it('validates defaultEnabled is false for all optional tools', () => {
-      const optionalTools = manifest.tools.filter(t => !t.required);
+      const optionalTools = filterTools((t: ToolDeclaration) => !t.required);
       for (const tool of optionalTools) {
         expect(tool.defaultEnabled).toBe(false);
       }
@@ -69,7 +75,7 @@ describe('Tool Disabling Policy Tests', () => {
 
   describe('World Effect Tools', () => {
     it('marks world effect tools as requiring explicit enablement', () => {
-      const worldTools = manifest.tools.filter(t => t.sideEffects === 'world');
+      const worldTools = filterTools((t: ToolDeclaration) => t.sideEffects === 'world');
 
       for (const tool of worldTools) {
         expect(tool.defaultEnabled).toBe(false);
@@ -78,7 +84,7 @@ describe('Tool Disabling Policy Tests', () => {
     });
 
     it('documents side effects for world tools', () => {
-      const worldTools = manifest.tools.filter(t => t.sideEffects === 'world');
+      const worldTools = filterTools((t: ToolDeclaration) => t.sideEffects === 'world');
 
       for (const tool of worldTools) {
         expect(tool.description.toLowerCase()).toContain('idempotent');
@@ -88,14 +94,14 @@ describe('Tool Disabling Policy Tests', () => {
 
   describe('Chat Effect Tools', () => {
     it('marks chat effect tool as requiring explicit enablement', () => {
-      const chatTool = manifest.tools.find(t => t.sideEffects === 'chat');
+      const chatTool = manifest.tools.find((t: ToolDeclaration) => t.sideEffects === 'chat');
 
       expect(chatTool?.defaultEnabled).toBe(false);
       expect(chatTool?.required).toBe(false);
     });
 
     it('documents idempotency for chat tool', () => {
-      const chatTool = manifest.tools.find(t => t.sideEffects === 'chat');
+      const chatTool = manifest.tools.find((t: ToolDeclaration) => t.sideEffects === 'chat');
 
       expect(chatTool?.description.toLowerCase()).toContain('idempotent');
     });
@@ -135,7 +141,7 @@ describe('Tool Disabling Policy Tests', () => {
 
   describe('Tool Schema References', () => {
     it('references AIC schemas for input/output', () => {
-      const observeTool = manifest.tools.find(t => t.name === 'ocw.observe');
+      const observeTool = findTool('ocw.observe');
       const inputRef = observeTool?.inputSchema?.$ref;
       const outputRef = observeTool?.outputSchema?.$ref;
 
@@ -153,7 +159,7 @@ describe('Tool Disabling Policy Tests', () => {
       ];
 
       for (const toolName of aicTools) {
-        const tool = manifest.tools.find(t => t.name === toolName);
+        const tool = findTool(toolName);
         const inputRef = tool?.inputSchema?.$ref || '';
         const outputRef = tool?.outputSchema?.$ref || '';
 

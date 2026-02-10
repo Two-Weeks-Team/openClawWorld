@@ -2,7 +2,12 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { OpenClawWorldClient } from '@openclawworld/plugin';
 import { setupMockFetch, createOkResult, jsonResponse, TestData } from '../helpers/mock-server.js';
 import type { MockServer } from '../helpers/mock-server.js';
-import type { ObserveResponseData, InteractResponseData } from '@openclawworld/shared';
+import type {
+  ObserveResponseData,
+  InteractResponseData,
+  ObservedEntity,
+  Affordance,
+} from '@openclawworld/shared';
 
 describe('Scenario A: Sign Reading', () => {
   let mockServer: MockServer;
@@ -54,10 +59,10 @@ describe('Scenario A: Sign Reading', () => {
 
       expect(result.status).toBe('ok');
       if (result.status === 'ok') {
-        const sign = result.data.nearby.find(n => n.entity.kind === 'object');
+        const sign = result.data.nearby.find((n: ObservedEntity) => n.entity.kind === 'object');
         expect(sign).toBeDefined();
         expect(sign?.entity.name).toBe('Welcome Sign');
-        expect(sign?.affords.some(a => a.action === 'read')).toBe(true);
+        expect(sign?.affords.some((a: Affordance) => a.action === 'read')).toBe(true);
       }
     });
 
@@ -94,7 +99,7 @@ describe('Scenario A: Sign Reading', () => {
 
       expect(result.status).toBe('ok');
       if (result.status === 'ok') {
-        const sign = result.data.nearby.find(n => n.entity.kind === 'object');
+        const sign = result.data.nearby.find((n: ObservedEntity) => n.entity.kind === 'object');
         expect(sign?.affords).toHaveLength(1);
         expect(sign?.affords[0]).toEqual({ action: 'read', label: 'Read Sign' });
       }
@@ -205,7 +210,9 @@ describe('Scenario A: Sign Reading', () => {
 
       expect(observeResult.status).toBe('ok');
       if (observeResult.status === 'ok') {
-        const sign = observeResult.data.nearby.find(n => n.entity.id === 'obj_info_sign');
+        const sign = observeResult.data.nearby.find(
+          (n: ObservedEntity) => n.entity.id === 'obj_info_sign'
+        );
         expect(sign).toBeDefined();
 
         const interactResult = await client.interact({

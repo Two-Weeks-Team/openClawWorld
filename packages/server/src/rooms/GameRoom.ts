@@ -7,6 +7,8 @@ import { EntitySchema } from '../schemas/EntitySchema.js';
 import { GameMap } from '../schemas/GameMap.js';
 import { MapLoader, MapLoadError } from '../map/MapLoader.js';
 import { CollisionSystem } from '../collision/CollisionSystem.js';
+import { ProximitySystem, type ProximityEvent } from '../proximity/ProximitySystem.js';
+import { DEFAULT_PROXIMITY_RADIUS, PROXIMITY_DEBOUNCE_MS } from '../constants.js';
 import type { EntityKind } from '@openclawworld/shared';
 
 export class GameRoom extends Room<RoomState> {
@@ -17,6 +19,8 @@ export class GameRoom extends Room<RoomState> {
     ['object', 0],
   ]);
   private collisionSystem: CollisionSystem | null = null;
+  private proximitySystem: ProximitySystem | null = null;
+  private recentProximityEvents: ProximityEvent[] = [];
   private mapLoader: MapLoader;
 
   constructor() {
@@ -34,6 +38,7 @@ export class GameRoom extends Room<RoomState> {
     try {
       const parsedMap = this.mapLoader.loadMap(mapId);
       this.collisionSystem = new CollisionSystem(parsedMap);
+      this.proximitySystem = new ProximitySystem(DEFAULT_PROXIMITY_RADIUS, PROXIMITY_DEBOUNCE_MS);
       gameMap = new GameMap(parsedMap.mapId, parsedMap.width, parsedMap.height, parsedMap.tileSize);
       console.log(
         `[GameRoom] Loaded map "${mapId}" (${parsedMap.width}x${parsedMap.height} tiles, ${parsedMap.tileSize}px each)`
@@ -55,6 +60,18 @@ export class GameRoom extends Room<RoomState> {
 
   getCollisionSystem(): CollisionSystem | null {
     return this.collisionSystem;
+  }
+
+  getProximitySystem(): ProximitySystem | null {
+    return this.proximitySystem;
+  }
+
+  getRecentProximityEvents(): ProximityEvent[] {
+    return this.recentProximityEvents;
+  }
+
+  clearRecentProximityEvents(): void {
+    this.recentProximityEvents = [];
   }
 
   override onJoin(client: Client, options: { name?: string }): void {
@@ -95,9 +112,26 @@ export class GameRoom extends Room<RoomState> {
   override onDispose(): void {
     console.log(`[GameRoom] Disposing room ${this.state.roomId}`);
     this.clientEntities.clear();
+    this.recentProximityEvents = [];
   }
 
-  private onTick(): void {}
+  private onTick(): void {
+    if (this.proximitySystem) {
+      const allEntities = this.state.getAllEntities();
+      const entityPositions = new Map<string, { id: string; x: number; y: number }>();
+
+      allEntities.forEach(entity => {
+        entityPositions.set(entity.id, {
+          id: entity.id,
+          x: entity.pos.x,
+          y: entity.pos.y,
+        });
+      });
+
+      const events = this.proximitySystem.update(entityPositions);
+      this.recentProximityEvents.push(...events);
+    }
+  }
 
   private generateEntityId(kind: EntityKind): string {
     const counter = (this.entityCounters.get(kind) ?? 0) + 1;

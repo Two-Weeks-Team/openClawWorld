@@ -19,6 +19,8 @@ import {
   chatObserveRateLimiter,
 } from './middleware/index.js';
 import { handleObserve } from './handlers/observe.js';
+import { handleMoveTo } from './handlers/moveTo.js';
+import { handleInteract } from './handlers/interact.js';
 
 const router: Router = Router();
 
@@ -40,22 +42,13 @@ function createNotImplementedError(endpoint: string): {
 
 router.post('/observe', observeRateLimiter, validateRequest(ObserveRequestSchema), handleObserve);
 
-router.post(
-  '/moveTo',
-  moveToRateLimiter,
-  validateRequest(MoveToRequestSchema),
-  (_req: Request, res: Response): void => {
-    res.status(501).json(createNotImplementedError('moveTo'));
-  }
-);
+router.post('/moveTo', moveToRateLimiter, validateRequest(MoveToRequestSchema), handleMoveTo);
 
 router.post(
   '/interact',
   interactRateLimiter,
   validateRequest(InteractRequestSchema),
-  (_req: Request, res: Response): void => {
-    res.status(501).json(createNotImplementedError('interact'));
-  }
+  handleInteract
 );
 
 router.post(

@@ -85,6 +85,28 @@ export class GameRoom extends Room<RoomState> {
       }
     });
 
+    this.onMessage('chat', (client, message: { message: string }) => {
+      const entityId = this.clientEntities.get(client.sessionId);
+      if (!entityId || !this.chatSystem) return;
+
+      const entity = this.state.getEntity(entityId);
+      if (!entity) return;
+
+      this.chatSystem.sendMessage(
+        this.state.roomId,
+        'global',
+        entityId,
+        entity.name,
+        message.message
+      );
+
+      this.broadcast('chat', {
+        from: entity.name,
+        message: message.message,
+        entityId: entityId,
+      });
+    });
+
     // Set up periodic cleanup of expired events (every minute)
     this.cleanupInterval = setInterval(() => {
       const removed = this.eventLog.cleanup();

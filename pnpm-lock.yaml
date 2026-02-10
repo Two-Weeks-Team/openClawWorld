@@ -23,6 +23,9 @@ importers:
       prettier:
         specifier: ^3.0.0
         version: 3.8.1
+      tsx:
+        specifier: ^4.7.0
+        version: 4.21.0
       typescript:
         specifier: ^5.4.0
         version: 5.9.3
@@ -38,6 +41,12 @@ importers:
       '@openclawworld/shared':
         specifier: workspace:*
         version: link:../shared
+      colyseus.js:
+        specifier: ^0.16.22
+        version: 0.16.22
+      phaser:
+        specifier: ^3.90.0
+        version: 3.90.0
     devDependencies:
       typescript:
         specifier: ^5.4.0
@@ -161,6 +170,13 @@ packages:
   '@colyseus/greeting-banner@2.0.6':
     resolution: {integrity: sha512-65nK7KnJn6g3ArtJqNfVX+Mx7xTlBka04kSwloLP7s24UpCEaK7bMGRLgkzfnysARzlVh1eV4jynBWZN82dYwQ==}
 
+  '@colyseus/httpie@2.0.1':
+    resolution: {integrity: sha512-JvABMZzPLiyrUsVj3ElXGORRDTu+NKzXHWd1uV1R1SThAKMm06cVW6bOyADARD65bs8JJoHNNbUkW8KoRvRDzA==}
+    engines: {node: '>=10'}
+
+  '@colyseus/msgpackr@1.11.2':
+    resolution: {integrity: sha512-MuwPFhizFKC3zmGfy0fpo+kcnZdNdnQHFVjw81v4WXHCelDeCX8yNRVtuEm8kGlHqq7qiASLC0pu0RPqYOhxXg==}
+
   '@colyseus/redis-driver@0.15.6':
     resolution: {integrity: sha512-nLNb1/e0KcK3wgVX1DQdC+bV86BIJWlVtxDrQW23aED+4ih6fIr0Iwfre3DlSke+DXa8oGwp5n3/s7A62q/4gQ==}
 
@@ -169,6 +185,10 @@ packages:
 
   '@colyseus/schema@2.0.37':
     resolution: {integrity: sha512-+WXEux9DMSaTz9hZKabl6LBuzsxzt9EvOwhXJ/G4rPCaaVkJ+iLxRsq8VbL2ZCx18E/uQH6nLaNIQVqH9wEt8w==}
+    hasBin: true
+
+  '@colyseus/schema@3.0.76':
+    resolution: {integrity: sha512-i+ceBZyhB7lTn5+BoG/xxYfzW4dKKyLOywsGKVgXHe9fD905AS/Lk180jd1bICEJhebGeiRXEQ2YUPl/xwFg2g==}
     hasBin: true
 
   '@colyseus/ws-transport@0.15.3':
@@ -954,6 +974,10 @@ packages:
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
+  colyseus.js@0.16.22:
+    resolution: {integrity: sha512-xyiajukHvlwOtcziVbXZWmz7yBH3EImovYrGPAe2kVkdubLVYmOjskJuXh2VLlO8XGjyhmNwig9ELz18sTUo9g==}
+    engines: {node: '>= 12.x'}
+
   colyseus@0.15.57:
     resolution: {integrity: sha512-h9hkmXOvcreRhJxdu73BJctGEPYW36ImHByjiMhEOIuSQLcNSlkcwaqCll/7Oc/cTELHStTa5eyOnI640mOe8A==}
     engines: {node: '>= 14.x'}
@@ -1147,6 +1171,9 @@ packages:
   etag@1.8.1:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
+
+  eventemitter3@5.0.4:
+    resolution: {integrity: sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==}
 
   execa@8.0.1:
     resolution: {integrity: sha512-VyhnebXciFV2DESc+p6B+y0LjSm0krU4OgJN44qFAhBY0TJ+1V61tYD2+wHusZ6F9n5K+vl8k0sTy7PEfV4qpg==}
@@ -1591,6 +1618,9 @@ packages:
   pathval@1.1.1:
     resolution: {integrity: sha512-Dp6zGqpTdETdR63lehJYPeIOqpiNBNtc7BpWSLrOje7UaIsE5aY92r/AunQA7rsXvet3lrJ3JnZX29UPTKXyKQ==}
 
+  phaser@3.90.0:
+    resolution: {integrity: sha512-/cziz/5ZIn02uDkC9RzN8VF9x3Gs3XdFFf9nkiMEQT3p7hQlWuyjy4QWosU802qqno2YSLn2BfqwOKLv/sSVfQ==}
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -1796,6 +1826,9 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       typescript: '>=4.2.0'
+
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
   tsx@4.21.0:
     resolution: {integrity: sha512-5C1sg4USs1lfG0GFb2RLXsdpXqBSEhAaA/0kPL01wxzpMqLILNxIxIOKiILz+cdg/pLnOUxFYOR5yhHU666wbw==}
@@ -2003,6 +2036,12 @@ snapshots:
 
   '@colyseus/greeting-banner@2.0.6': {}
 
+  '@colyseus/httpie@2.0.1': {}
+
+  '@colyseus/msgpackr@1.11.2':
+    optionalDependencies:
+      msgpackr-extract: 3.0.3
+
   '@colyseus/redis-driver@0.15.6(@colyseus/schema@2.0.37)':
     dependencies:
       '@colyseus/core': 0.15.57(@colyseus/schema@2.0.37)
@@ -2024,6 +2063,8 @@ snapshots:
       - utf-8-validate
 
   '@colyseus/schema@2.0.37': {}
+
+  '@colyseus/schema@3.0.76': {}
 
   '@colyseus/ws-transport@0.15.3(@colyseus/core@0.15.57(@colyseus/schema@2.0.37))(@colyseus/schema@2.0.37)':
     dependencies:
@@ -2668,6 +2709,17 @@ snapshots:
 
   color-name@1.1.4: {}
 
+  colyseus.js@0.16.22:
+    dependencies:
+      '@colyseus/httpie': 2.0.1
+      '@colyseus/msgpackr': 1.11.2
+      '@colyseus/schema': 3.0.76
+      tslib: 2.8.1
+      ws: 8.19.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   colyseus@0.15.57(@colyseus/schema@2.0.37)(express@4.22.1):
     dependencies:
       '@colyseus/auth': 0.15.12(@colyseus/core@0.15.57(@colyseus/schema@2.0.37))(express@4.22.1)
@@ -2907,6 +2959,8 @@ snapshots:
   esutils@2.0.3: {}
 
   etag@1.8.1: {}
+
+  eventemitter3@5.0.4: {}
 
   execa@8.0.1:
     dependencies:
@@ -3405,6 +3459,10 @@ snapshots:
 
   pathval@1.1.1: {}
 
+  phaser@3.90.0:
+    dependencies:
+      eventemitter3: 5.0.4
+
   picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
@@ -3624,6 +3682,8 @@ snapshots:
   ts-api-utils@1.4.3(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
+
+  tslib@2.8.1: {}
 
   tsx@4.21.0:
     dependencies:

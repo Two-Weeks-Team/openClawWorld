@@ -12,7 +12,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@openclawworld/shared": "workspace:*"
+    "@openclawworld/shared": "workspace:*",
+    "colyseus.js": "^0.16.22",
+    "phaser": "^3.90.0"
   },
   "devDependencies": {
     "typescript": "^5.4.0",

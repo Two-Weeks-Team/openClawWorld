@@ -17,6 +17,7 @@ import {
 } from '../constants.js';
 import { EventLog } from '../events/EventLog.js';
 import { MovementSystem } from '../movement/MovementSystem.js';
+import { ChatSystem } from '../chat/ChatSystem.js';
 import type { EntityKind } from '@openclawworld/shared';
 
 export class GameRoom extends Room<RoomState> {
@@ -29,6 +30,7 @@ export class GameRoom extends Room<RoomState> {
   private collisionSystem: CollisionSystem | null = null;
   private proximitySystem: ProximitySystem | null = null;
   private movementSystem: MovementSystem | null = null;
+  private chatSystem: ChatSystem | null = null;
   private recentProximityEvents: ProximityEvent[] = [];
   private mapLoader: MapLoader;
   private eventLog: EventLog;
@@ -38,6 +40,7 @@ export class GameRoom extends Room<RoomState> {
     super();
     this.mapLoader = new MapLoader();
     this.eventLog = new EventLog(EVENT_RETENTION_MS, EVENT_LOG_MAX_SIZE);
+    this.chatSystem = new ChatSystem();
   }
 
   override onCreate(options: { roomId?: string; mapId?: string; tickRate?: number }): void {
@@ -102,6 +105,10 @@ export class GameRoom extends Room<RoomState> {
 
   getMovementSystem(): MovementSystem | null {
     return this.movementSystem;
+  }
+
+  getChatSystem(): ChatSystem | null {
+    return this.chatSystem;
   }
 
   getEventLog(): EventLog {

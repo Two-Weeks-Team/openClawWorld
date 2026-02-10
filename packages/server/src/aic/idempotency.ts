@@ -144,7 +144,12 @@ export class IdempotencyStore<T> {
 }
 
 // Global singleton instances for different response types
-import type { MoveToResponseData, InteractResponseData } from '@openclawworld/shared';
+import type {
+  MoveToResponseData,
+  InteractResponseData,
+  ChatSendResponseData,
+} from '@openclawworld/shared';
 
 export const moveToIdempotencyStore = new IdempotencyStore<MoveToResponseData>();
 export const interactIdempotencyStore = new IdempotencyStore<InteractResponseData>();
+export const chatSendIdempotencyStore = new IdempotencyStore<ChatSendResponseData>();

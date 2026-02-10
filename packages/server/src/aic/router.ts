@@ -21,6 +21,8 @@ import {
 import { handleObserve } from './handlers/observe.js';
 import { handleMoveTo } from './handlers/moveTo.js';
 import { handleInteract } from './handlers/interact.js';
+import { handleChatSend } from './handlers/chatSend.js';
+import { handleChatObserve } from './handlers/chatObserve.js';
 
 const router: Router = Router();
 
@@ -55,18 +57,14 @@ router.post(
   '/chatSend',
   chatSendRateLimiter,
   validateRequest(ChatSendRequestSchema),
-  (_req: Request, res: Response): void => {
-    res.status(501).json(createNotImplementedError('chatSend'));
-  }
+  handleChatSend
 );
 
 router.post(
   '/chatObserve',
   chatObserveRateLimiter,
   validateRequest(ChatObserveRequestSchema),
-  (_req: Request, res: Response): void => {
-    res.status(501).json(createNotImplementedError('chatObserve'));
-  }
+  handleChatObserve
 );
 
 router.post(

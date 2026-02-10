@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import colyseus from 'colyseus';
 import wsTransport from '@colyseus/ws-transport';
 import { createServer } from 'http';
 import { GameRoom } from './rooms/GameRoom.js';
+import { aicRouter, requestIdMiddleware, errorHandler, notFoundHandler } from './aic/index.js';
 
 const { Server: ColyseusServer } = colyseus;
 const { WebSocketTransport } = wsTransport;
@@ -14,6 +16,18 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
 async function startServer(): Promise<void> {
   const app = express();
 
+  app.use(
+    cors({
+      origin: NODE_ENV === 'development' ? '*' : (process.env.ALLOWED_ORIGINS?.split(',') ?? '*'),
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
+      exposedHeaders: ['X-Request-Id', 'RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset'],
+    })
+  );
+
+  app.use(express.json());
+  app.use(requestIdMiddleware);
+
   app.get('/health', (_req, res) => {
     res.json({
       status: 'ok',
@@ -23,6 +37,11 @@ async function startServer(): Promise<void> {
       timestamp: Date.now(),
     });
   });
+
+  app.use('/aic/v0.1', aicRouter);
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   const httpServer = createServer(app);
 
@@ -40,6 +59,7 @@ async function startServer(): Promise<void> {
   console.log(`[Server] Environment: ${NODE_ENV}`);
   console.log(`[Server] WebSocket endpoint: ws://localhost:${PORT}`);
   console.log(`[Server] Health check: http://localhost:${PORT}/health`);
+  console.log(`[Server] AIC API: http://localhost:${PORT}/aic/v0.1`);
 }
 
 startServer().catch(error => {

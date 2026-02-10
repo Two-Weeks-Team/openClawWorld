@@ -8,6 +8,14 @@ export class GameScene extends Phaser.Scene {
   private collisionDebug?: Phaser.GameObjects.Graphics;
   private debugEnabled = false;
   private debugIndicator?: Phaser.GameObjects.Text;
+  private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+  private wasdKeys?: {
+    W: Phaser.Input.Keyboard.Key;
+    A: Phaser.Input.Keyboard.Key;
+    S: Phaser.Input.Keyboard.Key;
+    D: Phaser.Input.Keyboard.Key;
+  };
+  private lastMoveTime = 0;
 
   constructor() {
     super('GameScene');
@@ -18,6 +26,16 @@ export class GameScene extends Phaser.Scene {
     this.setupInput();
     this.setupDebugToggle();
     this.connectToServer();
+
+    this.cursors = this.input.keyboard?.createCursorKeys();
+    if (this.input.keyboard) {
+      this.wasdKeys = {
+        W: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+        A: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+        S: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S),
+        D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+      };
+    }
   }
 
   private createMap() {
@@ -149,8 +167,38 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private handleKeyboardMovement() {
+    if (!this.cursors || !this.wasdKeys) return;
+
+    if (document.activeElement?.tagName === 'INPUT') return;
+
+    const room = gameClient.currentRoom;
+    if (!room) return;
+
+    const myPlayer = room.state.humans.get(gameClient.sessionId!);
+    if (!myPlayer || !myPlayer.tile) return;
+
+    let dx = 0;
+    let dy = 0;
+
+    if (this.cursors.left.isDown || this.wasdKeys.A.isDown) dx = -1;
+    if (this.cursors.right.isDown || this.wasdKeys.D.isDown) dx = 1;
+    if (this.cursors.up.isDown || this.wasdKeys.W.isDown) dy = -1;
+    if (this.cursors.down.isDown || this.wasdKeys.S.isDown) dy = 1;
+
+    if (dx !== 0 || dy !== 0) {
+      const now = this.time.now;
+      if (now - this.lastMoveTime > 150) {
+        gameClient.moveTo(myPlayer.tile.tx + dx, myPlayer.tile.ty + dy);
+        this.lastMoveTime = now;
+      }
+    }
+  }
+
   update() {
     if (!gameClient.currentRoom) return;
+
+    this.handleKeyboardMovement();
 
     const room = gameClient.currentRoom;
 
@@ -166,6 +214,12 @@ export class GameScene extends Phaser.Scene {
         const t = 0.1;
         container.x = Phaser.Math.Linear(container.x, entity.pos.x, t);
         container.y = Phaser.Math.Linear(container.y, entity.pos.y, t);
+
+        if (entity.facing === 'left') {
+          (container.list[0] as Phaser.GameObjects.Sprite).setFlipX(true);
+        } else if (entity.facing === 'right') {
+          (container.list[0] as Phaser.GameObjects.Sprite).setFlipX(false);
+        }
 
         if (key === gameClient.sessionId) {
           (container.list[0] as Phaser.GameObjects.Sprite).setTint(0xffff00);

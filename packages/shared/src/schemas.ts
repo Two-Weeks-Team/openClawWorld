@@ -340,6 +340,21 @@ export const PluginManifestSchema = z.object({
 });
 
 // ============================================================================
+// Agent Registration Schemas
+// ============================================================================
+
+export const RegisterRequestSchema = z.object({
+  name: z.string().min(1).max(64),
+  roomId: IdRoomSchema,
+});
+
+export const RegisterResponseDataSchema = z.object({
+  agentId: IdEntitySchema,
+  roomId: IdRoomSchema,
+  sessionToken: z.string().regex(/^[a-zA-Z0-9._-]{8,256}$/, 'Invalid sessionToken format'),
+});
+
+// ============================================================================
 // Status Tool Schemas
 // ============================================================================
 

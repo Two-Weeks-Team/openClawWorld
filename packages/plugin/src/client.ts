@@ -13,6 +13,8 @@ import type {
   ChatSendResponseData,
   ChatObserveRequest,
   ChatObserveResponseData,
+  RegisterRequest,
+  RegisterResponseData,
 } from '@openclawworld/shared';
 import type { PluginConfig, RetryConfig } from './config.js';
 import { getRetryConfig } from './config.js';
@@ -201,6 +203,10 @@ export class OpenClawWorldClient {
   async chatObserve(params: ChatObserveRequest): Promise<AicResult<ChatObserveResponseData>> {
     return this.request<ChatObserveResponseData>('/chatObserve', params);
   }
+
+  async register(params: RegisterRequest): Promise<AicResult<RegisterResponseData>> {
+    return this.request<RegisterResponseData>('/register', params);
+  }
 }
 
 export type {
@@ -220,4 +226,6 @@ export type {
   ChatSendResponseData,
   ChatObserveRequest,
   ChatObserveResponseData,
+  RegisterRequest,
+  RegisterResponseData,
 };

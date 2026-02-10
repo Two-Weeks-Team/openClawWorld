@@ -331,6 +331,21 @@ export type PluginManifest = {
 };
 
 // ============================================================================
+// Agent Registration Types
+// ============================================================================
+
+export type RegisterRequest = {
+  name: string;
+  roomId: string;
+};
+
+export type RegisterResponseData = {
+  agentId: string;
+  roomId: string;
+  sessionToken: string;
+};
+
+// ============================================================================
 // Status Tool Types
 // ============================================================================
 

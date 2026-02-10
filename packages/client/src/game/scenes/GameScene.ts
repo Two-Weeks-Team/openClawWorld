@@ -5,6 +5,9 @@ export class GameScene extends Phaser.Scene {
   private entities: Map<string, Phaser.GameObjects.Container> = new Map();
   private map?: Phaser.Tilemaps.Tilemap;
   private marker?: Phaser.GameObjects.Graphics;
+  private collisionDebug?: Phaser.GameObjects.Graphics;
+  private debugEnabled = false;
+  private debugIndicator?: Phaser.GameObjects.Text;
 
   constructor() {
     super('GameScene');
@@ -13,6 +16,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.createMap();
     this.setupInput();
+    this.setupDebugToggle();
     this.connectToServer();
   }
 
@@ -46,6 +50,50 @@ export class GameScene extends Phaser.Scene {
         gameClient.moveTo(pointerTileX, pointerTileY);
       }
     });
+  }
+
+  private setupDebugToggle() {
+    this.input.keyboard?.addKey('F3').on('down', () => {
+      this.debugEnabled = !this.debugEnabled;
+      this.updateCollisionDebug();
+    });
+  }
+
+  private updateCollisionDebug() {
+    if (!this.collisionDebug) {
+      this.collisionDebug = this.add.graphics();
+      this.collisionDebug.setDepth(1000);
+    }
+
+    this.collisionDebug.clear();
+
+    // Toggle indicator
+    if (this.debugIndicator) this.debugIndicator.destroy();
+
+    if (this.debugEnabled && this.map) {
+      // Show indicator
+      this.debugIndicator = this.add.text(10, 10, 'DEBUG: Collision ON (F3)', {
+        fontSize: '12px',
+        color: '#ff0000',
+        backgroundColor: '#000000',
+        padding: { x: 4, y: 2 },
+      });
+      this.debugIndicator.setScrollFactor(0);
+      this.debugIndicator.setDepth(2000);
+
+      // Draw collision tiles
+      const collisionLayer = this.map.getLayer('collision');
+      if (collisionLayer) {
+        collisionLayer.data.forEach((row, y) => {
+          row.forEach((tile, x) => {
+            if (tile.index > 0) {
+              this.collisionDebug?.fillStyle(0xff0000, 0.3);
+              this.collisionDebug?.fillRect(x * 32, y * 32, 32, 32);
+            }
+          });
+        });
+      }
+    }
   }
 
   private async connectToServer() {

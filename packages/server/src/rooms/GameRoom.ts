@@ -18,7 +18,7 @@ import { ChatSystem } from '../chat/ChatSystem.js';
 import type { EntityKind } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 
-export class GameRoom extends Room {
+export class GameRoom extends Room<{ state: RoomState }> {
   declare state: RoomState;
   private clientEntities: Map<string, string> = new Map();
   private entityCounters: Map<EntityKind, number> = new Map([

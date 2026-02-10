@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@colyseus/schema": "^4.0.11",
+    "@colyseus/tools": "^0.17.18",
     "@colyseus/ws-transport": "^0.17.9",
     "@openclawworld/shared": "workspace:*",
     "colyseus": "^0.17.8",

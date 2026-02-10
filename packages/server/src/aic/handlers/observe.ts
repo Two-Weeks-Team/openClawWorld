@@ -31,8 +31,25 @@ function calculateDistance(x1: number, y1: number, x2: number, y2: number): numb
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
-function getAffordancesForObject(_entity: EntitySchema): Array<{ action: string; label: string }> {
-  return [];
+const AFFORDANCE_MAP: Record<string, Array<{ action: string; label: string }>> = {
+  sign: [{ action: 'read', label: 'Read Sign' }],
+  door: [
+    { action: 'open', label: 'Open Door' },
+    { action: 'close', label: 'Close Door' },
+  ],
+  portal: [{ action: 'use', label: 'Use Portal' }],
+  chest: [
+    { action: 'open', label: 'Open Chest' },
+    { action: 'examine', label: 'Examine Chest' },
+  ],
+};
+
+function getAffordancesForObject(entity: EntitySchema): Array<{ action: string; label: string }> {
+  const objectType = entity.meta.get('objectType') || entity.name.split('_')[0].toLowerCase();
+
+  return Object.prototype.hasOwnProperty.call(AFFORDANCE_MAP, objectType)
+    ? AFFORDANCE_MAP[objectType]
+    : [];
 }
 
 function createErrorResponse(

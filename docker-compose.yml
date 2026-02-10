@@ -5,11 +5,11 @@ services:
       dockerfile: Dockerfile
     container_name: openclawworld-server
     ports:
-      - '${PORT:-2567}:2567'
+      - '0.0.0.0:2567:2567'
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=2567
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      - ALLOWED_ORIGINS=*
       - LOG_LEVEL=${LOG_LEVEL:-info}
     env_file:
       - path: .env

@@ -47,7 +47,7 @@ export type Vec2 = {
 
 export type EntityKind = 'human' | 'agent' | 'object';
 export type Facing = 'up' | 'down' | 'left' | 'right';
-export type ChatChannel = 'proximity' | 'global';
+export type ChatChannel = 'proximity' | 'global' | 'team' | 'meeting' | 'dm';
 export type ObserveDetail = 'lite' | 'full';
 
 export type EntityBase = {
@@ -196,6 +196,11 @@ export type ChatMessage = {
   fromName: string;
   message: string;
   tsMs: number;
+  // New fields for extended channels:
+  targetEntityId?: string; // For DM
+  teamId?: string; // For team chat
+  meetingRoomId?: string; // For meeting chat
+  emotes?: string[]; // Emotes like :thumbsup:, :heart:
 };
 
 export type ChatObserveResponseData = {

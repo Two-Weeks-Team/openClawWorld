@@ -1,6 +1,7 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
 import { EntitySchema } from './EntitySchema.js';
 import { GameMap } from './GameMap.js';
+import { NPCSchema } from './NPCSchema.js';
 import { OrganizationSchema } from './OrganizationSchema.js';
 import { TeamSchema } from './TeamSchema.js';
 import { ZoneSchema } from './ZoneSchema.js';
@@ -35,6 +36,9 @@ export class RoomState extends Schema {
 
   @type({ map: TeamSchema })
   teams: MapSchema<TeamSchema> = new MapSchema<TeamSchema>();
+
+  @type({ map: NPCSchema })
+  npcs: MapSchema<NPCSchema> = new MapSchema<NPCSchema>();
 
   constructor(roomId: string, mapId: string, tickRate?: number, gameMap?: GameMap) {
     super();
@@ -85,6 +89,24 @@ export class RoomState extends Schema {
     this.humans.forEach((entity, id) => all.set(id, entity));
     this.agents.forEach((entity, id) => all.set(id, entity));
     this.objects.forEach((entity, id) => all.set(id, entity));
+    return all;
+  }
+
+  addNPC(npc: NPCSchema): void {
+    this.npcs.set(npc.id, npc);
+  }
+
+  removeNPC(npcId: string): void {
+    this.npcs.delete(npcId);
+  }
+
+  getNPC(npcId: string): NPCSchema | undefined {
+    return this.npcs.get(npcId);
+  }
+
+  getAllNPCs(): Map<string, NPCSchema> {
+    const all = new Map<string, NPCSchema>();
+    this.npcs.forEach((npc, id) => all.set(id, npc));
     return all;
   }
 }

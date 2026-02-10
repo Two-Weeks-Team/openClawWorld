@@ -258,6 +258,7 @@ export const EventTypeSchema = z.enum([
   'chat.message',
   'object.state_changed',
   'profile.updated',
+  'npc.state_change',
 ]);
 
 export const EventEnvelopeSchema = z.object({

@@ -52,9 +52,8 @@ const server = defineServer({
 
     if (NODE_ENV !== 'production') {
       app.use('/', playground());
+      app.use('/monitor', monitor());
     }
-
-    app.use('/monitor', monitor());
 
     app.use(notFoundHandler);
     app.use(errorHandler);

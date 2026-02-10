@@ -10,7 +10,8 @@
     "skipLibCheck": true,
     "useDefineForClassFields": false,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "noEmit": true
   },
   "include": ["src/**/*", "../server/src/**/*"],
   "exclude": ["dist", "node_modules", "**/*.test.ts"]

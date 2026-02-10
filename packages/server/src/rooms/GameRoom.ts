@@ -176,7 +176,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.clientEntities.delete(client.sessionId);
 
       // Log presence.leave event
-      const reason = consented ? 'disconnect' : 'disconnect';
+      const reason = consented ? 'consented' : 'disconnected';
       this.eventLog.append('presence.leave', this.state.roomId, {
         entityId,
         reason,

@@ -19,6 +19,7 @@ export class GameScene extends Phaser.Scene {
     D: Phaser.Input.Keyboard.Key;
   };
   private lastMoveTime = 0;
+  private roomCheckInterval?: ReturnType<typeof setInterval>;
 
   constructor() {
     super('GameScene');
@@ -115,12 +116,22 @@ export class GameScene extends Phaser.Scene {
   }
 
   private async connectToServer() {
-    const checkRoom = setInterval(() => {
+    this.roomCheckInterval = setInterval(() => {
       if (gameClient.currentRoom) {
-        clearInterval(checkRoom);
+        if (this.roomCheckInterval) {
+          clearInterval(this.roomCheckInterval);
+          this.roomCheckInterval = undefined;
+        }
         this.setupRoomListeners();
       }
     }, 100);
+  }
+
+  shutdown() {
+    if (this.roomCheckInterval) {
+      clearInterval(this.roomCheckInterval);
+      this.roomCheckInterval = undefined;
+    }
   }
 
   private setupRoomListeners() {

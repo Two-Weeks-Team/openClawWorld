@@ -6,7 +6,6 @@ import type { EntitySchema } from '../../../server/src/schemas/EntitySchema.js';
 import type { RoomState } from '../../../server/src/schemas/RoomState.js';
 
 export type Entity = EntitySchema;
-export type GameRoomState = RoomState;
 export type { RoomState, GameRoom };
 
 export class ColyseusClient {

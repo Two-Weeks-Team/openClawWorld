@@ -6,8 +6,13 @@ on:
   pull_request:
     branches: [main, master, develop]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Build & Test
     runs-on: ubuntu-latest
 
     strategy:
@@ -15,7 +20,7 @@ jobs:
         node-version: [20]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup pnpm
@@ -32,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages for type checking
+      - name: Build
         run: pnpm build
 
       - name: Type check
@@ -41,11 +46,8 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Check formatting
+      - name: Format check
         run: pnpm format:check
-
-      - name: Test
-        run: pnpm test
 
       - name: Test with coverage
         run: pnpm test -- --coverage
@@ -63,6 +65,3 @@ jobs:
           files: ./coverage/lcov.info
           fail_ci_if_error: false
           verbose: true
-
-      - name: Build
-        run: pnpm build

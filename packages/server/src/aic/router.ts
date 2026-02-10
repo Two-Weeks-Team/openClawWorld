@@ -7,6 +7,7 @@ import {
   ChatObserveRequestSchema,
   PollEventsRequestSchema,
   RegisterRequestSchema,
+  ProfileUpdateRequestSchema,
 } from '@openclawworld/shared';
 import {
   authMiddleware,
@@ -25,6 +26,7 @@ import { handleChatSend } from './handlers/chatSend.js';
 import { handleChatObserve } from './handlers/chatObserve.js';
 import { handlePollEvents } from './handlers/pollEvents.js';
 import { handleRegister } from './handlers/register.js';
+import { handleProfileUpdate } from './handlers/profileUpdate.js';
 
 const router: Router = Router();
 
@@ -69,6 +71,13 @@ router.post(
   pollEventsRateLimiter,
   validateRequest(PollEventsRequestSchema),
   handlePollEvents
+);
+
+router.post(
+  '/profile/update',
+  interactRateLimiter,
+  validateRequest(ProfileUpdateRequestSchema),
+  handleProfileUpdate
 );
 
 export default router;

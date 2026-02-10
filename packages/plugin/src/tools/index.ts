@@ -51,3 +51,12 @@ export {
   type ChatSendToolOutput,
   type ChatSendToolOptions,
 } from './chatSend.js';
+
+export {
+  executeChatObserveTool,
+  ChatObserveToolInputSchema,
+  ChatObserveToolOutputSchema,
+  type ChatObserveToolInput,
+  type ChatObserveToolOutput,
+  type ChatObserveToolOptions,
+} from './chatObserve.js';

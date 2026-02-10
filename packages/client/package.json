@@ -1,0 +1,22 @@
+{
+  "name": "@openclawworld/client",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && vite build",
+    "clean": "rm -rf dist",
+    "dev": "vite",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@openclawworld/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.5.0"
+  }
+}

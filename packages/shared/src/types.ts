@@ -132,6 +132,15 @@ export type PollEventsRequest = {
   waitMs?: number;
 };
 
+export type ProfileUpdateRequest = {
+  agentId: string;
+  roomId: string;
+  status?: UserStatus;
+  statusMessage?: string;
+  title?: string;
+  department?: string;
+};
+
 // ============================================================================
 // Response Types
 // ============================================================================
@@ -203,8 +212,12 @@ export type EventType =
   | 'presence.leave'
   | 'proximity.enter'
   | 'proximity.exit'
+  | 'zone.enter'
+  | 'zone.exit'
   | 'chat.message'
-  | 'object.state_changed';
+  | 'object.state_changed'
+  | 'profile.updated'
+  | 'npc.state_change';
 
 export type EventEnvelope<T = Record<string, unknown>> = {
   cursor: string;
@@ -217,6 +230,12 @@ export type EventEnvelope<T = Record<string, unknown>> = {
 export type PollEventsResponseData = {
   events: EventEnvelope[];
   nextCursor: string;
+  serverTsMs: number;
+};
+
+export type ProfileUpdateResponseData = {
+  applied: boolean;
+  profile: UserProfile;
   serverTsMs: number;
 };
 
@@ -246,6 +265,18 @@ export type ProximityExitPayload = {
   otherId: string;
 };
 
+export type ZoneEnterPayload = {
+  entityId: string;
+  zoneId: ZoneId;
+  previousZoneId: ZoneId | null;
+};
+
+export type ZoneExitPayload = {
+  entityId: string;
+  zoneId: ZoneId;
+  nextZoneId: ZoneId | null;
+};
+
 export type ChatMessagePayload = {
   messageId: string;
   fromEntityId: string;
@@ -265,6 +296,20 @@ export type ObjectStateChangedPayload = {
   objectType: string;
   patch: JsonPatchOp[];
   version: number;
+};
+
+export type ProfileUpdatedPayload = {
+  entityId: string;
+  status?: UserStatus;
+  statusMessage?: string;
+  title?: string;
+  department?: string;
+};
+
+export type NpcStateChangePayload = {
+  npcId: string;
+  oldState: NpcState;
+  newState: NpcState;
 };
 
 // ============================================================================
@@ -289,6 +334,12 @@ export type ChatMessageEvent = EventEnvelope<ChatMessagePayload> & {
 export type ObjectStateChangedEvent = EventEnvelope<ObjectStateChangedPayload> & {
   type: 'object.state_changed';
 };
+export type ProfileUpdatedEvent = EventEnvelope<ProfileUpdatedPayload> & {
+  type: 'profile.updated';
+};
+export type NpcStateChangeEvent = EventEnvelope<NpcStateChangePayload> & {
+  type: 'npc.state_change';
+};
 
 export type TypedEvent =
   | PresenceJoinEvent
@@ -296,7 +347,9 @@ export type TypedEvent =
   | ProximityEnterEvent
   | ProximityExitEvent
   | ChatMessageEvent
-  | ObjectStateChangedEvent;
+  | ObjectStateChangedEvent
+  | ProfileUpdatedEvent
+  | NpcStateChangeEvent;
 
 // ============================================================================
 // Plugin Types
@@ -446,3 +499,255 @@ export type ParsedMap = {
   layers: TiledLayer[];
   objects: TiledObject[];
 };
+
+// ============================================================================
+// Work-Life World Types
+// ============================================================================
+
+// Status/Presence
+export type UserStatus = 'online' | 'focus' | 'dnd' | 'afk' | 'offline';
+
+// Profile
+export type UserProfile = {
+  entityId: string;
+  displayName: string;
+  status: UserStatus;
+  statusMessage?: string;
+  avatarUrl?: string;
+  title?: string; // e.g., "Senior Engineer"
+  department?: string;
+};
+
+// Organization & Team
+export type OrgRole = 'owner' | 'admin' | 'member' | 'guest';
+
+export type Organization = {
+  id: string;
+  name: string;
+  description?: string;
+  logoUrl?: string;
+  createdAt: number;
+  ownerId: string;
+};
+
+export type Team = {
+  id: string;
+  orgId: string;
+  name: string;
+  description?: string;
+  createdAt: number;
+};
+
+export type TeamMember = {
+  orgId: string;
+  teamId: string;
+  entityId: string;
+  role: OrgRole;
+  joinedAt: number;
+};
+
+// Zones
+export type ZoneId = 'lobby' | 'office' | 'meeting-center' | 'lounge-cafe' | 'arcade';
+
+export type Zone = {
+  id: ZoneId;
+  name: string;
+  description?: string;
+  bounds: { x: number; y: number; width: number; height: number };
+  allowedRoles?: OrgRole[]; // If set, only these roles can enter
+};
+
+// Meetings
+export type MeetingStatus = 'scheduled' | 'in_progress' | 'ended' | 'cancelled';
+
+export type Meeting = {
+  id: string;
+  roomId: string;
+  title: string;
+  description?: string;
+  organizerId: string;
+  teamId?: string;
+  startTime: number;
+  endTime: number;
+  status: MeetingStatus;
+  attendeeIds: string[];
+  invitedIds: string[];
+};
+
+export type MeetingReservation = {
+  id: string;
+  meetingRoomId: string;
+  meetingId: string;
+  startTime: number;
+  endTime: number;
+};
+
+// Agenda
+export type AgendaItem = {
+  id: string;
+  meetingId: string;
+  title: string;
+  description?: string;
+  order: number;
+  completed: boolean;
+  createdBy: string;
+};
+
+// Work Tools - Kanban
+export type KanbanColumn = 'todo' | 'doing' | 'done';
+
+export type KanbanCard = {
+  id: string;
+  boardId: string;
+  column: KanbanColumn;
+  title: string;
+  description?: string;
+  assigneeId?: string;
+  order: number;
+  createdAt: number;
+  createdBy: string;
+};
+
+export type KanbanBoard = {
+  id: string;
+  teamId: string;
+  name: string;
+  cards: KanbanCard[];
+};
+
+// Work Tools - Notices
+export type Notice = {
+  id: string;
+  teamId: string;
+  title: string;
+  content: string;
+  pinned: boolean;
+  createdAt: number;
+  createdBy: string;
+};
+
+// Whiteboard
+export type StickyNote = {
+  id: string;
+  meetingId: string;
+  content: string;
+  color: 'yellow' | 'blue' | 'green' | 'pink' | 'orange';
+  position: { x: number; y: number }; // 0-9 grid
+  createdBy: string;
+};
+
+// Voting
+export type VoteOption = 'yes' | 'no' | 'abstain';
+
+export type Vote = {
+  id: string;
+  meetingId: string;
+  question: string;
+  anonymous: boolean;
+  status: 'open' | 'closed';
+  votes: Map<string, VoteOption>; // entityId -> vote
+  createdBy: string;
+  createdAt: number;
+};
+
+// NPCs
+export type NpcRole =
+  | 'receptionist'
+  | 'guard'
+  | 'barista'
+  | 'it_help'
+  | 'pm'
+  | 'hr'
+  | 'sales'
+  | 'event_host'
+  | 'tutorial_guide'
+  | 'quest_giver';
+
+export type NpcState = 'idle' | 'walking' | 'talking' | 'working' | 'break';
+
+export type NpcDefinition = {
+  id: string;
+  name: string;
+  role: NpcRole;
+  zone: ZoneId;
+  spawnPosition: Vec2;
+  dialogue: string[];
+  schedule?: Array<{ time: string; state: NpcState; location?: Vec2 }>;
+};
+
+// Facilities
+export type FacilityType =
+  | 'reception_desk'
+  | 'gate'
+  | 'meeting_door'
+  | 'whiteboard'
+  | 'voting_kiosk'
+  | 'cafe_counter';
+
+export type Facility = {
+  id: string;
+  type: FacilityType;
+  name: string;
+  zone: ZoneId;
+  position: Vec2;
+  interactionRadius: number;
+  affordances: Affordance[];
+};
+
+// Safety
+export type SafetyReport = {
+  id: string;
+  reporterId: string;
+  targetId: string;
+  reason: string;
+  createdAt: number;
+  status: 'pending' | 'reviewed' | 'resolved';
+};
+
+export type BlockedUser = {
+  blockerId: string;
+  blockedId: string;
+  createdAt: number;
+};
+
+export type MutedUser = {
+  orgId: string;
+  mutedId: string;
+  mutedBy: string;
+  expiresAt?: number;
+  createdAt: number;
+};
+
+// Extended Chat
+export type ExtendedChatChannel = 'proximity' | 'global' | 'team' | 'meeting' | 'dm';
+
+export type DirectMessage = {
+  id: string;
+  fromEntityId: string;
+  toEntityId: string;
+  message: string;
+  tsMs: number;
+};
+
+// Events (extend existing EventType)
+export type WorkLifeEventType =
+  | 'org.created'
+  | 'org.member_joined'
+  | 'org.member_left'
+  | 'team.created'
+  | 'team.member_joined'
+  | 'meeting.scheduled'
+  | 'meeting.started'
+  | 'meeting.ended'
+  | 'meeting.participant_joined'
+  | 'meeting.participant_left'
+  | 'board.card_created'
+  | 'board.card_moved'
+  | 'notice.created'
+  | 'vote.created'
+  | 'vote.cast'
+  | 'vote.closed'
+  | 'zone.enter'
+  | 'zone.exit'
+  | 'npc.dialogue'
+  | 'facility.interact';

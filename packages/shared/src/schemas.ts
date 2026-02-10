@@ -50,6 +50,8 @@ export const ChatChannelSchema = z.enum(['proximity', 'global']);
 
 export const ObserveDetailSchema = z.enum(['lite', 'full']);
 
+export const UserStatusSchema = z.enum(['online', 'focus', 'dnd', 'afk', 'offline']);
+
 export const EntityBaseSchema = z.object({
   id: IdEntitySchema,
   kind: EntityKindSchema,
@@ -171,6 +173,15 @@ export const PollEventsRequestSchema = z.object({
   waitMs: z.int().min(0).max(25000).optional(),
 });
 
+export const ProfileUpdateRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+  status: UserStatusSchema.optional(),
+  statusMessage: z.string().max(100).optional(),
+  title: z.string().max(50).optional(),
+  department: z.string().max(50).optional(),
+});
+
 // ============================================================================
 // Response Data Schemas
 // ============================================================================
@@ -242,8 +253,11 @@ export const EventTypeSchema = z.enum([
   'presence.leave',
   'proximity.enter',
   'proximity.exit',
+  'zone.enter',
+  'zone.exit',
   'chat.message',
   'object.state_changed',
+  'profile.updated',
 ]);
 
 export const EventEnvelopeSchema = z.object({
@@ -257,6 +271,20 @@ export const EventEnvelopeSchema = z.object({
 export const PollEventsResponseDataSchema = z.object({
   events: z.array(EventEnvelopeSchema).max(200),
   nextCursor: CursorSchema,
+  serverTsMs: TsMsSchema,
+});
+
+export const ProfileUpdateResponseDataSchema = z.object({
+  applied: z.boolean(),
+  profile: z.object({
+    entityId: IdEntitySchema,
+    displayName: z.string(),
+    status: UserStatusSchema,
+    statusMessage: z.string().optional(),
+    avatarUrl: z.string().optional(),
+    title: z.string().optional(),
+    department: z.string().optional(),
+  }),
   serverTsMs: TsMsSchema,
 });
 
@@ -370,3 +398,72 @@ export const StatusResponseDataSchema = z.object({
   roomId: z.string().optional(),
   agentId: z.string().optional(),
 });
+
+// ============================================================================
+// Work-Life World Schemas
+// ============================================================================
+
+export const OrgRoleSchema = z.enum(['owner', 'admin', 'member', 'guest']);
+
+export const ZoneIdSchema = z.enum(['lobby', 'office', 'meeting-center', 'lounge-cafe', 'arcade']);
+
+export const MeetingStatusSchema = z.enum(['scheduled', 'in_progress', 'ended', 'cancelled']);
+
+export const KanbanColumnSchema = z.enum(['todo', 'doing', 'done']);
+
+export const NpcRoleSchema = z.enum([
+  'receptionist',
+  'guard',
+  'barista',
+  'it_help',
+  'pm',
+  'hr',
+  'sales',
+  'event_host',
+  'tutorial_guide',
+  'quest_giver',
+]);
+
+export const NpcStateSchema = z.enum(['idle', 'walking', 'talking', 'working', 'break']);
+
+export const FacilityTypeSchema = z.enum([
+  'reception_desk',
+  'gate',
+  'meeting_door',
+  'whiteboard',
+  'voting_kiosk',
+  'cafe_counter',
+]);
+
+export const ExtendedChatChannelSchema = z.enum(['proximity', 'global', 'team', 'meeting', 'dm']);
+
+export const VoteOptionSchema = z.enum(['yes', 'no', 'abstain']);
+
+export const StickyNoteColorSchema = z.enum(['yellow', 'blue', 'green', 'pink', 'orange']);
+
+export const SafetyReportStatusSchema = z.enum(['pending', 'reviewed', 'resolved']);
+
+export const VoteStatusSchema = z.enum(['open', 'closed']);
+
+export const WorkLifeEventTypeSchema = z.enum([
+  'org.created',
+  'org.member_joined',
+  'org.member_left',
+  'team.created',
+  'team.member_joined',
+  'meeting.scheduled',
+  'meeting.started',
+  'meeting.ended',
+  'meeting.participant_joined',
+  'meeting.participant_left',
+  'board.card_created',
+  'board.card_moved',
+  'notice.created',
+  'vote.created',
+  'vote.cast',
+  'vote.closed',
+  'zone.enter',
+  'zone.exit',
+  'npc.dialogue',
+  'facility.interact',
+]);

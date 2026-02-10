@@ -6,6 +6,7 @@ import {
   ChatSendRequestSchema,
   ChatObserveRequestSchema,
   PollEventsRequestSchema,
+  RegisterRequestSchema,
 } from '@openclawworld/shared';
 import {
   authMiddleware,
@@ -23,6 +24,7 @@ import { handleInteract } from './handlers/interact.js';
 import { handleChatSend } from './handlers/chatSend.js';
 import { handleChatObserve } from './handlers/chatObserve.js';
 import { handlePollEvents } from './handlers/pollEvents.js';
+import { handleRegister } from './handlers/register.js';
 
 const router: Router = Router();
 
@@ -58,6 +60,13 @@ router.post(
   pollEventsRateLimiter,
   validateRequest(PollEventsRequestSchema),
   handlePollEvents
+);
+
+router.post(
+  '/register',
+  interactRateLimiter, // Use interact rate limiter (10 req/min) for registration
+  validateRequest(RegisterRequestSchema),
+  handleRegister
 );
 
 export default router;

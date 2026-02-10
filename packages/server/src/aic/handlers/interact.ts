@@ -9,8 +9,68 @@ import type {
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { interactIdempotencyStore } from '../idempotency.js';
 import { DEFAULT_PROXIMITY_RADIUS } from '../../constants.js';
+import type { EntitySchema } from '../../schemas/EntitySchema.js';
 
 const { matchMaker } = colyseus;
+
+type ActionHandler = (
+  agent: EntitySchema,
+  target: EntitySchema,
+  params: Record<string, unknown>
+) => InteractOutcome;
+
+const actionRegistry: Record<string, Record<string, ActionHandler>> = {
+  sign: {
+    read: (_agent, target) => {
+      const text = target.meta.get('text') || 'Empty sign';
+      return {
+        type: 'ok',
+        message: text,
+      };
+    },
+  },
+  door: {
+    open: (_agent, target) => {
+      const currentState = target.meta.get('isOpen');
+      if (currentState === 'true') {
+        return {
+          type: 'no_effect',
+          message: 'Door is already open',
+        };
+      }
+      target.meta.set('isOpen', 'true');
+      return {
+        type: 'ok',
+        message: 'Door opened',
+      };
+    },
+    close: (_agent, target) => {
+      const currentState = target.meta.get('isOpen');
+      if (currentState === 'false' || currentState === undefined) {
+        return {
+          type: 'no_effect',
+          message: 'Door is already closed',
+        };
+      }
+      target.meta.set('isOpen', 'false');
+      return {
+        type: 'ok',
+        message: 'Door closed',
+      };
+    },
+  },
+  portal: {
+    use: (agent, target) => {
+      const destX = parseInt(target.meta.get('destX') || '0', 10);
+      const destY = parseInt(target.meta.get('destY') || '0', 10);
+      agent.setPosition(destX, destY);
+      return {
+        type: 'ok',
+        message: 'Teleported',
+      };
+    },
+  },
+};
 
 function createErrorResponse(
   code: AicErrorObject['code'],
@@ -151,13 +211,33 @@ export async function handleInteract(req: Request, res: Response): Promise<void>
       return;
     }
 
-    const outcome: InteractOutcome = {
-      type: 'ok',
-      message: `Action '${action}' on '${targetId}' executed successfully`,
-    };
+    const objectType = targetEntity.meta.get('objectType') || 'unknown';
+    const handler = actionRegistry[objectType]?.[action];
+
+    let outcome: InteractOutcome;
+
+    if (handler) {
+      outcome = handler(agentEntity, targetEntity, body.params ?? {});
+
+      if (outcome.type === 'ok' && ['open', 'close', 'use'].includes(action)) {
+        const eventLog = gameRoom.getEventLog();
+        eventLog.append('object.state_changed', roomId, {
+          objectId: targetId,
+          objectType,
+          action,
+          agentId,
+        });
+      }
+    } else {
+      outcome = {
+        type: 'invalid_action',
+        message: `No handler for ${action} on ${objectType}`,
+      };
+    }
+
     const responseData: InteractResponseData = {
       txId,
-      applied: true,
+      applied: outcome.type === 'ok',
       serverTsMs: Date.now(),
       outcome,
     };

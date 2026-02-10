@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import colyseus from 'colyseus';
+import { matchMaker } from 'colyseus';
 import type {
   ObserveRequest,
   ObserveResponseData,
@@ -10,8 +10,6 @@ import type {
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
-
-const { matchMaker } = colyseus;
 
 function entityToBase(entity: EntitySchema): EntityBase {
   return {

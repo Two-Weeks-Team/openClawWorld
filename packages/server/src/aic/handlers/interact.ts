@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import colyseus from 'colyseus';
+import { matchMaker } from 'colyseus';
 import type {
   InteractRequest,
   InteractResponseData,
@@ -7,11 +7,9 @@ import type {
   AicErrorObject,
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
+import type { EntitySchema } from '../../schemas/EntitySchema.js';
 import { interactIdempotencyStore } from '../idempotency.js';
 import { DEFAULT_PROXIMITY_RADIUS } from '../../constants.js';
-import type { EntitySchema } from '../../schemas/EntitySchema.js';
-
-const { matchMaker } = colyseus;
 
 type ActionHandler = (
   agent: EntitySchema,

@@ -1,10 +1,8 @@
 import type { Request, Response } from 'express';
-import colyseus from 'colyseus';
+import { matchMaker } from 'colyseus';
 import type { ChatSendRequest, ChatSendResponseData, AicErrorObject } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { chatSendIdempotencyStore } from '../idempotency.js';
-
-const { matchMaker } = colyseus;
 
 const MAX_MESSAGE_LENGTH = 500;
 const VALID_CHANNELS = ['proximity', 'global'] as const;

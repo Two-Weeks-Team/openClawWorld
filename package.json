@@ -22,15 +22,15 @@
     "load-test": "tsx scripts/load-test.ts"
   },
   "devDependencies": {
-    "@eslint/js": "^9.0.0",
-    "@types/node": "^20.0.0",
-    "@vitest/coverage-v8": "^1.5.0",
-    "eslint": "^9.0.0",
-    "eslint-config-prettier": "^9.0.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.19.10",
+    "@vitest/coverage-v8": "^4.0.18",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.0.0",
     "tsx": "^4.7.0",
     "typescript": "^5.4.0",
-    "typescript-eslint": "^7.0.0",
-    "vitest": "^1.5.0"
+    "typescript-eslint": "^8.55.0",
+    "vitest": "^4.0.18"
   }
 }

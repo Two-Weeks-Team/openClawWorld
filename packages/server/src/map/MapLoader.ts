@@ -33,7 +33,7 @@ export class MapLoader {
     let fileContent: string;
     try {
       fileContent = readFileSync(filePath, 'utf-8');
-    } catch (error) {
+    } catch {
       throw new MapLoadError(`Map file not found at ${filePath}`, mapId);
     }
 

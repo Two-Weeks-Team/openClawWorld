@@ -11,7 +11,7 @@ import { z } from 'zod';
 // ============================================================================
 
 export const PluginConfigSchema = z.object({
-  baseUrl: z.string().url(),
+  baseUrl: z.url(),
   apiKey: z.string().optional(),
   defaultRoomId: z
     .string()
@@ -21,8 +21,8 @@ export const PluginConfigSchema = z.object({
     .string()
     .regex(/^[a-zA-Z0-9._-]{1,64}$/, 'Invalid agentId format')
     .optional(),
-  retryMaxAttempts: z.number().int().min(0).max(10).default(3),
-  retryBaseDelayMs: z.number().int().min(100).max(5000).default(500),
+  retryMaxAttempts: z.int().min(0).max(10).prefault(3),
+  retryBaseDelayMs: z.int().min(100).max(5000).prefault(500),
   enabledTools: z.array(z.string()).optional(),
   deniedTools: z.array(z.string()).optional(),
 });

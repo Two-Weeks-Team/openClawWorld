@@ -32,7 +32,7 @@ function createValidationError(error: ZodError): {
   };
 }
 
-export function validateBody<T extends z.ZodTypeAny>(schema: T) {
+export function validateBody<T extends z.ZodType>(schema: T) {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
       const result = schema.parse(req.body);
@@ -48,7 +48,7 @@ export function validateBody<T extends z.ZodTypeAny>(schema: T) {
   };
 }
 
-export function validateRequest<T extends z.ZodTypeAny>(schema: T) {
+export function validateRequest<T extends z.ZodType>(schema: T) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.body);
 

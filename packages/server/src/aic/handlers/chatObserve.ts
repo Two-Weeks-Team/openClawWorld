@@ -1,13 +1,11 @@
 import type { Request, Response } from 'express';
-import colyseus from 'colyseus';
+import { matchMaker } from 'colyseus';
 import type {
   ChatObserveRequest,
   ChatObserveResponseData,
   AicErrorObject,
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
-
-const { matchMaker } = colyseus;
 
 function createErrorResponse(
   code: AicErrorObject['code'],

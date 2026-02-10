@@ -3,6 +3,7 @@ import { gameClient, type Entity, type SchemaMap } from '../../network/ColyseusC
 
 export class GameScene extends Phaser.Scene {
   private entities: Map<string, Phaser.GameObjects.Container> = new Map();
+  private chatBubbles = new Map<string, Phaser.GameObjects.Container>();
   private map?: Phaser.Tilemaps.Tilemap;
   private marker?: Phaser.GameObjects.Graphics;
   private collisionDebug?: Phaser.GameObjects.Graphics;
@@ -135,6 +136,53 @@ export class GameScene extends Phaser.Scene {
 
     room.state.objects.onAdd((entity, key) => this.addEntity(entity, key, 'object'));
     room.state.objects.onRemove((_entity, key) => this.removeEntity(key));
+
+    room.onMessage('chat', (data: { from: string; message: string; entityId: string }) => {
+      this.showChatBubble(data.entityId, data.message);
+    });
+  }
+
+  private showChatBubble(entityId: string, message: string) {
+    const entityContainer = this.entities.get(entityId);
+    if (!entityContainer) return;
+
+    this.chatBubbles.get(entityId)?.destroy();
+
+    const bubble = this.add.container(0, -50);
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0xffffff, 0.9);
+    bg.lineStyle(2, 0x000000, 1);
+
+    const text = this.add.text(0, 0, message, {
+      fontSize: '11px',
+      color: '#000000',
+      wordWrap: { width: 120 },
+      align: 'center',
+    });
+    text.setOrigin(0.5);
+
+    const padding = 8;
+    const width = text.width + padding * 2;
+    const height = text.height + padding * 2;
+    bg.fillRoundedRect(-width / 2, -height / 2, width, height, 8);
+    bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 8);
+
+    bubble.add([bg, text]);
+    entityContainer.add(bubble);
+    this.chatBubbles.set(entityId, bubble);
+
+    this.time.delayedCall(4000, () => {
+      this.tweens.add({
+        targets: bubble,
+        alpha: 0,
+        duration: 500,
+        onComplete: () => {
+          bubble.destroy();
+          this.chatBubbles.delete(entityId);
+        },
+      });
+    });
   }
 
   private addEntity(entity: Entity, key: string, type: 'human' | 'agent' | 'object') {

@@ -8,7 +8,13 @@ import { GameMap } from '../schemas/GameMap.js';
 import { MapLoader, MapLoadError } from '../map/MapLoader.js';
 import { CollisionSystem } from '../collision/CollisionSystem.js';
 import { ProximitySystem, type ProximityEvent } from '../proximity/ProximitySystem.js';
-import { DEFAULT_PROXIMITY_RADIUS, PROXIMITY_DEBOUNCE_MS } from '../constants.js';
+import {
+  DEFAULT_PROXIMITY_RADIUS,
+  PROXIMITY_DEBOUNCE_MS,
+  EVENT_RETENTION_MS,
+  EVENT_LOG_MAX_SIZE,
+} from '../constants.js';
+import { EventLog } from '../events/EventLog.js';
 import type { EntityKind } from '@openclawworld/shared';
 
 export class GameRoom extends Room<RoomState> {
@@ -22,10 +28,13 @@ export class GameRoom extends Room<RoomState> {
   private proximitySystem: ProximitySystem | null = null;
   private recentProximityEvents: ProximityEvent[] = [];
   private mapLoader: MapLoader;
+  private eventLog: EventLog;
+  private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor() {
     super();
     this.mapLoader = new MapLoader();
+    this.eventLog = new EventLog(EVENT_RETENTION_MS, EVENT_LOG_MAX_SIZE);
   }
 
   override onCreate(options: { roomId?: string; mapId?: string; tickRate?: number }): void {
@@ -55,6 +64,14 @@ export class GameRoom extends Room<RoomState> {
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
     this.setSimulationInterval(() => this.onTick(), 1000 / tickRate);
 
+    // Set up periodic cleanup of expired events (every minute)
+    this.cleanupInterval = setInterval(() => {
+      const removed = this.eventLog.cleanup();
+      if (removed > 0) {
+        console.log(`[GameRoom] Cleaned up ${removed} expired events`);
+      }
+    }, 60000);
+
     console.log(`[GameRoom] Created room ${roomId} with map ${mapId}, tick rate ${tickRate}`);
   }
 
@@ -64,6 +81,10 @@ export class GameRoom extends Room<RoomState> {
 
   getProximitySystem(): ProximitySystem | null {
     return this.proximitySystem;
+  }
+
+  getEventLog(): EventLog {
+    return this.eventLog;
   }
 
   getRecentProximityEvents(): ProximityEvent[] {
@@ -86,6 +107,13 @@ export class GameRoom extends Room<RoomState> {
     this.state.addEntity(entity);
     this.clientEntities.set(client.sessionId, entityId);
 
+    // Log presence.join event
+    this.eventLog.append('presence.join', this.state.roomId, {
+      entityId,
+      name,
+      kind: 'human',
+    });
+
     console.log(`[GameRoom] Client ${client.sessionId} joined as ${entityId} (${name})`);
   }
 
@@ -95,6 +123,13 @@ export class GameRoom extends Room<RoomState> {
     if (entityId) {
       this.state.removeEntity(entityId, 'human');
       this.clientEntities.delete(client.sessionId);
+
+      // Log presence.leave event
+      const reason = consented ? 'disconnect' : 'disconnect';
+      this.eventLog.append('presence.leave', this.state.roomId, {
+        entityId,
+        reason,
+      });
 
       console.log(`[GameRoom] Client ${client.sessionId} left, removed ${entityId}`);
     }
@@ -113,6 +148,11 @@ export class GameRoom extends Room<RoomState> {
     console.log(`[GameRoom] Disposing room ${this.state.roomId}`);
     this.clientEntities.clear();
     this.recentProximityEvents = [];
+
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
   }
 
   private onTick(): void {
@@ -130,6 +170,15 @@ export class GameRoom extends Room<RoomState> {
 
       const events = this.proximitySystem.update(entityPositions);
       this.recentProximityEvents.push(...events);
+
+      // Store proximity events in EventLog
+      for (const event of events) {
+        if (event.type === 'proximity.enter') {
+          this.eventLog.append('proximity.enter', this.state.roomId, event.payload);
+        } else if (event.type === 'proximity.exit') {
+          this.eventLog.append('proximity.exit', this.state.roomId, event.payload);
+        }
+      }
     }
   }
 

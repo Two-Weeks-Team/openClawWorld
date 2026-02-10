@@ -153,3 +153,9 @@ import type {
 export const moveToIdempotencyStore = new IdempotencyStore<MoveToResponseData>();
 export const interactIdempotencyStore = new IdempotencyStore<InteractResponseData>();
 export const chatSendIdempotencyStore = new IdempotencyStore<ChatSendResponseData>();
+
+export function disposeAllIdempotencyStores(): void {
+  moveToIdempotencyStore.dispose();
+  interactIdempotencyStore.dispose();
+  chatSendIdempotencyStore.dispose();
+}

@@ -6,6 +6,8 @@ import wsTransport from '@colyseus/ws-transport';
 import { createServer } from 'http';
 import { GameRoom } from './rooms/GameRoom.js';
 import { aicRouter, requestIdMiddleware, errorHandler, notFoundHandler } from './aic/index.js';
+import { getMetricsCollector } from './metrics/MetricsCollector.js';
+import { disposeAllIdempotencyStores } from './aic/idempotency.js';
 
 const { Server: ColyseusServer } = colyseus;
 const { WebSocketTransport } = wsTransport;
@@ -38,6 +40,18 @@ async function startServer(): Promise<void> {
     });
   });
 
+  app.get('/metrics', (_req, res) => {
+    const metrics = getMetricsCollector().getMetricsJSON();
+    res.json(metrics);
+  });
+
+  const metricsCollector = getMetricsCollector();
+
+  app.use('/aic/v0.1', (_req, _res, next) => {
+    metricsCollector.recordAicRequest();
+    next();
+  });
+
   app.use('/aic/v0.1', aicRouter);
 
   app.use(notFoundHandler);
@@ -60,6 +74,46 @@ async function startServer(): Promise<void> {
   console.log(`[Server] WebSocket endpoint: ws://localhost:${PORT}`);
   console.log(`[Server] Health check: http://localhost:${PORT}/health`);
   console.log(`[Server] AIC API: http://localhost:${PORT}/aic/v0.1`);
+  console.log(`[Server] Metrics: http://localhost:${PORT}/metrics`);
+
+  setupGracefulShutdown(httpServer, colyseusServer);
+}
+
+function setupGracefulShutdown(
+  httpServer: ReturnType<typeof createServer>,
+  colyseusServer: InstanceType<typeof ColyseusServer>
+): void {
+  const shutdown = async (signal: string): Promise<void> => {
+    console.log(`[Server] Received ${signal}, starting graceful shutdown...`);
+
+    const shutdownTimeout = setTimeout(() => {
+      console.error('[Server] Shutdown timeout exceeded, forcing exit');
+      process.exit(1);
+    }, 30000);
+
+    try {
+      httpServer.close(() => {
+        console.log('[Server] HTTP server closed');
+      });
+
+      await colyseusServer.gracefullyShutdown(false);
+      console.log('[Server] Colyseus server shut down');
+
+      disposeAllIdempotencyStores();
+      console.log('[Server] Idempotency stores disposed');
+
+      clearTimeout(shutdownTimeout);
+      console.log('[Server] Graceful shutdown complete');
+      process.exit(0);
+    } catch (error) {
+      console.error('[Server] Error during shutdown:', error);
+      clearTimeout(shutdownTimeout);
+      process.exit(1);
+    }
+  };
+
+  process.on('SIGTERM', () => void shutdown('SIGTERM'));
+  process.on('SIGINT', () => void shutdown('SIGINT'));
 }
 
 startServer().catch(error => {

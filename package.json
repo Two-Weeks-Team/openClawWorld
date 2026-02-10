@@ -18,7 +18,8 @@
     "typecheck": "pnpm -r typecheck",
     "clean": "pnpm -r clean && rm -rf node_modules",
     "dev:server": "pnpm --filter @openclawworld/server dev",
-    "dev:client": "pnpm --filter @openclawworld/client dev"
+    "dev:client": "pnpm --filter @openclawworld/client dev",
+    "load-test": "tsx scripts/load-test.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
@@ -26,6 +27,7 @@
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
     "prettier": "^3.0.0",
+    "tsx": "^4.7.0",
     "typescript": "^5.4.0",
     "typescript-eslint": "^7.0.0",
     "vitest": "^1.5.0"

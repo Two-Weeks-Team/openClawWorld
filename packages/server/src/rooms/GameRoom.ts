@@ -19,6 +19,7 @@ import { EventLog } from '../events/EventLog.js';
 import { MovementSystem } from '../movement/MovementSystem.js';
 import { ChatSystem } from '../chat/ChatSystem.js';
 import type { EntityKind } from '@openclawworld/shared';
+import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 
 export class GameRoom extends Room<RoomState> {
   private clientEntities: Map<string, string> = new Map();
@@ -184,6 +185,7 @@ export class GameRoom extends Room<RoomState> {
   }
 
   private onTick(): void {
+    const tickStart = performance.now();
     const deltaMs = 1000 / this.state.tickRate;
 
     if (this.movementSystem) {
@@ -206,7 +208,6 @@ export class GameRoom extends Room<RoomState> {
       const events = this.proximitySystem.update(entityPositions);
       this.recentProximityEvents.push(...events);
 
-      // Store proximity events in EventLog
       for (const event of events) {
         if (event.type === 'proximity.enter') {
           this.eventLog.append('proximity.enter', this.state.roomId, event.payload);
@@ -215,6 +216,12 @@ export class GameRoom extends Room<RoomState> {
         }
       }
     }
+
+    const tickTime = performance.now() - tickStart;
+    const metricsCollector = getMetricsCollector();
+    metricsCollector.recordTick(tickTime);
+    metricsCollector.setEventQueueDepth(this.eventLog.getSize());
+    metricsCollector.setConnectionCount(this.clientEntities.size);
   }
 
   private generateEntityId(kind: EntityKind): string {

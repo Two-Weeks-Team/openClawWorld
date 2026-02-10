@@ -155,6 +155,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.state.addEntity(entity);
     this.clientEntities.set(client.sessionId, entityId);
+    client.send('assignedEntityId', { entityId });
 
     // Log presence.join event
     this.eventLog.append('presence.join', this.state.roomId, {

@@ -13,6 +13,7 @@ export class ColyseusClient {
   private client: Client<typeof appConfig>;
   private room: Room<GameRoom> | null = null;
   private _sessionId: string | null = null;
+  private _entityId: string | null = null;
 
   constructor(endpoint: string = 'ws://localhost:2567') {
     this.client = new Client<typeof appConfig>(endpoint);
@@ -22,6 +23,12 @@ export class ColyseusClient {
     try {
       this.room = await this.client.joinOrCreate('game', { name });
       this._sessionId = this.room.sessionId;
+
+      this.room.onMessage('assignedEntityId', (data: { entityId: string }) => {
+        this._entityId = data.entityId;
+        console.log('Assigned entity ID:', this._entityId);
+      });
+
       console.log('Joined room:', this.room.name, 'Session ID:', this.room.sessionId);
       return this.room;
     } catch (e) {
@@ -45,6 +52,10 @@ export class ColyseusClient {
 
   get sessionId() {
     return this._sessionId;
+  }
+
+  get entityId() {
+    return this._entityId;
   }
 
   get currentRoom() {

@@ -234,9 +234,9 @@ export class GameScene extends Phaser.Scene {
   private handleKeyboardMovement() {
     if (!this.cursors || !this.wasdKeys) return;
     if (document.activeElement?.tagName === 'INPUT') return;
-    if (!gameClient.currentRoom || !gameClient.sessionId) return;
+    if (!gameClient.currentRoom || !gameClient.entityId) return;
 
-    const myPlayer = this.entityData.get(gameClient.sessionId);
+    const myPlayer = this.entityData.get(gameClient.entityId);
     if (!myPlayer || !myPlayer.tile) return;
 
     let dx = 0;
@@ -278,7 +278,7 @@ export class GameScene extends Phaser.Scene {
           sprite.setFlipX(false);
         }
 
-        if (key === gameClient.sessionId) {
+        if (key === gameClient.entityId) {
           sprite.setTint(0xffff00);
         }
       }

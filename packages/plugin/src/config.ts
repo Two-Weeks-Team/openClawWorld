@@ -40,9 +40,9 @@ export const PluginConfigSchema = z.object({
 });
 
 /**
- * Plugin configuration type inferred from schema
+ * Plugin configuration type (input type - allows optional retry fields)
  */
-export type PluginConfig = z.infer<typeof PluginConfigSchema>;
+export type PluginConfig = z.input<typeof PluginConfigSchema>;
 
 // ============================================================================
 // Retry Configuration

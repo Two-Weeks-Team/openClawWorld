@@ -138,8 +138,8 @@ describe('Scenario C: Movement', () => {
 
       expect(result.status).toBe('ok');
       if (result.status === 'ok') {
-        expect(result.data.self.tile.tx).toBe(destTile.tx);
-        expect(result.data.self.tile.ty).toBe(destTile.ty);
+        expect(result.data.self.tile?.tx).toBe(destTile.tx);
+        expect(result.data.self.tile?.ty).toBe(destTile.ty);
       }
     });
   });
@@ -231,8 +231,8 @@ describe('Scenario C: Movement', () => {
 
         expect(observeResult.status).toBe('ok');
         if (observeResult.status === 'ok') {
-          expect(observeResult.data.self.tile.tx).toBe(destination.tx);
-          expect(observeResult.data.self.tile.ty).toBe(destination.ty);
+          expect(observeResult.data.self.tile?.tx).toBe(destination.tx);
+          expect(observeResult.data.self.tile?.ty).toBe(destination.ty);
         }
       }
     });

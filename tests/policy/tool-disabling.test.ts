@@ -115,17 +115,20 @@ describe('Tool Disabling Policy Tests', () => {
     });
 
     it('has optional apiKey in config', () => {
-      const hasApiKey = manifest.configSchema.properties?.apiKey !== undefined;
+      const props = manifest.configSchema.properties as Record<string, unknown> | undefined;
+      const hasApiKey = props?.apiKey !== undefined;
       expect(hasApiKey).toBe(true);
     });
 
     it('has optional defaultRoomId in config', () => {
-      const hasRoomId = manifest.configSchema.properties?.defaultRoomId !== undefined;
+      const props = manifest.configSchema.properties as Record<string, unknown> | undefined;
+      const hasRoomId = props?.defaultRoomId !== undefined;
       expect(hasRoomId).toBe(true);
     });
 
     it('has optional defaultAgentId in config', () => {
-      const hasAgentId = manifest.configSchema.properties?.defaultAgentId !== undefined;
+      const props = manifest.configSchema.properties as Record<string, unknown> | undefined;
+      const hasAgentId = props?.defaultAgentId !== undefined;
       expect(hasAgentId).toBe(true);
     });
   });

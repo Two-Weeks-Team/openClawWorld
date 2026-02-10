@@ -4,9 +4,13 @@
     "outDir": "./dist",
     "rootDir": ".",
     "composite": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@openclawworld/shared": ["../packages/shared/src"],
+      "@openclawworld/plugin": ["../packages/plugin/src"]
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"],
-  "references": [{ "path": "../packages/shared" }]
+  "references": [{ "path": "../packages/shared" }, { "path": "../packages/plugin" }]
 }

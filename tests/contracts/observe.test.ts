@@ -137,7 +137,7 @@ describe('Observe Endpoint Contract Tests', () => {
       invalidInput: Record<string, unknown>,
       expectedCode: AicErrorCode
     ) => {
-      mockServer.setHandler('/observe', (_url, body) => {
+      mockServer.setHandler('/observe', (_url, _body) => {
         return jsonResponse(createErrorResult(expectedCode, 'Invalid request', false), 400);
       });
 

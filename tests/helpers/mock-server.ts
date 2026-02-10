@@ -30,7 +30,10 @@ let defaultHandler: MockHandler | null = null;
 export function setupMockFetch(): MockServer {
   const originalFetch = globalThis.fetch;
 
-  globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  globalThis.fetch = async (
+    input: URL | Request | string,
+    init?: RequestInit
+  ): Promise<Response> => {
     const url = input.toString();
     const body = init?.body ? JSON.parse(init.body as string) : undefined;
 

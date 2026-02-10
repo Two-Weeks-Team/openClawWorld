@@ -34,6 +34,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private mapLoader: MapLoader;
   private eventLog: EventLog;
   private cleanupInterval: NodeJS.Timeout | null = null;
+  private spawnPoint: { x: number; y: number; tx: number; ty: number } = {
+    x: 0,
+    y: 0,
+    tx: 0,
+    ty: 0,
+  };
 
   constructor() {
     super();
@@ -55,6 +61,20 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.proximitySystem = new ProximitySystem(DEFAULT_PROXIMITY_RADIUS, PROXIMITY_DEBOUNCE_MS);
       this.movementSystem = new MovementSystem(this.collisionSystem, DEFAULT_MOVE_SPEED);
       gameMap = new GameMap(parsedMap.mapId, parsedMap.width, parsedMap.height, parsedMap.tileSize);
+
+      const spawnObj = parsedMap.objects.find(obj => {
+        const typeProp = obj.properties?.find(p => p.name === 'type');
+        return typeProp?.value === 'spawn';
+      });
+      if (spawnObj) {
+        this.spawnPoint = {
+          x: spawnObj.x + 16,
+          y: spawnObj.y + 16,
+          tx: Math.floor(spawnObj.x / parsedMap.tileSize),
+          ty: Math.floor(spawnObj.y / parsedMap.tileSize),
+        };
+      }
+
       console.log(
         `[GameRoom] Loaded map "${mapId}" (${parsedMap.width}x${parsedMap.height} tiles, ${parsedMap.tileSize}px each)`
       );
@@ -150,21 +170,22 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     const entity = new EntitySchema(entityId, 'human', name, this.state.roomId);
 
-    entity.setPosition(0, 0);
-    entity.setTile(0, 0);
+    entity.setPosition(this.spawnPoint.x, this.spawnPoint.y);
+    entity.setTile(this.spawnPoint.tx, this.spawnPoint.ty);
 
     this.state.addEntity(entity);
     this.clientEntities.set(client.sessionId, entityId);
     client.send('assignedEntityId', { entityId });
 
-    // Log presence.join event
     this.eventLog.append('presence.join', this.state.roomId, {
       entityId,
       name,
       kind: 'human',
     });
 
-    console.log(`[GameRoom] Client ${client.sessionId} joined as ${entityId} (${name})`);
+    console.log(
+      `[GameRoom] Client ${client.sessionId} joined as ${entityId} (${name}) at spawn (${this.spawnPoint.tx}, ${this.spawnPoint.ty})`
+    );
   }
 
   override async onLeave(client: Client, code?: number): Promise<void> {

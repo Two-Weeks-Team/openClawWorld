@@ -2,15 +2,35 @@ import Phaser from 'phaser';
 import { Callbacks } from '@colyseus/sdk';
 import { gameClient, type Entity } from '../../network/ColyseusClient';
 
+interface MapObject {
+  id: number;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  properties?: Array<{ name: string; type: string; value: unknown }>;
+}
+
+interface TiledObjectLayer {
+  type: string;
+  objects?: MapObject[];
+}
+
 export class GameScene extends Phaser.Scene {
   private entities: Map<string, Phaser.GameObjects.Container> = new Map();
   private entityData: Map<string, Entity> = new Map();
   private chatBubbles = new Map<string, Phaser.GameObjects.Container>();
+  private mapObjects = new Map<string, Phaser.GameObjects.Sprite>();
+  private mapObjectData = new Map<string, MapObject>();
   private map?: Phaser.Tilemaps.Tilemap;
   private marker?: Phaser.GameObjects.Graphics;
   private collisionDebug?: Phaser.GameObjects.Graphics;
   private debugEnabled = false;
   private debugIndicator?: Phaser.GameObjects.Text;
+  private interactionPrompt?: Phaser.GameObjects.Container;
+  private nearbyObject?: MapObject;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasdKeys?: {
     W: Phaser.Input.Keyboard.Key;
@@ -27,8 +47,11 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     this.createMap();
+    this.renderMapObjects();
     this.setupInput();
     this.setupDebugToggle();
+    this.setupInteractionKey();
+    this.createInteractionPrompt();
     this.connectToServer();
 
     this.cursors = this.input.keyboard?.createCursorKeys();
@@ -48,13 +71,83 @@ export class GameScene extends Phaser.Scene {
     const tileset = this.map.addTilesetImage('tileset', 'tileset');
     if (tileset) {
       this.map.createLayer('ground', tileset, 0, 0);
-      this.map.createLayer('collision', tileset, 0, 0);
+      const collisionLayer = this.map.createLayer('collision', tileset, 0, 0);
+      if (collisionLayer) {
+        collisionLayer.setAlpha(0);
+      }
     }
 
     this.marker = this.add.graphics();
     this.marker.lineStyle(2, 0xffff00, 1);
     this.marker.strokeRect(0, 0, 32, 32);
     this.marker.setVisible(false);
+    this.marker.setDepth(100);
+
+    if (this.map) {
+      const mapWidth = this.map.widthInPixels;
+      const mapHeight = this.map.heightInPixels;
+      this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+    }
+  }
+
+  private renderMapObjects() {
+    if (!this.map) return;
+
+    const objectLayer = this.map.getObjectLayer('objects');
+    if (!objectLayer) return;
+
+    const objects = (objectLayer as unknown as TiledObjectLayer).objects;
+    if (!objects) return;
+
+    for (const obj of objects) {
+      const objType = this.getObjectProperty(obj, 'type') as string;
+      if (!objType || objType === 'spawn') continue;
+
+      let texture = 'player-object';
+      switch (objType) {
+        case 'chest':
+          texture = 'chest';
+          break;
+        case 'sign':
+          texture = 'sign';
+          break;
+        case 'portal':
+          texture = 'portal';
+          break;
+        case 'npc':
+          texture = 'npc';
+          break;
+        case 'decoration':
+          if (obj.name.includes('fountain')) texture = 'fountain';
+          else if (obj.name.includes('lamp')) texture = 'lamp';
+          else if (obj.name.includes('bench')) texture = 'bench';
+          break;
+      }
+
+      const sprite = this.add.sprite(obj.x + 16, obj.y + 16, texture);
+      sprite.setDepth(obj.y);
+
+      if (objType === 'portal') {
+        this.tweens.add({
+          targets: sprite,
+          scaleX: 1.1,
+          scaleY: 1.1,
+          duration: 1000,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+      }
+
+      this.mapObjects.set(obj.name, sprite);
+      this.mapObjectData.set(obj.name, obj);
+    }
+  }
+
+  private getObjectProperty(obj: MapObject, propName: string): unknown {
+    if (!obj.properties) return obj.type || null;
+    const prop = obj.properties.find(p => p.name === propName);
+    return prop ? prop.value : null;
   }
 
   private setupInput() {
@@ -78,6 +171,126 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard?.addKey('F3').on('down', () => {
       this.debugEnabled = !this.debugEnabled;
       this.updateCollisionDebug();
+    });
+  }
+
+  private setupInteractionKey() {
+    this.input.keyboard?.addKey('E').on('down', () => {
+      if (this.nearbyObject) {
+        this.handleInteraction(this.nearbyObject);
+      }
+    });
+  }
+
+  private createInteractionPrompt() {
+    this.interactionPrompt = this.add.container(0, 0);
+    this.interactionPrompt.setDepth(2000);
+    this.interactionPrompt.setVisible(false);
+    this.interactionPrompt.setScrollFactor(0);
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x000000, 0.8);
+    bg.fillRoundedRect(-80, -20, 160, 40, 8);
+
+    const text = this.add.text(0, 0, 'Press E to interact', {
+      fontSize: '14px',
+      color: '#ffffff',
+    });
+    text.setOrigin(0.5);
+
+    this.interactionPrompt.add([bg, text]);
+    this.interactionPrompt.setPosition(this.cameras.main.width / 2, this.cameras.main.height - 60);
+  }
+
+  private handleInteraction(obj: MapObject) {
+    const objType = this.getObjectProperty(obj, 'type') as string;
+
+    switch (objType) {
+      case 'sign': {
+        const text = (this.getObjectProperty(obj, 'text') as string) || 'Empty sign';
+        this.showMessage(text);
+        break;
+      }
+      case 'chest': {
+        const isOpen = this.getObjectProperty(obj, 'isOpen') as string;
+        if (isOpen === 'true') {
+          this.showMessage('This chest is already open.');
+        } else {
+          const loot = (this.getObjectProperty(obj, 'loot') as string) || 'nothing';
+          this.showMessage(`You found: ${loot}!`);
+          const sprite = this.mapObjects.get(obj.name);
+          if (sprite) {
+            sprite.setTexture('chest-open');
+          }
+        }
+        break;
+      }
+      case 'portal': {
+        const targetMap = (this.getObjectProperty(obj, 'targetMap') as string) || 'unknown';
+        this.showMessage(`Portal to: ${targetMap} (not implemented yet)`);
+        break;
+      }
+      case 'npc': {
+        const npcName = (this.getObjectProperty(obj, 'name') as string) || 'Stranger';
+        const dialogue = (this.getObjectProperty(obj, 'dialogue') as string) || 'Hello there!';
+        this.showMessage(`${npcName}: "${dialogue}"`);
+        break;
+      }
+      default:
+        this.showMessage(`You examine the ${obj.name}.`);
+    }
+  }
+
+  private showMessage(text: string) {
+    const messageBox = this.add.container(
+      this.cameras.main.width / 2,
+      this.cameras.main.height / 2
+    );
+    messageBox.setScrollFactor(0);
+    messageBox.setDepth(3000);
+
+    const padding = 20;
+    const maxWidth = 400;
+
+    const textObj = this.add.text(0, 0, text, {
+      fontSize: '16px',
+      color: '#ffffff',
+      wordWrap: { width: maxWidth - padding * 2 },
+      align: 'center',
+    });
+    textObj.setOrigin(0.5);
+
+    const boxWidth = Math.min(maxWidth, textObj.width + padding * 2);
+    const boxHeight = textObj.height + padding * 2;
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x1a1a2e, 0.95);
+    bg.fillRoundedRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight, 12);
+    bg.lineStyle(2, 0x4a90d9, 1);
+    bg.strokeRoundedRect(-boxWidth / 2, -boxHeight / 2, boxWidth, boxHeight, 12);
+
+    const closeHint = this.add.text(0, boxHeight / 2 + 20, 'Click to close', {
+      fontSize: '12px',
+      color: '#888888',
+    });
+    closeHint.setOrigin(0.5);
+
+    messageBox.add([bg, textObj, closeHint]);
+
+    const closeHandler = () => {
+      messageBox.destroy();
+      this.input.off('pointerdown', closeHandler);
+    };
+
+    this.time.delayedCall(100, () => {
+      this.input.on('pointerdown', closeHandler);
+    });
+
+    this.time.delayedCall(5000, () => {
+      if (messageBox.active) {
+        messageBox.destroy();
+        this.input.off('pointerdown', closeHandler);
+      }
     });
   }
 
@@ -115,7 +328,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private async connectToServer() {
+  private connectToServer() {
     this.roomCheckInterval = setInterval(() => {
       if (gameClient.currentRoom) {
         if (this.roomCheckInterval) {
@@ -212,6 +425,7 @@ export class GameScene extends Phaser.Scene {
 
   private addEntity(entity: Entity, key: string, type: 'human' | 'agent' | 'object') {
     const container = this.add.container(entity.pos.x, entity.pos.y);
+    container.setDepth(entity.pos.y);
 
     let texture = 'player-human';
     if (type === 'agent') texture = 'player-agent';
@@ -231,6 +445,10 @@ export class GameScene extends Phaser.Scene {
     container.add([sprite, text]);
     this.entities.set(key, container);
     this.entityData.set(key, entity);
+
+    if (key === gameClient.entityId) {
+      this.cameras.main.startFollow(container, true, 0.1, 0.1);
+    }
   }
 
   private removeEntity(key: string) {
@@ -267,11 +485,46 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private checkNearbyObjects() {
+    if (!gameClient.entityId) return;
+
+    const myEntity = this.entityData.get(gameClient.entityId);
+    if (!myEntity) return;
+
+    const playerX = myEntity.pos.x;
+    const playerY = myEntity.pos.y;
+    const interactionRadius = 64;
+
+    let closestObject: MapObject | undefined;
+    let closestDistance = Infinity;
+
+    this.mapObjectData.forEach(obj => {
+      const objType = this.getObjectProperty(obj, 'type') as string;
+      if (!objType || objType === 'spawn' || objType === 'decoration') return;
+
+      const objCenterX = obj.x + 16;
+      const objCenterY = obj.y + 16;
+      const distance = Phaser.Math.Distance.Between(playerX, playerY, objCenterX, objCenterY);
+
+      if (distance < interactionRadius && distance < closestDistance) {
+        closestObject = obj;
+        closestDistance = distance;
+      }
+    });
+
+    this.nearbyObject = closestObject;
+
+    if (this.interactionPrompt) {
+      this.interactionPrompt.setVisible(!!closestObject);
+    }
+  }
+
   update() {
     if (!gameClient.currentRoom) return;
 
     this.handleKeyboardMovement();
     this.interpolateEntities();
+    this.checkNearbyObjects();
   }
 
   private interpolateEntities() {
@@ -281,6 +534,7 @@ export class GameScene extends Phaser.Scene {
         const t = 0.15;
         container.x = Phaser.Math.Linear(container.x, entity.pos.x, t);
         container.y = Phaser.Math.Linear(container.y, entity.pos.y, t);
+        container.setDepth(container.y);
 
         const sprite = container.list[0] as Phaser.GameObjects.Sprite;
         if (entity.facing === 'left') {

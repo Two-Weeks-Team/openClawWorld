@@ -13,8 +13,10 @@ import {
   PROXIMITY_DEBOUNCE_MS,
   EVENT_RETENTION_MS,
   EVENT_LOG_MAX_SIZE,
+  DEFAULT_MOVE_SPEED,
 } from '../constants.js';
 import { EventLog } from '../events/EventLog.js';
+import { MovementSystem } from '../movement/MovementSystem.js';
 import type { EntityKind } from '@openclawworld/shared';
 
 export class GameRoom extends Room<RoomState> {
@@ -26,6 +28,7 @@ export class GameRoom extends Room<RoomState> {
   ]);
   private collisionSystem: CollisionSystem | null = null;
   private proximitySystem: ProximitySystem | null = null;
+  private movementSystem: MovementSystem | null = null;
   private recentProximityEvents: ProximityEvent[] = [];
   private mapLoader: MapLoader;
   private eventLog: EventLog;
@@ -48,6 +51,7 @@ export class GameRoom extends Room<RoomState> {
       const parsedMap = this.mapLoader.loadMap(mapId);
       this.collisionSystem = new CollisionSystem(parsedMap);
       this.proximitySystem = new ProximitySystem(DEFAULT_PROXIMITY_RADIUS, PROXIMITY_DEBOUNCE_MS);
+      this.movementSystem = new MovementSystem(this.collisionSystem, DEFAULT_MOVE_SPEED);
       gameMap = new GameMap(parsedMap.mapId, parsedMap.width, parsedMap.height, parsedMap.tileSize);
       console.log(
         `[GameRoom] Loaded map "${mapId}" (${parsedMap.width}x${parsedMap.height} tiles, ${parsedMap.tileSize}px each)`
@@ -63,6 +67,19 @@ export class GameRoom extends Room<RoomState> {
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
     this.setSimulationInterval(() => this.onTick(), 1000 / tickRate);
+
+    this.onMessage('move_to', (client, message: { tx: number; ty: number }) => {
+      const entityId = this.clientEntities.get(client.sessionId);
+      if (!entityId || !this.movementSystem) {
+        return;
+      }
+
+      const result = this.movementSystem.setDestination(entityId, message.tx, message.ty);
+
+      if (result === 'accepted') {
+        console.log(`[GameRoom] Entity ${entityId} moving to (${message.tx}, ${message.ty})`);
+      }
+    });
 
     // Set up periodic cleanup of expired events (every minute)
     this.cleanupInterval = setInterval(() => {
@@ -81,6 +98,10 @@ export class GameRoom extends Room<RoomState> {
 
   getProximitySystem(): ProximitySystem | null {
     return this.proximitySystem;
+  }
+
+  getMovementSystem(): MovementSystem | null {
+    return this.movementSystem;
   }
 
   getEventLog(): EventLog {
@@ -156,6 +177,13 @@ export class GameRoom extends Room<RoomState> {
   }
 
   private onTick(): void {
+    const deltaMs = 1000 / this.state.tickRate;
+
+    if (this.movementSystem) {
+      const allEntities = this.state.getAllEntities();
+      this.movementSystem.update(deltaMs, allEntities);
+    }
+
     if (this.proximitySystem) {
       const allEntities = this.state.getAllEntities();
       const entityPositions = new Map<string, { id: string; x: number; y: number }>();

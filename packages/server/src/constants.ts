@@ -30,3 +30,13 @@ export const EVENT_LOG_MAX_SIZE = 10000;
  * Default limit for event queries.
  */
 export const EVENT_DEFAULT_LIMIT = 50;
+
+/**
+ * Default movement speed in pixels per second.
+ */
+export const DEFAULT_MOVE_SPEED = 100;
+
+/**
+ * Maximum movement speed in pixels per second.
+ */
+export const MAX_MOVE_SPEED = 200;

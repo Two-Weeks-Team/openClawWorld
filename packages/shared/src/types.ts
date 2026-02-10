@@ -346,3 +346,88 @@ export type StatusResponseData = {
   roomId?: string;
   agentId?: string;
 };
+
+// ============================================================================
+// Map Types
+// ============================================================================
+
+/**
+ * Represents a 2D collision grid where true = blocked, false = passable
+ */
+export type CollisionGrid = boolean[][];
+
+/**
+ * Tiled map layer data
+ */
+export type TiledLayer = {
+  id: number;
+  name: string;
+  type: 'tilelayer' | 'objectgroup' | 'imagelayer';
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  visible: boolean;
+  opacity: number;
+  data?: number[];
+  objects?: TiledObject[];
+  properties?: TiledProperty[];
+};
+
+/**
+ * Tiled map object
+ */
+export type TiledObject = {
+  id: number;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  properties?: TiledProperty[];
+};
+
+/**
+ * Tiled property
+ */
+export type TiledProperty = {
+  name: string;
+  type: 'string' | 'int' | 'float' | 'bool' | 'color' | 'file';
+  value: unknown;
+};
+
+/**
+ * Raw map data loaded from Tiled JSON
+ */
+export type MapData = {
+  version: number;
+  tiledversion: string;
+  orientation: string;
+  renderorder: string;
+  width: number;
+  height: number;
+  tilewidth: number;
+  tileheight: number;
+  nextlayerid: number;
+  nextobjectid: number;
+  properties?: TiledProperty[];
+  layers: TiledLayer[];
+  tilesets: Array<{
+    firstgid: number;
+    source: string;
+  }>;
+};
+
+/**
+ * Parsed map information with collision data
+ */
+export type ParsedMap = {
+  mapId: string;
+  width: number;
+  height: number;
+  tileSize: number;
+  collisionGrid: CollisionGrid;
+  layers: TiledLayer[];
+  objects: TiledObject[];
+};

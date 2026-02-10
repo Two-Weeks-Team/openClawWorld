@@ -1,5 +1,6 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
 import { EntitySchema } from './EntitySchema.js';
+import { GameMap } from './GameMap.js';
 
 export class RoomState extends Schema {
   @type('string')
@@ -11,6 +12,9 @@ export class RoomState extends Schema {
   @type('number')
   tickRate: number = 20;
 
+  @type(GameMap)
+  map: GameMap | null = null;
+
   @type({ map: EntitySchema })
   humans: MapSchema<EntitySchema> = new MapSchema<EntitySchema>();
 
@@ -20,12 +24,15 @@ export class RoomState extends Schema {
   @type({ map: EntitySchema })
   objects: MapSchema<EntitySchema> = new MapSchema<EntitySchema>();
 
-  constructor(roomId: string, mapId: string, tickRate?: number) {
+  constructor(roomId: string, mapId: string, tickRate?: number, gameMap?: GameMap) {
     super();
     this.roomId = roomId;
     this.mapId = mapId;
     if (tickRate !== undefined) {
       this.tickRate = tickRate;
+    }
+    if (gameMap !== undefined) {
+      this.map = gameMap;
     }
   }
 

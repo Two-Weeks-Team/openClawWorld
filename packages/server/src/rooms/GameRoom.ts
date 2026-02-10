@@ -4,6 +4,9 @@ import type { Client } from 'colyseus';
 const { Room } = colyseus;
 import { RoomState } from '../schemas/RoomState.js';
 import { EntitySchema } from '../schemas/EntitySchema.js';
+import { GameMap } from '../schemas/GameMap.js';
+import { MapLoader, MapLoadError } from '../map/MapLoader.js';
+import { CollisionSystem } from '../collision/CollisionSystem.js';
 import type { EntityKind } from '@openclawworld/shared';
 
 export class GameRoom extends Room<RoomState> {
@@ -13,16 +16,45 @@ export class GameRoom extends Room<RoomState> {
     ['agent', 0],
     ['object', 0],
   ]);
+  private collisionSystem: CollisionSystem | null = null;
+  private mapLoader: MapLoader;
+
+  constructor() {
+    super();
+    this.mapLoader = new MapLoader();
+  }
 
   override onCreate(options: { roomId?: string; mapId?: string; tickRate?: number }): void {
     const roomId = options.roomId ?? 'default';
-    const mapId = options.mapId ?? 'default-map';
+    const mapId = options.mapId ?? 'lobby';
     const tickRate = options.tickRate ?? 20;
 
-    this.setState(new RoomState(roomId, mapId, tickRate));
+    let gameMap: GameMap | undefined;
+
+    try {
+      const parsedMap = this.mapLoader.loadMap(mapId);
+      this.collisionSystem = new CollisionSystem(parsedMap);
+      gameMap = new GameMap(parsedMap.mapId, parsedMap.width, parsedMap.height, parsedMap.tileSize);
+      console.log(
+        `[GameRoom] Loaded map "${mapId}" (${parsedMap.width}x${parsedMap.height} tiles, ${parsedMap.tileSize}px each)`
+      );
+    } catch (error) {
+      if (error instanceof MapLoadError) {
+        console.error(`[GameRoom] ${error.message}`);
+      } else {
+        console.error(`[GameRoom] Unexpected error loading map "${mapId}":`, error);
+      }
+      throw error;
+    }
+
+    this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
     this.setSimulationInterval(() => this.onTick(), 1000 / tickRate);
 
     console.log(`[GameRoom] Created room ${roomId} with map ${mapId}, tick rate ${tickRate}`);
+  }
+
+  getCollisionSystem(): CollisionSystem | null {
+    return this.collisionSystem;
   }
 
   override onJoin(client: Client, options: { name?: string }): void {

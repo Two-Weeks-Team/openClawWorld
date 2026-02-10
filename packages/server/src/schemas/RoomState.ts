@@ -58,11 +58,7 @@ export class RoomState extends Schema {
   }
 
   getEntity(entityId: string): EntitySchema | undefined {
-    return (
-      this.humans.get(entityId) ??
-      this.agents.get(entityId) ??
-      this.objects.get(entityId)
-    );
+    return this.humans.get(entityId) ?? this.agents.get(entityId) ?? this.objects.get(entityId);
   }
 
   getAllEntities(): Map<string, EntitySchema> {

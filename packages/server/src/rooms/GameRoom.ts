@@ -65,8 +65,7 @@ export class GameRoom extends Room<RoomState> {
     this.clientEntities.clear();
   }
 
-  private onTick(): void {
-  }
+  private onTick(): void {}
 
   private generateEntityId(kind: EntityKind): string {
     const counter = (this.entityCounters.get(kind) ?? 0) + 1;

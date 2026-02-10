@@ -42,7 +42,7 @@ async function startServer(): Promise<void> {
   console.log(`[Server] Health check: http://localhost:${PORT}/health`);
 }
 
-startServer().catch((error) => {
+startServer().catch(error => {
   console.error('[Server] Failed to start:', error);
   process.exit(1);
 });

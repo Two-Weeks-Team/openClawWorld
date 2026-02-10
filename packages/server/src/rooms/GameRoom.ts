@@ -18,7 +18,7 @@ import { ChatSystem } from '../chat/ChatSystem.js';
 import type { EntityKind } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 
-export class GameRoom extends Room {
+export class GameRoom extends Room<{ state: RoomState }> {
   declare state: RoomState;
   private clientEntities: Map<string, string> = new Map();
   private entityCounters: Map<EntityKind, number> = new Map([
@@ -155,6 +155,7 @@ export class GameRoom extends Room {
 
     this.state.addEntity(entity);
     this.clientEntities.set(client.sessionId, entityId);
+    client.send('assignedEntityId', { entityId });
 
     // Log presence.join event
     this.eventLog.append('presence.join', this.state.roomId, {
@@ -175,7 +176,7 @@ export class GameRoom extends Room {
       this.clientEntities.delete(client.sessionId);
 
       // Log presence.leave event
-      const reason = consented ? 'disconnect' : 'disconnect';
+      const reason = consented ? 'consented' : 'disconnected';
       this.eventLog.append('presence.leave', this.state.roomId, {
         entityId,
         reason,

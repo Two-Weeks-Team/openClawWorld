@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
-import { gameClient, type Entity, type SchemaMap } from '../../network/ColyseusClient';
+import { Callbacks } from '@colyseus/sdk';
+import { gameClient, type Entity } from '../../network/ColyseusClient';
 
 export class GameScene extends Phaser.Scene {
   private entities: Map<string, Phaser.GameObjects.Container> = new Map();
+  private entityData: Map<string, Entity> = new Map();
   private chatBubbles = new Map<string, Phaser.GameObjects.Container>();
   private map?: Phaser.Tilemaps.Tilemap;
   private marker?: Phaser.GameObjects.Graphics;
@@ -17,6 +19,7 @@ export class GameScene extends Phaser.Scene {
     D: Phaser.Input.Keyboard.Key;
   };
   private lastMoveTime = 0;
+  private roomCheckInterval?: ReturnType<typeof setInterval>;
 
   constructor() {
     super('GameScene');
@@ -86,11 +89,9 @@ export class GameScene extends Phaser.Scene {
 
     this.collisionDebug.clear();
 
-    // Toggle indicator
     if (this.debugIndicator) this.debugIndicator.destroy();
 
     if (this.debugEnabled && this.map) {
-      // Show indicator
       this.debugIndicator = this.add.text(10, 10, 'DEBUG: Collision ON (F3)', {
         fontSize: '12px',
         color: '#ff0000',
@@ -100,7 +101,6 @@ export class GameScene extends Phaser.Scene {
       this.debugIndicator.setScrollFactor(0);
       this.debugIndicator.setDepth(2000);
 
-      // Draw collision tiles
       const collisionLayer = this.map.getLayer('collision');
       if (collisionLayer) {
         collisionLayer.data.forEach((row, y) => {
@@ -116,30 +116,55 @@ export class GameScene extends Phaser.Scene {
   }
 
   private async connectToServer() {
-    const checkRoom = setInterval(() => {
+    this.roomCheckInterval = setInterval(() => {
       if (gameClient.currentRoom) {
-        clearInterval(checkRoom);
+        if (this.roomCheckInterval) {
+          clearInterval(this.roomCheckInterval);
+          this.roomCheckInterval = undefined;
+        }
         this.setupRoomListeners();
       }
     }, 100);
+  }
+
+  shutdown() {
+    if (this.roomCheckInterval) {
+      clearInterval(this.roomCheckInterval);
+      this.roomCheckInterval = undefined;
+    }
   }
 
   private setupRoomListeners() {
     const room = gameClient.currentRoom;
     if (!room) return;
 
-    room.state.humans.onAdd((entity, key) => this.addEntity(entity, key, 'human'));
-    room.state.humans.onRemove((_entity, key) => this.removeEntity(key));
+    const callbacks = Callbacks.get(room);
 
-    room.state.agents.onAdd((entity, key) => this.addEntity(entity, key, 'agent'));
-    room.state.agents.onRemove((_entity, key) => this.removeEntity(key));
+    callbacks.onAdd('humans', (entity, key) => {
+      this.addEntity(entity, key, 'human');
+      callbacks.onChange(entity, () => this.updateEntityData(entity, key));
+    });
+    callbacks.onRemove('humans', (_entity, key) => this.removeEntity(key));
 
-    room.state.objects.onAdd((entity, key) => this.addEntity(entity, key, 'object'));
-    room.state.objects.onRemove((_entity, key) => this.removeEntity(key));
+    callbacks.onAdd('agents', (entity, key) => {
+      this.addEntity(entity, key, 'agent');
+      callbacks.onChange(entity, () => this.updateEntityData(entity, key));
+    });
+    callbacks.onRemove('agents', (_entity, key) => this.removeEntity(key));
+
+    callbacks.onAdd('objects', (entity, key) => {
+      this.addEntity(entity, key, 'object');
+      callbacks.onChange(entity, () => this.updateEntityData(entity, key));
+    });
+    callbacks.onRemove('objects', (_entity, key) => this.removeEntity(key));
 
     room.onMessage('chat', (data: { from: string; message: string; entityId: string }) => {
       this.showChatBubble(data.entityId, data.message);
     });
+  }
+
+  private updateEntityData(entity: Entity, key: string) {
+    this.entityData.set(key, entity);
   }
 
   private showChatBubble(entityId: string, message: string) {
@@ -205,6 +230,7 @@ export class GameScene extends Phaser.Scene {
 
     container.add([sprite, text]);
     this.entities.set(key, container);
+    this.entityData.set(key, entity);
   }
 
   private removeEntity(key: string) {
@@ -212,18 +238,16 @@ export class GameScene extends Phaser.Scene {
     if (entity) {
       entity.destroy();
       this.entities.delete(key);
+      this.entityData.delete(key);
     }
   }
 
   private handleKeyboardMovement() {
     if (!this.cursors || !this.wasdKeys) return;
-
     if (document.activeElement?.tagName === 'INPUT') return;
+    if (!gameClient.currentRoom || !gameClient.entityId) return;
 
-    const room = gameClient.currentRoom;
-    if (!room) return;
-
-    const myPlayer = room.state.humans.get(gameClient.sessionId!);
+    const myPlayer = this.entityData.get(gameClient.entityId);
     if (!myPlayer || !myPlayer.tile) return;
 
     let dx = 0;
@@ -247,30 +271,26 @@ export class GameScene extends Phaser.Scene {
     if (!gameClient.currentRoom) return;
 
     this.handleKeyboardMovement();
-
-    const room = gameClient.currentRoom;
-
-    this.updateEntities(room.state.humans);
-    this.updateEntities(room.state.agents);
-    this.updateEntities(room.state.objects);
+    this.interpolateEntities();
   }
 
-  private updateEntities(entities: SchemaMap<Entity>) {
-    entities.forEach((entity: Entity, key: string) => {
+  private interpolateEntities() {
+    this.entityData.forEach((entity, key) => {
       const container = this.entities.get(key);
       if (container) {
-        const t = 0.1;
+        const t = 0.15;
         container.x = Phaser.Math.Linear(container.x, entity.pos.x, t);
         container.y = Phaser.Math.Linear(container.y, entity.pos.y, t);
 
+        const sprite = container.list[0] as Phaser.GameObjects.Sprite;
         if (entity.facing === 'left') {
-          (container.list[0] as Phaser.GameObjects.Sprite).setFlipX(true);
+          sprite.setFlipX(true);
         } else if (entity.facing === 'right') {
-          (container.list[0] as Phaser.GameObjects.Sprite).setFlipX(false);
+          sprite.setFlipX(false);
         }
 
-        if (key === gameClient.sessionId) {
-          (container.list[0] as Phaser.GameObjects.Sprite).setTint(0xffff00);
+        if (key === gameClient.entityId) {
+          sprite.setTint(0xffff00);
         }
       }
     });

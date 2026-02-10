@@ -1,69 +1,33 @@
 import { Client, Room } from '@colyseus/sdk';
-import type { EntityKind, Facing } from '@openclawworld/shared';
 
-export interface Vector2 {
-  x: number;
-  y: number;
-}
+import type appConfig from '../../../server/src/app.config.js';
+import type { GameRoom } from '../../../server/src/rooms/GameRoom.js';
+import type { EntitySchema } from '../../../server/src/schemas/EntitySchema.js';
+import type { RoomState } from '../../../server/src/schemas/RoomState.js';
 
-export interface TileCoord {
-  tx: number;
-  ty: number;
-}
-
-export interface Entity {
-  id: string;
-  kind: EntityKind;
-  name: string;
-  roomId: string;
-  pos: Vector2;
-  tile?: TileCoord;
-  facing: Facing;
-  speed: number;
-  meta: Map<string, string>;
-}
-
-export interface GameMap {
-  mapId: string;
-  width: number;
-  height: number;
-  tileSize: number;
-}
-
-export interface SchemaMap<T> {
-  onAdd(callback: (item: T, key: string) => void): void;
-  onRemove(callback: (item: T, key: string) => void): void;
-  onChange(callback: (item: T, key: string) => void): void;
-  forEach(
-    callbackfn: (value: T, key: string, map: Map<string, T>) => void,
-    thisArg?: unknown
-  ): void;
-  get(key: string): T | undefined;
-}
-
-export interface RoomState {
-  roomId: string;
-  mapId: string;
-  tickRate: number;
-  map: GameMap;
-  humans: SchemaMap<Entity>;
-  agents: SchemaMap<Entity>;
-  objects: SchemaMap<Entity>;
-}
+export type Entity = EntitySchema;
+export type { RoomState, GameRoom };
 
 export class ColyseusClient {
-  private client: Client;
-  private room: Room<RoomState> | null = null;
+  private client: Client<typeof appConfig>;
+  private room: Room<GameRoom> | null = null;
   private _sessionId: string | null = null;
+  private _entityId: string | null = null;
 
   constructor(endpoint: string = 'ws://localhost:2567') {
-    this.client = new Client(endpoint);
+    this.client = new Client<typeof appConfig>(endpoint);
   }
 
-  async connect(name: string): Promise<Room<RoomState>> {
+  async connect(name: string): Promise<Room<GameRoom>> {
     try {
-      this.room = await this.client.joinOrCreate<RoomState>('game', { name });
+      this.room = await this.client.joinOrCreate('game', { name });
       this._sessionId = this.room.sessionId;
+
+      this.room.onMessage('assignedEntityId', (data: { entityId: string }) => {
+        this._entityId = data.entityId;
+        console.log('Assigned entity ID:', this._entityId);
+      });
+
       console.log('Joined room:', this.room.name, 'Session ID:', this.room.sessionId);
       return this.room;
     } catch (e) {
@@ -87,6 +51,10 @@ export class ColyseusClient {
 
   get sessionId() {
     return this._sessionId;
+  }
+
+  get entityId() {
+    return this._entityId;
   }
 
   get currentRoom() {

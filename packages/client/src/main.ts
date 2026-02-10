@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { Room } from '@colyseus/sdk';
 import { gameConfig } from './game/config';
-import { gameClient, type RoomState } from './network/ColyseusClient';
+import { gameClient, type GameRoom } from './network/ColyseusClient';
 
 const loginScreen = document.getElementById('login-screen') as HTMLDivElement;
 const usernameInput = document.getElementById('username-input') as HTMLInputElement;
@@ -9,6 +9,7 @@ const joinBtn = document.getElementById('join-btn') as HTMLButtonElement;
 const chatContainer = document.getElementById('chat-container') as HTMLDivElement;
 const chatMessages = document.getElementById('chat-messages') as HTMLDivElement;
 const chatInput = document.getElementById('chat-input') as HTMLInputElement;
+const gameContainer = document.getElementById('game-container') as HTMLDivElement;
 
 let game: Phaser.Game | null = null;
 
@@ -28,6 +29,16 @@ joinBtn.addEventListener('click', async () => {
     game = new Phaser.Game(gameConfig);
     console.log('Game started', game);
 
+    gameContainer.addEventListener('click', () => {
+      chatInput.blur();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.activeElement !== chatInput) {
+        chatInput.focus();
+      }
+    });
+
     setupChat(room);
   } catch (error) {
     console.error('Failed to connect:', error);
@@ -37,9 +48,9 @@ joinBtn.addEventListener('click', async () => {
   }
 });
 
-function setupChat(room: Room<RoomState>) {
+function setupChat(room: Room<GameRoom>) {
   chatInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.isComposing) {
       const message = chatInput.value.trim();
       if (message) {
         room.send('chat', { message });

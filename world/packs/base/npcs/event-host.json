@@ -1,0 +1,133 @@
+{
+  "id": "event-host",
+  "name": "Riley the Event Coordinator",
+  "sprite": "npc-event-host",
+  "zone": "arcade",
+  "defaultPosition": { "x": 720, "y": 100 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 720, "y": 100 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 780, "y": 200 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 720, "y": 100 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "WHAT'S UP, WHAT'S UP, WHAT'S UUUUUUP! *jumps excitedly* Welcome to the ARCADE, the beating heart of OpenClaw World! I'm Riley, your EVENT COORDINATOR extraordinaire! Are you ready to GET HYPE?!",
+      "options": [
+        { "text": "I'm ready! What's happening?", "next": "current-events" },
+        { "text": "What events do you host?", "next": "event-types" },
+        { "text": "Why are you so energetic?", "next": "energy-source" },
+        { "text": "Just looking around!", "next": "looking-around" }
+      ]
+    },
+    "current-events": {
+      "id": "current-events",
+      "text": "RIGHT NOW we're in the middle of our WEEKLY TOURNAMENT! Players are competing for the HIGH SCORE and ULTIMATE BRAGGING RIGHTS! *gestures to leaderboard* Look at those numbers! The competition is FIERCE!",
+      "options": [
+        { "text": "How do I join the tournament?", "next": "join-tournament" },
+        { "text": "What's the prize?", "next": "tournament-prize" },
+        { "text": "Who's winning right now?", "next": "current-leader" }
+      ]
+    },
+    "join-tournament": {
+      "id": "join-tournament",
+      "text": "You wanna join?! I LOVE the enthusiasm! Head over to any arcade machine and enter the tournament code: HYPER-2024! Just... uh... fair warning? The competition is INTENSE! We're talking carpal tunnel syndrome INTENSE!",
+      "options": [
+        { "text": "I'm not scared! Sign me up!", "next": "no-fear" },
+        { "text": "Maybe I should practice first", "next": "practice-first" }
+      ]
+    },
+    "no-fear": {
+      "id": "no-fear",
+      "text": "NO FEAR! I LOVE IT! *air horns* That's the spirit! Go out there and SHOW THEM WHAT YOU'VE GOT! Remember: it's not about winning or losing! It's about... okay, it's totally about winning! WIN THAT TROPHY!",
+      "options": [{ "text": "I'm going to win!", "next": null }]
+    },
+    "practice-first": {
+      "id": "practice-first",
+      "text": "Smart! Strategic! I respect it! Talk to Drew about daily challenges - they'll help you level up your skills! Come back when you're ready to COMPETE! I'll be here, cheering for EVERYONE!",
+      "options": [{ "text": "Thanks Riley, I'll be back!", "next": null }]
+    },
+    "tournament-prize": {
+      "id": "tournament-prize",
+      "text": "The prize? Oh, it's GLORIOUS! Winner gets: a CUSTOM FLAIR for their avatar, their name on the HALL OF FAME, and... *drumroll* ...BRAGGING RIGHTS FOR A WHOLE WEEK! Plus Morgan usually bakes cookies for the winner!",
+      "options": [{ "text": "Morgan's cookies?! I'm in!", "next": "cookies-motivation" }]
+    },
+    "cookies-motivation": {
+      "id": "cookies-motivation",
+      "text": "RIGHT?! Morgan's cookies are LEGENDARY! Oatmeal raisin that somehow taste like happiness! Last week's winner said they were 'transcendent!' That's a DIRECT QUOTE! For cookies like that, I'd enter myself!",
+      "options": [{ "text": "Cookies are serious business!", "next": null }]
+    },
+    "current-leader": {
+      "id": "current-leader",
+      "text": "Currently in FIRST PLACE is... *checks clipboard* ...Player_XX_Dragon! They're DESTROYING the competition with a score of 999,999! Can anyone beat them?! The SUSPENSE is KILLING ME!",
+      "options": [{ "text": "999,999?! That's insane!", "next": "high-score-reaction" }]
+    },
+    "high-score-reaction": {
+      "id": "high-score-reaction",
+      "text": "INSANE, right?! Some people think they're using... *looks around* ...performance-enhancing caffeine! But NO! They're just THAT GOOD! Or really lucky! Either way, IMPRESSIVE!",
+      "options": [{ "text": "I need to step up my game!", "next": null }]
+    },
+    "event-types": {
+      "id": "event-types",
+      "text": "We have EVERYTHING! Weekly tournaments! Monthly speedruns! Quarterly COSPLAY CONTESTS! Random DANCE PARTIES! Emergency meetings about absolutely nothing! If it's fun, we DO IT! If it's not fun, we MAKE it fun!",
+      "options": [
+        { "text": "Cosplay contests?!", "next": "cosplay-info" },
+        { "text": "Tell me about dance parties!", "next": "dance-parties" },
+        { "text": "Emergency meetings about nothing?", "next": "fake-meetings" }
+      ]
+    },
+    "cosplay-info": {
+      "id": "cosplay-info",
+      "text": "COSPLAY! Last quarter, Taylor came as a Server Rack! Complete with blinking lights! And Chris dressed as a SALES FUNNEL! It was both terrifying and educational! Next contest is in two weeks - theme is 'Digital Dreams!'",
+      "options": [{ "text": "I want to participate!", "next": "cosplay-signup" }]
+    },
+    "cosplay-signup": {
+      "id": "cosplay-signup",
+      "text": "YES! Sign up at my desk! I have FORMS! And INSPIRATION BOARDS! And GLITTER! Actually, keep the glitter away from the computers. Taylor got VERY upset last time. But YES! SIGN UP!",
+      "options": [{ "text": "Forms and glitter - I'm there!", "next": null }]
+    },
+    "dance-parties": {
+      "id": "dance-parties",
+      "text": "RANDOM DANCE PARTIES! They happen WHENEVER THE MOOD STRIKES! Music blares, lights flash, and everyone just... DANCES! Last time, even Sam the security guard joined in! Though their moves were... *whispers* ...very security-guard-like.",
+      "options": [{ "text": "When's the next one?", "next": "next-dance" }]
+    },
+    "next-dance": {
+      "id": "next-dance",
+      "text": "That's the beauty - NO ONE KNOWS! It could be in five minutes! It could be tomorrow! It could be... RIGHT NOW! *checks watch* ...No, not now. But SOON! Always be ready to DANCE!",
+      "options": [{ "text": "I'll keep my dancing shoes ready!", "next": null }]
+    },
+    "fake-meetings": {
+      "id": "fake-meetings",
+      "text": "*laughs* Okay, so one time we called an emergency meeting because someone said 'we need to talk about the thing' but NO ONE KNEW what 'the thing' was! We discussed it for an HOUR! Turns out it was just a broken coffee maker!",
+      "options": [{ "text": "An hour about a coffee maker?!", "next": "coffee-meeting" }]
+    },
+    "coffee-meeting": {
+      "id": "coffee-meeting",
+      "text": "RIGHT?! But in our defense, it was the GOOD coffee maker! The one with the frother! Jordan almost had a breakdown! We had to hold a memorial service! Don't worry, we got a new one. The 'Phoenix' we call it. Rises from the ashes!",
+      "options": [{ "text": "Office drama at its finest!", "next": null }]
+    },
+    "energy-source": {
+      "id": "energy-source",
+      "text": "*spins in place* My energy? It comes from PASSION! And maybe a little too much of Jamie's 'Event Coordinator Special!' It's like coffee, but with sparkles! Literally! Jamie puts edible glitter in it!",
+      "options": [
+        { "text": "Sparkle coffee?! I need that!", "next": "sparkle-coffee" },
+        { "text": "You're naturally energetic!", "next": "natural-energy" }
+      ]
+    },
+    "sparkle-coffee": {
+      "id": "sparkle-coffee",
+      "text": "It's MAGICAL! Literally! The glitter makes everything seem more... POSSIBLE! And EXCITING! Just don't drink it after 3 PM. I learned that the hard way. I reorganized the entire supply closet at 2 AM. ALPHABETICALLY!",
+      "options": [{ "text": "Note to self: no sparkle coffee after 3!", "next": null }]
+    },
+    "natural-energy": {
+      "id": "natural-energy",
+      "text": "AWW, thanks! I just LOVE what I do! Bringing people together, creating memories, making people SMILE! It's the best job in the WORLD! Plus I get to use a MICROPHONE sometimes! *makes feedback noise* BEST! DAY! EVER!",
+      "options": [{ "text": "Your enthusiasm is contagious!", "next": null }]
+    },
+    "looking-around": {
+      "id": "looking-around",
+      "text": "LOOK AROUND! Take it ALL in! The lights! The sounds! The COMPETITIVE ENERGY! This place is ALIVE! And if you see something you like, jump in! The water's FINE! The games are FUN! And the company is EXCELLENT!",
+      "options": [{ "text": "Thanks Riley, I will!", "next": null }]
+    }
+  }
+}

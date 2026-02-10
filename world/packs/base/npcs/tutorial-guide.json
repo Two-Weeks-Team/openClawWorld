@@ -1,0 +1,150 @@
+{
+  "id": "tutorial-guide",
+  "name": "Casey the Tutorial Guide",
+  "sprite": "npc-tutorial-guide",
+  "zone": "lobby",
+  "defaultPosition": { "x": 80, "y": 200 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 80, "y": 200 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 120, "y": 280 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 80, "y": 200 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Hello there! Welcome to OpenClaw World! *waves warmly* I'm Casey, your Tutorial Guide. First time here? No worries at all - I'm here to help you learn the ropes! What would you like to know about?",
+      "options": [
+        { "text": "How do I move around?", "next": "movement-help" },
+        { "text": "How does the world work?", "next": "world-basics" },
+        { "text": "Who can I talk to?", "next": "npc-intro" },
+        { "text": "I'm good, thanks!", "next": "farewell" }
+      ]
+    },
+    "movement-help": {
+      "id": "movement-help",
+      "text": "Great question! You can move by clicking anywhere on the ground, or use the WASD or arrow keys for direct control. Try clicking on a tile - your character will walk right to it! It's simple and intuitive.",
+      "options": [
+        { "text": "Can I run or go faster?", "next": "sprint-info" },
+        { "text": "What about collision?", "next": "collision-help" },
+        { "text": "Thanks, I'll try it out!", "next": "practice-move" }
+      ]
+    },
+    "sprint-info": {
+      "id": "sprint-info",
+      "text": "Not currently! The world is designed for a relaxed pace so you can chat with others and enjoy the scenery. But who knows? Maybe in a future update! *winks* The developers are always listening to feedback.",
+      "options": [{ "text": "Slow and steady works for me!", "next": null }]
+    },
+    "collision-help": {
+      "id": "collision-help",
+      "text": "Good thinking! Some objects like walls, desks, and decorative items have collision - you can't walk through them. But you can walk freely through other players and NPCs. If you see a red outline on something, that's a collision boundary!",
+      "options": [
+        { "text": "Press F3 to see collision debug!", "next": "debug-tip" },
+        { "text": "Got it, thanks!", "next": null }
+      ]
+    },
+    "debug-tip": {
+      "id": "debug-tip",
+      "text": "Exactly! Pressing F3 toggles the collision debug view. You'll see red boxes around everything you can't walk through. It's super helpful when you're exploring new areas or if you seem 'stuck' somewhere.",
+      "options": [{ "text": "Cool feature!", "next": null }]
+    },
+    "practice-move": {
+      "id": "practice-move",
+      "text": "Perfect! Try walking around the lobby first. It's a safe space to practice. Once you're comfortable, you can explore the office, meeting center, lounge-cafe, and even the arcade! Each zone has its own character and NPCs to meet.",
+      "options": [
+        { "text": "Which zone should I visit first?", "next": "zone-recommendation" },
+        { "text": "Thanks Casey!", "next": null }
+      ]
+    },
+    "zone-recommendation": {
+      "id": "zone-recommendation",
+      "text": "I'd suggest visiting Morgan in the office for proper onboarding! Or if you want to relax, Jamie in the lounge-cafe makes excellent coffee. For excitement, check out Riley in the arcade - they always have events happening!",
+      "options": [{ "text": "I'll start with Morgan then!", "next": null }]
+    },
+    "world-basics": {
+      "id": "world-basics",
+      "text": "OpenClaw World is a virtual space where humans and AI agents coexist and interact! It's divided into different zones - each with its own theme and purpose. You can chat with other players, complete challenges, attend events, or just hang out!",
+      "options": [
+        { "text": "Tell me about the zones", "next": "zones-detail" },
+        { "text": "How do I chat with people?", "next": "chat-help" },
+        { "text": "What kind of challenges?", "next": "challenges-info" }
+      ]
+    },
+    "zones-detail": {
+      "id": "zones-detail",
+      "text": "We have five zones: LOBBY (where we are now - welcoming and central), OFFICE (where the work happens - meet HR, IT, PM, and Sales), MEETING CENTER (for presentations and collaboration), LOUNGE-CAFE (relaxation and coffee!), and ARCADE (games and challenges)!",
+      "options": [
+        { "text": "Which zone is your favorite?", "next": "favorite-zone" },
+        { "text": "How big is each zone?", "next": "zone-size" }
+      ]
+    },
+    "favorite-zone": {
+      "id": "favorite-zone",
+      "text": "*thinks* That's tough! I love the lobby because I get to meet new people like you! But the lounge-cafe is so cozy, and the arcade is exciting... Honestly, each zone has its own charm. Explore them all and find your favorite!",
+      "options": [{ "text": "I will! Thanks Casey!", "next": null }]
+    },
+    "zone-size": {
+      "id": "zone-size",
+      "text": "Each zone is 320x320 pixels in size, arranged in a grid. The lobby is at top-left, office at top-right, meeting center at bottom-left, lounge-cafe at bottom-right, and arcade is a tall zone on the far right. Press M for the map to see it all!",
+      "options": [{ "text": "Good to know!", "next": null }]
+    },
+    "chat-help": {
+      "id": "chat-help",
+      "text": "Chatting is easy! Press Enter to open the chat box, type your message, and press Enter again to send. You'll see chat bubbles appear above characters when they talk. It's proximity-based, so you can have private conversations by standing close together!",
+      "options": [
+        { "text": "Can I chat with NPCs too?", "next": "npc-chat" },
+        { "text": "Are there emotes?", "next": "emote-info" }
+      ]
+    },
+    "npc-chat": {
+      "id": "npc-chat",
+      "text": "Absolutely! Walk up to any NPC and interact with them - they'll have conversations with you! Each NPC has their own personality and dialogue options. Try talking to Alex at the reception desk or Sam the security guard. They're very friendly!",
+      "options": [{ "text": "I'll go say hi to them!", "next": null }]
+    },
+    "emote-info": {
+      "id": "emote-info",
+      "text": "Not yet, but it's on the roadmap! For now, you can express yourself through your avatar's movements and chat messages. Some players get really creative with ASCII art in chat. I've seen some impressive emoticons!",
+      "options": [{ "text": "I'll get creative then!", "next": null }]
+    },
+    "challenges-info": {
+      "id": "challenges-info",
+      "text": "Challenges are daily tasks hosted by Drew in the arcade! They range from exploration missions to skill-based mini-games. Complete them to earn points, unlock achievements, and gain access to special areas. It's a great way to stay engaged!",
+      "options": [
+        { "text": "How do I start challenges?", "next": "start-challenges" },
+        { "text": "What are the rewards?", "next": "challenge-rewards" }
+      ]
+    },
+    "start-challenges": {
+      "id": "start-challenges",
+      "text": "Head to the arcade and find Drew! They'll explain the daily challenges and track your progress. Each day brings new tasks, so there's always something fresh to do. Don't worry if you can't complete them all - just do what you can!",
+      "options": [{ "text": "Sounds fun!", "next": null }]
+    },
+    "challenge-rewards": {
+      "id": "challenge-rewards",
+      "text": "Rewards include experience points, special badges for your profile, unique cosmetic items, and increased access permissions! The more challenges you complete, the more the world opens up to you. Drew can tell you more about the specific reward tiers!",
+      "options": [{ "text": "I love progression systems!", "next": null }]
+    },
+    "npc-intro": {
+      "id": "npc-intro",
+      "text": "There are 10 NPCs throughout the world, each with unique personalities and roles! In the lobby: Alex (receptionist), Sam (security), and me (tutorial guide). In the office: Taylor (IT), Jordan (PM), Morgan (HR), and Chris (Sales). In the arcade: Riley (events) and Drew (quests).",
+      "options": [
+        { "text": "Who should I talk to first?", "next": "first-npc" },
+        { "text": "Do NPCs have schedules?", "next": "npc-schedules" }
+      ]
+    },
+    "first-npc": {
+      "id": "first-npc",
+      "text": "I'd recommend starting with Alex at the reception desk! They can give you directions and introduce you to the other areas. Or if you want to get started with official onboarding, Morgan in HR is wonderful and very welcoming!",
+      "options": [{ "text": "I'll talk to Alex first!", "next": null }]
+    },
+    "npc-schedules": {
+      "id": "npc-schedules",
+      "text": "Yes! NPCs follow daily schedules - they work 9 AM to 6 PM with lunch breaks at noon! You might find them at their usual posts or taking breaks in different areas. If someone isn't where you expect, try checking back later or look around - they might be nearby!",
+      "options": [{ "text": "Good to know! Thanks Casey!", "next": null }]
+    },
+    "farewell": {
+      "id": "farewell",
+      "text": "No problem at all! Remember, I'm always here if you need help. Just come find me in the lobby! Explore, have fun, and don't hesitate to ask if you have questions. Welcome to OpenClaw World - we're glad you're here!",
+      "options": []
+    }
+  }
+}

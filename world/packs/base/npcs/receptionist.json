@@ -1,0 +1,60 @@
+{
+  "id": "receptionist",
+  "name": "Alex the Receptionist",
+  "sprite": "npc-receptionist",
+  "zone": "lobby",
+  "defaultPosition": { "x": 160, "y": 80 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 160, "y": 80 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 200, "y": 250 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 160, "y": 80 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Welcome to OpenClaw World! I'm Alex, your friendly receptionist. How can I help you today?",
+      "options": [
+        { "text": "Where's the meeting room?", "next": "directions-meeting" },
+        { "text": "I'm looking for IT support", "next": "directions-it" },
+        { "text": "Where can I get coffee?", "next": "directions-cafe" },
+        { "text": "Just browsing, thanks!", "next": "farewell" }
+      ]
+    },
+    "directions-meeting": {
+      "id": "directions-meeting",
+      "text": "The meeting center is just south of here! Look for the big glass doors with the conference table logo. Can't miss it!",
+      "options": [
+        { "text": "Thanks! Anything else I should know?", "next": "meeting-tips" },
+        { "text": "Got it, thanks Alex!", "next": null }
+      ]
+    },
+    "meeting-tips": {
+      "id": "meeting-tips",
+      "text": "Riley the Event Host is usually there if you need help with presentations. And don't forget to check the schedule board for upcoming events!",
+      "options": [{ "text": "Great tips! Thanks!", "next": null }]
+    },
+    "directions-it": {
+      "id": "directions-it",
+      "text": "IT Help is in the office area to the east. Look for Taylor at the help desk - they're the one surrounded by monitors and energy drinks!",
+      "options": [
+        { "text": "Taylor? Got it!", "next": "it-warning" },
+        { "text": "Thanks for the help!", "next": null }
+      ]
+    },
+    "it-warning": {
+      "id": "it-warning",
+      "text": "Oh, and fair warning - they might ask if you've tried turning it off and on again. It's kind of their thing!",
+      "options": [{ "text": "Ha! I'll keep that in mind.", "next": null }]
+    },
+    "directions-cafe": {
+      "id": "directions-cafe",
+      "text": "Ah, looking for caffeine! Head to the lounge-cafe in the southeast corner. Jamie makes the best coffee in the building - just don't ask for decaf, they might cry.",
+      "options": [{ "text": "Jamie it is! Thanks!", "next": null }]
+    },
+    "farewell": {
+      "id": "farewell",
+      "text": "Feel free to explore! If you need anything else, I'll be right here at the front desk. Have a wonderful day!",
+      "options": []
+    }
+  }
+}

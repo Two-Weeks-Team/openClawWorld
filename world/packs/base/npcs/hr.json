@@ -1,0 +1,129 @@
+{
+  "id": "hr",
+  "name": "Morgan the HR Manager",
+  "sprite": "npc-hr",
+  "zone": "office",
+  "defaultPosition": { "x": 400, "y": 200 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 400, "y": 200 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 450, "y": 280 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 400, "y": 200 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "*watering plants* Oh, hello there! Welcome! I'm Morgan from Human Resources. *adjusts World's Best HR mug* Are you here for onboarding, or just need someone to talk to? My door - well, desk - is always open!",
+      "options": [
+        { "text": "I'm new here, need onboarding!", "next": "onboarding" },
+        { "text": "Tell me about company policies", "next": "policies" },
+        { "text": "I need a visitor badge", "next": "visitor-badge" },
+        { "text": "Just saying hello!", "next": "just-hello" }
+      ]
+    },
+    "onboarding": {
+      "id": "onboarding",
+      "text": "Wonderful! I LOVE onboarding! *pulls out checklist* Okay, first things first: welcome packet, badge photo, desk assignment, and the most important part - introductions! Everyone here is lovely. Well, mostly. Jordan might seem stressed but they're sweet deep down.",
+      "options": [
+        { "text": "What should I know about the team?", "next": "team-intro" },
+        { "text": "Where's my desk?", "next": "desk-assignment" },
+        { "text": "Any advice for a new person?", "next": "newbie-advice" }
+      ]
+    },
+    "team-intro": {
+      "id": "team-intro",
+      "text": "Oh, where to start! Alex at reception knows everything about everyone. Taylor in IT is a sweetheart but will lecture you about password security. Chris in Sales has boundless energy - seriously, how do they do it? And Jamie... well, just don't ask for decaf.",
+      "options": [
+        { "text": "They all sound great!", "next": "team-positive" },
+        { "text": "Anyone I should avoid?", "next": "avoid-anyone" }
+      ]
+    },
+    "team-positive": {
+      "id": "team-positive",
+      "text": "They really are! We're like a family here. A slightly dysfunctional, overly-caffeinated family, but a family nonetheless. And now you're part of it! *hugs you mentally* Welcome aboard!",
+      "options": [{ "text": "Thanks Morgan! I'm excited!", "next": null }]
+    },
+    "avoid-anyone": {
+      "id": "avoid-anyone",
+      "text": "*looks around* Well, Drew in the arcade can be... intense. They run the challenge system and take it VERY seriously. But they're not dangerous! Just... competitive. And maybe don't mention deadlines to Jordan unless you want a 20-minute vent session.",
+      "options": [{ "text": "Noted! Thanks for the heads up!", "next": null }]
+    },
+    "desk-assignment": {
+      "id": "desk-assignment",
+      "text": "Your desk is in the main office area! You've got a great view of... *checks notes* ...the coffee station! That's prime real estate here. The previous occupant was promoted to the... *whispers* ...mythical 'remote work' position.",
+      "options": [{ "text": "Coffee station view? Perfect!", "next": "coffee-station" }]
+    },
+    "coffee-station": {
+      "id": "coffee-station",
+      "text": "I know, right? You'll be everyone's best friend! Just remember: the good creamer is in the back of the fridge, hidden behind the expired yogurt. Don't tell anyone I told you.",
+      "options": [{ "text": "Your secret's safe with me!", "next": null }]
+    },
+    "newbie-advice": {
+      "id": "newbie-advice",
+      "text": "Best advice? Be yourself! Also: learn everyone's coffee order, always label your food in the fridge, and if you hear someone say 'quick question,' run. Just kidding! *pauses* ...Mostly.",
+      "options": [{ "text": "I'll keep that in mind!", "next": null }]
+    },
+    "policies": {
+      "id": "policies",
+      "text": "Policies! My favorite topic! *brightens* We have the usual: no harassment, inclusive environment, mandatory fun - I mean, team building. But the important ones? Unlimited PTO, flexible hours, and bring-your-plant-to-work day!",
+      "options": [
+        { "text": "Unlimited PTO? Really?", "next": "pto-details" },
+        { "text": "Flexible hours? How flexible?", "next": "flexible-hours" },
+        { "text": "Bring your plant to work?!", "next": "plant-day" }
+      ]
+    },
+    "pto-details": {
+      "id": "pto-details",
+      "text": "Yes! We trust you to manage your time. Just coordinate with your team and don't leave during crunch time. Jordan once took a 'mental health day' and we all got so much done! Just kidding, Jordan. *looks around nervously*",
+      "options": [{ "text": "That's refreshing!", "next": null }]
+    },
+    "flexible-hours": {
+      "id": "flexible-hours",
+      "text": "Core hours are 10 AM to 3 PM, but otherwise? Come in early, leave late, work from the cafe - whatever works! As long as you're productive and available for meetings, we don't micromanage. Taylor sometimes codes at 2 AM. We don't ask questions.",
+      "options": [{ "text": "That sounds perfect!", "next": null }]
+    },
+    "plant-day": {
+      "id": "plant-day",
+      "text": "*gestures to desk jungle* Every third Friday! Bring in your plant babies, swap cuttings, share care tips. It's my favorite day! These are all from colleagues. This one's from Alex, this one's from Taylor, this one's... *whispers* ...from a plant I rescued from the trash.",
+      "options": [{ "text": "I love that! I'll bring mine!", "next": null }]
+    },
+    "visitor-badge": {
+      "id": "visitor-badge",
+      "text": "Of course! *pulls out camera* Let's get you a proper badge. Smile! No, bigger smile! Think of something that makes you happy... like... free pizza on Fridays! *snaps photo* Perfect! Sam will stop giving you the suspicious security guard look.",
+      "options": [
+        { "text": "Free pizza on Fridays?!", "next": "pizza-fridays" },
+        { "text": "Thanks Morgan!", "next": null }
+      ]
+    },
+    "pizza-fridays": {
+      "id": "pizza-fridays",
+      "text": "Oh! Didn't anyone tell you? Every Friday at noon! We rotate toppings based on votes. Last week was controversial - pineapple won by one vote. Chris campaigned HARD for it. Office politics, am I right?",
+      "options": [
+        { "text": "I love pineapple pizza!", "next": "pineapple-love" },
+        { "text": "Pineapple on pizza?!", "next": "pineapple-horror" }
+      ]
+    },
+    "pineapple-love": {
+      "id": "pineapple-love",
+      "text": "*gasps* A kindred spirit! You and Chris will get along famously! We have a secret Pineapple Pizza Appreciation Society. Very exclusive. Very controversial. Welcome to the resistance!",
+      "options": [{ "text": "Down with pizza gatekeeping!", "next": null }]
+    },
+    "pineapple-horror": {
+      "id": "pineapple-horror",
+      "text": "*laughs* I know, I know! The great debate! But hey, we respect all pizza preferences here. Except anchovies. We had to draw the line somewhere. Even HR has limits.",
+      "options": [{ "text": "Anchovies are where I draw the line too!", "next": null }]
+    },
+    "just-hello": {
+      "id": "just-hello",
+      "text": "Well hello to you too! *smiles warmly* I hope you're settling in well. Remember, HR isn't just for problems - we're here for celebrations, questions, or just a chat. And I make excellent tea! Herbal, of course. Gotta balance out all that coffee everyone else drinks.",
+      "options": [
+        { "text": "I'll come by for tea sometime!", "next": "tea-invite" },
+        { "text": "Thanks Morgan, you're the best!", "next": null }
+      ]
+    },
+    "tea-invite": {
+      "id": "tea-invite",
+      "text": "Please do! I have chamomile for stress, peppermint for focus, and my special 'Monday blend' which is just... extra strong everything. Trust me, you'll need it. Mondays are rough around here.",
+      "options": [{ "text": "I'll remember that! See you around!", "next": null }]
+    }
+  }
+}

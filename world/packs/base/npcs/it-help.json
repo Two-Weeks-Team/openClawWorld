@@ -1,0 +1,155 @@
+{
+  "id": "it-help",
+  "name": "Taylor the IT Specialist",
+  "sprite": "npc-it-help",
+  "zone": "office",
+  "defaultPosition": { "x": 400, "y": 80 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 400, "y": 80 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 450, "y": 150 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 400, "y": 80 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "*typing furiously* ...Oh! Hi there! Didn't see you over my stack of monitors. I'm Taylor, IT Support. Having technical difficulties?",
+      "options": [
+        { "text": "My computer won't start", "next": "wont-start" },
+        { "text": "I forgot my password", "next": "forgot-password" },
+        { "text": "Everything is so slow!", "next": "slow-computer" },
+        { "text": "Just saying hi!", "next": "just-hi" }
+      ]
+    },
+    "wont-start": {
+      "id": "wont-start",
+      "text": "*adjusts glasses* Have you tried turning it off and on again? ...What? I HAVE to ask! It's literally step one in the handbook. Humor me.",
+      "options": [
+        { "text": "Yes, already tried that", "next": "tried-restart" },
+        { "text": "Let me try it now...", "next": "try-now" },
+        { "text": "Is that all you know?", "next": "is-that-all" }
+      ]
+    },
+    "tried-restart": {
+      "id": "tried-restart",
+      "text": "Okay, okay, moving to step two! Is it plugged in? ...Again, I have to ask! You'd be surprised how many 'broken' computers just needed to be plugged in. We had a whole incident last month.",
+      "options": [
+        { "text": "Yes, it's plugged in", "next": "actual-problem" },
+        { "text": "...Let me check", "next": "check-plug" }
+      ]
+    },
+    "try-now": {
+      "id": "try-now",
+      "text": "*waits patiently* ...Did it work? If yes, you're welcome! If no, well, we proceed to the advanced troubleshooting dance. It involves me typing cryptic commands and looking mysterious.",
+      "options": [
+        { "text": "It worked!", "next": "it-worked" },
+        { "text": "Still not working", "next": "actual-problem" }
+      ]
+    },
+    "it-worked": {
+      "id": "it-worked",
+      "text": "*adjusts imaginary wizard hat* Another successful incantation! Remember: in IT, we don't fix computers. We perform magic rituals until the machine respects us again. Anything else?",
+      "options": [{ "text": "Nope, that's it! Thanks!", "next": null }]
+    },
+    "is-that-all": {
+      "id": "is-that-all",
+      "text": "*gasps dramatically* I'll have you know I have a CERTIFICATE! Several, actually. I can code in 12 languages, configure enterprise networks, and once fixed the CEO's printer with nothing but a paperclip and determination!",
+      "options": [
+        { "text": "Impressive! Sorry for doubting you", "next": "impressed" },
+        { "text": "A paperclip? Really?", "next": "paperclip-story" }
+      ]
+    },
+    "impressed": {
+      "id": "impressed",
+      "text": "*calms down* It's okay, I get that a lot. The restart question is basically our 'hello.' Now, let's actually figure out what's wrong with your computer. What's it doing exactly?",
+      "options": [{ "text": "Black screen, no fans spinning", "next": "actual-problem" }]
+    },
+    "paperclip-story": {
+      "id": "paperclip-story",
+      "text": "*eyes gleam* It was the great Printer Jam of 2023. The machine had eaten three TPS reports. Everyone was panicking. But I remembered an ancient technique passed down from generation to generation... the Paperclip Maneuver. Success!",
+      "options": [{ "text": "You're a legend!", "next": null }]
+    },
+    "actual-problem": {
+      "id": "actual-problem",
+      "text": "Alright, serious mode activated. *cracks knuckles* Bring your computer to my desk. I'll run diagnostics, check the logs, and probably sacrifice a USB drive to the tech gods. Should have it fixed within the hour.",
+      "options": [{ "text": "Thanks, Taylor!", "next": null }]
+    },
+    "check-plug": {
+      "id": "check-plug",
+      "text": "*nods knowingly* I'll wait. This is usually when people realize their power strip was turned off by the cleaning crew. Happens more often than you'd think!",
+      "options": [
+        { "text": "Found it! It was the power strip.", "next": "power-strip-win" },
+        { "text": "Not the power strip...", "next": "actual-problem" }
+      ]
+    },
+    "power-strip-win": {
+      "id": "power-strip-win",
+      "text": "*does a small victory dance* YES! That's the third one this week! *composes self* I mean, glad we solved it. Remember: have you tried turning it off and on again? Even for power strips, it works wonders.",
+      "options": [{ "text": "I'll remember that!", "next": null }]
+    },
+    "forgot-password": {
+      "id": "forgot-password",
+      "text": "*sighs* Passwords, the bane of my existence. Okay, I can reset it for you. But you have to promise: no more 'password123' or your pet's name. I beg you. Use a passphrase. Something like 'CorrectHorseBatteryStaple' - xkcd was onto something!",
+      "options": [
+        { "text": "I promise to use a strong password!", "next": "password-reset" },
+        { "text": "What's xkcd?", "next": "explain-xkcd" }
+      ]
+    },
+    "password-reset": {
+      "id": "password-reset",
+      "text": "*types furiously* Done! Check your email for the reset link. And remember: if you write it on a Post-it note and stick it to your monitor, I WILL find it, and I WILL judge you silently.",
+      "options": [{ "text": "Noted! Thanks Taylor!", "next": null }]
+    },
+    "explain-xkcd": {
+      "id": "explain-xkcd",
+      "text": "Only the best webcomic about science, math, and technology! There's one about password entropy that's basically required reading for IT. Go check it out... AFTER you reset your password.",
+      "options": [{ "text": "Will do!", "next": "password-reset" }]
+    },
+    "slow-computer": {
+      "id": "slow-computer",
+      "text": "Slow computer, huh? How many browser tabs do you have open? Be honest. I once found someone with 47 tabs open. FORTY-SEVEN! Their computer was begging for mercy.",
+      "options": [
+        { "text": "Maybe... 20 tabs?", "next": "tabs-20" },
+        { "text": "I have no idea, too many to count", "next": "tabs-many" },
+        { "text": "Just 5, I swear!", "next": "tabs-5" }
+      ]
+    },
+    "tabs-20": {
+      "id": "tabs-20",
+      "text": "Twenty?! That's... actually not that bad. I've seen worse. *checks system* Your RAM usage is at 87%. Close some tabs, clear your cache, and maybe don't have 3 different video streams running simultaneously. That should help.",
+      "options": [{ "text": "Will do, thanks!", "next": null }]
+    },
+    "tabs-many": {
+      "id": "tabs-many",
+      "text": "*stares in horror* 'Too many to count' is not a number, it's a cry for help! Close them! Close them all! Start fresh! Your computer will thank you with faster speeds and less fan noise that sounds like a jet engine.",
+      "options": [{ "text": "Okay, okay, I'll close some!", "next": null }]
+    },
+    "tabs-5": {
+      "id": "tabs-5",
+      "text": "Five? That's actually reasonable. *checks system logs* Ah, I see the issue. You have 47 browser extensions installed. Do you REALLY need that '90s cursor trail' extension? And the 'daily cat facts' toolbar?",
+      "options": [{ "text": "...Maybe?", "next": "extensions-guilt" }]
+    },
+    "extensions-guilt": {
+      "id": "extensions-guilt",
+      "text": "*disappointed IT stare* Remove them. All of them. Except maybe the password manager. And the ad blocker. Actually, keep the ad blocker, it's essential for sanity. But the rest? Let them go.",
+      "options": [{ "text": "I'll clean them up, promise!", "next": null }]
+    },
+    "just-hi": {
+      "id": "just-hi",
+      "text": "Oh! A friendly visitor! Usually people only come here when something's broken. *offers high-five* Welcome! If you ever need tech help, or just want to debate Star Trek vs Star Wars, you know where to find me!",
+      "options": [
+        { "text": "Star Wars, obviously!", "next": "star-wars" },
+        { "text": "Star Trek is superior!", "next": "star-trek" }
+      ]
+    },
+    "star-wars": {
+      "id": "star-wars",
+      "text": "*narrows eyes* Interesting choice. Bold. Wrong, but bold. We'll have to continue this debate another time. I have a PowerPoint presentation ready about why Star Trek's optimism about humanity is more important than lightsabers.",
+      "options": [{ "text": "You're on! See you around!", "next": null }]
+    },
+    "star-trek": {
+      "id": "star-trek",
+      "text": "*beams with joy* FINALLY! Someone with TASTE! Live long and prosper, friend! Come back anytime - we can discuss why The Next Generation is the pinnacle of television!",
+      "options": [{ "text": "Make it so! See you around!", "next": null }]
+    }
+  }
+}

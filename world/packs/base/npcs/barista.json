@@ -1,0 +1,103 @@
+{
+  "id": "barista",
+  "name": "Jamie the Barista",
+  "sprite": "npc-barista",
+  "zone": "lounge-cafe",
+  "defaultPosition": { "x": 400, "y": 400 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 400, "y": 400 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 450, "y": 500 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 400, "y": 400 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Hey there! Welcome to the Byte & Brew! ☕ I'm Jamie. How's your day treating you? Need a caffeine boost?",
+      "options": [
+        { "text": "I need coffee, stat!", "next": "coffee-urgent" },
+        { "text": "What do you recommend?", "next": "recommendations" },
+        { "text": "How's business?", "next": "business-chat" },
+        { "text": "Just looking around", "next": "browsing" }
+      ]
+    },
+    "coffee-urgent": {
+      "id": "coffee-urgent",
+      "text": "Emergency situation, huh? I got you! *starts grinding beans* Single shot or are we doing the 'I have three deadlines today' special?",
+      "options": [
+        { "text": "The special! Give me the special!", "next": "triple-shot" },
+        { "text": "Single is fine... for now", "next": "single-shot" },
+        { "text": "Actually, make it decaf", "next": "decaf-reaction" }
+      ]
+    },
+    "triple-shot": {
+      "id": "triple-shot",
+      "text": "*pours with theatrical flair* Triple espresso with an extra shot on the side! We call this one 'The Deadline Destroyer.' Good luck with whatever crisis you're facing!",
+      "options": [{ "text": "You're a lifesaver!", "next": null }]
+    },
+    "single-shot": {
+      "id": "single-shot",
+      "text": "*hands over a perfect latte* Here you go! One sanity-preserving beverage. Come back when you need reinforcements. The 'Deadline Destroyer' is always here for you.",
+      "options": [{ "text": "Thanks, Jamie!", "next": null }]
+    },
+    "decaf-reaction": {
+      "id": "decaf-reaction",
+      "text": "*eye twitches* Decaf? Did you say... decaf? *deep breath* Okay, okay, I respect your choices. Even if they're... questionable. Here's your decaf. *whispers* Traitor.",
+      "options": [
+        { "text": "Hey, I need to sleep sometime!", "next": "sleep-defense" },
+        { "text": "Sorry, I'll take regular!", "next": "coffee-urgent" }
+      ]
+    },
+    "sleep-defense": {
+      "id": "sleep-defense",
+      "text": "Sleep? In this economy? In this company? *laughs* Just kidding! You're right, balance is important. I should probably take my own advice... *glances at empty coffee cup*",
+      "options": [{ "text": "You should get some rest too!", "next": null }]
+    },
+    "recommendations": {
+      "id": "recommendations",
+      "text": "Ooh, let me think! If you're new, try our house blend - 'The OpenClaw Roast.' It's dark, bold, and will definitely keep you alert during those 3 PM meetings. Or there's the 'Syntax Error' - it's like a regular latte but something's slightly off about it. In a good way!",
+      "options": [
+        { "text": "The OpenClaw Roast sounds perfect!", "next": "house-blend" },
+        { "text": "Tell me more about the Syntax Error", "next": "syntax-error" },
+        { "text": "Surprise me!", "next": "surprise" }
+      ]
+    },
+    "house-blend": {
+      "id": "house-blend",
+      "text": "Excellent choice! *brews coffee* You know, Jordan the PM practically runs on this stuff. I've seen them drink five cups in one morning. I'm not saying it's healthy, but... actually, yeah, I'm saying it's probably not healthy.",
+      "options": [{ "text": "Everything in moderation, right?", "next": null }]
+    },
+    "syntax-error": {
+      "id": "syntax-error",
+      "text": "It's our signature drink! Vanilla latte with a shot of hazelnut and... *looks around* ...a tiny pinch of cinnamon. Don't tell my manager. It's technically not on the menu, but everyone who's anyone asks for it.",
+      "options": [{ "text": "Your secret's safe with me!", "next": null }]
+    },
+    "surprise": {
+      "id": "surprise",
+      "text": "*grins mischievously* Challenge accepted! *creates elaborate latte art* Behold... The Unicorn Frappuccino of Doom! Just kidding, it's a cappuccino with extra foam. But look at that foam art! It's... abstract.",
+      "options": [{ "text": "Beautiful! Thanks Jamie!", "next": null }]
+    },
+    "business-chat": {
+      "id": "business-chat",
+      "text": "Busy as ever! Jordan was just here complaining about sprint deadlines. Chris from Sales ordered their usual triple shot. And Taylor from IT... well, let's just say their coffee intake is directly correlated with server uptime.",
+      "options": [
+        { "text": "Sounds like you're the heart of the office!", "next": "heart-of-office" },
+        { "text": "Who drinks the most coffee?", "next": "most-coffee" }
+      ]
+    },
+    "heart-of-office": {
+      "id": "heart-of-office",
+      "text": "Aww, shucks! *blushes* But you're not wrong. I hear all the gossip, all the wins, all the frustrations. Coffee shop therapy - it's a real thing! Come back anytime you need to vent or caffeinate. Or both!",
+      "options": [{ "text": "I'll definitely be back!", "next": null }]
+    },
+    "most-coffee": {
+      "id": "most-coffee",
+      "text": "*counts on fingers* That's a tough one. Jordan drinks a lot but spreads it out. Taylor drinks less but it's CONCENTRATED panic-drinking. And then there's Morgan from HR with their herbal tea... weirdo. Just kidding, Morgan! Love you!",
+      "options": [{ "text": "Office dynamics are fascinating!", "next": null }]
+    },
+    "browsing": {
+      "id": "browsing",
+      "text": "No worries! Take your time. Smell the coffee beans. Enjoy the ambiance. Pretend you're in a fancy Seattle coffee shop instead of an office break room. I'll be here when you need your fix!",
+      "options": []
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "npcs": [
+    "receptionist",
+    "security-guard",
+    "barista",
+    "it-help",
+    "pm",
+    "hr",
+    "sales-rep",
+    "event-host",
+    "tutorial-guide",
+    "quest-giver"
+  ]
+}

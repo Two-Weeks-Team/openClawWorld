@@ -1,0 +1,141 @@
+{
+  "id": "quest-giver",
+  "name": "Drew the Quest Master",
+  "sprite": "npc-quest-giver",
+  "zone": "arcade",
+  "defaultPosition": { "x": 780, "y": 400 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 780, "y": 400 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 720, "y": 500 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 780, "y": 400 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "*looks up from mysterious glowing book* Ah... a seeker approaches. I am Drew, keeper of challenges, master of quests, guardian of... *squints* ...did you want something? Or are you just here to stare at my cool cape?",
+      "options": [
+        { "text": "I want a quest!", "next": "quest-offer" },
+        { "text": "Tell me about challenges", "next": "challenge-info" },
+        { "text": "What's with the cape?", "next": "cape-story" },
+        { "text": "You seem... mysterious", "next": "mystery-response" }
+      ]
+    },
+    "quest-offer": {
+      "id": "quest-offer",
+      "text": "A quest, you say? *rubs hands together* I have DAILY challenges that will test your wit, skill, and determination! Complete them for rewards, glory, and... *whispers* ...access to secret areas. Interested?",
+      "options": [
+        { "text": "Tell me today's challenges!", "next": "daily-challenges" },
+        { "text": "What are the rewards?", "next": "rewards-info" },
+        { "text": "Secret areas?!", "next": "secret-areas" }
+      ]
+    },
+    "daily-challenges": {
+      "id": "daily-challenges",
+      "text": "Today's challenges are: 1) Social Butterfly - Talk to 5 different NPCs, 2) Explorer - Visit all 5 zones in the world, 3) Coffee Connoisseur - Order 3 drinks from Jamie, and 4) Arcade Champion - Beat the practice high score!",
+      "options": [
+        { "text": "Which should I do first?", "next": "challenge-priority" },
+        { "text": "How do I track progress?", "next": "progress-tracking" }
+      ]
+    },
+    "challenge-priority": {
+      "id": "challenge-priority",
+      "text": "*strokes chin thoughtfully* For a beginner? Start with 'Social Butterfly.' Talking to NPCs is easy, helps you learn the world, and... *leans in* ...some of them give hints about other quests. Information is power, seeker.",
+      "options": [{ "text": "Smart strategy!", "next": null }]
+    },
+    "progress-tracking": {
+      "id": "progress-tracking",
+      "text": "Your progress is tracked automatically! Just press... uh... *looks around* ...actually, we're still working on the UI for that. For now, just... remember what you've done? I'll believe you. Probably. Don't lie to me.",
+      "options": [{ "text": "I'll keep track myself!", "next": null }]
+    },
+    "rewards-info": {
+      "id": "rewards-info",
+      "text": "Rewards come in tiers! Complete 1 challenge: Experience points and a participation badge. Complete 3 challenges: Special cosmetic flair and a 'Dedicated' title. Complete ALL 4: Access to the SECRET ROOM and my personal respect. Which is priceless.",
+      "options": [
+        { "text": "What's in the secret room?", "next": "secret-room-tease" },
+        { "text": "I want that title!", "next": "title-motivation" }
+      ]
+    },
+    "secret-room-tease": {
+      "id": "secret-room-tease",
+      "text": "*smirks* If I told you, it wouldn't be a SECRET, would it? Let's just say... it contains knowledge. Power. And possibly a really comfortable chair. You'll have to complete all challenges to find out. No shortcuts!",
+      "options": [{ "text": "Challenge accepted!", "next": null }]
+    },
+    "title-motivation": {
+      "id": "title-motivation",
+      "text": "The 'Dedicated' title? *nods approvingly* Shows everyone you're not here to mess around. You'll stand out in chat, people will respect you, and... *whispers* ...Alex gives a small discount on directions to dedicated players. Don't tell Sam.",
+      "options": [{ "text": "Discount directions? I'm in!", "next": null }]
+    },
+    "secret-areas": {
+      "id": "secret-areas",
+      "text": "*looks around nervously* There are... places in this world not shown on any map. Hidden rooms, secret passages, areas that require... special clearance. Complete enough challenges and doors will open. Literally. I rigged them.",
+      "options": [
+        { "text": "How many challenges for access?", "next": "access-requirement" },
+        { "text": "Have you explored them all?", "next": "drew-exploration" }
+      ]
+    },
+    "access-requirement": {
+      "id": "access-requirement",
+      "text": "Complete 10 daily challenges total and I'll grant you Tier 1 access. That's... *counts on fingers* ...two and a half days if you're dedicated! Or ten days if you do one per day. Math is hard, okay? Just do the challenges!",
+      "options": [{ "text": "10 challenges, got it!", "next": null }]
+    },
+    "drew-exploration": {
+      "id": "drew-exploration",
+      "text": "*laughs* Me? Explore? I'm too busy MANAGING the challenges! Someone has to sit here looking mysterious and occasionally helpful. But I've heard... things. Whispers of a room where the walls are made of code itself...",
+      "options": [{ "text": "That sounds ominous...", "next": null }]
+    },
+    "challenge-info": {
+      "id": "challenge-info",
+      "text": "Challenges are daily tasks designed to push you out of your comfort zone! Some are social, some are exploratory, some are skill-based. They reset every day at midnight, so there's always something new. Think of it as... structured adventure!",
+      "options": [
+        { "text": "Do challenges get harder?", "next": "difficulty-progression" },
+        { "text": "What if I can't complete one?", "next": "incomplete-challenge" }
+      ]
+    },
+    "difficulty-progression": {
+      "id": "difficulty-progression",
+      "text": "*grins* As you prove yourself, YES! Early challenges: 'Talk to 3 people.' Later challenges: 'Convince Taylor that turning it off and on again ISN'T always the answer.' The final challenge? *dramatic pause* ...I'm not allowed to say. Yet.",
+      "options": [{ "text": "I look forward to the challenge!", "next": null }]
+    },
+    "incomplete-challenge": {
+      "id": "incomplete-challenge",
+      "text": "No worries! Challenges are optional. Complete what you can, skip what you can't. There's no penalty for failure, only rewards for success. Tomorrow brings new challenges! And hey, partial progress is still progress. I believe in you. Kind of.",
+      "options": [{ "text": "Thanks for understanding!", "next": null }]
+    },
+    "cape-story": {
+      "id": "cape-story",
+      "text": "*dramatically swirls cape* This? This is the Cloak of Endless Quests! It symbolizes my burden... my duty... my undeniable fashion sense! Also it has pockets. Deep, mysterious pockets. I found a sandwich in here once. From 2022.",
+      "options": [
+        { "text": "Does it have magical powers?", "next": "cape-powers" },
+        { "text": "A 2022 sandwich?!", "next": "old-sandwich" }
+      ]
+    },
+    "cape-powers": {
+      "id": "cape-powers",
+      "text": "Magical powers? *considers* Well, it does an EXCELLENT job of getting caught in doorways. And it billows dramatically when I spin. Is that magic? In my heart, yes. In reality... *whispers* ...it's just a really nice cape from the costume shop.",
+      "options": [{ "text": "It suits you!", "next": null }]
+    },
+    "old-sandwich": {
+      "id": "old-sandwich",
+      "text": "*shudders* Yeah. I don't know how it got there. I don't remember putting it there. It was... concerning. Like, cosmically concerning. I gave it a respectful burial in the trash. May it rest in peace.",
+      "options": [{ "text": "Rest in peace, mysterious sandwich", "next": null }]
+    },
+    "mystery-response": {
+      "id": "mystery-response",
+      "text": "Mysterious? *adjusts cape and straightens up* I am the keeper of secrets, the weaver of destinies, the... *phone buzzes* ...oh, hold on. *checks phone* ...sorry, that was my mom. Where was I? Right! Mysterious! Very mysterious!",
+      "options": [
+        { "text": "What secrets do you keep?", "next": "secrets-reveal" },
+        { "text": "Weaver of destinies? Really?", "next": "destiny-weaver" }
+      ]
+    },
+    "secrets-reveal": {
+      "id": "secrets-reveal",
+      "text": "*leans in close* I'll tell you one secret: Casey the Tutorial Guide? They know more than they let on. WAY more. They've been here since... well, since before. Ask them about the 'incident.' Watch their face. *sits back* That's all you get for free.",
+      "options": [{ "text": "The incident? Now I'm curious!", "next": null }]
+    },
+    "destiny-weaver": {
+      "id": "destiny-weaver",
+      "text": "Okay, fine, 'weaver of destinies' might be overstating it. But I DO assign quests! And quests shape your journey! And your journey shapes... uh... your afternoon? Look, I'm mysterious within reason. I have a lunch break at noon.",
+      "options": [{ "text": "Even mystery needs lunch!", "next": null }]
+    }
+  }
+}

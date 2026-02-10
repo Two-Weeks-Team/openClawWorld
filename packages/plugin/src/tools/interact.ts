@@ -5,6 +5,8 @@ import {
   createResultSchema,
 } from '@openclawworld/shared';
 import type { OpenClawWorldClient } from '../client.js';
+import type { PluginConfig } from '../config.js';
+import { isToolEnabled, createForbiddenError } from '../config.js';
 
 export type InteractToolInput = InteractRequest;
 export type InteractToolOutput = AicResult<InteractResponseData>;
@@ -15,13 +17,20 @@ export const InteractToolOutputSchema = createResultSchema(InteractResponseDataS
 export interface InteractToolOptions {
   defaultRoomId?: string;
   defaultAgentId?: string;
+  config: PluginConfig;
 }
+
+const TOOL_NAME = 'ocw.interact';
 
 export async function executeInteractTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: InteractToolOptions = {}
+  options: InteractToolOptions
 ): Promise<InteractToolOutput> {
+  if (!isToolEnabled(TOOL_NAME, options.config)) {
+    return createForbiddenError(TOOL_NAME);
+  }
+
   const parseResult = InteractToolInputSchema.safeParse(input);
   if (!parseResult.success) {
     return {

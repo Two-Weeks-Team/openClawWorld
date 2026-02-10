@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+for cmd in curl jq; do
+    if ! command -v "$cmd" &> /dev/null; then
+        echo "ERROR: '$cmd' is required but not installed."
+        exit 1
+    fi
+done
+
 SERVER_URL="${SERVER_URL:-http://localhost:2567}"
 MAX_RETRIES=30
 RETRY_INTERVAL=2

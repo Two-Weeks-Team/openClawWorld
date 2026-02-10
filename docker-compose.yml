@@ -9,10 +9,11 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=2567
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-*}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000}
       - LOG_LEVEL=${LOG_LEVEL:-info}
     env_file:
-      - .env
+      - path: .env
+        required: false
     volumes:
       - server-logs:/app/logs
       - server-data:/app/data

@@ -1,5 +1,6 @@
 import { defineServer, defineRoom, monitor, playground } from 'colyseus';
 import cors from 'cors';
+import express from 'express';
 import { GameRoom } from './rooms/GameRoom.js';
 import { aicRouter, requestIdMiddleware, errorHandler, notFoundHandler } from './aic/index.js';
 import { getMetricsCollector } from './metrics/MetricsCollector.js';
@@ -26,6 +27,7 @@ const server = defineServer({
       })
     );
 
+    app.use(express.json());
     app.use(requestIdMiddleware);
 
     app.get('/health', (_req, res) => {

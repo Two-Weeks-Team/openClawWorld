@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import Phaser from 'phaser';
 import type { Room } from '@colyseus/sdk';
 import { gameConfig } from './game/config';
@@ -40,6 +41,16 @@ joinBtn.addEventListener('click', async () => {
     });
 
     setupChat(room);
+
+    // Dev-only debug interface
+    if (import.meta.env.DEV) {
+      (window as any).__ocw = {
+        getMyState: () => gameClient.getMyEntity(),
+        findEntity: (id: string) => gameClient.findEntity(id),
+        getRoom: () => gameClient.currentRoom,
+        sendMessage: (type: string, data: any) => gameClient.currentRoom?.send(type, data),
+      };
+    }
   } catch (error) {
     console.error('Failed to connect:', error);
     joinBtn.disabled = false;

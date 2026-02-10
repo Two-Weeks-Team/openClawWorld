@@ -8,13 +8,20 @@ import type { RoomState } from '../../../server/src/schemas/RoomState.js';
 export type Entity = EntitySchema;
 export type { RoomState, GameRoom };
 
+function getServerEndpoint(): string {
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const protocol =
+    typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${hostname}:2567`;
+}
+
 export class ColyseusClient {
   private client: Client<typeof appConfig>;
   private room: Room<GameRoom> | null = null;
   private _sessionId: string | null = null;
   private _entityId: string | null = null;
 
-  constructor(endpoint: string = 'ws://localhost:2567') {
+  constructor(endpoint: string = getServerEndpoint()) {
     this.client = new Client<typeof appConfig>(endpoint);
   }
 
@@ -59,6 +66,22 @@ export class ColyseusClient {
 
   get currentRoom() {
     return this.room;
+  }
+
+  getMyEntity() {
+    if (!this.room || !this._entityId) return undefined;
+    const state = this.room.state;
+    return (
+      state.humans.get(this._entityId) ||
+      state.agents.get(this._entityId) ||
+      state.objects.get(this._entityId)
+    );
+  }
+
+  findEntity(id: string) {
+    if (!this.room) return undefined;
+    const state = this.room.state;
+    return state.humans.get(id) || state.agents.get(id) || state.objects.get(id);
   }
 }
 

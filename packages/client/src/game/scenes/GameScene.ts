@@ -378,6 +378,7 @@ export class GameScene extends Phaser.Scene {
 
   private updateEntityData(entity: Entity, key: string) {
     this.entityData.set(key, entity);
+    this.updateEntityStatus(key, entity);
   }
 
   private showChatBubble(entityId: string, message: string) {
@@ -442,12 +443,42 @@ export class GameScene extends Phaser.Scene {
     });
     text.setOrigin(0.5, 0.5);
 
-    container.add([sprite, text]);
+    const statusCircle = this.add.circle(text.width / 2 + 6, -20, 4, 0x00ff00);
+    statusCircle.setName('statusIndicator');
+
+    container.add([sprite, text, statusCircle]);
     this.entities.set(key, container);
     this.entityData.set(key, entity);
 
+    this.updateEntityStatus(key, entity);
+
     if (key === gameClient.entityId) {
       this.cameras.main.startFollow(container, true, 0.1, 0.1);
+    }
+  }
+
+  private updateEntityStatus(key: string, entity: Entity) {
+    const container = this.entities.get(key);
+    if (!container) return;
+
+    const statusIndicator = container.getByName('statusIndicator') as Phaser.GameObjects.Arc;
+    if (statusIndicator) {
+      let color = 0x00ff00;
+      switch (entity.status) {
+        case 'focus':
+          color = 0xffff00;
+          break;
+        case 'dnd':
+          color = 0xff0000;
+          break;
+        case 'afk':
+          color = 0x808080;
+          break;
+        case 'offline':
+          color = 0x000000;
+          break;
+      }
+      statusIndicator.setFillStyle(color);
     }
   }
 

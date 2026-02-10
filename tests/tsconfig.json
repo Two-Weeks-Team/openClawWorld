@@ -2,15 +2,20 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": ".",
+    "rootDir": "..",
     "composite": true,
     "noEmit": true,
     "paths": {
       "@openclawworld/shared": ["../packages/shared/src"],
-      "@openclawworld/plugin": ["../packages/plugin/src"]
+      "@openclawworld/plugin": ["../packages/plugin/src"],
+      "@openclawworld/server/*": ["../packages/server/src/*"]
     }
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules"],
-  "references": [{ "path": "../packages/shared" }, { "path": "../packages/plugin" }]
+  "include": ["**/*.ts", "../packages/server/src/**/*.ts"],
+  "exclude": ["node_modules", "e2e"],
+  "references": [
+    { "path": "../packages/shared" },
+    { "path": "../packages/plugin" },
+    { "path": "../packages/server" }
+  ]
 }

@@ -1,4 +1,5 @@
 import type { SafetyReport, MutedUser } from '@openclawworld/shared';
+import type { AuditLog } from '../audit/AuditLog.js';
 
 /**
  * Safety service for user protection with report, block, and mute functionality.
@@ -7,6 +8,23 @@ export class SafetyService {
   private reports: Map<string, SafetyReport> = new Map();
   private blocks: Map<string, Set<string>> = new Map();
   private mutes: Map<string, MutedUser[]> = new Map();
+  private auditLog: AuditLog | null = null;
+
+  /**
+   * Set the audit log for tracking safety actions.
+   * @param auditLog - The audit log instance
+   */
+  setAuditLog(auditLog: AuditLog): void {
+    this.auditLog = auditLog;
+  }
+
+  /**
+   * Get the audit log instance.
+   * @returns The audit log or null
+   */
+  getAuditLog(): AuditLog | null {
+    return this.auditLog;
+  }
 
   /**
    * Report a user for inappropriate behavior.
@@ -15,7 +33,7 @@ export class SafetyService {
    * @param reason - The reason for the report
    * @returns The created safety report
    */
-  reportUser(reporterId: string, targetId: string, reason: string): SafetyReport {
+  reportUser(reporterId: string, targetId: string, reason: string, roomId?: string): SafetyReport {
     const report: SafetyReport = {
       id: `report_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       reporterId,
@@ -25,6 +43,14 @@ export class SafetyService {
       status: 'pending',
     };
     this.reports.set(report.id, report);
+
+    this.auditLog?.log('safety.report', reporterId, {
+      targetId,
+      roomId,
+      reason,
+      reportId: report.id,
+    });
+
     return report;
   }
 
@@ -33,11 +59,16 @@ export class SafetyService {
    * @param blockerId - The entity ID of the blocker
    * @param targetId - The entity ID of the user to block
    */
-  blockUser(blockerId: string, targetId: string): void {
+  blockUser(blockerId: string, targetId: string, roomId?: string): void {
     if (!this.blocks.has(blockerId)) {
       this.blocks.set(blockerId, new Set());
     }
     this.blocks.get(blockerId)!.add(targetId);
+
+    this.auditLog?.log('safety.block', blockerId, {
+      targetId,
+      roomId,
+    });
   }
 
   /**
@@ -45,8 +76,13 @@ export class SafetyService {
    * @param blockerId - The entity ID of the blocker
    * @param targetId - The entity ID of the user to unblock
    */
-  unblockUser(blockerId: string, targetId: string): void {
+  unblockUser(blockerId: string, targetId: string, roomId?: string): void {
     this.blocks.get(blockerId)?.delete(targetId);
+
+    this.auditLog?.log('safety.unblock', blockerId, {
+      targetId,
+      roomId,
+    });
   }
 
   /**
@@ -77,7 +113,13 @@ export class SafetyService {
    * @param durationMs - Optional duration in milliseconds
    * @returns The created mute record
    */
-  muteUser(orgId: string, mutedId: string, mutedBy: string, durationMs?: number): MutedUser {
+  muteUser(
+    orgId: string,
+    mutedId: string,
+    mutedBy: string,
+    durationMs?: number,
+    roomId?: string
+  ): MutedUser {
     const mute: MutedUser = {
       orgId,
       mutedId,
@@ -96,6 +138,13 @@ export class SafetyService {
     );
     this.mutes.get(orgId)!.push(mute);
 
+    this.auditLog?.log('safety.mute', mutedBy, {
+      targetId: mutedId,
+      roomId,
+      orgId,
+      durationMs,
+    });
+
     return mute;
   }
 
@@ -104,12 +153,20 @@ export class SafetyService {
    * @param orgId - The organization ID
    * @param mutedId - The entity ID to unmute
    */
-  unmuteUser(orgId: string, mutedId: string): void {
+  unmuteUser(orgId: string, mutedId: string, unmutedBy?: string, roomId?: string): void {
     if (this.mutes.has(orgId)) {
       this.mutes.set(
         orgId,
         this.mutes.get(orgId)!.filter(m => m.mutedId !== mutedId)
       );
+    }
+
+    if (unmutedBy) {
+      this.auditLog?.log('safety.unmute', unmutedBy, {
+        targetId: mutedId,
+        roomId,
+        orgId,
+      });
     }
   }
 

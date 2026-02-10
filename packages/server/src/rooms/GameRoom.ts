@@ -17,10 +17,14 @@ import { MovementSystem } from '../movement/MovementSystem.js';
 import { ChatSystem } from '../chat/ChatSystem.js';
 import { ProfileService } from '../profile/ProfileService.js';
 import { ZoneSystem, DEFAULT_ZONE_BOUNDS } from '../zone/ZoneSystem.js';
+import { NPCSystem } from '../systems/NPCSystem.js';
 import { PermissionService } from '../services/PermissionService.js';
 import { SafetyService } from '../services/SafetyService.js';
+import { AuditLog } from '../audit/AuditLog.js';
 import type { EntityKind, UserStatus } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
+
+const DEFAULT_NPC_SEED = 12345;
 
 export class GameRoom extends Room<{ state: RoomState }> {
   declare state: RoomState;
@@ -35,9 +39,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private movementSystem: MovementSystem | null = null;
   private chatSystem: ChatSystem | null = null;
   private zoneSystem: ZoneSystem | null = null;
+  private npcSystem: NPCSystem | null = null;
   private profileService: ProfileService;
   private permissionService!: PermissionService;
   private safetyService: SafetyService;
+  private auditLog: AuditLog;
+  private gameTimeMs: number = 0;
   private recentProximityEvents: ProximityEvent[] = [];
   private mapLoader: MapLoader;
   private eventLog: EventLog;
@@ -55,6 +62,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.eventLog = new EventLog(EVENT_RETENTION_MS, EVENT_LOG_MAX_SIZE);
     this.chatSystem = new ChatSystem();
     this.profileService = new ProfileService();
+    this.safetyService = new SafetyService();
+    this.auditLog = new AuditLog();
+    this.safetyService.setAuditLog(this.auditLog);
+    this.chatSystem.setSafetyService(this.safetyService);
   }
 
   override onCreate(options: { roomId?: string; mapId?: string; tickRate?: number }): void {
@@ -70,6 +81,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.proximitySystem = new ProximitySystem(DEFAULT_PROXIMITY_RADIUS, PROXIMITY_DEBOUNCE_MS);
       this.movementSystem = new MovementSystem(this.collisionSystem, DEFAULT_MOVE_SPEED);
       this.zoneSystem = new ZoneSystem(DEFAULT_ZONE_BOUNDS);
+      this.npcSystem = new NPCSystem(DEFAULT_NPC_SEED);
       gameMap = new GameMap(parsedMap.mapId, parsedMap.width, parsedMap.height, parsedMap.tileSize);
 
       const spawnObj = parsedMap.objects.find(obj => {
@@ -182,6 +194,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
     return this.zoneSystem;
   }
 
+  getNPCSystem(): NPCSystem | null {
+    return this.npcSystem;
+  }
+
   getChatSystem(): ChatSystem | null {
     return this.chatSystem;
   }
@@ -192,6 +208,14 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   getPermissionService(): PermissionService {
     return this.permissionService;
+  }
+
+  getSafetyService(): SafetyService {
+    return this.safetyService;
+  }
+
+  getAuditLog(): AuditLog {
+    return this.auditLog;
   }
 
   getEventLog(): EventLog {
@@ -305,6 +329,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (this.zoneSystem) {
       const allEntities = this.state.getAllEntities();
       this.zoneSystem.update(allEntities, this.eventLog, this.state.roomId);
+    }
+
+    if (this.npcSystem) {
+      this.gameTimeMs += deltaMs;
+      this.npcSystem.update(this.gameTimeMs, this.eventLog, this.state.roomId);
     }
 
     const tickTime = performance.now() - tickStart;

@@ -1,0 +1,689 @@
+{
+  "schemaVersion": "1.0",
+  "name": "openclawworld",
+  "version": "0.1.0",
+  "description": "OpenClawWorld game plugin for AI agent integration",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "baseUrl": {
+        "type": "string",
+        "format": "uri",
+        "description": "Server base URL for AIC API"
+      },
+      "apiKey": {
+        "type": "string",
+        "description": "Authentication token for API requests"
+      },
+      "defaultRoomId": {
+        "type": "string",
+        "description": "Default room ID for tool operations"
+      },
+      "defaultAgentId": {
+        "type": "string",
+        "description": "Default agent ID for tool operations"
+      }
+    },
+    "required": ["baseUrl"]
+  },
+  "tools": [
+    {
+      "name": "ocw.status",
+      "description": "Check server connectivity and status",
+      "required": true,
+      "sideEffects": "none",
+      "defaultEnabled": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "description": "Room ID to check status for"
+          },
+          "agentId": {
+            "type": "string",
+            "description": "Agent ID to check status for"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "ok" },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "serverReachable": { "type": "boolean" },
+                  "baseUrl": { "type": "string", "format": "uri" },
+                  "serverTsMs": { "type": "integer", "minimum": 0 },
+                  "roomId": { "type": "string" },
+                  "agentId": { "type": "string" }
+                },
+                "required": ["serverReachable", "baseUrl", "serverTsMs"]
+              }
+            },
+            "required": ["status", "data"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "error" },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "bad_request",
+                      "unauthorized",
+                      "forbidden",
+                      "not_found",
+                      "room_not_ready",
+                      "agent_not_in_room",
+                      "invalid_destination",
+                      "collision_blocked",
+                      "rate_limited",
+                      "conflict",
+                      "timeout",
+                      "internal"
+                    ]
+                  },
+                  "message": { "type": "string" },
+                  "retryable": { "type": "boolean" },
+                  "details": { "type": "object" }
+                },
+                "required": ["code", "message", "retryable"]
+              }
+            },
+            "required": ["status", "error"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ocw.observe",
+      "description": "Get a snapshot of the world around your agent",
+      "required": true,
+      "sideEffects": "none",
+      "defaultEnabled": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Your agent's ID"
+          },
+          "roomId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Room to observe"
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 2000,
+            "description": "Observation radius in pixels"
+          },
+          "detail": {
+            "type": "string",
+            "enum": ["lite", "full"],
+            "description": "Level of detail"
+          },
+          "includeSelf": {
+            "type": "boolean",
+            "description": "Include self in response"
+          }
+        },
+        "required": ["agentId", "roomId", "radius", "detail"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "ok" },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "self": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "kind": { "type": "string", "enum": ["human", "agent", "object"] },
+                      "name": { "type": "string" },
+                      "roomId": { "type": "string" },
+                      "pos": {
+                        "type": "object",
+                        "properties": {
+                          "x": { "type": "number" },
+                          "y": { "type": "number" }
+                        },
+                        "required": ["x", "y"]
+                      },
+                      "tile": {
+                        "type": "object",
+                        "properties": {
+                          "tx": { "type": "integer", "minimum": 0, "maximum": 100000 },
+                          "ty": { "type": "integer", "minimum": 0, "maximum": 100000 }
+                        },
+                        "required": ["tx", "ty"]
+                      },
+                      "facing": { "type": "string", "enum": ["up", "down", "left", "right"] },
+                      "speed": { "type": "number", "minimum": 0, "maximum": 1000 }
+                    },
+                    "required": ["id", "kind", "name", "roomId", "pos"]
+                  },
+                  "nearby": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "entity": {
+                          "type": "object",
+                          "properties": {
+                            "id": { "type": "string" },
+                            "kind": { "type": "string", "enum": ["human", "agent", "object"] },
+                            "name": { "type": "string" },
+                            "roomId": { "type": "string" },
+                            "pos": {
+                              "type": "object",
+                              "properties": {
+                                "x": { "type": "number" },
+                                "y": { "type": "number" }
+                              },
+                              "required": ["x", "y"]
+                            }
+                          },
+                          "required": ["id", "kind", "name", "roomId", "pos"]
+                        },
+                        "distance": { "type": "number", "minimum": 0 },
+                        "affords": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "action": { "type": "string" },
+                              "label": { "type": "string" }
+                            },
+                            "required": ["action", "label"]
+                          }
+                        }
+                      },
+                      "required": ["entity", "distance", "affords"]
+                    }
+                  },
+                  "serverTsMs": { "type": "integer", "minimum": 0 },
+                  "room": {
+                    "type": "object",
+                    "properties": {
+                      "roomId": { "type": "string" },
+                      "mapId": { "type": "string" },
+                      "tickRate": { "type": "integer", "minimum": 1, "maximum": 60 }
+                    },
+                    "required": ["roomId", "mapId", "tickRate"]
+                  }
+                },
+                "required": ["self", "nearby", "serverTsMs", "room"]
+              }
+            },
+            "required": ["status", "data"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "error" },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "bad_request",
+                      "unauthorized",
+                      "forbidden",
+                      "not_found",
+                      "room_not_ready",
+                      "agent_not_in_room",
+                      "invalid_destination",
+                      "collision_blocked",
+                      "rate_limited",
+                      "conflict",
+                      "timeout",
+                      "internal"
+                    ]
+                  },
+                  "message": { "type": "string" },
+                  "retryable": { "type": "boolean" },
+                  "details": { "type": "object" }
+                },
+                "required": ["code", "message", "retryable"]
+              }
+            },
+            "required": ["status", "error"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ocw.poll_events",
+      "description": "Long-poll for game events (movements, chat, presence changes)",
+      "required": true,
+      "sideEffects": "none",
+      "defaultEnabled": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Your agent's ID"
+          },
+          "roomId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Room ID"
+          },
+          "sinceCursor": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9=_-]{1,256}$",
+            "description": "Cursor from last poll (use 'evt_0' for first call)"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Max events to return"
+          },
+          "waitMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 25000,
+            "description": "Long-poll timeout in ms"
+          }
+        },
+        "required": ["agentId", "roomId", "sinceCursor"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "ok" },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "events": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "cursor": { "type": "string" },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "presence.join",
+                            "presence.leave",
+                            "proximity.enter",
+                            "proximity.exit",
+                            "chat.message",
+                            "object.state_changed"
+                          ]
+                        },
+                        "roomId": { "type": "string" },
+                        "tsMs": { "type": "integer", "minimum": 0 },
+                        "payload": { "type": "object" }
+                      },
+                      "required": ["cursor", "type", "roomId", "tsMs", "payload"]
+                    }
+                  },
+                  "nextCursor": { "type": "string" },
+                  "serverTsMs": { "type": "integer", "minimum": 0 }
+                },
+                "required": ["events", "nextCursor", "serverTsMs"]
+              }
+            },
+            "required": ["status", "data"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "error" },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "bad_request",
+                      "unauthorized",
+                      "forbidden",
+                      "not_found",
+                      "room_not_ready",
+                      "agent_not_in_room",
+                      "invalid_destination",
+                      "collision_blocked",
+                      "rate_limited",
+                      "conflict",
+                      "timeout",
+                      "internal"
+                    ]
+                  },
+                  "message": { "type": "string" },
+                  "retryable": { "type": "boolean" },
+                  "details": { "type": "object" }
+                },
+                "required": ["code", "message", "retryable"]
+              }
+            },
+            "required": ["status", "error"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ocw.move_to",
+      "description": "Move your agent to a target tile position",
+      "required": false,
+      "sideEffects": "world",
+      "defaultEnabled": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Your agent's ID"
+          },
+          "roomId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Room ID"
+          },
+          "txId": {
+            "type": "string",
+            "pattern": "^tx_[a-zA-Z0-9._-]{8,128}$",
+            "description": "Unique transaction ID for idempotency"
+          },
+          "dest": {
+            "type": "object",
+            "properties": {
+              "tx": { "type": "integer", "minimum": 0, "maximum": 100000 },
+              "ty": { "type": "integer", "minimum": 0, "maximum": 100000 }
+            },
+            "required": ["tx", "ty"],
+            "description": "Target tile coordinates"
+          },
+          "mode": {
+            "type": "string",
+            "const": "walk",
+            "description": "Movement mode"
+          }
+        },
+        "required": ["agentId", "roomId", "txId", "dest"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "ok" },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "txId": { "type": "string" },
+                  "applied": { "type": "boolean" },
+                  "serverTsMs": { "type": "integer", "minimum": 0 },
+                  "result": { "type": "string", "enum": ["accepted", "rejected", "no_op"] }
+                },
+                "required": ["txId", "applied", "serverTsMs", "result"]
+              }
+            },
+            "required": ["status", "data"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "error" },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "bad_request",
+                      "unauthorized",
+                      "forbidden",
+                      "not_found",
+                      "room_not_ready",
+                      "agent_not_in_room",
+                      "invalid_destination",
+                      "collision_blocked",
+                      "rate_limited",
+                      "conflict",
+                      "timeout",
+                      "internal"
+                    ]
+                  },
+                  "message": { "type": "string" },
+                  "retryable": { "type": "boolean" },
+                  "details": { "type": "object" }
+                },
+                "required": ["code", "message", "retryable"]
+              }
+            },
+            "required": ["status", "error"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ocw.interact",
+      "description": "Interact with a nearby object or entity",
+      "required": false,
+      "sideEffects": "world",
+      "defaultEnabled": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Your agent's ID"
+          },
+          "roomId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Room ID"
+          },
+          "txId": {
+            "type": "string",
+            "pattern": "^tx_[a-zA-Z0-9._-]{8,128}$",
+            "description": "Unique transaction ID"
+          },
+          "targetId": {
+            "type": "string",
+            "pattern": "^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$",
+            "description": "Entity/object to interact with"
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Action to perform"
+          },
+          "params": {
+            "type": "object",
+            "description": "Action-specific parameters"
+          }
+        },
+        "required": ["agentId", "roomId", "txId", "targetId", "action"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "ok" },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "txId": { "type": "string" },
+                  "applied": { "type": "boolean" },
+                  "serverTsMs": { "type": "integer", "minimum": 0 },
+                  "outcome": {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": ["ok", "no_effect", "invalid_action", "too_far"]
+                      },
+                      "message": { "type": "string" }
+                    },
+                    "required": ["type"]
+                  }
+                },
+                "required": ["txId", "applied", "serverTsMs", "outcome"]
+              }
+            },
+            "required": ["status", "data"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "error" },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "bad_request",
+                      "unauthorized",
+                      "forbidden",
+                      "not_found",
+                      "room_not_ready",
+                      "agent_not_in_room",
+                      "invalid_destination",
+                      "collision_blocked",
+                      "rate_limited",
+                      "conflict",
+                      "timeout",
+                      "internal"
+                    ]
+                  },
+                  "message": { "type": "string" },
+                  "retryable": { "type": "boolean" },
+                  "details": { "type": "object" }
+                },
+                "required": ["code", "message", "retryable"]
+              }
+            },
+            "required": ["status", "error"]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ocw.chat_send",
+      "description": "Send a chat message",
+      "required": false,
+      "sideEffects": "chat",
+      "defaultEnabled": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Your agent's ID"
+          },
+          "roomId": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9._-]{1,64}$",
+            "description": "Room ID"
+          },
+          "txId": {
+            "type": "string",
+            "pattern": "^tx_[a-zA-Z0-9._-]{8,128}$",
+            "description": "Unique transaction ID"
+          },
+          "channel": {
+            "type": "string",
+            "enum": ["proximity", "global"],
+            "description": "Chat channel"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500,
+            "description": "Message content"
+          }
+        },
+        "required": ["agentId", "roomId", "txId", "channel", "message"]
+      },
+      "outputSchema": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "ok" },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "txId": { "type": "string" },
+                  "applied": { "type": "boolean" },
+                  "serverTsMs": { "type": "integer", "minimum": 0 },
+                  "chatMessageId": { "type": "string" }
+                },
+                "required": ["txId", "applied", "serverTsMs", "chatMessageId"]
+              }
+            },
+            "required": ["status", "data"]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": { "const": "error" },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "bad_request",
+                      "unauthorized",
+                      "forbidden",
+                      "not_found",
+                      "room_not_ready",
+                      "agent_not_in_room",
+                      "invalid_destination",
+                      "collision_blocked",
+                      "rate_limited",
+                      "conflict",
+                      "timeout",
+                      "internal"
+                    ]
+                  },
+                  "message": { "type": "string" },
+                  "retryable": { "type": "boolean" },
+                  "details": { "type": "object" }
+                },
+                "required": ["code", "message", "retryable"]
+              }
+            },
+            "required": ["status", "error"]
+          }
+        ]
+      }
+    }
+  ]
+}

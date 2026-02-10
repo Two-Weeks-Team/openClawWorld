@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclawworld.local/schemas/aic/v0.1.json",
+  "title": "AIC v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {},
+  "$defs": {
+    "IdRoom": { "type": "string", "pattern": "^[a-zA-Z0-9._-]{1,64}$" },
+    "IdAgent": { "type": "string", "pattern": "^[a-zA-Z0-9._-]{1,64}$" },
+    "IdEntity": { "type": "string", "pattern": "^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$" },
+    "IdTx": { "type": "string", "pattern": "^tx_[a-zA-Z0-9._-]{8,128}$" },
+    "Cursor": { "type": "string", "pattern": "^[A-Za-z0-9=_-]{1,256}$" },
+    "TsMs": { "type": "integer", "minimum": 0 },
+
+    "Vec2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" }
+      }
+    },
+
+    "TileCoord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tx", "ty"],
+      "properties": {
+        "tx": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "ty": { "type": "integer", "minimum": 0, "maximum": 100000 }
+      }
+    },
+
+    "ErrorObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "retryable"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "bad_request",
+            "unauthorized",
+            "forbidden",
+            "not_found",
+            "room_not_ready",
+            "agent_not_in_room",
+            "invalid_destination",
+            "collision_blocked",
+            "rate_limited",
+            "conflict",
+            "timeout",
+            "internal"
+          ]
+        },
+        "message": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "retryable": { "type": "boolean" },
+        "details": { "type": "object", "additionalProperties": true }
+      }
+    },
+
+    "ResultOk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "data"],
+      "properties": {
+        "status": { "type": "string", "const": "ok" },
+        "data": {}
+      }
+    },
+
+    "ResultError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "error"],
+      "properties": {
+        "status": { "type": "string", "const": "error" },
+        "error": { "$ref": "#/$defs/ErrorObject" }
+      }
+    },
+
+    "Result": {
+      "oneOf": [
+        { "$ref": "#/$defs/ResultOk" },
+        { "$ref": "#/$defs/ResultError" }
+      ]
+    },
+
+    "Affordance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "label"],
+      "properties": {
+        "action": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "label": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "paramsSchema": { "type": "object", "additionalProperties": true }
+      }
+    },
+
+    "EntityKind": { "type": "string", "enum": ["human", "agent", "object"] },
+
+    "EntityBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "name", "pos", "roomId"],
+      "properties": {
+        "id": { "$ref": "#/$defs/IdEntity" },
+        "kind": { "$ref": "#/$defs/EntityKind" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "pos": { "$ref": "#/$defs/Vec2" },
+        "tile": { "$ref": "#/$defs/TileCoord" },
+        "facing": { "type": "string", "enum": ["up", "down", "left", "right"] },
+        "speed": { "type": "number", "minimum": 0, "maximum": 1000 },
+        "meta": { "type": "object", "additionalProperties": true }
+      }
+    },
+
+    "ObjectState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectType", "state"],
+      "properties": {
+        "objectType": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "state": { "type": "object", "additionalProperties": true }
+      }
+    },
+
+    "ObservedEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entity", "distance", "affords"],
+      "properties": {
+        "entity": { "$ref": "#/$defs/EntityBase" },
+        "distance": { "type": "number", "minimum": 0, "maximum": 1000000 },
+        "affords": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 50,
+          "items": { "$ref": "#/$defs/Affordance" }
+        },
+        "object": { "$ref": "#/$defs/ObjectState" }
+      }
+    },
+
+    "ObserveDetail": { "type": "string", "enum": ["lite", "full"] },
+
+    "ObserveRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "radius", "detail"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "radius": { "type": "number", "minimum": 1, "maximum": 2000 },
+        "detail": { "$ref": "#/$defs/ObserveDetail" },
+        "includeSelf": { "type": "boolean", "default": true }
+      }
+    },
+
+    "ObserveResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["self", "nearby", "serverTsMs", "room"],
+      "properties": {
+        "self": { "$ref": "#/$defs/EntityBase" },
+        "nearby": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 500,
+          "items": { "$ref": "#/$defs/ObservedEntity" }
+        },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" },
+        "room": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["roomId", "mapId", "tickRate"],
+          "properties": {
+            "roomId": { "$ref": "#/$defs/IdRoom" },
+            "mapId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "tickRate": { "type": "integer", "minimum": 1, "maximum": 60 }
+          }
+        }
+      }
+    },
+
+    "MoveToRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "txId", "dest"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "dest": { "$ref": "#/$defs/TileCoord" },
+        "mode": { "type": "string", "enum": ["walk"], "default": "walk" }
+      }
+    },
+
+    "MoveToResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["txId", "applied", "serverTsMs", "result"],
+      "properties": {
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "applied": { "type": "boolean" },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" },
+        "result": {
+          "type": "string",
+          "enum": ["accepted", "rejected", "no_op"]
+        }
+      }
+    },
+
+    "InteractRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "txId", "targetId", "action"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "targetId": { "$ref": "#/$defs/IdEntity" },
+        "action": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "params": { "type": "object", "additionalProperties": true }
+      }
+    },
+
+    "InteractResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["txId", "applied", "serverTsMs", "outcome"],
+      "properties": {
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "applied": { "type": "boolean" },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" },
+        "outcome": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["ok", "no_effect", "invalid_action", "too_far"]
+            },
+            "message": { "type": "string", "maxLength": 2000 }
+          }
+        }
+      }
+    },
+
+    "ChatChannel": { "type": "string", "enum": ["proximity", "global"] },
+
+    "ChatSendRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "txId", "channel", "message"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "channel": { "$ref": "#/$defs/ChatChannel" },
+        "message": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+
+    "ChatMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "roomId", "channel", "fromEntityId", "fromName", "message", "tsMs"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^msg_[A-Za-z0-9._-]{8,128}$" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "channel": { "$ref": "#/$defs/ChatChannel" },
+        "fromEntityId": { "$ref": "#/$defs/IdEntity" },
+        "fromName": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "tsMs": { "$ref": "#/$defs/TsMs" }
+      }
+    },
+
+    "ChatSendResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["txId", "applied", "serverTsMs", "chatMessageId"],
+      "properties": {
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "applied": { "type": "boolean" },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" },
+        "chatMessageId": { "type": "string", "pattern": "^msg_[A-Za-z0-9._-]{8,128}$" }
+      }
+    },
+
+    "ChatObserveRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "windowSec"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "windowSec": { "type": "integer", "minimum": 1, "maximum": 300 },
+        "channel": { "$ref": "#/$defs/ChatChannel" }
+      }
+    },
+
+    "ChatObserveResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["messages", "serverTsMs"],
+      "properties": {
+        "messages": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 500,
+          "items": { "$ref": "#/$defs/ChatMessage" }
+        },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" }
+      }
+    },
+
+    "EventType": {
+      "type": "string",
+      "enum": [
+        "presence.join",
+        "presence.leave",
+        "proximity.enter",
+        "proximity.exit",
+        "chat.message",
+        "object.state_changed"
+      ]
+    },
+
+    "EventEnvelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cursor", "type", "roomId", "tsMs", "payload"],
+      "properties": {
+        "cursor": { "$ref": "#/$defs/Cursor" },
+        "type": { "$ref": "#/$defs/EventType" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "tsMs": { "$ref": "#/$defs/TsMs" },
+        "payload": { "type": "object", "additionalProperties": true }
+      }
+    },
+
+    "PollEventsRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "sinceCursor"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "sinceCursor": { "$ref": "#/$defs/Cursor" },
+        "limit": { "type": "integer", "minimum": 1, "maximum": 200, "default": 50 },
+        "waitMs": { "type": "integer", "minimum": 0, "maximum": 25000, "default": 0 }
+      }
+    },
+
+    "PollEventsResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["events", "nextCursor", "serverTsMs"],
+      "properties": {
+        "events": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/EventEnvelope" }
+        },
+        "nextCursor": { "$ref": "#/$defs/Cursor" },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" }
+      }
+    }
+  }
+}

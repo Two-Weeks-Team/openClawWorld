@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openclawworld.local/schemas/aic/v0.1.events.json",
+  "title": "AIC v0.1 Events",
+  "description": "Event payload schemas for AIC v0.1 event types",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "IdRoom": { "type": "string", "pattern": "^[a-zA-Z0-9._-]{1,64}$" },
+    "IdEntity": { "type": "string", "pattern": "^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$" },
+    "TsMs": { "type": "integer", "minimum": 0 },
+
+    "PresenceJoin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entityId", "name", "kind"],
+      "properties": {
+        "entityId": { "$ref": "#/$defs/IdEntity" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "kind": { "type": "string", "enum": ["human", "agent", "object"] }
+      }
+    },
+
+    "PresenceLeave": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entityId", "reason"],
+      "properties": {
+        "entityId": { "$ref": "#/$defs/IdEntity" },
+        "reason": { "type": "string", "enum": ["disconnect", "kicked", "room_closed"] }
+      }
+    },
+
+    "ProximityEnter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subjectId", "otherId", "distance"],
+      "properties": {
+        "subjectId": { "$ref": "#/$defs/IdEntity" },
+        "otherId": { "$ref": "#/$defs/IdEntity" },
+        "distance": { "type": "number", "minimum": 0, "maximum": 1000000 }
+      }
+    },
+
+    "ProximityExit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subjectId", "otherId"],
+      "properties": {
+        "subjectId": { "$ref": "#/$defs/IdEntity" },
+        "otherId": { "$ref": "#/$defs/IdEntity" }
+      }
+    },
+
+    "ChatMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["messageId", "fromEntityId", "channel", "message", "tsMs"],
+      "properties": {
+        "messageId": { "type": "string", "pattern": "^msg_[A-Za-z0-9._-]{8,128}$" },
+        "fromEntityId": { "$ref": "#/$defs/IdEntity" },
+        "channel": { "type": "string", "enum": ["proximity", "global"] },
+        "message": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "tsMs": { "$ref": "#/$defs/TsMs" }
+      }
+    },
+
+    "JsonPatchOp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "path"],
+      "properties": {
+        "op": { "type": "string", "enum": ["add", "remove", "replace"] },
+        "path": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "value": {}
+      }
+    },
+
+    "ObjectStateChanged": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objectId", "objectType", "patch", "version"],
+      "properties": {
+        "objectId": { "$ref": "#/$defs/IdEntity" },
+        "objectType": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "patch": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/JsonPatchOp" }
+        },
+        "version": { "type": "integer", "minimum": 1, "maximum": 1000000000 }
+      }
+    }
+  }
+}

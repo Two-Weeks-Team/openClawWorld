@@ -28,6 +28,15 @@ import { handleRegister } from './handlers/register.js';
 
 const router: Router = Router();
 
+// Register endpoint is UNAUTHENTICATED - agents call this to get their first token
+router.post(
+  '/register',
+  interactRateLimiter,
+  validateRequest(RegisterRequestSchema),
+  handleRegister
+);
+
+// All routes below require authentication
 router.use(authMiddleware);
 
 router.post('/observe', observeRateLimiter, validateRequest(ObserveRequestSchema), handleObserve);
@@ -60,13 +69,6 @@ router.post(
   pollEventsRateLimiter,
   validateRequest(PollEventsRequestSchema),
   handlePollEvents
-);
-
-router.post(
-  '/register',
-  interactRateLimiter, // Use interact rate limiter (10 req/min) for registration
-  validateRequest(RegisterRequestSchema),
-  handleRegister
 );
 
 export default router;

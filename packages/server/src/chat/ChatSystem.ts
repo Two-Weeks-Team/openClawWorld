@@ -1,19 +1,18 @@
 import type { ChatChannel, ChatMessage } from '@openclawworld/shared';
 import crypto from 'crypto';
+import type { SafetyService } from '../services/SafetyService.js';
 
-/**
- * Ring buffer implementation for storing chat messages with bounded memory usage.
- */
 export class ChatSystem {
   private messages: ChatMessage[] = [];
   private maxSize: number;
+  private safetyService: SafetyService | null = null;
 
-  /**
-   * Create a new ChatSystem.
-   * @param maxSize - Maximum number of messages to keep (ring buffer size)
-   */
   constructor(maxSize: number = 1000) {
     this.maxSize = maxSize;
+  }
+
+  setSafetyService(safetyService: SafetyService): void {
+    this.safetyService = safetyService;
   }
 
   /**
@@ -56,34 +55,34 @@ export class ChatSystem {
     return { messageId, tsMs };
   }
 
-  /**
-   * Get messages from the chat system, optionally filtered by room, channel, and time window.
-   * @param roomId - The room ID to filter by
-   * @param channel - Optional channel to filter by
-   * @param windowSec - Time window in seconds (messages newer than now - windowSec)
-   * @returns Array of matching messages
-   */
   getMessages(roomId: string, channel?: ChatChannel, windowSec?: number): ChatMessage[] {
     const cutoffTime = windowSec ? Date.now() - windowSec * 1000 : 0;
 
     return this.messages.filter(msg => {
-      // Filter by room
-      if (msg.roomId !== roomId) {
-        return false;
-      }
-
-      // Filter by channel if specified
-      if (channel && msg.channel !== channel) {
-        return false;
-      }
-
-      // Filter by time window if specified
-      if (windowSec && msg.tsMs < cutoffTime) {
-        return false;
-      }
-
+      if (msg.roomId !== roomId) return false;
+      if (channel && msg.channel !== channel) return false;
+      if (windowSec && msg.tsMs < cutoffTime) return false;
       return true;
     });
+  }
+
+  getMessagesForEntity(
+    roomId: string,
+    viewerId: string,
+    channel?: ChatChannel,
+    windowSec?: number
+  ): ChatMessage[] {
+    const baseMessages = this.getMessages(roomId, channel, windowSec);
+
+    if (!this.safetyService) return baseMessages;
+
+    return baseMessages.filter(
+      msg => !this.safetyService!.isBlockedEitherWay(viewerId, msg.fromEntityId)
+    );
+  }
+
+  isBlocked(senderId: string, receiverId: string): boolean {
+    return this.safetyService?.isBlockedEitherWay(senderId, receiverId) ?? false;
   }
 
   /**

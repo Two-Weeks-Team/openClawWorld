@@ -22,7 +22,8 @@ FROM node:22-alpine AS production
 
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
-RUN addgroup -g 1001 -S nodejs && \
+RUN apk add --no-cache wget && \
+    addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 WORKDIR /app
@@ -35,7 +36,7 @@ COPY --from=builder /app/packages/server/dist ./packages/server/dist
 
 RUN pnpm install --frozen-lockfile --prod
 
-COPY packages/server/assets ./assets
+COPY --from=builder /app/packages/server/assets ./assets
 
 RUN chown -R nodejs:nodejs /app
 

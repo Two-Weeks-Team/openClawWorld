@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eo pipefail
 
 for cmd in curl jq; do
     if ! command -v "$cmd" &> /dev/null; then
@@ -68,7 +68,7 @@ test_register() {
     AGENT_ID=$(echo "$RESPONSE" | jq -r '.data.agentId')
     SESSION_TOKEN=$(echo "$RESPONSE" | jq -r '.data.sessionToken')
     
-    if [ "$STATUS" = "ok" ] && [ -n "$AGENT_ID" ] && [ "$AGENT_ID" != "null" ]; then
+    if [ "$STATUS" = "ok" ] && [ -n "$AGENT_ID" ] && [ "$AGENT_ID" != "null" ] && [ -n "$SESSION_TOKEN" ] && [ "$SESSION_TOKEN" != "null" ]; then
         echo "  PASS: Agent registered successfully"
         echo "  Agent ID: $AGENT_ID"
         export AGENT_ID

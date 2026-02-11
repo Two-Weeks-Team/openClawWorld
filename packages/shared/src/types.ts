@@ -222,7 +222,23 @@ export type EventType =
   | 'chat.message'
   | 'object.state_changed'
   | 'profile.updated'
-  | 'npc.state_change';
+  | 'npc.state_change'
+  | 'facility.interacted'
+  | MeetingEventType;
+
+export type MeetingEventType =
+  | 'meeting.created'
+  | 'meeting.participant_joined'
+  | 'meeting.participant_left'
+  | 'meeting.host_transferred'
+  | 'meeting.ended'
+  | 'agenda.item_added'
+  | 'agenda.item_removed'
+  | 'agenda.item_updated'
+  | 'agenda.item_completed'
+  | 'agenda.current_item_set'
+  | 'agenda.next_item'
+  | 'agenda.items_reordered';
 
 export type EventEnvelope<T = Record<string, unknown>> = {
   cursor: string;
@@ -579,13 +595,29 @@ export type Meeting = {
   invitedIds: string[];
 };
 
+export type MeetingReservationStatus = 'scheduled' | 'active' | 'cancelled' | 'completed';
+
 export type MeetingReservation = {
   id: string;
-  meetingRoomId: string;
-  meetingId: string;
-  startTime: number;
+  meetingRoomId: string; // Physical room in map
+  orgId: string;
+  creatorId: string;
+  name: string;
+  startTime: number; // Unix timestamp
   endTime: number;
+  status: MeetingReservationStatus;
+  colyseusRoomId?: string; // Set when meeting is active
 };
+
+export type MeetingRoomOptions = {
+  meetingId: string;
+  orgId: string;
+  name: string;
+  hostId: string;
+  capacity?: number;
+};
+
+export type MeetingParticipantRole = 'host' | 'participant';
 
 // Agenda
 export type AgendaItem = {

@@ -18,6 +18,7 @@ import { ChatSystem } from '../chat/ChatSystem.js';
 import { ProfileService } from '../profile/ProfileService.js';
 import { ZoneSystem, DEFAULT_ZONE_BOUNDS } from '../zone/ZoneSystem.js';
 import { NPCSystem } from '../systems/NPCSystem.js';
+import { FacilityService } from '../services/FacilityService.js';
 import { PermissionService } from '../services/PermissionService.js';
 import { SafetyService } from '../services/SafetyService.js';
 import { AuditLog } from '../audit/AuditLog.js';
@@ -41,6 +42,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private zoneSystem: ZoneSystem | null = null;
   private npcSystem: NPCSystem | null = null;
   private profileService: ProfileService;
+  private facilityService!: FacilityService;
   private permissionService!: PermissionService;
   private safetyService: SafetyService;
   private auditLog: AuditLog;
@@ -110,6 +112,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     }
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
+    this.facilityService = new FacilityService(this.state);
     this.permissionService = new PermissionService(this.state);
     this.setSimulationInterval(() => this.onTick(), 1000 / tickRate);
 
@@ -204,6 +207,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   getProfileService(): ProfileService {
     return this.profileService;
+  }
+
+  getFacilityService(): FacilityService {
+    return this.facilityService;
   }
 
   getPermissionService(): PermissionService {

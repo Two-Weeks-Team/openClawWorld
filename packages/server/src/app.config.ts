@@ -2,6 +2,7 @@ import { defineServer, defineRoom, monitor, playground } from 'colyseus';
 import cors from 'cors';
 import express from 'express';
 import { GameRoom } from './rooms/GameRoom.js';
+import { MeetingRoom } from './rooms/MeetingRoom.js';
 import { aicRouter, requestIdMiddleware, errorHandler, notFoundHandler } from './aic/index.js';
 import { getMetricsCollector } from './metrics/MetricsCollector.js';
 
@@ -10,6 +11,7 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
 const server = defineServer({
   rooms: {
     game: defineRoom(GameRoom),
+    meeting: defineRoom(MeetingRoom),
   },
 
   express: app => {

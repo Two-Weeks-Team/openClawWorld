@@ -1,6 +1,8 @@
 import { Schema, type, MapSchema } from '@colyseus/schema';
 import { EntitySchema } from './EntitySchema.js';
+import { FacilitySchema } from './FacilitySchema.js';
 import { GameMap } from './GameMap.js';
+import { MeetingReservationSchema } from './MeetingReservationSchema.js';
 import { NPCSchema } from './NPCSchema.js';
 import { NoticeSchema } from './NoticeSchema.js';
 import { OrganizationSchema } from './OrganizationSchema.js';
@@ -43,6 +45,12 @@ export class RoomState extends Schema {
 
   @type({ map: NoticeSchema })
   notices: MapSchema<NoticeSchema> = new MapSchema<NoticeSchema>();
+
+  @type({ map: FacilitySchema })
+  facilities: MapSchema<FacilitySchema> = new MapSchema<FacilitySchema>();
+
+  @type({ map: MeetingReservationSchema })
+  reservations: MapSchema<MeetingReservationSchema> = new MapSchema<MeetingReservationSchema>();
 
   constructor(roomId: string, mapId: string, tickRate?: number, gameMap?: GameMap) {
     super();
@@ -111,6 +119,24 @@ export class RoomState extends Schema {
   getAllNPCs(): Map<string, NPCSchema> {
     const all = new Map<string, NPCSchema>();
     this.npcs.forEach((npc, id) => all.set(id, npc));
+    return all;
+  }
+
+  addFacility(facility: FacilitySchema): void {
+    this.facilities.set(facility.id, facility);
+  }
+
+  removeFacility(facilityId: string): boolean {
+    return this.facilities.delete(facilityId);
+  }
+
+  getFacility(facilityId: string): FacilitySchema | undefined {
+    return this.facilities.get(facilityId);
+  }
+
+  getAllFacilities(): Map<string, FacilitySchema> {
+    const all = new Map<string, FacilitySchema>();
+    this.facilities.forEach((facility, id) => all.set(id, facility));
     return all;
   }
 }

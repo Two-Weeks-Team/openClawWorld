@@ -157,4 +157,42 @@ export class ChatSystem {
   clear(): void {
     this.messages = [];
   }
+
+  /**
+   * Send a message to a meeting channel.
+   * @param meetingId - The meeting room ID
+   * @param senderId - The entity ID of the sender
+   * @param senderName - The display name of the sender
+   * @param message - The message content
+   * @returns The generated message ID and timestamp, or null if validation fails
+   */
+  sendMeetingMessage(
+    meetingId: string,
+    senderId: string,
+    senderName: string,
+    message: string
+  ): { messageId: string; tsMs: number } | null {
+    return this.sendMessage(meetingId, 'meeting', senderId, senderName, message, {
+      meetingRoomId: meetingId,
+    });
+  }
+
+  /**
+   * Get chat history for a specific meeting.
+   * @param meetingId - The meeting room ID
+   * @param limit - Maximum number of messages to return (optional)
+   * @returns Array of chat messages for the meeting
+   */
+  getMeetingHistory(meetingId: string, limit?: number): ChatMessage[] {
+    const messages = this.messages.filter(msg => msg.meetingRoomId === meetingId);
+
+    if (limit !== undefined) {
+      if (limit <= 0) {
+        return [];
+      }
+      return messages.slice(-limit);
+    }
+
+    return messages;
+  }
 }

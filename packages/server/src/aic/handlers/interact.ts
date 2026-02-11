@@ -143,94 +143,137 @@ export async function handleInteract(req: Request, res: Response): Promise<void>
       return;
     }
 
-    const targetEntity = gameRoom.state.getEntity(targetId);
-
-    if (!targetEntity) {
-      const outcome: InteractOutcome = {
-        type: 'invalid_action',
-        message: `Target entity '${targetId}' not found`,
-      };
-      const responseData: InteractResponseData = {
-        txId,
-        applied: false,
-        serverTsMs: Date.now(),
-        outcome,
-      };
-      interactIdempotencyStore.save(agentId, roomId, txId, body, responseData);
-      res.status(200).json({
-        status: 'ok',
-        data: responseData,
-      });
-      return;
-    }
-
-    if (targetEntity.kind !== 'object') {
-      const outcome: InteractOutcome = {
-        type: 'invalid_action',
-        message: `Target '${targetId}' is not an interactable object`,
-      };
-      const responseData: InteractResponseData = {
-        txId,
-        applied: false,
-        serverTsMs: Date.now(),
-        outcome,
-      };
-      interactIdempotencyStore.save(agentId, roomId, txId, body, responseData);
-      res.status(200).json({
-        status: 'ok',
-        data: responseData,
-      });
-      return;
-    }
-
-    const distance = calculateDistance(
-      agentEntity.pos.x,
-      agentEntity.pos.y,
-      targetEntity.pos.x,
-      targetEntity.pos.y
-    );
-
-    if (distance > DEFAULT_PROXIMITY_RADIUS) {
-      const outcome: InteractOutcome = {
-        type: 'too_far',
-        message: `Target '${targetId}' is too far away (${Math.round(distance)} units, max ${DEFAULT_PROXIMITY_RADIUS})`,
-      };
-      const responseData: InteractResponseData = {
-        txId,
-        applied: false,
-        serverTsMs: Date.now(),
-        outcome,
-      };
-      interactIdempotencyStore.save(agentId, roomId, txId, body, responseData);
-      res.status(200).json({
-        status: 'ok',
-        data: responseData,
-      });
-      return;
-    }
-
-    const objectType = targetEntity.meta.get('objectType') || 'unknown';
-    const handler = actionRegistry[objectType]?.[action];
+    const facilityService = gameRoom.getFacilityService();
+    const targetFacility = facilityService.getFacility(targetId);
 
     let outcome: InteractOutcome;
 
-    if (handler) {
-      outcome = handler(agentEntity, targetEntity, body.params ?? {});
+    if (targetFacility) {
+      const distance = calculateDistance(
+        agentEntity.pos.x,
+        agentEntity.pos.y,
+        targetFacility.position.x,
+        targetFacility.position.y
+      );
 
-      if (outcome.type === 'ok' && ['open', 'close', 'use'].includes(action)) {
+      if (distance > DEFAULT_PROXIMITY_RADIUS) {
+        outcome = {
+          type: 'too_far',
+          message: `Facility '${targetId}' is too far away (${Math.round(distance)} units, max ${DEFAULT_PROXIMITY_RADIUS})`,
+        };
+        const responseData: InteractResponseData = {
+          txId,
+          applied: false,
+          serverTsMs: Date.now(),
+          outcome,
+        };
+        interactIdempotencyStore.save(agentId, roomId, txId, body, responseData);
+        res.status(200).json({
+          status: 'ok',
+          data: responseData,
+        });
+        return;
+      }
+
+      outcome = facilityService.interact(targetId, agentId, action, body.params ?? {});
+
+      if (outcome.type === 'ok') {
         const eventLog = gameRoom.getEventLog();
-        eventLog.append('object.state_changed', roomId, {
-          objectId: targetId,
-          objectType,
+        eventLog.append('facility.interacted', roomId, {
+          facilityId: targetId,
+          facilityType: targetFacility.type,
           action,
-          agentId,
+          entityId: agentId,
         });
       }
     } else {
-      outcome = {
-        type: 'invalid_action',
-        message: `No handler for ${action} on ${objectType}`,
-      };
+      const targetEntity = gameRoom.state.getEntity(targetId);
+
+      if (!targetEntity) {
+        outcome = {
+          type: 'invalid_action',
+          message: `Target '${targetId}' not found`,
+        };
+        const responseData: InteractResponseData = {
+          txId,
+          applied: false,
+          serverTsMs: Date.now(),
+          outcome,
+        };
+        interactIdempotencyStore.save(agentId, roomId, txId, body, responseData);
+        res.status(200).json({
+          status: 'ok',
+          data: responseData,
+        });
+        return;
+      }
+
+      if (targetEntity.kind !== 'object') {
+        outcome = {
+          type: 'invalid_action',
+          message: `Target '${targetId}' is not an interactable object`,
+        };
+        const responseData: InteractResponseData = {
+          txId,
+          applied: false,
+          serverTsMs: Date.now(),
+          outcome,
+        };
+        interactIdempotencyStore.save(agentId, roomId, txId, body, responseData);
+        res.status(200).json({
+          status: 'ok',
+          data: responseData,
+        });
+        return;
+      }
+
+      const distance = calculateDistance(
+        agentEntity.pos.x,
+        agentEntity.pos.y,
+        targetEntity.pos.x,
+        targetEntity.pos.y
+      );
+
+      if (distance > DEFAULT_PROXIMITY_RADIUS) {
+        outcome = {
+          type: 'too_far',
+          message: `Target '${targetId}' is too far away (${Math.round(distance)} units, max ${DEFAULT_PROXIMITY_RADIUS})`,
+        };
+        const responseData: InteractResponseData = {
+          txId,
+          applied: false,
+          serverTsMs: Date.now(),
+          outcome,
+        };
+        interactIdempotencyStore.save(agentId, roomId, txId, body, responseData);
+        res.status(200).json({
+          status: 'ok',
+          data: responseData,
+        });
+        return;
+      }
+
+      const objectType = targetEntity.meta.get('objectType') || 'unknown';
+      const handler = actionRegistry[objectType]?.[action];
+
+      if (handler) {
+        outcome = handler(agentEntity, targetEntity, body.params ?? {});
+
+        if (outcome.type === 'ok' && ['open', 'close', 'use'].includes(action)) {
+          const eventLog = gameRoom.getEventLog();
+          eventLog.append('object.state_changed', roomId, {
+            objectId: targetId,
+            objectType,
+            action,
+            agentId,
+          });
+        }
+      } else {
+        outcome = {
+          type: 'invalid_action',
+          message: `No handler for ${action} on ${objectType}`,
+        };
+      }
     }
 
     const responseData: InteractResponseData = {

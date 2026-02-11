@@ -1,14 +1,28 @@
 import type { ChatChannel, ChatMessage } from '@openclawworld/shared';
+import { parseEmotes } from '@openclawworld/shared';
 import crypto from 'crypto';
 import type { SafetyService } from '../services/SafetyService.js';
+
+export type TeamMembershipCheck = (entityId: string, teamId: string) => boolean;
+export type MeetingParticipationCheck = (entityId: string, meetingRoomId: string) => boolean;
 
 export class ChatSystem {
   private messages: ChatMessage[] = [];
   private maxSize: number;
   private safetyService: SafetyService | null = null;
+  private teamMembershipCheck: TeamMembershipCheck | null = null;
+  private meetingParticipationCheck: MeetingParticipationCheck | null = null;
 
   constructor(maxSize: number = 1000) {
     this.maxSize = maxSize;
+  }
+
+  setTeamMembershipCheck(check: TeamMembershipCheck): void {
+    this.teamMembershipCheck = check;
+  }
+
+  setMeetingParticipationCheck(check: MeetingParticipationCheck): void {
+    this.meetingParticipationCheck = check;
   }
 
   setSafetyService(safetyService: SafetyService): void {
@@ -18,21 +32,44 @@ export class ChatSystem {
   /**
    * Send a message and store it in the chat system.
    * @param roomId - The room ID
-   * @param channel - The chat channel (proximity/global)
+   * @param channel - The chat channel (proximity/global/team/meeting/dm)
    * @param fromEntityId - The entity ID of the sender
    * @param fromName - The display name of the sender
    * @param message - The message content
-   * @returns The generated message ID and timestamp
+   * @param options - Additional options for extended channels
+   * @returns The generated message ID and timestamp, or null if validation fails
    */
   sendMessage(
     roomId: string,
     channel: ChatChannel,
     fromEntityId: string,
     fromName: string,
-    message: string
-  ): { messageId: string; tsMs: number } {
+    message: string,
+    options?: {
+      targetEntityId?: string;
+      teamId?: string;
+      meetingRoomId?: string;
+    }
+  ): { messageId: string; tsMs: number } | null {
+    if (channel === 'team' && options?.teamId && this.teamMembershipCheck) {
+      if (!this.teamMembershipCheck(fromEntityId, options.teamId)) {
+        return null;
+      }
+    }
+
+    if (channel === 'meeting' && options?.meetingRoomId && this.meetingParticipationCheck) {
+      if (!this.meetingParticipationCheck(fromEntityId, options.meetingRoomId)) {
+        return null;
+      }
+    }
+
+    if (channel === 'dm' && !options?.targetEntityId) {
+      return null;
+    }
+
     const tsMs = Date.now();
     const messageId = this.generateMessageId();
+    const emotes = parseEmotes(message);
 
     const chatMessage: ChatMessage = {
       id: messageId,
@@ -42,11 +79,14 @@ export class ChatSystem {
       fromName,
       message,
       tsMs,
+      targetEntityId: options?.targetEntityId,
+      teamId: options?.teamId,
+      meetingRoomId: options?.meetingRoomId,
+      emotes: emotes.length > 0 ? emotes : undefined,
     };
 
-    // Ring buffer: if full, remove oldest messages
     if (this.messages.length >= this.maxSize) {
-      const removeCount = Math.ceil(this.maxSize * 0.1); // Remove 10% when full
+      const removeCount = Math.ceil(this.maxSize * 0.1);
       this.messages.splice(0, removeCount);
     }
 
@@ -74,11 +114,19 @@ export class ChatSystem {
   ): ChatMessage[] {
     const baseMessages = this.getMessages(roomId, channel, windowSec);
 
-    if (!this.safetyService) return baseMessages;
+    return baseMessages.filter(msg => {
+      if (msg.channel === 'dm' && msg.targetEntityId) {
+        const isSender = msg.fromEntityId === viewerId;
+        const isRecipient = msg.targetEntityId === viewerId;
+        if (!isSender && !isRecipient) return false;
+      }
 
-    return baseMessages.filter(
-      msg => !this.safetyService!.isBlockedEitherWay(viewerId, msg.fromEntityId)
-    );
+      if (this.safetyService && this.safetyService.isBlockedEitherWay(viewerId, msg.fromEntityId)) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   isBlocked(senderId: string, receiverId: string): boolean {

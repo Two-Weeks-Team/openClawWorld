@@ -117,13 +117,18 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
       return;
     }
 
-    const { messageId, tsMs } = chatSystem.sendMessage(
-      roomId,
-      channel,
-      agentId,
-      agentEntity.name,
-      message
-    );
+    const result = chatSystem.sendMessage(roomId, channel, agentId, agentEntity.name, message);
+
+    if (!result) {
+      res
+        .status(403)
+        .json(
+          createErrorResponse('forbidden', 'Not authorized to send message in this channel', false)
+        );
+      return;
+    }
+
+    const { messageId, tsMs } = result;
 
     const eventLog = gameRoom.getEventLog();
     eventLog.append('chat.message', roomId, {

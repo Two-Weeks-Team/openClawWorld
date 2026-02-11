@@ -35,6 +35,7 @@ export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = new Map([
   ['meeting-center', { x: 0, y: 1280, width: 1280, height: 1280 }],
   ['lounge-cafe', { x: 1280, y: 1280, width: 1280, height: 1280 }],
   ['arcade', { x: 2560, y: 0, width: 640, height: 2560 }],
+  ['plaza', { x: 3200, y: 0, width: 960, height: 1280 }],
 ]);
 
 export class ZoneSystem {

@@ -390,7 +390,7 @@ export class WorldPackLoader {
       'meeting-center': { x: 0, y: 640, width: 533, height: 640 },
       'lounge-cafe': { x: 533, y: 640, width: 534, height: 640 },
       arcade: { x: 1067, y: 0, width: 533, height: 1280 },
-      plaza: { x: 1600, y: 0, width: 533, height: 640 },
+      plaza: { x: 3200, y: 0, width: 960, height: 1280 },
     };
 
     return defaultBounds[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };

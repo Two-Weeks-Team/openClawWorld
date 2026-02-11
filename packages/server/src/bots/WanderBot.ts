@@ -88,10 +88,12 @@ export class WanderBot {
 
   /**
    * Seeded random number generator (LCG)
+   * Uses Math.imul for proper 32-bit multiplication and divides by 0x80000000
+   * to ensure the result is in [0, 1) (never returns exactly 1.0)
    */
   private random(): number {
-    this.randomState = (this.randomState * 1103515245 + 12345) & 0x7fffffff;
-    return this.randomState / 0x7fffffff;
+    this.randomState = (Math.imul(this.randomState, 1103515245) + 12345) >>> 0;
+    return (this.randomState >>> 1) / 0x80000000;
   }
 
   /**

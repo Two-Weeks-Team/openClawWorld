@@ -499,6 +499,11 @@ export class GameScene extends Phaser.Scene {
       this.zoneBanner?.showEnter(currentZone);
 
       this.notificationPanel?.addEvent(
+        'zone.exit',
+        `Left zone: ${this.previousZone}`,
+        EVENT_COLORS['zone.exit']
+      );
+      this.notificationPanel?.addEvent(
         'zone.enter',
         `Entered zone: ${currentZone}`,
         EVENT_COLORS['zone.enter']

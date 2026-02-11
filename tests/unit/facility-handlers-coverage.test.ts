@@ -12,7 +12,7 @@ describe('Facility Handlers Coverage', () => {
   let service: FacilityService;
 
   beforeEach(() => {
-    state = new RoomState('default', 'lobby');
+    state = new RoomState('default', 'plaza');
     service = new FacilityService(state);
     registerAllFacilityHandlers(service);
   });
@@ -57,7 +57,7 @@ describe('Facility Handlers Coverage', () => {
 
   describe('reception_desk handlers', () => {
     beforeEach(() => {
-      const facility = new FacilitySchema('reception_desk_1', 'reception_desk', 'lobby', 100, 100);
+      const facility = new FacilitySchema('reception_desk_1', 'reception_desk', 'plaza', 100, 100);
       facility.setAffordances(FACILITY_AFFORDANCES.reception_desk);
       service.registerFacility(facility);
     });
@@ -76,7 +76,7 @@ describe('Facility Handlers Coverage', () => {
 
   describe('kanban_terminal handlers', () => {
     beforeEach(() => {
-      const facility = new FacilitySchema('kanban_1', 'kanban_terminal', 'office', 200, 100);
+      const facility = new FacilitySchema('kanban_1', 'kanban_terminal', 'north-block', 200, 100);
       facility.setAffordances(FACILITY_AFFORDANCES.kanban_terminal);
       service.registerFacility(facility);
     });
@@ -112,7 +112,7 @@ describe('Facility Handlers Coverage', () => {
 
   describe('whiteboard handlers', () => {
     beforeEach(() => {
-      const facility = new FacilitySchema('whiteboard_1', 'whiteboard', 'meeting-center', 300, 100);
+      const facility = new FacilitySchema('whiteboard_1', 'whiteboard', 'east-block', 300, 100);
       facility.setAffordances(FACILITY_AFFORDANCES.whiteboard);
       service.registerFacility(facility);
     });
@@ -135,7 +135,7 @@ describe('Facility Handlers Coverage', () => {
 
   describe('cafe_counter handlers', () => {
     beforeEach(() => {
-      const facility = new FacilitySchema('cafe_1', 'cafe_counter', 'lounge-cafe', 400, 100);
+      const facility = new FacilitySchema('cafe_1', 'cafe_counter', 'west-block', 400, 100);
       facility.setAffordances(FACILITY_AFFORDANCES.cafe_counter);
       service.registerFacility(facility);
     });
@@ -180,7 +180,7 @@ describe('Facility Handlers Coverage', () => {
 
   describe('gate handlers', () => {
     beforeEach(() => {
-      const facility = new FacilitySchema('gate_1', 'gate', 'lobby', 600, 100);
+      const facility = new FacilitySchema('gate_1', 'gate', 'plaza', 600, 100);
       facility.setAffordances(FACILITY_AFFORDANCES.gate);
       service.registerFacility(facility);
     });
@@ -217,7 +217,7 @@ describe('Facility Handlers Coverage', () => {
 
   describe('arcade_cabinets handlers', () => {
     beforeEach(() => {
-      const facility = new FacilitySchema('arcade_1', 'arcade_cabinets', 'arcade', 800, 100);
+      const facility = new FacilitySchema('arcade_1', 'arcade_cabinets', 'south-block', 800, 100);
       facility.setAffordances(FACILITY_AFFORDANCES.arcade_cabinets);
       service.registerFacility(facility);
     });
@@ -237,7 +237,7 @@ describe('Facility Handlers Coverage', () => {
     it('has handlers for all facility types in FACILITY_AFFORDANCES', () => {
       const entries = Object.entries(FACILITY_AFFORDANCES) as [string, string[]][];
       for (const [facilityType, affordances] of entries) {
-        const facility = new FacilitySchema(`test_${facilityType}`, facilityType, 'lobby', 0, 0);
+        const facility = new FacilitySchema(`test_${facilityType}`, facilityType, 'plaza', 0, 0);
         facility.setAffordances(affordances);
         service.registerFacility(facility);
 

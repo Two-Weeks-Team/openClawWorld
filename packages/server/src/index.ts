@@ -12,6 +12,7 @@ listen(appConfig, PORT).then(server => {
   console.log(`[Server] WebSocket endpoint: ws://localhost:${PORT}`);
   console.log(`[Server] Health check: http://localhost:${PORT}/health`);
   console.log(`[Server] AIC API: http://localhost:${PORT}/aic/v0.1`);
+  console.log(`[Server] API Docs: http://localhost:${PORT}/docs`);
   console.log(`[Server] Metrics: http://localhost:${PORT}/metrics`);
 
   setupGracefulShutdown(server);

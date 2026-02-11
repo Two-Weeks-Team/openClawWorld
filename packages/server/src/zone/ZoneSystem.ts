@@ -19,32 +19,35 @@ export type ZoneTransitionResult = {
   changed: boolean;
 };
 
-// Map layout: 64x52 tiles (2048x1664 pixels @ 32px)
-// Based on Work & Life Village reference image
+// Map layout: 64x64 tiles (2048x2048 pixels @ 32px)
+// Based on Grid-Town reference image
 // ┌─────────────────────────────────────────────────────────────────────┐
 // │                                                                     │
-// │    Lobby (192,96)           Office (1024,192)                       │
-// │    23x13 tiles              14x14 tiles                             │
-// │    736x416 px               448x448 px                              │
+// │    North Block (576,64)       Central cross-roads                   │
+// │    24x12 tiles                                                      │
+// │    768x384 px                                                       │
 // │                                                                     │
 // ├─────────────────────────────────────────────────────────────────────┤
 // │                                                                     │
-// │    Meeting Center           Lounge-Cafe           Arcade (1344,736) │
-// │    (96,928)                 (704,928)             19x13 tiles       │
-// │    16x18 tiles              16x10 tiles           608x416 px        │
-// │    512x576 px               512x320 px                              │
+// │  West Block        Plaza (768,768)        East Block                │
+// │  (64,704)          16x16 tiles            (1472,704)                │
+// │  20x20 tiles       512x512 px             18x20 tiles               │
+// │  640x640 px                               576x640 px                │
 // │                                                                     │
-// │                                                   Plaza (1344,1152) │
-// │                                                   19x13 tiles       │
-// │                                                   608x416 px        │
+// ├─────────────────────────────────────────────────────────────────────┤
+// │                                                                     │
+// │    South Block (576,1472)                 Lake (1408,1408)          │
+// │    24x12 tiles                            20x20 tiles               │
+// │    768x384 px                             640x640 px (BLOCKED)      │
+// │                                                                     │
 // └─────────────────────────────────────────────────────────────────────┘
 export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = new Map([
-  ['lobby', { x: 192, y: 96, width: 736, height: 416 }],
-  ['office', { x: 1024, y: 192, width: 448, height: 448 }],
-  ['meeting-center', { x: 96, y: 928, width: 512, height: 576 }],
-  ['lounge-cafe', { x: 704, y: 928, width: 512, height: 320 }],
-  ['arcade', { x: 1344, y: 736, width: 608, height: 416 }],
-  ['plaza', { x: 1344, y: 1152, width: 608, height: 416 }],
+  ['plaza', { x: 768, y: 768, width: 512, height: 512 }],
+  ['north-block', { x: 576, y: 64, width: 768, height: 384 }],
+  ['west-block', { x: 64, y: 704, width: 640, height: 640 }],
+  ['east-block', { x: 1472, y: 704, width: 576, height: 640 }],
+  ['south-block', { x: 576, y: 1472, width: 768, height: 384 }],
+  ['lake', { x: 1408, y: 1408, width: 640, height: 640 }],
 ]);
 
 export class ZoneSystem {

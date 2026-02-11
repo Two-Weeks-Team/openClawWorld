@@ -1,14 +1,7 @@
 import Phaser from 'phaser';
 
-const ZONE_IDS = [
-  'lobby',
-  'office',
-  'meeting-center',
-  'lounge-cafe',
-  'arcade',
-  'plaza',
-  'village',
-] as const;
+// Single unified map for the entire world
+const ZONE_IDS = ['village'] as const;
 
 export class BootScene extends Phaser.Scene {
   constructor() {

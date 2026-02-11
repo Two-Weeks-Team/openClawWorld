@@ -3,7 +3,7 @@ import type { ZoneId } from '@openclawworld/shared';
 
 export class ZoneSchema extends Schema {
   @type('string')
-  id: ZoneId = 'lobby';
+  id: ZoneId = 'plaza';
 
   @type('string')
   name: string = '';

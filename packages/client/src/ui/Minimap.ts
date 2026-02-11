@@ -25,12 +25,12 @@ const DEFAULT_CONFIG: MinimapConfig = {
 };
 
 const ZONE_COLORS: Record<string, number> = {
-  lobby: 0x3a5a40,
-  office: 0x4a6fa5,
-  'meeting-center': 0x8b4513,
-  'lounge-cafe': 0xdaa520,
-  arcade: 0x9932cc,
-  plaza: 0x6b8e23,
+  plaza: 0x808080, // gray - stone plaza
+  'north-block': 0x4a90d9, // blue - office
+  'west-block': 0xdaa520, // goldenrod - cafe
+  'east-block': 0x8b4513, // brown - meeting
+  'south-block': 0x9932cc, // purple - arcade
+  lake: 0x4169e1, // royal blue - water
   water: 0x3a7ca5,
   road: 0xa88b5a,
 };
@@ -124,12 +124,12 @@ export class Minimap {
     );
 
     const zones = [
-      { id: 'lobby', x: 384, y: 96, w: 768, h: 288 },
-      { id: 'office', x: 1184, y: 96, w: 704, h: 448 },
-      { id: 'meeting-center', x: 96, y: 640, w: 448, h: 640 },
-      { id: 'lounge-cafe', x: 544, y: 1216, w: 704, h: 384 },
-      { id: 'arcade', x: 1280, y: 576, w: 576, h: 448 },
-      { id: 'plaza', x: 1280, y: 1056, w: 576, h: 544 },
+      { id: 'plaza', x: 768, y: 768, w: 512, h: 512 },
+      { id: 'north-block', x: 576, y: 64, w: 768, h: 384 },
+      { id: 'west-block', x: 64, y: 704, w: 640, h: 640 },
+      { id: 'east-block', x: 1472, y: 704, w: 576, h: 640 },
+      { id: 'south-block', x: 576, y: 1472, w: 768, h: 384 },
+      { id: 'lake', x: 1408, y: 1408, w: 640, h: 640 },
     ];
 
     for (const zone of zones) {

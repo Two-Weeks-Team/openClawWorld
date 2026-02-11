@@ -60,12 +60,12 @@ describe('World System Integration Tests', () => {
 
       expect(result.changed).toBe(true);
       expect(result.previousZone).toBeNull();
-      expect(result.currentZone).toBe('lobby');
-      expect(zoneSystem.getEntityZone('player_1')).toBe('lobby');
+      expect(result.currentZone).toBe('plaza');
+      expect(zoneSystem.getEntityZone('player_1')).toBe('plaza');
 
       const { events } = eventLog.getSince('', 10);
       const enterEvent = events.find(
-        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'lobby'
+        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'plaza'
       );
       expect(enterEvent).toBeDefined();
       expect((enterEvent?.payload as { entityId: string }).entityId).toBe('player_1');
@@ -76,7 +76,7 @@ describe('World System Integration Tests', () => {
       entity.setPosition(640, 300);
       zoneSystem.updateEntityZone('player_1', 640, 300, eventLog, 'room_1', entity);
 
-      expect(entity.currentZone).toBe('lobby');
+      expect(entity.currentZone).toBe('plaza');
     });
   });
 
@@ -100,12 +100,12 @@ describe('World System Integration Tests', () => {
       const result = zoneSystem.updateEntityZone('player_1', 100, 100, eventLog, 'room_1', entity);
 
       expect(result.changed).toBe(true);
-      expect(result.previousZone).toBe('lobby');
+      expect(result.previousZone).toBe('plaza');
       expect(result.currentZone).toBeNull();
 
       const { events } = eventLog.getSince('', 10);
       const exitEvent = events.find(
-        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'lobby'
+        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'plaza'
       );
       expect(exitEvent).toBeDefined();
       expect((exitEvent?.payload as { entityId: string }).entityId).toBe('player_1');
@@ -117,22 +117,22 @@ describe('World System Integration Tests', () => {
       const result = zoneSystem.updateEntityZone('player_1', 1200, 400, eventLog, 'room_1', entity);
 
       expect(result.changed).toBe(true);
-      expect(result.previousZone).toBe('lobby');
-      expect(result.currentZone).toBe('office');
+      expect(result.previousZone).toBe('plaza');
+      expect(result.currentZone).toBe('north-block');
 
       const { events } = eventLog.getSince('', 10);
 
       const exitEvent = events.find(
-        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'lobby'
+        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'plaza'
       );
       const enterEvent = events.find(
-        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'office'
+        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'north-block'
       );
 
       expect(exitEvent).toBeDefined();
       expect(enterEvent).toBeDefined();
-      expect((exitEvent?.payload as { nextZoneId: string }).nextZoneId).toBe('office');
-      expect((enterEvent?.payload as { previousZoneId: string }).previousZoneId).toBe('lobby');
+      expect((exitEvent?.payload as { nextZoneId: string }).nextZoneId).toBe('north-block');
+      expect((enterEvent?.payload as { previousZoneId: string }).previousZoneId).toBe('plaza');
     });
   });
 
@@ -222,8 +222,8 @@ describe('World System Integration Tests', () => {
     });
 
     it('bot starts in lobby zone', () => {
-      expect(wanderBot.getCurrentZone()).toBe('lobby');
-      expect(wanderBot.getZonesVisited()).toContain('lobby');
+      expect(wanderBot.getCurrentZone()).toBe('plaza');
+      expect(wanderBot.getZonesVisited()).toContain('plaza');
     });
 
     it('bot can move to office zone', () => {
@@ -232,16 +232,16 @@ describe('World System Integration Tests', () => {
 
       wanderBot.update(Date.now());
 
-      expect(wanderBot.getCurrentZone()).toBe('office');
-      expect(wanderBot.getZonesVisited()).toContain('lobby');
-      expect(wanderBot.getZonesVisited()).toContain('office');
+      expect(wanderBot.getCurrentZone()).toBe('north-block');
+      expect(wanderBot.getZonesVisited()).toContain('plaza');
+      expect(wanderBot.getZonesVisited()).toContain('north-block');
     });
 
     it('bot visits at least 3 zones when manually moved', () => {
       const zonePositions: Array<{ zone: ZoneId; x: number; y: number }> = [
-        { zone: 'lobby', x: 640, y: 300 },
-        { zone: 'office', x: 1200, y: 400 },
-        { zone: 'meeting-center', x: 300, y: 1100 },
+        { zone: 'plaza', x: 640, y: 300 },
+        { zone: 'north-block', x: 1200, y: 400 },
+        { zone: 'east-block', x: 300, y: 1100 },
       ];
 
       for (const { x, y } of zonePositions) {
@@ -251,9 +251,9 @@ describe('World System Integration Tests', () => {
 
       const visited = wanderBot.getZonesVisited();
       expect(visited.length).toBeGreaterThanOrEqual(3);
-      expect(visited).toContain('lobby');
-      expect(visited).toContain('office');
-      expect(visited).toContain('meeting-center');
+      expect(visited).toContain('plaza');
+      expect(visited).toContain('north-block');
+      expect(visited).toContain('east-block');
     });
 
     it('bot respects collision when trying to move', () => {
@@ -305,10 +305,10 @@ describe('World System Integration Tests', () => {
       const { events } = eventLog.getSince('', 10);
 
       const exitLobby = events.find(
-        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'lobby'
+        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'plaza'
       );
       const enterOffice = events.find(
-        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'office'
+        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'north-block'
       );
 
       expect(exitLobby).toBeDefined();

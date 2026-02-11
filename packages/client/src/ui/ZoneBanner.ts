@@ -2,12 +2,12 @@ import Phaser from 'phaser';
 import type { ZoneId } from '@openclawworld/shared';
 
 const ZONE_DISPLAY_NAMES: Record<ZoneId, string> = {
-  lobby: 'Lobby',
-  office: 'Office',
-  'meeting-center': 'Meeting Center',
-  'lounge-cafe': 'Lounge Cafe',
-  arcade: 'Arcade',
-  plaza: 'Plaza',
+  plaza: 'Central Plaza',
+  'north-block': 'North Block',
+  'west-block': 'West Block',
+  'east-block': 'East Block',
+  'south-block': 'South Block',
+  lake: 'Lake',
 };
 
 const BANNER_DURATION_MS = 2000;

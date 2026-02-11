@@ -18,7 +18,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lobby = loader.getZoneMap('lobby');
+      const lobby = loader.getZoneMap('plaza');
       expect(lobby).toBeDefined();
       expect(lobby?.width).toBe(64);
       expect(lobby?.height).toBe(52);
@@ -31,11 +31,11 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       loader.loadPack();
 
       const zones = [
-        'lobby',
-        'office',
-        'meeting-center',
-        'lounge-cafe',
-        'arcade',
+        'plaza',
+        'north-block',
+        'east-block',
+        'west-block',
+        'south-block',
         'plaza',
       ] as const;
 
@@ -53,7 +53,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lobby = loader.getZoneMap('lobby');
+      const lobby = loader.getZoneMap('plaza');
       expect(lobby?.bounds).toEqual({ x: 192, y: 96, width: 736, height: 416 });
     });
 
@@ -61,7 +61,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const office = loader.getZoneMap('office');
+      const office = loader.getZoneMap('north-block');
       expect(office?.bounds).toEqual({ x: 1024, y: 192, width: 448, height: 448 });
     });
 
@@ -69,7 +69,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const meeting = loader.getZoneMap('meeting-center');
+      const meeting = loader.getZoneMap('east-block');
       expect(meeting?.bounds).toEqual({ x: 96, y: 928, width: 512, height: 576 });
     });
 
@@ -77,7 +77,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lounge = loader.getZoneMap('lounge-cafe');
+      const lounge = loader.getZoneMap('west-block');
       expect(lounge?.bounds).toEqual({ x: 704, y: 928, width: 512, height: 320 });
     });
 
@@ -85,7 +85,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const arcade = loader.getZoneMap('arcade');
+      const arcade = loader.getZoneMap('south-block');
       expect(arcade?.bounds).toEqual({ x: 1344, y: 736, width: 608, height: 416 });
     });
 
@@ -111,7 +111,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lobby = loader.getZoneMap('lobby');
+      const lobby = loader.getZoneMap('plaza');
       expect(lobby).toBeDefined();
 
       const facilityObjects = lobby?.objects.filter(obj => obj.type === 'facility') ?? [];
@@ -122,7 +122,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const office = loader.getZoneMap('office');
+      const office = loader.getZoneMap('north-block');
       expect(office).toBeDefined();
 
       const hasKanban = office?.objects.some(
@@ -140,11 +140,11 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       loader.loadPack();
 
       const zones = [
-        'lobby',
-        'office',
-        'meeting-center',
-        'lounge-cafe',
-        'arcade',
+        'plaza',
+        'north-block',
+        'east-block',
+        'west-block',
+        'south-block',
         'plaza',
       ] as const;
 
@@ -186,7 +186,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lobby = loader.getZoneMap('lobby');
+      const lobby = loader.getZoneMap('plaza');
       expect(lobby).toBeDefined();
 
       const layerNames = lobby?.layers.map(l => l.name) ?? [];
@@ -199,7 +199,7 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lobby = loader.getZoneMap('lobby');
+      const lobby = loader.getZoneMap('plaza');
       const collisionLayer = lobby?.layers.find(l => l.name === 'collision');
 
       expect(collisionLayer).toBeDefined();
@@ -217,14 +217,14 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lobby = loader.getZoneMap('lobby');
+      const lobby = loader.getZoneMap('plaza');
       expect(lobby?.npcs).toContain('receptionist');
       expect(lobby?.npcs).toContain('security-guard');
 
-      const office = loader.getZoneMap('office');
+      const office = loader.getZoneMap('north-block');
       expect(office?.npcs).toContain('pm');
 
-      const lounge = loader.getZoneMap('lounge-cafe');
+      const lounge = loader.getZoneMap('west-block');
       expect(lounge?.npcs).toContain('barista');
     });
 
@@ -232,10 +232,10 @@ describe('WorldPackLoader - Unified Map Integration (64x52)', () => {
       const loader = new WorldPackLoader(REAL_PACK_PATH);
       loader.loadPack();
 
-      const lobby = loader.getZoneMap('lobby');
+      const lobby = loader.getZoneMap('plaza');
       expect(lobby?.facilities).toContain('reception_desk');
 
-      const office = loader.getZoneMap('office');
+      const office = loader.getZoneMap('north-block');
       expect(office?.facilities).toContain('kanban_terminal');
 
       const plaza = loader.getZoneMap('plaza');

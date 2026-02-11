@@ -1,0 +1,31 @@
+{
+  "id": "ranger",
+  "name": "River the Ranger",
+  "sprite": "npc-ranger",
+  "zone": "lake",
+  "defaultPosition": { "x": 1408, "y": 1408 },
+  "schedule": [
+    { "startHour": 6, "endHour": 18, "state": "patrolling", "position": { "x": 1408, "y": 1408 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Ahoy! I'm River, the lake ranger. Beautiful day for a stroll by the water, isn't it?",
+      "options": [
+        { "text": "Can I swim here?", "next": "swimming" },
+        { "text": "Any fish in the lake?", "next": "fishing" },
+        { "text": "Just enjoying the view!", "next": null }
+      ]
+    },
+    "swimming": {
+      "id": "swimming",
+      "text": "Afraid not - the lake is for viewing only! But feel free to toss a coin and make a wish at the viewpoint. Who knows, it might come true!",
+      "options": [{ "text": "I'll try my luck!", "next": null }]
+    },
+    "fishing": {
+      "id": "fishing",
+      "text": "Oh yes! We've got some digital fish swimming around. They're shy though - you'll need to wait patiently at the pond edge to spot them!",
+      "options": [{ "text": "I'll keep an eye out!", "next": null }]
+    }
+  }
+}

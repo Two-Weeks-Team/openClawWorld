@@ -8,7 +8,14 @@ import { EventLog } from '../../packages/server/src/events/EventLog.js';
 import { EntitySchema } from '../../packages/server/src/schemas/EntitySchema.js';
 import type { ZoneId } from '@openclawworld/shared';
 
-describe('ZoneSystem', () => {
+type ZoneEventPayload = {
+  entityId?: string;
+  zoneId?: ZoneId | null;
+  previousZoneId?: ZoneId | null;
+  nextZoneId?: ZoneId | null;
+};
+
+describe('ZoneSystem (64x52 layout)', () => {
   let zoneSystem: ZoneSystem;
   let eventLog: EventLog;
 
@@ -19,23 +26,23 @@ describe('ZoneSystem', () => {
 
   describe('getZoneAtPosition', () => {
     it('returns lobby for position in lobby bounds', () => {
-      expect(zoneSystem.getZoneAtPosition(160, 160)).toBe('lobby');
+      expect(zoneSystem.getZoneAtPosition(640, 300)).toBe('lobby');
     });
 
     it('returns office for position in office bounds', () => {
-      expect(zoneSystem.getZoneAtPosition(1400, 160)).toBe('office');
+      expect(zoneSystem.getZoneAtPosition(1200, 400)).toBe('office');
     });
 
     it('returns meeting-center for position in meeting-center bounds', () => {
-      expect(zoneSystem.getZoneAtPosition(160, 1400)).toBe('meeting-center');
+      expect(zoneSystem.getZoneAtPosition(300, 1000)).toBe('meeting-center');
     });
 
     it('returns lounge-cafe for position in lounge-cafe bounds', () => {
-      expect(zoneSystem.getZoneAtPosition(1400, 1400)).toBe('lounge-cafe');
+      expect(zoneSystem.getZoneAtPosition(900, 1000)).toBe('lounge-cafe');
     });
 
     it('returns arcade for position in arcade bounds', () => {
-      expect(zoneSystem.getZoneAtPosition(2700, 320)).toBe('arcade');
+      expect(zoneSystem.getZoneAtPosition(1600, 900)).toBe('arcade');
     });
 
     it('returns null for position outside all zones', () => {
@@ -44,18 +51,18 @@ describe('ZoneSystem', () => {
     });
 
     it('returns correct zone at zone boundaries', () => {
-      expect(zoneSystem.getZoneAtPosition(0, 0)).toBe('lobby');
-      expect(zoneSystem.getZoneAtPosition(1279, 1279)).toBe('lobby');
-      expect(zoneSystem.getZoneAtPosition(1280, 0)).toBe('office');
-      expect(zoneSystem.getZoneAtPosition(0, 1280)).toBe('meeting-center');
-      expect(zoneSystem.getZoneAtPosition(1280, 1280)).toBe('lounge-cafe');
-      expect(zoneSystem.getZoneAtPosition(2560, 0)).toBe('arcade');
+      expect(zoneSystem.getZoneAtPosition(192, 96)).toBe('lobby');
+      expect(zoneSystem.getZoneAtPosition(927, 511)).toBe('lobby');
+      expect(zoneSystem.getZoneAtPosition(1024, 192)).toBe('office');
+      expect(zoneSystem.getZoneAtPosition(96, 928)).toBe('meeting-center');
+      expect(zoneSystem.getZoneAtPosition(704, 928)).toBe('lounge-cafe');
+      expect(zoneSystem.getZoneAtPosition(1344, 736)).toBe('arcade');
     });
   });
 
   describe('updateEntityZone', () => {
     it('detects initial zone entry', () => {
-      const result = zoneSystem.updateEntityZone('entity_1', 160, 160);
+      const result = zoneSystem.updateEntityZone('entity_1', 640, 300);
 
       expect(result.previousZone).toBeNull();
       expect(result.currentZone).toBe('lobby');
@@ -63,8 +70,8 @@ describe('ZoneSystem', () => {
     });
 
     it('detects no change when entity stays in same zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
-      const result = zoneSystem.updateEntityZone('entity_1', 170, 170);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
+      const result = zoneSystem.updateEntityZone('entity_1', 650, 310);
 
       expect(result.previousZone).toBe('lobby');
       expect(result.currentZone).toBe('lobby');
@@ -72,8 +79,8 @@ describe('ZoneSystem', () => {
     });
 
     it('detects zone transition from lobby to office', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
-      const result = zoneSystem.updateEntityZone('entity_1', 1400, 160);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
+      const result = zoneSystem.updateEntityZone('entity_1', 1200, 400);
 
       expect(result.previousZone).toBe('lobby');
       expect(result.currentZone).toBe('office');
@@ -81,40 +88,40 @@ describe('ZoneSystem', () => {
     });
 
     it('emits zone.exit and zone.enter events on transition', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160, eventLog, 'room_1');
-      zoneSystem.updateEntityZone('entity_1', 1400, 160, eventLog, 'room_1');
+      zoneSystem.updateEntityZone('entity_1', 640, 300, eventLog, 'room_1');
+      zoneSystem.updateEntityZone('entity_1', 1200, 400, eventLog, 'room_1');
 
       const { events } = eventLog.getSince('', 10);
 
       expect(events).toHaveLength(3);
 
       const enterLobby = events.find(
-        e => e.type === 'zone.enter' && (e.payload as any).zoneId === 'lobby'
+        e => e.type === 'zone.enter' && (e.payload as ZoneEventPayload).zoneId === 'lobby'
       );
       const exitLobby = events.find(
-        e => e.type === 'zone.exit' && (e.payload as any).zoneId === 'lobby'
+        e => e.type === 'zone.exit' && (e.payload as ZoneEventPayload).zoneId === 'lobby'
       );
       const enterOffice = events.find(
-        e => e.type === 'zone.enter' && (e.payload as any).zoneId === 'office'
+        e => e.type === 'zone.enter' && (e.payload as ZoneEventPayload).zoneId === 'office'
       );
 
       expect(enterLobby).toBeDefined();
       expect(exitLobby).toBeDefined();
       expect(enterOffice).toBeDefined();
-      expect((exitLobby?.payload as any).nextZoneId).toBe('office');
-      expect((enterOffice?.payload as any).previousZoneId).toBe('lobby');
+      expect((exitLobby?.payload as ZoneEventPayload).nextZoneId).toBe('office');
+      expect((enterOffice?.payload as ZoneEventPayload).previousZoneId).toBe('lobby');
     });
 
     it('updates entity currentZone when entity provided', () => {
       const entity = new EntitySchema('entity_1', 'human', 'Test', 'room_1');
 
-      zoneSystem.updateEntityZone('entity_1', 1400, 160, eventLog, 'room_1', entity);
+      zoneSystem.updateEntityZone('entity_1', 1200, 400, eventLog, 'room_1', entity);
 
       expect(entity.currentZone).toBe('office');
     });
 
     it('handles transition to outside all zones', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
       const result = zoneSystem.updateEntityZone('entity_1', -100, -100);
 
       expect(result.previousZone).toBe('lobby');
@@ -129,23 +136,23 @@ describe('ZoneSystem', () => {
     });
 
     it('increments population when entity enters zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
 
       expect(zoneSystem.getZonePopulation('lobby')).toBe(1);
     });
 
     it('decrements population when entity leaves zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
-      zoneSystem.updateEntityZone('entity_1', 1400, 160);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
+      zoneSystem.updateEntityZone('entity_1', 1200, 400);
 
       expect(zoneSystem.getZonePopulation('lobby')).toBe(0);
       expect(zoneSystem.getZonePopulation('office')).toBe(1);
     });
 
     it('tracks multiple entities per zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
-      zoneSystem.updateEntityZone('entity_2', 170, 170);
-      zoneSystem.updateEntityZone('entity_3', 180, 180);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
+      zoneSystem.updateEntityZone('entity_2', 650, 310);
+      zoneSystem.updateEntityZone('entity_3', 660, 320);
 
       expect(zoneSystem.getZonePopulation('lobby')).toBe(3);
     });
@@ -157,8 +164,8 @@ describe('ZoneSystem', () => {
     });
 
     it('returns entity IDs in zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
-      zoneSystem.updateEntityZone('entity_2', 170, 170);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
+      zoneSystem.updateEntityZone('entity_2', 650, 310);
 
       const entities = zoneSystem.getEntitiesInZone('lobby');
 
@@ -168,8 +175,8 @@ describe('ZoneSystem', () => {
     });
 
     it('excludes entities that left zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
-      zoneSystem.updateEntityZone('entity_1', 1400, 160);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
+      zoneSystem.updateEntityZone('entity_1', 1200, 400);
 
       expect(zoneSystem.getEntitiesInZone('lobby')).toEqual([]);
       expect(zoneSystem.getEntitiesInZone('office')).toContain('entity_1');
@@ -178,7 +185,7 @@ describe('ZoneSystem', () => {
 
   describe('removeEntity', () => {
     it('returns previous zone when entity removed', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
 
       const previousZone = zoneSystem.removeEntity('entity_1');
 
@@ -192,8 +199,8 @@ describe('ZoneSystem', () => {
     });
 
     it('decrements population when entity removed', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
-      zoneSystem.updateEntityZone('entity_2', 170, 170);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
+      zoneSystem.updateEntityZone('entity_2', 650, 310);
 
       expect(zoneSystem.getZonePopulation('lobby')).toBe(2);
 
@@ -203,7 +210,7 @@ describe('ZoneSystem', () => {
     });
 
     it('removes entity from tracking', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160);
+      zoneSystem.updateEntityZone('entity_1', 640, 300);
       zoneSystem.removeEntity('entity_1');
 
       expect(zoneSystem.getEntityZone('entity_1')).toBeNull();
@@ -211,19 +218,19 @@ describe('ZoneSystem', () => {
     });
 
     it('emits zone.exit event with null nextZoneId', () => {
-      zoneSystem.updateEntityZone('entity_1', 160, 160, eventLog, 'room_1');
+      zoneSystem.updateEntityZone('entity_1', 640, 300, eventLog, 'room_1');
       zoneSystem.removeEntity('entity_1', eventLog, 'room_1');
 
       const { events } = eventLog.getSince('', 10);
       const exitEvent = events.find(
         e =>
           e.type === 'zone.exit' &&
-          (e.payload as any).entityId === 'entity_1' &&
-          (e.payload as any).nextZoneId === null
+          (e.payload as ZoneEventPayload).entityId === 'entity_1' &&
+          (e.payload as ZoneEventPayload).nextZoneId === null
       );
 
       expect(exitEvent).toBeDefined();
-      expect((exitEvent?.payload as any).zoneId).toBe('lobby');
+      expect((exitEvent?.payload as ZoneEventPayload).zoneId).toBe('lobby');
     });
   });
 
@@ -233,8 +240,8 @@ describe('ZoneSystem', () => {
       const entity1 = new EntitySchema('entity_1', 'human', 'Test1', 'room_1');
       const entity2 = new EntitySchema('entity_2', 'human', 'Test2', 'room_1');
 
-      entity1.setPosition(160, 160);
-      entity2.setPosition(1400, 160);
+      entity1.setPosition(640, 300);
+      entity2.setPosition(1200, 400);
       entities.set('entity_1', entity1);
       entities.set('entity_2', entity2);
 
@@ -250,7 +257,7 @@ describe('ZoneSystem', () => {
     it('cleans up removed entities', () => {
       const entities = new Map<string, EntitySchema>();
       const entity1 = new EntitySchema('entity_1', 'human', 'Test1', 'room_1');
-      entity1.setPosition(160, 160);
+      entity1.setPosition(640, 300);
       entities.set('entity_1', entity1);
 
       zoneSystem.update(entities, eventLog, 'room_1');
@@ -267,7 +274,7 @@ describe('ZoneSystem', () => {
   describe('edge cases', () => {
     describe('spawn', () => {
       it('handles entity spawning at zone boundary', () => {
-        const result = zoneSystem.updateEntityZone('entity_1', 1280, 0);
+        const result = zoneSystem.updateEntityZone('entity_1', 1024, 192);
 
         expect(result.currentZone).toBe('office');
         expect(result.changed).toBe(true);
@@ -283,8 +290,8 @@ describe('ZoneSystem', () => {
 
     describe('teleport', () => {
       it('handles teleport across multiple zones', () => {
-        zoneSystem.updateEntityZone('entity_1', 160, 160);
-        const result = zoneSystem.updateEntityZone('entity_1', 2700, 500);
+        zoneSystem.updateEntityZone('entity_1', 640, 300);
+        const result = zoneSystem.updateEntityZone('entity_1', 1600, 900);
 
         expect(result.previousZone).toBe('lobby');
         expect(result.currentZone).toBe('arcade');
@@ -292,12 +299,12 @@ describe('ZoneSystem', () => {
       });
 
       it('updates populations correctly on teleport', () => {
-        zoneSystem.updateEntityZone('entity_1', 160, 160);
-        zoneSystem.updateEntityZone('entity_2', 170, 170);
+        zoneSystem.updateEntityZone('entity_1', 640, 300);
+        zoneSystem.updateEntityZone('entity_2', 650, 310);
 
         expect(zoneSystem.getZonePopulation('lobby')).toBe(2);
 
-        zoneSystem.updateEntityZone('entity_1', 2700, 500);
+        zoneSystem.updateEntityZone('entity_1', 1600, 900);
 
         expect(zoneSystem.getZonePopulation('lobby')).toBe(1);
         expect(zoneSystem.getZonePopulation('arcade')).toBe(1);
@@ -306,20 +313,20 @@ describe('ZoneSystem', () => {
 
     describe('boundary precision', () => {
       it('correctly handles positions exactly on zone boundary', () => {
-        expect(zoneSystem.getZoneAtPosition(1280, 160)).toBe('office');
-        expect(zoneSystem.getZoneAtPosition(1279, 160)).toBe('lobby');
+        expect(zoneSystem.getZoneAtPosition(1024, 300)).toBe('office');
+        expect(zoneSystem.getZoneAtPosition(1023, 300)).toBeNull();
       });
 
-      it('handles arcade spanning two rows', () => {
-        expect(zoneSystem.getZoneAtPosition(2700, 100)).toBe('arcade');
-        expect(zoneSystem.getZoneAtPosition(2700, 500)).toBe('arcade');
-        expect(zoneSystem.getZoneAtPosition(2700, 1500)).toBe('arcade');
+      it('handles arcade and plaza vertical stacking', () => {
+        expect(zoneSystem.getZoneAtPosition(1600, 800)).toBe('arcade');
+        expect(zoneSystem.getZoneAtPosition(1600, 1100)).toBe('arcade');
+        expect(zoneSystem.getZoneAtPosition(1600, 1300)).toBe('plaza');
       });
     });
 
     describe('population never goes negative', () => {
       it('population stays at 0 after multiple removes', () => {
-        zoneSystem.updateEntityZone('entity_1', 160, 160);
+        zoneSystem.updateEntityZone('entity_1', 640, 300);
         zoneSystem.removeEntity('entity_1');
         zoneSystem.removeEntity('entity_1');
         zoneSystem.removeEntity('entity_1');
@@ -333,7 +340,7 @@ describe('ZoneSystem', () => {
     it('returns bounds for valid zone', () => {
       const bounds = zoneSystem.getZoneBounds('lobby');
 
-      expect(bounds).toEqual({ x: 0, y: 0, width: 1280, height: 1280 });
+      expect(bounds).toEqual({ x: 192, y: 96, width: 736, height: 416 });
     });
 
     it('returns undefined for invalid zone', () => {

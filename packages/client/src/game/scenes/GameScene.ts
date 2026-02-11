@@ -449,7 +449,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private checkZoneChange(entity: Entity): void {
-    const currentZone = (entity as any).currentZone as string | undefined;
+    const currentZone = (entity as unknown as { currentZone?: string }).currentZone;
     if (!currentZone) return;
 
     if (this.previousZone && this.previousZone !== currentZone) {
@@ -459,6 +459,7 @@ export class GameScene extends Phaser.Scene {
         'meeting-center': 'Meeting Center',
         'lounge-cafe': 'Lounge Cafe',
         arcade: 'Arcade',
+        plaza: 'Plaza',
       };
       const zoneName = zoneNames[currentZone] || currentZone;
       this.notificationPanel?.addEvent(

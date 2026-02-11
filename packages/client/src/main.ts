@@ -44,11 +44,11 @@ joinBtn.addEventListener('click', async () => {
 
     // Dev-only debug interface
     if (import.meta.env.DEV) {
-      (window as any).__ocw = {
+      (window as unknown as Record<string, unknown>).__ocw = {
         getMyState: () => gameClient.getMyEntity(),
         findEntity: (id: string) => gameClient.findEntity(id),
         getRoom: () => gameClient.currentRoom,
-        sendMessage: (type: string, data: any) => gameClient.currentRoom?.send(type, data),
+        sendMessage: (type: string, data: unknown) => gameClient.currentRoom?.send(type, data),
       };
     }
   } catch (error) {

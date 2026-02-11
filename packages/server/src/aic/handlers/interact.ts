@@ -10,6 +10,7 @@ import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
 import { interactIdempotencyStore } from '../idempotency.js';
 import { DEFAULT_PROXIMITY_RADIUS } from '../../constants.js';
+import { getColyseusRoomId } from '../roomRegistry.js';
 
 type ActionHandler = (
   agent: EntitySchema,
@@ -109,17 +110,16 @@ export async function handleInteract(req: Request, res: Response): Promise<void>
       return;
     }
 
-    const room = await matchMaker.query({ name: 'game', roomId });
+    const colyseusRoomId = getColyseusRoomId(roomId);
 
-    if (!room || room.length === 0) {
+    if (!colyseusRoomId) {
       res
         .status(404)
         .json(createErrorResponse('not_found', `Room with id '${roomId}' not found`, false));
       return;
     }
 
-    const roomRef = room[0];
-    const gameRoom = (await matchMaker.remoteRoomCall(roomRef.roomId, '')) as GameRoom;
+    const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId) as GameRoom | undefined;
 
     if (!gameRoom) {
       res

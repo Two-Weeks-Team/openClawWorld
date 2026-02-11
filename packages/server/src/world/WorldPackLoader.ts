@@ -109,6 +109,20 @@ type RawNpcDefinition = {
   schedule?: unknown[];
 };
 
+type RawUnifiedMap = {
+  zoneId?: string;
+  name?: string;
+  bounds?: { x?: number; y?: number; width?: number; height?: number };
+  spawnPoints?: Array<{ x?: number; y?: number; zone?: string }>;
+  npcs?: string[];
+  facilities?: string[];
+  width?: number;
+  height?: number;
+  tilewidth?: number;
+  tileheight?: number;
+  layers?: TiledLayer[];
+};
+
 export class WorldPackLoader {
   private packPath: string;
   private pack: WorldPack | null = null;
@@ -233,6 +247,11 @@ export class WorldPackLoader {
       throw new WorldPackError('maps directory not found', this.packPath);
     }
 
+    const unifiedMapPath = join(mapsDir, 'village_outdoor.json');
+    if (existsSync(unifiedMapPath)) {
+      return this.loadUnifiedMap(unifiedMapPath, zones);
+    }
+
     for (const zoneId of zones) {
       try {
         const zoneMap = this.loadZoneMap(zoneId);
@@ -251,6 +270,149 @@ export class WorldPackLoader {
     }
 
     return maps;
+  }
+
+  private loadUnifiedMap(mapPath: string, zones: ZoneId[]): Map<ZoneId, ZoneMapData> {
+    let content: string;
+    try {
+      content = readFileSync(mapPath, 'utf-8');
+    } catch (error) {
+      throw new WorldPackError(
+        `Failed to read unified map: ${error instanceof Error ? error.message : String(error)}`,
+        this.packPath
+      );
+    }
+
+    let raw: RawUnifiedMap;
+    try {
+      raw = JSON.parse(content) as RawUnifiedMap;
+    } catch (error) {
+      throw new WorldPackError(
+        `Invalid JSON in unified map: ${error instanceof Error ? error.message : String(error)}`,
+        this.packPath
+      );
+    }
+
+    const maps = new Map<ZoneId, ZoneMapData>();
+    const spawnPoints = this.extractSpawnPointsFromUnified(raw);
+    const objects = this.extractObjects(raw.layers ?? []);
+
+    for (const zoneId of zones) {
+      const zoneSpawns = spawnPoints.filter(sp => sp.zone === zoneId);
+      const zoneObjects = this.filterObjectsByZone(objects, zoneId);
+
+      maps.set(zoneId, {
+        zoneId,
+        name: this.formatZoneName(zoneId),
+        bounds: this.getDefaultZoneBounds(zoneId),
+        spawnPoints: zoneSpawns.map(sp => ({ x: sp.x, y: sp.y })),
+        width: raw.width ?? 64,
+        height: raw.height ?? 52,
+        tileWidth: raw.tilewidth ?? 32,
+        tileHeight: raw.tileheight ?? 32,
+        layers: raw.layers ?? [],
+        objects: zoneObjects,
+        npcs: (raw.npcs ?? []).filter(npc => this.getNpcZone(npc, zoneId)),
+        facilities: (raw.facilities ?? []).filter(f => this.getFacilityZone(f, zoneId)),
+      });
+    }
+
+    console.log(
+      `[WorldPackLoader] Loaded unified map (${raw.width}x${raw.height}) for ${zones.length} zones`
+    );
+    return maps;
+  }
+
+  private extractSpawnPointsFromUnified(
+    raw: RawUnifiedMap
+  ): Array<{ x: number; y: number; zone: ZoneId }> {
+    const spawns: Array<{ x: number; y: number; zone: ZoneId }> = [];
+
+    if (raw.spawnPoints && Array.isArray(raw.spawnPoints)) {
+      for (const sp of raw.spawnPoints) {
+        if (typeof sp.x === 'number' && typeof sp.y === 'number' && sp.zone) {
+          spawns.push({ x: sp.x, y: sp.y, zone: sp.zone as ZoneId });
+        }
+      }
+    }
+
+    if (raw.layers) {
+      for (const layer of raw.layers) {
+        if (layer.type === 'objectgroup' && layer.objects) {
+          for (const obj of layer.objects) {
+            if (obj.type === 'spawn' && obj.name) {
+              const zoneName = obj.name.replace('spawn_', '') as ZoneId;
+              spawns.push({
+                x: obj.x + (obj.width ?? 0) / 2,
+                y: obj.y + (obj.height ?? 0) / 2,
+                zone: zoneName,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    return spawns;
+  }
+
+  private filterObjectsByZone(objects: TiledObject[], zoneId: ZoneId): TiledObject[] {
+    const bounds = this.getDefaultZoneBounds(zoneId);
+    return objects.filter(obj => {
+      if (obj.type === 'spawn') return false;
+      const cx = obj.x + (obj.width ?? 0) / 2;
+      const cy = obj.y + (obj.height ?? 0) / 2;
+      return (
+        cx >= bounds.x &&
+        cx < bounds.x + bounds.width &&
+        cy >= bounds.y &&
+        cy < bounds.y + bounds.height
+      );
+    });
+  }
+
+  private getNpcZone(npcId: string, zoneId: ZoneId): boolean {
+    const npcZoneMap: Record<string, ZoneId> = {
+      receptionist: 'lobby',
+      'security-guard': 'lobby',
+      'tutorial-guide': 'lobby',
+      pm: 'office',
+      'it-help': 'office',
+      hr: 'office',
+      'meeting-host': 'meeting-center',
+      barista: 'lounge-cafe',
+      'arcade-host': 'arcade',
+      'event-host': 'plaza',
+      'sales-rep': 'plaza',
+      'quest-giver': 'plaza',
+    };
+    return npcZoneMap[npcId] === zoneId;
+  }
+
+  private getFacilityZone(facilityId: string, zoneId: ZoneId): boolean {
+    const facilityZoneMap: Record<string, ZoneId> = {
+      reception_desk: 'lobby',
+      notice_board: 'lobby',
+      gate: 'lobby',
+      pond_edge: 'lobby',
+      kanban_terminal: 'office',
+      whiteboard: 'office',
+      printer: 'office',
+      watercooler: 'office',
+      schedule_kiosk: 'meeting-center',
+      voting_kiosk: 'meeting-center',
+      room_door_a: 'meeting-center',
+      room_door_b: 'meeting-center',
+      room_door_c: 'meeting-center',
+      agenda_panel: 'meeting-center',
+      cafe_counter: 'lounge-cafe',
+      vending_machine: 'lounge-cafe',
+      arcade_cabinets: 'arcade',
+      small_stage: 'arcade',
+      game_table: 'arcade',
+      fountain: 'plaza',
+    };
+    return facilityZoneMap[facilityId] === zoneId;
   }
 
   private loadZoneMap(zoneId: ZoneId): ZoneMapData {
@@ -385,12 +547,12 @@ export class WorldPackLoader {
 
   private getDefaultZoneBounds(zoneId: ZoneId): ZoneBounds {
     const defaultBounds: Record<ZoneId, ZoneBounds> = {
-      lobby: { x: 0, y: 0, width: 533, height: 640 },
-      office: { x: 533, y: 0, width: 534, height: 640 },
-      'meeting-center': { x: 0, y: 640, width: 533, height: 640 },
-      'lounge-cafe': { x: 533, y: 640, width: 534, height: 640 },
-      arcade: { x: 1067, y: 0, width: 533, height: 1280 },
-      plaza: { x: 3200, y: 0, width: 960, height: 1280 },
+      lobby: { x: 192, y: 96, width: 736, height: 416 },
+      office: { x: 1024, y: 192, width: 448, height: 448 },
+      'meeting-center': { x: 96, y: 928, width: 512, height: 576 },
+      'lounge-cafe': { x: 704, y: 928, width: 512, height: 320 },
+      arcade: { x: 1344, y: 736, width: 608, height: 416 },
+      plaza: { x: 1344, y: 1152, width: 608, height: 416 },
     };
 
     return defaultBounds[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };

@@ -25,9 +25,10 @@ import { FacilitySchema } from '../schemas/FacilitySchema.js';
 import { PermissionService } from '../services/PermissionService.js';
 import { SafetyService } from '../services/SafetyService.js';
 import { AuditLog } from '../audit/AuditLog.js';
-import type { EntityKind, UserStatus, ZoneId } from '@openclawworld/shared';
+import type { EntityKind, UserStatus, ZoneId, SkillDefinition } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 import { WorldPackLoader, WorldPackError, type WorldPack } from '../world/WorldPackLoader.js';
+import { SkillService } from '../services/SkillService.js';
 
 const DEFAULT_NPC_SEED = 12345;
 const DEFAULT_WORLD_PACK_PATH = resolve(process.cwd(), 'world/packs/base');
@@ -58,6 +59,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private worldPack: WorldPack | null = null;
   private eventLog: EventLog;
   private cleanupInterval: NodeJS.Timeout | null = null;
+  private skillService: SkillService | null = null;
   private spawnPoint: { x: number; y: number; tx: number; ty: number } = {
     x: 0,
     y: 0,
@@ -125,6 +127,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     registerAllFacilityHandlers(this.facilityService);
     this.loadFacilitiesFromWorldPack();
     this.permissionService = new PermissionService(this.state);
+    this.skillService = new SkillService(this.state);
+    this.registerBuiltinSkills();
     this.setSimulationInterval(() => this.onTick(), 1000 / tickRate);
 
     this.onMessage('move_to', (client, message: { tx: number; ty: number }) => {
@@ -180,6 +184,61 @@ export class GameRoom extends Room<{ state: RoomState }> {
         });
       }
     );
+
+    this.onMessage(
+      'skill_invoke',
+      (
+        client,
+        data: {
+          skillId: string;
+          actionId: string;
+          targetId?: string;
+          params?: Record<string, unknown>;
+        }
+      ) => {
+        const entityId = this.clientEntities.get(client.sessionId);
+        if (!entityId || !this.skillService) return;
+
+        const entity = this.state.getEntity(entityId);
+        if (!entity) return;
+
+        const txId = `ws_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        void this.skillService
+          .invokeAction(
+            entityId,
+            data.skillId,
+            data.actionId,
+            {
+              targetId: data.targetId,
+              ...data.params,
+            },
+            txId
+          )
+          .then(outcome => {
+            client.send('skill.invoke_result', { txId, outcome });
+            if (outcome.type === 'pending') {
+              this.broadcast('skill.cast_started', {
+                txId,
+                skillId: data.skillId,
+                actionId: data.actionId,
+                casterId: entityId,
+                targetId: data.targetId,
+                completionTime: (outcome.data as { completionTime?: number })?.completionTime,
+              });
+            }
+          });
+      }
+    );
+
+    this.onMessage('skill_cancel', client => {
+      const entityId = this.clientEntities.get(client.sessionId);
+      if (!entityId || !this.skillService) return;
+
+      const cancelled = this.skillService.cancelAllCastsForAgent(entityId);
+      if (cancelled > 0) {
+        this.broadcast('skill.cast_cancelled', { casterId: entityId, reason: 'user_cancelled' });
+      }
+    });
 
     // Set up periodic cleanup of expired events (every minute)
     this.cleanupInterval = setInterval(() => {
@@ -240,6 +299,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
     return this.eventLog;
   }
 
+  getSkillService(): SkillService | null {
+    return this.skillService;
+  }
+
   getRecentProximityEvents(): ProximityEvent[] {
     return this.recentProximityEvents;
   }
@@ -279,6 +342,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (entityId) {
       if (this.zoneSystem) {
         this.zoneSystem.removeEntity(entityId, this.eventLog, this.state.roomId);
+      }
+
+      if (this.skillService) {
+        this.skillService.cleanupAgent(entityId);
       }
 
       this.state.removeEntity(entityId, 'human');
@@ -355,6 +422,11 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (this.npcSystem) {
       this.gameTimeMs += deltaMs;
       this.npcSystem.update(this.gameTimeMs, this.eventLog, this.state.roomId);
+    }
+
+    if (this.skillService) {
+      this.skillService.processPendingCasts();
+      this.skillService.processEffectExpirations();
     }
 
     const tickTime = performance.now() - tickStart;
@@ -471,6 +543,49 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   getWorldPackLoader(): WorldPackLoader | null {
     return this.worldPackLoader;
+  }
+
+  private registerBuiltinSkills(): void {
+    if (!this.skillService) return;
+
+    const slowAuraSkill: SkillDefinition = {
+      id: 'slow_aura',
+      name: 'Slow Aura',
+      version: '1.0.0',
+      description: 'Emit an aura that slows nearby targets',
+      category: 'social',
+      emoji: '🐌',
+      source: { type: 'builtin' },
+      actions: [
+        {
+          id: 'cast',
+          name: 'Cast Slow Aura',
+          description: 'Apply a slowing effect to target within range',
+          params: [
+            {
+              name: 'targetId',
+              type: 'string',
+              required: true,
+              description: 'Entity ID of the target to slow',
+            },
+          ],
+          cooldownMs: 5000,
+          castTimeMs: 1000,
+          rangeUnits: 200,
+          effect: {
+            id: 'slowed',
+            durationMs: 3000,
+            statModifiers: {
+              speedMultiplier: 0.5,
+            },
+          },
+        },
+      ],
+      triggers: ['slow', 'aura'],
+    };
+
+    this.skillService.registerSkill(slowAuraSkill);
+    console.log('[GameRoom] Registered builtin skill: slow_aura');
   }
 
   private loadFacilitiesFromWorldPack(): void {

@@ -4,9 +4,21 @@ import type appConfig from '../../../server/src/app.config.js';
 import type { GameRoom } from '../../../server/src/rooms/GameRoom.js';
 import type { EntitySchema } from '../../../server/src/schemas/EntitySchema.js';
 import type { RoomState } from '../../../server/src/schemas/RoomState.js';
+import type { SkillDefinition, SkillInvokeOutcome } from '@openclawworld/shared';
 
 export type Entity = EntitySchema;
 export type { RoomState, GameRoom };
+
+export type SkillInvokeResult = {
+  txId: string;
+  outcome: SkillInvokeOutcome;
+};
+
+export type InstalledSkill = {
+  definition: SkillDefinition;
+  lastUsedTime: number;
+  enabled: boolean;
+};
 
 function getServerEndpoint(): string {
   const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
@@ -82,6 +94,68 @@ export class ColyseusClient {
     if (!this.room) return undefined;
     const state = this.room.state;
     return state.humans.get(id) || state.agents.get(id) || state.objects.get(id);
+  }
+
+  invokeSkill(
+    skillId: string,
+    actionId: string,
+    targetId?: string,
+    params?: Record<string, unknown>
+  ): void {
+    if (this.room) {
+      this.room.send('skill_invoke', {
+        skillId,
+        actionId,
+        targetId,
+        params,
+      });
+    }
+  }
+
+  cancelSkill(): void {
+    if (this.room) {
+      this.room.send('skill_cancel', {});
+    }
+  }
+
+  onSkillEvent(
+    callback: (event: {
+      type: string;
+      txId?: string;
+      skillId?: string;
+      actionId?: string;
+      casterId?: string;
+      targetId?: string;
+      effectInstanceId?: string;
+      completionTime?: number;
+      reason?: string;
+    }) => void
+  ): () => void {
+    if (!this.room) return () => {};
+
+    const handlers = [
+      'skill.cast_started',
+      'skill.cast_complete',
+      'skill.cast_cancelled',
+      'skill.cast_failed',
+      'effect.applied',
+      'effect.refreshed',
+      'effect.expired',
+    ];
+
+    const unsubscribers: (() => void)[] = [];
+    for (const eventType of handlers) {
+      const unsub = this.room.onMessage(eventType, (data: Record<string, unknown>) => {
+        callback({ type: eventType, ...data } as Parameters<typeof callback>[0]);
+      });
+      unsubscribers.push(unsub);
+    }
+
+    return () => {
+      for (const unsub of unsubscribers) {
+        unsub();
+      }
+    };
   }
 }
 

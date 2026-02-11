@@ -7,6 +7,8 @@ import type {
   UserStatus,
   ZoneId,
 } from '@openclawworld/shared';
+import { SkillStateSchema } from './SkillStateSchema.js';
+import { ActiveEffectSchema } from './ActiveEffectSchema.js';
 
 export class Vector2Schema extends Schema {
   @type('number')
@@ -101,6 +103,12 @@ export class EntitySchema extends Schema {
   @type({ map: 'string' })
   meta: MapSchema<string> = new MapSchema<string>();
 
+  @type({ map: SkillStateSchema })
+  skillStates: MapSchema<SkillStateSchema> = new MapSchema<SkillStateSchema>();
+
+  @type({ map: ActiveEffectSchema })
+  activeEffects: MapSchema<ActiveEffectSchema> = new MapSchema<ActiveEffectSchema>();
+
   constructor(id: string, kind: EntityKind, name: string, roomId: string) {
     super();
     this.id = id;
@@ -124,5 +132,68 @@ export class EntitySchema extends Schema {
 
   setZone(zone: ZoneId): void {
     this.currentZone = zone;
+  }
+
+  getEffectiveSpeed(): number {
+    let latestMultiplier = 1.0;
+    let latestStartTime = 0;
+    this.activeEffects.forEach(effect => {
+      if (!effect.isExpired() && effect.speedMultiplier !== 1.0) {
+        if (effect.startTime > latestStartTime) {
+          latestStartTime = effect.startTime;
+          latestMultiplier = effect.speedMultiplier;
+        }
+      }
+    });
+    return this.speed * latestMultiplier;
+  }
+
+  setSkillState(skillId: string, actionId: string): SkillStateSchema {
+    const key = `${skillId}:${actionId}`;
+    let state = this.skillStates.get(key);
+    if (!state) {
+      state = new SkillStateSchema(skillId, actionId);
+      this.skillStates.set(key, state);
+    }
+    return state;
+  }
+
+  getSkillState(skillId: string, actionId: string): SkillStateSchema | undefined {
+    return this.skillStates.get(`${skillId}:${actionId}`);
+  }
+
+  addEffect(effect: ActiveEffectSchema): void {
+    let existingKey: string | null = null;
+    this.activeEffects.forEach((existing, key) => {
+      if (
+        existing.effectType === effect.effectType &&
+        existing.sourceEntityId === effect.sourceEntityId
+      ) {
+        existingKey = key;
+      }
+    });
+    if (existingKey) {
+      this.activeEffects.delete(existingKey);
+    }
+    this.activeEffects.set(effect.id, effect);
+  }
+
+  removeEffect(effectId: string): boolean {
+    return this.activeEffects.delete(effectId);
+  }
+
+  cleanupExpiredEffects(): number {
+    let removed = 0;
+    const toRemove: string[] = [];
+    this.activeEffects.forEach((effect, key) => {
+      if (effect.isExpired()) {
+        toRemove.push(key);
+      }
+    });
+    toRemove.forEach(key => {
+      this.activeEffects.delete(key);
+      removed++;
+    });
+    return removed;
   }
 }

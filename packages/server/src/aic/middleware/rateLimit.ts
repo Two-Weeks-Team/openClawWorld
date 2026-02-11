@@ -9,6 +9,9 @@ export const RateLimits = {
   moveTo: { windowMs: 1000, max: 10 },
   interact: { windowMs: 1000, max: 10 },
   chatObserve: { windowMs: 1000, max: 10 },
+  skillList: { windowMs: 1000, max: 10 },
+  skillInstall: { windowMs: 1000, max: 5 },
+  skillInvoke: { windowMs: 1000, max: 5 },
 } as const;
 
 function createRateLimitResponse(): {
@@ -71,4 +74,19 @@ export const interactRateLimiter = createRateLimiter(
 export const chatObserveRateLimiter = createRateLimiter(
   RateLimits.chatObserve.windowMs,
   RateLimits.chatObserve.max
+);
+
+export const skillListRateLimiter = createRateLimiter(
+  RateLimits.skillList.windowMs,
+  RateLimits.skillList.max
+);
+
+export const skillInstallRateLimiter = createRateLimiter(
+  RateLimits.skillInstall.windowMs,
+  RateLimits.skillInstall.max
+);
+
+export const skillInvokeRateLimiter = createRateLimiter(
+  RateLimits.skillInvoke.windowMs,
+  RateLimits.skillInvoke.max
 );

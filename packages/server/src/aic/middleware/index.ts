@@ -9,5 +9,8 @@ export {
   moveToRateLimiter,
   interactRateLimiter,
   chatObserveRateLimiter,
+  skillListRateLimiter,
+  skillInstallRateLimiter,
+  skillInvokeRateLimiter,
 } from './rateLimit.js';
 export { validateBody, validateRequest } from './validation.js';

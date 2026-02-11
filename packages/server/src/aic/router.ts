@@ -8,6 +8,9 @@ import {
   PollEventsRequestSchema,
   RegisterRequestSchema,
   ProfileUpdateRequestSchema,
+  SkillListRequestSchema,
+  SkillInstallRequestSchema,
+  SkillInvokeRequestSchema,
 } from '@openclawworld/shared';
 import {
   authMiddleware,
@@ -18,6 +21,9 @@ import {
   moveToRateLimiter,
   interactRateLimiter,
   chatObserveRateLimiter,
+  skillListRateLimiter,
+  skillInstallRateLimiter,
+  skillInvokeRateLimiter,
 } from './middleware/index.js';
 import { handleObserve } from './handlers/observe.js';
 import { handleMoveTo } from './handlers/moveTo.js';
@@ -27,6 +33,9 @@ import { handleChatObserve } from './handlers/chatObserve.js';
 import { handlePollEvents } from './handlers/pollEvents.js';
 import { handleRegister } from './handlers/register.js';
 import { handleProfileUpdate } from './handlers/profileUpdate.js';
+import { handleSkillList } from './handlers/skillList.js';
+import { handleSkillInstall } from './handlers/skillInstall.js';
+import { handleSkillInvoke } from './handlers/skillInvoke.js';
 
 const router: Router = Router();
 
@@ -78,6 +87,27 @@ router.post(
   interactRateLimiter,
   validateRequest(ProfileUpdateRequestSchema),
   handleProfileUpdate
+);
+
+router.post(
+  '/skill/list',
+  skillListRateLimiter,
+  validateRequest(SkillListRequestSchema),
+  handleSkillList
+);
+
+router.post(
+  '/skill/install',
+  skillInstallRateLimiter,
+  validateRequest(SkillInstallRequestSchema),
+  handleSkillInstall
+);
+
+router.post(
+  '/skill/invoke',
+  skillInvokeRateLimiter,
+  validateRequest(SkillInvokeRequestSchema),
+  handleSkillInvoke
 );
 
 export default router;

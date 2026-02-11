@@ -1,0 +1,52 @@
+{
+  "sheetName": "interactables",
+  "inputPath": "interactables.png",
+  "outputTileSize": 32,
+  "sourceImageSize": { "width": 2048, "height": 2048 },
+  "gridLine": {
+    "enabled": true,
+    "thickness": 2,
+    "color": [0, 0, 0, 255],
+    "tolerance": 50
+  },
+  "mode": "grid",
+  "grid": {
+    "cols": 8,
+    "rows": 8,
+    "cellWidth": 256,
+    "cellHeight": 256
+  },
+  "excludeRects": [
+    { "x": 0, "y": 1280, "w": 768, "h": 40, "reason": "Flower bed labels row 1" },
+    { "x": 0, "y": 1536, "w": 768, "h": 40, "reason": "Flower bed labels row 2" },
+    { "x": 0, "y": 1792, "w": 768, "h": 40, "reason": "Flower bed labels row 3" }
+  ],
+  "multiTile": [
+    { "name": "whiteboard", "startCol": 1, "startRow": 0, "cols": 2, "rows": 1 },
+    { "name": "service_counter", "startCol": 3, "startRow": 1, "cols": 2, "rows": 1 },
+    { "name": "stage_main", "startCol": 0, "startRow": 4, "cols": 4, "rows": 1 },
+    { "name": "stage_extension", "startCol": 4, "startRow": 4, "cols": 3, "rows": 1 },
+    { "name": "fountain", "startCol": 0, "startRow": 5, "cols": 3, "rows": 3 },
+    { "name": "flowerbed", "startCol": 5, "startRow": 5, "cols": 3, "rows": 3 }
+  ],
+  "blankDetector": {
+    "enabled": true,
+    "mode": "transparent",
+    "threshold": 0.95
+  },
+  "namingPrefix": "inter",
+  "aliases": {
+    "kiosk": "inter_0_0",
+    "printer": "inter_0_3",
+    "vending_machine": "inter_1_5",
+    "arcade_purple": "inter_2_0",
+    "arcade_blue": "inter_2_1",
+    "arcade_red": "inter_2_2",
+    "arcade_pink": "inter_2_3",
+    "arcade_green": "inter_2_4",
+    "arcade_orange": "inter_2_5",
+    "sign_a": "inter_1_2",
+    "sign_b": "inter_1_3",
+    "sign_c": "inter_1_4"
+  }
+}

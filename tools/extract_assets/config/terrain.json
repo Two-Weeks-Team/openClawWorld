@@ -1,0 +1,41 @@
+{
+  "sheetName": "terrain",
+  "inputPath": "terrain.png",
+  "outputTileSize": 32,
+  "sourceImageSize": { "width": 2048, "height": 2048 },
+  "gridLine": {
+    "enabled": true,
+    "thickness": 2,
+    "color": [0, 0, 0, 255],
+    "tolerance": 50
+  },
+  "mode": "grid",
+  "grid": {
+    "cols": 8,
+    "rows": 10,
+    "cellWidth": 256,
+    "cellHeight": 204
+  },
+  "excludeRects": [
+    { "x": 0, "y": 0, "w": 256, "h": 40, "reason": "GRASS label" },
+    { "x": 256, "y": 0, "w": 512, "h": 40, "reason": "STONE PATH label" },
+    { "x": 768, "y": 0, "w": 512, "h": 40, "reason": "PLAZA label" },
+    { "x": 1280, "y": 0, "w": 256, "h": 40, "reason": "DIRT label" },
+    { "x": 1536, "y": 0, "w": 512, "h": 40, "reason": "WATER/SHORE label" },
+    { "x": 0, "y": 1600, "w": 512, "h": 40, "reason": "WOOD DECK label" }
+  ],
+  "blankDetector": {
+    "enabled": true,
+    "mode": "transparent",
+    "threshold": 0.95
+  },
+  "namingPrefix": "terrain",
+  "aliases": {
+    "grass_full": "terrain_0_0",
+    "stone_center": "terrain_1_1",
+    "plaza_center": "terrain_3_1",
+    "dirt_center": "terrain_5_1",
+    "water_full": "terrain_6_0",
+    "wood_deck": "terrain_8_0"
+  }
+}

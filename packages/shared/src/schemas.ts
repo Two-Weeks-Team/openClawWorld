@@ -481,6 +481,132 @@ export const SafetyReportStatusSchema = z.enum(['pending', 'reviewed', 'resolved
 
 export const VoteStatusSchema = z.enum(['open', 'closed']);
 
+// ============================================================================
+// Skill System Schemas
+// ============================================================================
+
+export const SkillCategorySchema = z.enum(['movement', 'combat', 'social', 'utility']);
+
+export const SkillEffectDefinitionSchema = z.object({
+  id: z.string().min(1).max(64),
+  durationMs: z.number().int().min(0).max(3600000),
+  statModifiers: z
+    .object({
+      speedMultiplier: z.number().min(0).max(10).optional(),
+    })
+    .optional(),
+});
+
+export const SkillActionSchema = z.object({
+  id: z.string().min(1).max(64),
+  label: z.string().min(1).max(128),
+  description: z.string().min(1).max(500),
+  cooldownMs: z.number().int().min(0).max(3600000).optional(),
+  castTimeMs: z.number().int().min(0).max(60000).optional(),
+  rangeUnits: z.number().min(0).max(10000).optional(),
+  manaCost: z.number().int().min(0).max(10000).optional(),
+  params: z.record(z.string(), z.unknown()).optional(),
+  effect: SkillEffectDefinitionSchema.optional(),
+});
+
+export const SkillDefinitionSchema = z.object({
+  id: z.string().min(1).max(64),
+  name: z.string().min(1).max(64),
+  description: z.string().min(1).max(500),
+  category: SkillCategorySchema,
+  icon: z.string().max(256).optional(),
+  actions: z.array(SkillActionSchema).min(1).max(20),
+  passive: z.boolean().optional(),
+  prerequisites: z.array(z.string().min(1).max(64)).max(10).optional(),
+});
+
+export const SkillInvokeOutcomeTypeSchema = z.enum(['ok', 'pending', 'cancelled', 'error']);
+
+export const SkillInvokeOutcomeSchema = z.object({
+  type: SkillInvokeOutcomeTypeSchema,
+  message: z.string().max(500).optional(),
+  data: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const AgentSkillStateSchema = z.object({
+  skillId: z.string().min(1).max(64),
+  installedAt: TsMsSchema,
+  enabled: z.boolean(),
+  credentials: z.record(z.string(), z.string()).optional(),
+});
+
+export const PendingCastSchema = z.object({
+  txId: IdTxSchema,
+  skillId: z.string().min(1).max(64),
+  actionId: z.string().min(1).max(64),
+  sourceEntityId: IdEntitySchema,
+  targetEntityId: z.string(),
+  startTime: TsMsSchema,
+  completionTime: TsMsSchema,
+  startPosition: Vec2Schema,
+});
+
+export const ActiveEffectSchema = z.object({
+  effectId: z.string().min(1).max(64),
+  effectType: z.string().min(1).max(64),
+  sourceId: IdEntitySchema,
+  targetId: IdEntitySchema,
+  durationMs: z.number().int().min(0).max(3600000),
+  speedMultiplier: z.number().min(0).max(10),
+  startTime: TsMsSchema.optional(),
+});
+
+// ============================================================================
+// Skill System Request Schemas
+// ============================================================================
+
+export const SkillListRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+  category: SkillCategorySchema.optional(),
+  installed: z.boolean().optional(),
+});
+
+export const SkillInstallRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+  txId: IdTxSchema,
+  skillId: z.string().min(1).max(64),
+  credentials: z.record(z.string(), z.string()).optional(),
+});
+
+export const SkillInvokeRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+  txId: IdTxSchema,
+  skillId: z.string().min(1).max(64),
+  actionId: z.string().min(1).max(64),
+  targetId: IdEntitySchema.optional(),
+  params: z.record(z.string(), z.unknown()).optional(),
+});
+
+// ============================================================================
+// Skill System Response Schemas
+// ============================================================================
+
+export const SkillListResponseDataSchema = z.object({
+  skills: z.array(SkillDefinitionSchema).max(100),
+  serverTsMs: TsMsSchema,
+});
+
+export const SkillInstallResponseDataSchema = z.object({
+  txId: IdTxSchema,
+  applied: z.boolean(),
+  serverTsMs: TsMsSchema,
+  skillState: AgentSkillStateSchema,
+});
+
+export const SkillInvokeResponseDataSchema = z.object({
+  txId: IdTxSchema,
+  outcome: SkillInvokeOutcomeSchema,
+  serverTsMs: TsMsSchema,
+});
+
 export const WorkLifeEventTypeSchema = z.enum([
   'org.created',
   'org.member_joined',

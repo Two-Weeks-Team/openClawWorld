@@ -865,3 +865,144 @@ export type WorkLifeEventType =
   | 'zone.exit'
   | 'npc.dialogue'
   | 'facility.interact';
+
+// ============================================================================
+// Skill System Types
+// ============================================================================
+
+export type SkillCategory = 'movement' | 'combat' | 'social' | 'utility';
+
+export type SkillEffectDefinition = {
+  id: string;
+  durationMs: number;
+  statModifiers?: {
+    speedMultiplier?: number;
+  };
+};
+
+export type SkillActionParam = {
+  name: string;
+  type: string;
+  required: boolean;
+  description: string;
+};
+
+export type SkillAction = {
+  id: string;
+  name?: string;
+  label?: string;
+  description: string;
+  cooldownMs?: number;
+  castTimeMs?: number;
+  rangeUnits?: number;
+  manaCost?: number;
+  params?: SkillActionParam[] | Record<string, unknown>;
+  effect?: SkillEffectDefinition;
+};
+
+export type SkillSource = {
+  type: 'builtin' | 'plugin' | 'custom';
+  pluginId?: string;
+};
+
+export type SkillDefinition = {
+  id: string;
+  name: string;
+  description: string;
+  category: SkillCategory;
+  version?: string;
+  icon?: string;
+  emoji?: string;
+  source?: SkillSource;
+  actions: SkillAction[];
+  passive?: boolean;
+  prerequisites?: string[];
+  triggers?: string[];
+};
+
+export type SkillInvokeOutcomeType = 'ok' | 'pending' | 'cancelled' | 'error';
+
+export type SkillInvokeOutcome = {
+  type: SkillInvokeOutcomeType;
+  message?: string;
+  data?: Record<string, unknown>;
+};
+
+export type AgentSkillState = {
+  skillId: string;
+  installedAt: number;
+  enabled: boolean;
+  credentials?: Record<string, string>;
+};
+
+export type PendingCast = {
+  txId: string;
+  skillId: string;
+  actionId: string;
+  sourceEntityId: string;
+  targetEntityId: string;
+  startTime: number;
+  completionTime: number;
+  startPosition: Vec2;
+};
+
+export type ActiveEffect = {
+  effectId: string;
+  effectType: string;
+  sourceId: string;
+  targetId: string;
+  durationMs: number;
+  speedMultiplier: number;
+  startTime?: number;
+};
+
+// ============================================================================
+// Skill System Request Types
+// ============================================================================
+
+export type SkillListRequest = {
+  agentId: string;
+  roomId: string;
+  category?: SkillCategory;
+  installed?: boolean;
+};
+
+export type SkillInstallRequest = {
+  agentId: string;
+  roomId: string;
+  txId: string;
+  skillId: string;
+  credentials?: Record<string, string>;
+};
+
+export type SkillInvokeRequest = {
+  agentId: string;
+  roomId: string;
+  txId: string;
+  skillId: string;
+  actionId: string;
+  targetId?: string;
+  params?: Record<string, unknown>;
+};
+
+// ============================================================================
+// Skill System Response Types
+// ============================================================================
+
+export type SkillListResponseData = {
+  skills: SkillDefinition[];
+  serverTsMs: number;
+};
+
+export type SkillInstallResponseData = {
+  txId: string;
+  applied: boolean;
+  serverTsMs: number;
+  skillState: AgentSkillState;
+};
+
+export type SkillInvokeResponseData = {
+  txId: string;
+  outcome: SkillInvokeOutcome;
+  serverTsMs: number;
+};

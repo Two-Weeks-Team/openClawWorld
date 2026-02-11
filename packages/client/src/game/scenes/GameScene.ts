@@ -6,7 +6,9 @@ import { Minimap } from '../../ui/Minimap';
 import { ZoneBanner } from '../../ui/ZoneBanner';
 import { TileInterpreter } from '../../world/TileInterpreter';
 import { ClientCollisionSystem } from '../../systems/CollisionSystem';
-import type { ZoneId } from '@openclawworld/shared';
+import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
+import { CastBar } from '../../ui/CastBar';
+import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
 
 interface MapObject {
   id: number;
@@ -53,6 +55,13 @@ export class GameScene extends Phaser.Scene {
   private clientCollision?: ClientCollisionSystem;
   private previousZone?: ZoneId;
   private chatInputFocused = false;
+  private skillBar?: SkillBar;
+  private castBar?: CastBar;
+  private skillKeys?: Phaser.Input.Keyboard.Key[];
+  private targetingMode = false;
+  private selectedSkillSlot: number | null = null;
+  private entityEffects: Map<string, Set<string>> = new Map();
+  private builtinSkills: SkillDefinition[] = [];
 
   constructor() {
     super('GameScene');
@@ -80,10 +89,16 @@ export class GameScene extends Phaser.Scene {
     this.notificationPanel = new EventNotificationPanel(this);
     this.minimap = new Minimap(this);
     this.zoneBanner = new ZoneBanner(this);
+    this.skillBar = new SkillBar(this);
+    this.castBar = new CastBar(this);
 
     this.tileInterpreter = new TileInterpreter(32);
     this.clientCollision = new ClientCollisionSystem();
     this.initializeWorldGrid();
+
+    this.setupSkillKeys();
+    this.setupSkillTargeting();
+    this.initializeBuiltinSkills();
 
     this.setupKeyboardFocusHandling();
   }
@@ -138,6 +153,156 @@ export class GameScene extends Phaser.Scene {
     this.wasdKeys.A.enabled = enabled;
     this.wasdKeys.S.enabled = enabled;
     this.wasdKeys.D.enabled = enabled;
+  }
+
+  private setupSkillKeys(): void {
+    if (!this.input.keyboard) return;
+
+    this.skillKeys = [
+      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE),
+      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO),
+      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE),
+      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR),
+    ];
+
+    this.skillKeys.forEach((key, index) => {
+      key.on('down', () => {
+        if (this.chatInputFocused) return;
+        this.activateSkillSlot(index);
+      });
+    });
+
+    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC).on('down', () => {
+      this.cancelTargeting();
+    });
+  }
+
+  private setupSkillTargeting(): void {
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (!this.targetingMode || this.selectedSkillSlot === null) return;
+      if (!this.skillBar) return;
+
+      const skill = this.skillBar.getSkill(this.selectedSkillSlot);
+      if (!skill) return;
+
+      const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
+      const targetEntity = this.findEntityAtPosition(worldPoint.x, worldPoint.y);
+
+      if (targetEntity) {
+        this.invokeSkillOnTarget(skill, targetEntity);
+      }
+
+      this.cancelTargeting();
+    });
+  }
+
+  private initializeBuiltinSkills(): void {
+    this.builtinSkills = [
+      {
+        id: 'slow_aura',
+        name: 'Slow Aura',
+        version: '1.0.0',
+        description: 'Emit an aura that slows nearby targets',
+        category: 'social',
+        emoji: '🐌',
+        source: { type: 'builtin' },
+        actions: [
+          {
+            id: 'cast',
+            name: 'Cast Slow Aura',
+            description: 'Apply a slowing effect to target within range',
+            cooldownMs: 5000,
+            castTimeMs: 1000,
+            rangeUnits: 200,
+            effect: {
+              id: 'slowed',
+              durationMs: 3000,
+              statModifiers: { speedMultiplier: 0.5 },
+            },
+          },
+        ],
+        triggers: ['slow', 'aura'],
+      },
+    ];
+
+    if (this.skillBar && this.builtinSkills.length > 0) {
+      this.skillBar.setSkill(0, {
+        definition: this.builtinSkills[0],
+        lastUsedTime: 0,
+        enabled: true,
+      });
+    }
+  }
+
+  private activateSkillSlot(slotIndex: number): void {
+    if (!this.skillBar) return;
+
+    const skill = this.skillBar.getSkill(slotIndex);
+    if (!skill || !skill.enabled) return;
+
+    const action = skill.definition.actions[0];
+    if (!action) return;
+
+    const cooldownMs = action.cooldownMs ?? 0;
+    const now = Date.now();
+    if (cooldownMs > 0 && now - skill.lastUsedTime < cooldownMs) {
+      this.notificationPanel?.addEvent('skill', 'Skill on cooldown', 0xff6666);
+      return;
+    }
+
+    if (action.rangeUnits && action.rangeUnits > 0) {
+      this.startTargeting(slotIndex);
+    } else {
+      this.invokeSkillOnTarget(skill, undefined);
+    }
+  }
+
+  private startTargeting(slotIndex: number): void {
+    this.targetingMode = true;
+    this.selectedSkillSlot = slotIndex;
+    this.skillBar?.highlightSlot(slotIndex, true);
+    this.notificationPanel?.addEvent('skill', 'Select a target...', 0x66aaff);
+  }
+
+  private cancelTargeting(): void {
+    if (this.selectedSkillSlot !== null && this.skillBar) {
+      this.skillBar.highlightSlot(this.selectedSkillSlot, false);
+    }
+    this.targetingMode = false;
+    this.selectedSkillSlot = null;
+  }
+
+  private invokeSkillOnTarget(skill: SkillSlot, targetEntityId: string | undefined): void {
+    const action = skill.definition.actions[0];
+    if (!action) return;
+
+    gameClient.invokeSkill(skill.definition.id, action.id, targetEntityId);
+    skill.lastUsedTime = Date.now();
+
+    if (action.castTimeMs && action.castTimeMs > 0) {
+      this.castBar?.startCast({
+        skillName: skill.definition.name,
+        startTime: Date.now(),
+        completionTime: Date.now() + action.castTimeMs,
+      });
+    }
+  }
+
+  private findEntityAtPosition(x: number, y: number): string | undefined {
+    const clickRadius = 32;
+    let closestId: string | undefined;
+    let closestDist = Infinity;
+
+    this.entityData.forEach((entity, id) => {
+      if (id === gameClient.entityId) return;
+      const dist = Phaser.Math.Distance.Between(x, y, entity.pos.x, entity.pos.y);
+      if (dist < clickRadius && dist < closestDist) {
+        closestDist = dist;
+        closestId = id;
+      }
+    });
+
+    return closestId;
   }
 
   private createMap() {
@@ -423,6 +588,8 @@ export class GameScene extends Phaser.Scene {
     this.notificationPanel?.destroy();
     this.minimap?.destroy();
     this.zoneBanner?.destroy();
+    this.skillBar?.destroy();
+    this.castBar?.destroy();
   }
 
   private setupRoomListeners() {
@@ -479,6 +646,99 @@ export class GameScene extends Phaser.Scene {
       this.showChatBubble(data.entityId, data.message);
       this.notificationPanel?.addEvent('chat', `${data.from}: ${data.message}`, EVENT_COLORS.chat);
     });
+
+    this.setupSkillEventListeners(room);
+  }
+
+  private setupSkillEventListeners(room: NonNullable<typeof gameClient.currentRoom>): void {
+    room.onMessage(
+      'skill.cast_started',
+      (data: { txId: string; skillId: string; casterId: string; completionTime: number }) => {
+        if (data.casterId === gameClient.entityId) {
+          const skill = this.builtinSkills.find(s => s.id === data.skillId);
+          if (skill) {
+            this.castBar?.startCast({
+              skillName: skill.name,
+              startTime: Date.now(),
+              completionTime: data.completionTime,
+            });
+          }
+        }
+        this.notificationPanel?.addEvent('skill', `Casting ${data.skillId}...`, 0x66aaff);
+      }
+    );
+
+    room.onMessage(
+      'skill.cast_complete',
+      (data: { txId: string; skillId: string; casterId: string; targetId?: string }) => {
+        if (data.casterId === gameClient.entityId) {
+          this.castBar?.cancelCast();
+        }
+        this.notificationPanel?.addEvent('skill', `${data.skillId} complete!`, 0x66ff66);
+      }
+    );
+
+    room.onMessage(
+      'skill.cast_cancelled',
+      (data: { txId: string; skillId: string; casterId: string; reason: string }) => {
+        if (data.casterId === gameClient.entityId) {
+          this.castBar?.cancelCast();
+        }
+        this.notificationPanel?.addEvent('skill', `Cast cancelled: ${data.reason}`, 0xffaa66);
+      }
+    );
+
+    room.onMessage(
+      'effect.applied',
+      (data: { effectInstanceId: string; effectType: string; targetEntityId: string }) => {
+        this.applyEffectVisual(data.targetEntityId, data.effectType);
+        this.notificationPanel?.addEvent('effect', `${data.effectType} applied`, 0xaa66ff);
+      }
+    );
+
+    room.onMessage(
+      'effect.expired',
+      (data: { effectInstanceId: string; effectType: string; targetEntityId: string }) => {
+        this.removeEffectVisual(data.targetEntityId, data.effectType);
+      }
+    );
+  }
+
+  private applyEffectVisual(entityId: string, effectType: string): void {
+    const container = this.entities.get(entityId);
+    if (!container) return;
+
+    let effects = this.entityEffects.get(entityId);
+    if (!effects) {
+      effects = new Set();
+      this.entityEffects.set(entityId, effects);
+    }
+    effects.add(effectType);
+
+    const sprite = container.list[0] as Phaser.GameObjects.Sprite;
+    if (effectType === 'slowed') {
+      sprite.setTint(0x6688ff);
+    }
+  }
+
+  private removeEffectVisual(entityId: string, effectType: string): void {
+    const container = this.entities.get(entityId);
+    if (!container) return;
+
+    const effects = this.entityEffects.get(entityId);
+    if (effects) {
+      effects.delete(effectType);
+    }
+
+    const sprite = container.list[0] as Phaser.GameObjects.Sprite;
+    const remainingEffects = effects?.size ?? 0;
+    if (remainingEffects === 0) {
+      if (entityId === gameClient.entityId) {
+        sprite.setTint(0xffff00);
+      } else {
+        sprite.clearTint();
+      }
+    }
   }
 
   private updateEntityData(entity: Entity, key: string) {
@@ -687,11 +947,14 @@ export class GameScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     if (!gameClient.currentRoom) return;
 
+    const now = Date.now();
     this.handleKeyboardMovement();
     this.interpolateEntities();
     this.checkNearbyObjects();
     this.notificationPanel?.update(delta);
     this.updateMinimap();
+    this.skillBar?.update(now);
+    this.castBar?.update(now);
   }
 
   private updateMinimap(): void {

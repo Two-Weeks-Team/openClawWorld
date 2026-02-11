@@ -20,6 +20,8 @@ import { ProfileService } from '../profile/ProfileService.js';
 import { ZoneSystem, DEFAULT_ZONE_BOUNDS, type ZoneBounds } from '../zone/ZoneSystem.js';
 import { NPCSystem } from '../systems/NPCSystem.js';
 import { FacilityService } from '../services/FacilityService.js';
+import { registerAllFacilityHandlers, FACILITY_AFFORDANCES } from '../facilities/index.js';
+import { FacilitySchema } from '../schemas/FacilitySchema.js';
 import { PermissionService } from '../services/PermissionService.js';
 import { SafetyService } from '../services/SafetyService.js';
 import { AuditLog } from '../audit/AuditLog.js';
@@ -117,6 +119,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
     this.facilityService = new FacilityService(this.state);
+    registerAllFacilityHandlers(this.facilityService);
+    this.loadFacilitiesFromWorldPack();
     this.permissionService = new PermissionService(this.state);
     this.setSimulationInterval(() => this.onTick(), 1000 / tickRate);
 
@@ -464,5 +468,28 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   getWorldPackLoader(): WorldPackLoader | null {
     return this.worldPackLoader;
+  }
+
+  private loadFacilitiesFromWorldPack(): void {
+    if (!this.worldPack) {
+      return;
+    }
+
+    let loadedCount = 0;
+    for (const facilityDef of this.worldPack.facilities) {
+      const affordances = FACILITY_AFFORDANCES[facilityDef.type] ?? [];
+      const facility = new FacilitySchema(
+        facilityDef.id,
+        facilityDef.type,
+        facilityDef.zone,
+        facilityDef.position.x,
+        facilityDef.position.y
+      );
+      facility.setAffordances(affordances);
+      this.facilityService.registerFacility(facility);
+      loadedCount++;
+    }
+
+    console.log(`[GameRoom] Registered ${loadedCount} facilities from world pack`);
   }
 }

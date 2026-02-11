@@ -449,7 +449,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private checkZoneChange(entity: Entity): void {
-    const currentZone = (entity as any).currentZone as string | undefined;
+    const currentZone = (entity as unknown as { currentZone?: string }).currentZone;
     if (!currentZone) return;
 
     if (this.previousZone && this.previousZone !== currentZone) {

@@ -3,7 +3,7 @@ import { ZoneSystem, DEFAULT_ZONE_BOUNDS } from '../../packages/server/src/zone/
 import { EventLog } from '../../packages/server/src/events/EventLog.js';
 import { EntitySchema } from '../../packages/server/src/schemas/EntitySchema.js';
 
-describe('ZoneSystem - Plaza Zone', () => {
+describe('ZoneSystem - Plaza Zone (64x52 layout)', () => {
   let zoneSystem: ZoneSystem;
   let eventLog: EventLog;
 
@@ -13,31 +13,24 @@ describe('ZoneSystem - Plaza Zone', () => {
   });
 
   describe('detectZone', () => {
-    it('returns plaza for position inside plaza bounds (3300, 500)', () => {
-      // Plaza bounds: { x: 3200, y: 0, width: 960, height: 1280 }
-      // Position (3300, 500) is inside plaza
-      expect(zoneSystem.detectZone(3300, 500)).toBe('plaza');
+    it('returns plaza for position inside plaza bounds (1600, 1300)', () => {
+      expect(zoneSystem.detectZone(1600, 1300)).toBe('plaza');
     });
 
-    it('returns plaza for position at plaza origin (3200, 0)', () => {
-      // Position (3200, 0) is at the top-left corner of plaza
-      expect(zoneSystem.detectZone(3200, 0)).toBe('plaza');
+    it('returns plaza for position at plaza origin (1344, 1152)', () => {
+      expect(zoneSystem.detectZone(1344, 1152)).toBe('plaza');
     });
 
     it('returns plaza for position at plaza bottom-right boundary', () => {
-      // Position (4159, 1279) is just inside plaza bottom-right corner
-      // (3200 + 960 = 4160, 0 + 1280 = 1280, so 4159, 1279 is inside)
-      expect(zoneSystem.detectZone(4159, 1279)).toBe('plaza');
+      expect(zoneSystem.detectZone(1951, 1567)).toBe('plaza');
     });
 
     it('returns null for position outside all zones', () => {
-      // Position (5000, 500) is outside plaza (plaza ends at x=4160)
       expect(zoneSystem.detectZone(5000, 500)).toBeNull();
     });
 
     it('returns null for position just outside plaza to the right', () => {
-      // Position (4160, 100) is at x=4160 which is plaza.x + plaza.width
-      expect(zoneSystem.detectZone(4160, 100)).toBeNull();
+      expect(zoneSystem.detectZone(1952, 1300)).toBeNull();
     });
   });
 
@@ -45,30 +38,37 @@ describe('ZoneSystem - Plaza Zone', () => {
     it('fires zone.enter event when entity enters plaza', () => {
       const entity = new EntitySchema('entity_1', 'human', 'Test', 'room_1');
 
-      const result = zoneSystem.updateEntityZone('entity_1', 3300, 500, eventLog, 'room_1', entity);
+      const result = zoneSystem.updateEntityZone(
+        'entity_1',
+        1600,
+        1300,
+        eventLog,
+        'room_1',
+        entity
+      );
 
       expect(result.currentZone).toBe('plaza');
       expect(result.changed).toBe(true);
 
       const { events } = eventLog.getSince('', 10);
       const enterEvent = events.find(
-        e => e.type === 'zone.enter' && (e.payload as any).zoneId === 'plaza'
+        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'plaza'
       );
 
       expect(enterEvent).toBeDefined();
-      expect((enterEvent?.payload as any).entityId).toBe('entity_1');
+      expect((enterEvent?.payload as { entityId: string }).entityId).toBe('entity_1');
     });
 
     it('updates entity currentZone to plaza when entity enters', () => {
       const entity = new EntitySchema('entity_1', 'human', 'Test', 'room_1');
 
-      zoneSystem.updateEntityZone('entity_1', 3300, 500, eventLog, 'room_1', entity);
+      zoneSystem.updateEntityZone('entity_1', 1600, 1300, eventLog, 'room_1', entity);
 
       expect(entity.currentZone).toBe('plaza');
     });
 
     it('tracks entity zone correctly for plaza', () => {
-      zoneSystem.updateEntityZone('entity_1', 3300, 500);
+      zoneSystem.updateEntityZone('entity_1', 1600, 1300);
 
       expect(zoneSystem.getEntityZone('entity_1')).toBe('plaza');
     });
@@ -76,15 +76,15 @@ describe('ZoneSystem - Plaza Zone', () => {
 
   describe('zone population', () => {
     it('returns correct population for plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 3300, 500);
-      zoneSystem.updateEntityZone('entity_2', 3400, 600);
+      zoneSystem.updateEntityZone('entity_1', 1600, 1300);
+      zoneSystem.updateEntityZone('entity_2', 1700, 1400);
 
       expect(zoneSystem.getZonePopulation('plaza')).toBe(2);
     });
 
     it('returns entities in plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 3300, 500);
-      zoneSystem.updateEntityZone('entity_2', 3400, 600);
+      zoneSystem.updateEntityZone('entity_1', 1600, 1300);
+      zoneSystem.updateEntityZone('entity_2', 1700, 1400);
 
       const entities = zoneSystem.getEntitiesInZone('plaza');
 
@@ -106,7 +106,7 @@ describe('ZoneSystem - Plaza Zone', () => {
     it('returns correct bounds for plaza zone', () => {
       const bounds = zoneSystem.getZoneBounds('plaza');
 
-      expect(bounds).toEqual({ x: 3200, y: 0, width: 960, height: 1280 });
+      expect(bounds).toEqual({ x: 1344, y: 1152, width: 608, height: 416 });
     });
   });
 });

@@ -103,7 +103,7 @@ export class EventNotificationPanel {
     });
   }
 
-  update(delta: number): void {
+  update(_delta: number): void {
     const now = Date.now();
     let needsRender = false;
 

@@ -568,7 +568,7 @@ export type TeamMember = {
 };
 
 // Zones
-export type ZoneId = 'lobby' | 'office' | 'meeting-center' | 'lounge-cafe' | 'arcade';
+export type ZoneId = 'lobby' | 'office' | 'meeting-center' | 'lounge-cafe' | 'arcade' | 'plaza';
 
 export type Zone = {
   id: ZoneId;
@@ -698,7 +698,9 @@ export type NpcRole =
   | 'sales'
   | 'event_host'
   | 'tutorial_guide'
-  | 'quest_giver';
+  | 'quest_giver'
+  | 'meeting_host'
+  | 'arcade_host';
 
 export type NpcState = 'idle' | 'walking' | 'talking' | 'working' | 'break';
 
@@ -719,7 +721,22 @@ export type FacilityType =
   | 'meeting_door'
   | 'whiteboard'
   | 'voting_kiosk'
-  | 'cafe_counter';
+  | 'cafe_counter'
+  | 'kanban_terminal'
+  | 'notice_board'
+  | 'onboarding_signpost'
+  | 'pond_edge'
+  | 'printer'
+  | 'watercooler'
+  | 'vending_machine'
+  | 'fountain'
+  | 'schedule_kiosk'
+  | 'agenda_panel'
+  | 'stage'
+  | 'game_table'
+  | 'room_door_a'
+  | 'room_door_b'
+  | 'room_door_c';
 
 export type Facility = {
   id: string;

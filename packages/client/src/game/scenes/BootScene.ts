@@ -1,12 +1,17 @@
 import Phaser from 'phaser';
 
+const ZONE_IDS = ['lobby', 'office', 'meeting-center', 'lounge-cafe', 'arcade'] as const;
+
 export class BootScene extends Phaser.Scene {
   constructor() {
     super('BootScene');
   }
 
   preload() {
-    this.load.tilemapTiledJSON('lobby', 'assets/maps/lobby.json');
+    for (const zoneId of ZONE_IDS) {
+      this.load.tilemapTiledJSON(zoneId, `assets/maps/${zoneId}.json`);
+    }
+
     this.load.svg('tileset', 'assets/maps/tileset.svg', { width: 256, height: 128 });
 
     this.load.svg('player-human', 'assets/sprites/player-human.svg', { width: 32, height: 32 });

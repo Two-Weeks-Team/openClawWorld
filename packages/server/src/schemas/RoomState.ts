@@ -2,6 +2,9 @@ import { Schema, type, MapSchema } from '@colyseus/schema';
 import { EntitySchema } from './EntitySchema.js';
 import { FacilitySchema } from './FacilitySchema.js';
 import { GameMap } from './GameMap.js';
+import { KanbanBoardSchema } from './KanbanSchema.js';
+import { VoteSchema } from './VoteSchema.js';
+import { WhiteboardSchema } from './WhiteboardSchema.js';
 import { MeetingReservationSchema } from './MeetingReservationSchema.js';
 import { NPCSchema } from './NPCSchema.js';
 import { NoticeSchema } from './NoticeSchema.js';
@@ -51,6 +54,15 @@ export class RoomState extends Schema {
 
   @type({ map: MeetingReservationSchema })
   reservations: MapSchema<MeetingReservationSchema> = new MapSchema<MeetingReservationSchema>();
+
+  @type({ map: KanbanBoardSchema })
+  boards: MapSchema<KanbanBoardSchema> = new MapSchema<KanbanBoardSchema>();
+
+  @type({ map: WhiteboardSchema })
+  whiteboards: MapSchema<WhiteboardSchema> = new MapSchema<WhiteboardSchema>();
+
+  @type({ map: VoteSchema })
+  votes: MapSchema<VoteSchema> = new MapSchema<VoteSchema>();
 
   constructor(roomId: string, mapId: string, tickRate?: number, gameMap?: GameMap) {
     super();

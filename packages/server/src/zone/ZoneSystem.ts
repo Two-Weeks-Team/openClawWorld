@@ -19,12 +19,22 @@ export type ZoneTransitionResult = {
   changed: boolean;
 };
 
+// Map layout: 100x80 tiles (3200x2560 pixels)
+// ┌──────────────┬──────────────┬────────────┐
+// │    Lobby     │    Office    │            │
+// │   (0,0)      │   (1280,0)   │   Arcade   │
+// │   40x40      │   40x40      │   (2560,0) │
+// ├──────────────┼──────────────┤   20x80    │
+// │   Meeting    │    Lounge    │            │
+// │   (0,1280)   │ (1280,1280)  │            │
+// │   40x40      │   40x40      │            │
+// └──────────────┴──────────────┴────────────┘
 export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = new Map([
-  ['lobby', { x: 0, y: 0, width: 533, height: 640 }],
-  ['office', { x: 533, y: 0, width: 534, height: 640 }],
-  ['meeting-center', { x: 0, y: 640, width: 533, height: 640 }],
-  ['lounge-cafe', { x: 533, y: 640, width: 534, height: 640 }],
-  ['arcade', { x: 1067, y: 0, width: 533, height: 1280 }],
+  ['lobby', { x: 0, y: 0, width: 1280, height: 1280 }],
+  ['office', { x: 1280, y: 0, width: 1280, height: 1280 }],
+  ['meeting-center', { x: 0, y: 1280, width: 1280, height: 1280 }],
+  ['lounge-cafe', { x: 1280, y: 1280, width: 1280, height: 1280 }],
+  ['arcade', { x: 2560, y: 0, width: 640, height: 2560 }],
 ]);
 
 export class ZoneSystem {

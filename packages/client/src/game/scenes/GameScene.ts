@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Callbacks } from '@colyseus/sdk';
 import { gameClient, type Entity } from '../../network/ColyseusClient';
+import { EventNotificationPanel, EVENT_COLORS } from '../../ui/EventNotificationPanel';
 
 interface MapObject {
   id: number;
@@ -40,6 +41,7 @@ export class GameScene extends Phaser.Scene {
   };
   private lastMoveTime = 0;
   private roomCheckInterval?: ReturnType<typeof setInterval>;
+  private notificationPanel?: EventNotificationPanel;
 
   constructor() {
     super('GameScene');
@@ -63,6 +65,8 @@ export class GameScene extends Phaser.Scene {
         D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
       };
     }
+
+    this.notificationPanel = new EventNotificationPanel(this);
   }
 
   private createMap() {
@@ -345,6 +349,7 @@ export class GameScene extends Phaser.Scene {
       clearInterval(this.roomCheckInterval);
       this.roomCheckInterval = undefined;
     }
+    this.notificationPanel?.destroy();
   }
 
   private setupRoomListeners() {
@@ -356,14 +361,40 @@ export class GameScene extends Phaser.Scene {
     callbacks.onAdd('humans', (entity, key) => {
       this.addEntity(entity, key, 'human');
       callbacks.onChange(entity, () => this.updateEntityData(entity, key));
+      if (key !== gameClient.entityId) {
+        this.notificationPanel?.addEvent(
+          'presence.join',
+          `${entity.name} joined`,
+          EVENT_COLORS['presence.join']
+        );
+      }
     });
-    callbacks.onRemove('humans', (_entity, key) => this.removeEntity(key));
+    callbacks.onRemove('humans', (entity, key) => {
+      this.notificationPanel?.addEvent(
+        'presence.leave',
+        `${entity.name} left`,
+        EVENT_COLORS['presence.leave']
+      );
+      this.removeEntity(key);
+    });
 
     callbacks.onAdd('agents', (entity, key) => {
       this.addEntity(entity, key, 'agent');
       callbacks.onChange(entity, () => this.updateEntityData(entity, key));
+      this.notificationPanel?.addEvent(
+        'presence.join',
+        `Agent ${entity.name} appeared`,
+        EVENT_COLORS['presence.join']
+      );
     });
-    callbacks.onRemove('agents', (_entity, key) => this.removeEntity(key));
+    callbacks.onRemove('agents', (entity, key) => {
+      this.notificationPanel?.addEvent(
+        'presence.leave',
+        `Agent ${entity.name} disappeared`,
+        EVENT_COLORS['presence.leave']
+      );
+      this.removeEntity(key);
+    });
 
     callbacks.onAdd('objects', (entity, key) => {
       this.addEntity(entity, key, 'object');
@@ -373,6 +404,7 @@ export class GameScene extends Phaser.Scene {
 
     room.onMessage('chat', (data: { from: string; message: string; entityId: string }) => {
       this.showChatBubble(data.entityId, data.message);
+      this.notificationPanel?.addEvent('chat', `${data.from}: ${data.message}`, EVENT_COLORS.chat);
     });
   }
 
@@ -550,12 +582,13 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  update() {
+  update(_time: number, delta: number) {
     if (!gameClient.currentRoom) return;
 
     this.handleKeyboardMovement();
     this.interpolateEntities();
     this.checkNearbyObjects();
+    this.notificationPanel?.update(delta);
   }
 
   private interpolateEntities() {

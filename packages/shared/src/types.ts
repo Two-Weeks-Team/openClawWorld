@@ -628,7 +628,7 @@ export type TeamMember = {
 };
 
 // Zones
-export type ZoneId = 'lobby' | 'office' | 'meeting-center' | 'lounge-cafe' | 'arcade' | 'plaza';
+export type ZoneId = 'plaza' | 'north-block' | 'west-block' | 'east-block' | 'south-block' | 'lake';
 
 export type Zone = {
   id: ZoneId;

@@ -1,21 +1,18 @@
 import type { Request, Response } from 'express';
+import { randomBytes } from 'node:crypto';
 import { matchMaker } from 'colyseus';
+import { v4 as uuidv4 } from 'uuid';
 import type { RegisterRequest, RegisterResponseData, AicErrorObject } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { EntitySchema } from '../../schemas/EntitySchema.js';
 import { registerRoom, getColyseusRoomId } from '../roomRegistry.js';
 
-let agentCounter = 0;
-
 function generateAgentId(): string {
-  agentCounter++;
-  return `agt_${agentCounter.toString().padStart(4, '0')}`;
+  return `agt_${uuidv4().replace(/-/g, '').substring(0, 12)}`;
 }
 
 function generateSessionToken(): string {
-  const randomPart = Math.random().toString(36).substring(2, 15);
-  const timestampPart = Date.now().toString(36);
-  return `tok_${randomPart}_${timestampPart}`;
+  return `tok_${randomBytes(24).toString('base64url')}`;
 }
 
 function createErrorResponse(

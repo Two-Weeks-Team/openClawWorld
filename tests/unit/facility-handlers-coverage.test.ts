@@ -227,8 +227,8 @@ describe('Facility Handlers Coverage', () => {
       expect(result.type).toBe('ok');
     });
 
-    it('handles join action', () => {
-      const result = service.interact('arcade_1', 'entity_001', 'join', {});
+    it('handles view_highscores action', () => {
+      const result = service.interact('arcade_1', 'entity_001', 'view_highscores', {});
       expect(result.type).toBe('ok');
     });
   });

@@ -459,6 +459,7 @@ export class GameScene extends Phaser.Scene {
         'meeting-center': 'Meeting Center',
         'lounge-cafe': 'Lounge Cafe',
         arcade: 'Arcade',
+        plaza: 'Plaza',
       };
       const zoneName = zoneNames[currentZone] || currentZone;
       this.notificationPanel?.addEvent(

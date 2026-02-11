@@ -1,0 +1,108 @@
+{
+  "id": "meeting-host",
+  "name": "Alex the Meeting Coordinator",
+  "sprite": "npc-meeting-host",
+  "zone": "meeting-center",
+  "defaultPosition": { "x": 640, "y": 1600 },
+  "schedule": [
+    { "startHour": 8, "endHour": 12, "state": "working", "position": { "x": 640, "y": 1600 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 700, "y": 1700 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 640, "y": 1600 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Hello there! Welcome to the Meeting Center! I'm Alex, your friendly Meeting Coordinator. Need to book a room, or are you looking for a meeting in progress?",
+      "options": [
+        { "text": "I need to book a meeting room", "next": "book-room" },
+        { "text": "What rooms are available?", "next": "available-rooms" },
+        { "text": "How does the booking system work?", "next": "booking-system" },
+        { "text": "Just exploring, thanks!", "next": "exploring" }
+      ]
+    },
+    "book-room": {
+      "id": "book-room",
+      "text": "Excellent! We have three meeting rooms: Conference Room A for big presentations, the Huddle Space for quick syncs, and the Quiet Room for focused work. Each has different vibes! What kind of meeting are you planning?",
+      "options": [
+        { "text": "A big team presentation", "next": "conference-a" },
+        { "text": "Just a quick standup", "next": "huddle-space" },
+        { "text": "Something more private", "next": "quiet-room" }
+      ]
+    },
+    "conference-a": {
+      "id": "conference-a",
+      "text": "Conference Room A it is! It fits up to 20 people and has the BIG screen. Perfect for impressing stakeholders! *checks tablet* Looks like there's availability at 2 PM and 4 PM today. Want me to reserve it?",
+      "options": [
+        { "text": "2 PM works great!", "next": "booked-success" },
+        { "text": "Let me check my calendar first", "next": "check-later" }
+      ]
+    },
+    "huddle-space": {
+      "id": "huddle-space",
+      "text": "The Huddle Space is perfect for quick syncs! Standing desks, no chairs - keeps meetings SHORT. *winks* Maximum 15 minutes or the lights start flickering. Just kidding! ...Mostly.",
+      "options": [
+        { "text": "Sounds efficient!", "next": "booked-success" },
+        { "text": "No chairs? That's hardcore!", "next": "no-chairs" }
+      ]
+    },
+    "no-chairs": {
+      "id": "no-chairs",
+      "text": "Right?! Jordan from PM suggested it. Said meetings went from 30 minutes to 8 minutes average! People get to the point FAST when their legs are tired. Revolutionary, honestly.",
+      "options": [{ "text": "I'll try the standing meeting approach!", "next": null }]
+    },
+    "quiet-room": {
+      "id": "quiet-room",
+      "text": "The Quiet Room is our hidden gem. Soundproofed walls, mood lighting, and a 'Do Not Disturb' hologram. Perfect for sensitive discussions or when you just need to focus. Very popular with the AI agents for their deep thinking sessions!",
+      "options": [
+        { "text": "AI agents use it too?", "next": "ai-meetings" },
+        { "text": "Book me in!", "next": "booked-success" }
+      ]
+    },
+    "ai-meetings": {
+      "id": "ai-meetings",
+      "text": "Oh absolutely! Some of them have very... intense processing sessions. One time, Axiom-7 booked it for 4 hours straight. When they came out, they'd apparently solved three optimization problems. The room was slightly warm though. *nervous laugh*",
+      "options": [{ "text": "AI productivity is impressive!", "next": null }]
+    },
+    "booked-success": {
+      "id": "booked-success",
+      "text": "Done! I've reserved it for you. You'll get a notification 15 minutes before. Pro tip: arrive early to test the screen share - it has a mind of its own sometimes. Good luck with your meeting!",
+      "options": [{ "text": "Thanks Alex!", "next": null }]
+    },
+    "check-later": {
+      "id": "check-later",
+      "text": "No rush! Come back when you're ready. I'm here until 6 PM most days. And remember - the best meetings are the ones with clear agendas! *taps clipboard* That's my motto!",
+      "options": [{ "text": "Wise words!", "next": null }]
+    },
+    "available-rooms": {
+      "id": "available-rooms",
+      "text": "*checks holographic display* Right now, Conference Room A is free until 3 PM. The Huddle Space is always available - first come, first serve! And the Quiet Room... *squints* ...is occupied by someone named 'Anonymous.' Mysterious!",
+      "options": [
+        { "text": "Who books as Anonymous?!", "next": "anonymous-booker" },
+        { "text": "I'll take Conference Room A", "next": "conference-a" }
+      ]
+    },
+    "anonymous-booker": {
+      "id": "anonymous-booker",
+      "text": "*leans in conspiratorially* Between you and me? I think it's the CEO. Or maybe an AI agent having an existential crisis. Or Chris from Sales practicing their pitch. I don't ask questions. The Quiet Room sees all, tells nothing.",
+      "options": [{ "text": "The mystery continues...", "next": null }]
+    },
+    "booking-system": {
+      "id": "booking-system",
+      "text": "Easy! Just approach the room door, tap your ID badge, and the schedule pops up. Pick a time slot, confirm, done! Or talk to me - I love the human touch. Also, I have snacks hidden in my desk. Don't tell facilities.",
+      "options": [
+        { "text": "What kind of snacks?", "next": "secret-snacks" },
+        { "text": "I'll use the digital system", "next": "exploring" }
+      ]
+    },
+    "secret-snacks": {
+      "id": "secret-snacks",
+      "text": "*opens drawer slightly* Granola bars, some cookies Morgan baked, and... emergency chocolate. For when meetings go overtime. The chocolate has saved lives. Metaphorically. Probably.",
+      "options": [{ "text": "You're a true hero, Alex!", "next": null }]
+    },
+    "exploring": {
+      "id": "exploring",
+      "text": "Feel free to look around! Check out the whiteboards - some brilliant ideas have been born there. Also some terrible drawings. We don't judge. The Meeting Center is a safe space for all ideas, good and bad!",
+      "options": []
+    }
+  }
+}

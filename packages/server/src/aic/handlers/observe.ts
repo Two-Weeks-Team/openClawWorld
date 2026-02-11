@@ -5,11 +5,13 @@ import type {
   ObserveResponseData,
   EntityBase,
   ObservedEntity,
+  ObservedFacility,
   RoomInfo,
   AicErrorObject,
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
+import type { FacilitySchema } from '../../schemas/FacilitySchema.js';
 
 function entityToBase(entity: EntitySchema): EntityBase {
   return {
@@ -48,6 +50,21 @@ function getAffordancesForObject(entity: EntitySchema): Array<{ action: string; 
   return Object.prototype.hasOwnProperty.call(AFFORDANCE_MAP, objectType)
     ? AFFORDANCE_MAP[objectType]
     : [];
+}
+
+function facilityToObserved(facility: FacilitySchema, distance: number): ObservedFacility {
+  const affordances = facility.getAffordances();
+  return {
+    id: facility.id,
+    type: facility.type as ObservedFacility['type'],
+    name: facility.id,
+    position: { x: facility.position.x, y: facility.position.y },
+    distance: Math.round(distance * 100) / 100,
+    affords: affordances.map(action => ({
+      action,
+      label: action.charAt(0).toUpperCase() + action.slice(1).replace(/_/g, ' '),
+    })),
+  };
 }
 
 function createErrorResponse(
@@ -128,6 +145,22 @@ export async function handleObserve(req: Request, res: Response): Promise<void> 
 
     nearby.sort((a, b) => a.distance - b.distance);
 
+    const nearbyFacilities: ObservedFacility[] = [];
+    gameRoom.state.facilities.forEach(facility => {
+      const distance = calculateDistance(
+        agentPos.x,
+        agentPos.y,
+        facility.position.x,
+        facility.position.y
+      );
+
+      if (distance <= radius) {
+        nearbyFacilities.push(facilityToObserved(facility, distance));
+      }
+    });
+
+    nearbyFacilities.sort((a, b) => a.distance - b.distance);
+
     const roomInfo: RoomInfo = {
       roomId: gameRoom.state.roomId,
       mapId: gameRoom.state.mapId,
@@ -137,6 +170,7 @@ export async function handleObserve(req: Request, res: Response): Promise<void> 
     const responseData: ObserveResponseData = {
       self: entityToBase(agentEntity),
       nearby,
+      facilities: nearbyFacilities,
       serverTsMs: Date.now(),
       room: roomInfo,
     };

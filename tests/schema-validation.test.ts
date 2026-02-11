@@ -116,6 +116,7 @@ describe('Schema Validation', () => {
           object: { objectType: 'sign', state: { text: 'Welcome!' } },
         },
       ],
+      facilities: [],
       serverTsMs: 1707523200000,
       room: {
         roomId: 'lobby_01',

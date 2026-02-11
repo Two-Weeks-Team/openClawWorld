@@ -44,6 +44,7 @@ describe('Scenario A: Sign Reading', () => {
             object: { objectType: 'sign', state: { text: 'Welcome to OpenClawWorld!' } },
           },
         ],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: { roomId: 'lobby', mapId: 'lobby_map', tickRate: 20 },
       };
@@ -84,6 +85,7 @@ describe('Scenario A: Sign Reading', () => {
             object: { objectType: 'sign', state: { text: 'North: Forest, South: Beach' } },
           },
         ],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: { roomId: 'lobby', mapId: 'lobby_map', tickRate: 20 },
       };

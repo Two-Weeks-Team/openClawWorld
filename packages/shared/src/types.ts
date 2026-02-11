@@ -80,6 +80,15 @@ export type ObservedEntity = {
   object?: ObjectState;
 };
 
+export type ObservedFacility = {
+  id: string;
+  type: FacilityType;
+  name: string;
+  position: Vec2;
+  distance: number;
+  affords: Affordance[];
+};
+
 // ============================================================================
 // Request Types
 // ============================================================================
@@ -154,6 +163,7 @@ export type RoomInfo = {
 export type ObserveResponseData = {
   self: EntityBase;
   nearby: ObservedEntity[];
+  facilities: ObservedFacility[];
   serverTsMs: number;
   room: RoomInfo;
 };

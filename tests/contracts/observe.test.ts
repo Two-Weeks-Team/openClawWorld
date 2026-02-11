@@ -37,6 +37,7 @@ describe('Observe Endpoint Contract Tests', () => {
             affords: [],
           },
         ],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: TestData.room,
       };
@@ -62,6 +63,7 @@ describe('Observe Endpoint Contract Tests', () => {
       const responseData: ObserveResponseData = {
         self: TestData.agent,
         nearby: [],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: TestData.room,
       };
@@ -82,6 +84,7 @@ describe('Observe Endpoint Contract Tests', () => {
       const responseData: ObserveResponseData = {
         self: TestData.agent,
         nearby: [],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: TestData.room,
       };
@@ -110,6 +113,7 @@ describe('Observe Endpoint Contract Tests', () => {
             object: { objectType: 'sign', state: { text: 'Welcome!' } },
           },
         ],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: TestData.room,
       };
@@ -233,6 +237,7 @@ describe('Observe Endpoint Contract Tests', () => {
       const responseData: ObserveResponseData = {
         self: TestData.agent,
         nearby: [],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: TestData.room,
       };

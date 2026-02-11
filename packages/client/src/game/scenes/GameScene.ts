@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Callbacks } from '@colyseus/sdk';
 import { gameClient, type Entity } from '../../network/ColyseusClient';
 import { EventNotificationPanel, EVENT_COLORS } from '../../ui/EventNotificationPanel';
+import { Minimap } from '../../ui/Minimap';
 
 interface MapObject {
   id: number;
@@ -42,6 +43,9 @@ export class GameScene extends Phaser.Scene {
   private lastMoveTime = 0;
   private roomCheckInterval?: ReturnType<typeof setInterval>;
   private notificationPanel?: EventNotificationPanel;
+  private minimap?: Minimap;
+  private previousZone?: string;
+  private chatInputFocused = false;
 
   constructor() {
     super('GameScene');
@@ -67,6 +71,32 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.notificationPanel = new EventNotificationPanel(this);
+    this.minimap = new Minimap(this);
+
+    this.setupKeyboardFocusHandling();
+  }
+
+  private setupKeyboardFocusHandling(): void {
+    const chatInput = document.getElementById('chat-input');
+    if (!chatInput) return;
+
+    chatInput.addEventListener('focus', () => {
+      this.chatInputFocused = true;
+      this.setWasdKeysEnabled(false);
+    });
+
+    chatInput.addEventListener('blur', () => {
+      this.chatInputFocused = false;
+      this.setWasdKeysEnabled(true);
+    });
+  }
+
+  private setWasdKeysEnabled(enabled: boolean): void {
+    if (!this.wasdKeys) return;
+    this.wasdKeys.W.enabled = enabled;
+    this.wasdKeys.A.enabled = enabled;
+    this.wasdKeys.S.enabled = enabled;
+    this.wasdKeys.D.enabled = enabled;
   }
 
   private createMap() {
@@ -350,6 +380,7 @@ export class GameScene extends Phaser.Scene {
       this.roomCheckInterval = undefined;
     }
     this.notificationPanel?.destroy();
+    this.minimap?.destroy();
   }
 
   private setupRoomListeners() {
@@ -411,6 +442,33 @@ export class GameScene extends Phaser.Scene {
   private updateEntityData(entity: Entity, key: string) {
     this.entityData.set(key, entity);
     this.updateEntityStatus(key, entity);
+
+    if (key === gameClient.entityId) {
+      this.checkZoneChange(entity);
+    }
+  }
+
+  private checkZoneChange(entity: Entity): void {
+    const currentZone = (entity as any).currentZone as string | undefined;
+    if (!currentZone) return;
+
+    if (this.previousZone && this.previousZone !== currentZone) {
+      const zoneNames: Record<string, string> = {
+        lobby: 'Lobby',
+        office: 'Office',
+        'meeting-center': 'Meeting Center',
+        'lounge-cafe': 'Lounge Cafe',
+        arcade: 'Arcade',
+      };
+      const zoneName = zoneNames[currentZone] || currentZone;
+      this.notificationPanel?.addEvent(
+        'zone.enter',
+        `Entered ${zoneName}`,
+        EVENT_COLORS['zone.enter']
+      );
+    }
+
+    this.previousZone = currentZone;
   }
 
   private showChatBubble(entityId: string, message: string) {
@@ -589,6 +647,19 @@ export class GameScene extends Phaser.Scene {
     this.interpolateEntities();
     this.checkNearbyObjects();
     this.notificationPanel?.update(delta);
+    this.updateMinimap();
+  }
+
+  private updateMinimap(): void {
+    if (!this.minimap) return;
+
+    const entities = new Map<string, { x: number; y: number; kind: string }>();
+    this.entityData.forEach((entity, id) => {
+      entities.set(id, { x: entity.pos.x, y: entity.pos.y, kind: entity.kind });
+    });
+
+    this.minimap.updateEntities(entities, gameClient.entityId);
+    this.minimap.updateViewport(this.cameras.main);
   }
 
   private interpolateEntities() {

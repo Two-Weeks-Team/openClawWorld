@@ -82,6 +82,15 @@ export const ObservedEntitySchema = z.object({
   object: ObjectStateSchema.optional(),
 });
 
+export const ObservedFacilitySchema = z.object({
+  id: z.string().min(1).max(64),
+  type: z.string().min(1).max(64),
+  name: z.string().min(1).max(64),
+  position: Vec2Schema,
+  distance: z.number().min(0).max(1000000),
+  affords: z.array(AffordanceSchema).max(50),
+});
+
 // ============================================================================
 // Error Schemas
 // ============================================================================
@@ -195,6 +204,7 @@ export const RoomInfoSchema = z.object({
 export const ObserveResponseDataSchema = z.object({
   self: EntityBaseSchema,
   nearby: z.array(ObservedEntitySchema).max(500),
+  facilities: z.array(ObservedFacilitySchema).max(100),
   serverTsMs: TsMsSchema,
   room: RoomInfoSchema,
 });
@@ -424,6 +434,8 @@ export const NpcRoleSchema = z.enum([
   'event_host',
   'tutorial_guide',
   'quest_giver',
+  'meeting_host',
+  'arcade_host',
 ]);
 
 export const NpcStateSchema = z.enum(['idle', 'walking', 'talking', 'working', 'break']);
@@ -435,6 +447,21 @@ export const FacilityTypeSchema = z.enum([
   'whiteboard',
   'voting_kiosk',
   'cafe_counter',
+  'kanban_terminal',
+  'notice_board',
+  'onboarding_signpost',
+  'pond_edge',
+  'printer',
+  'watercooler',
+  'vending_machine',
+  'fountain',
+  'schedule_kiosk',
+  'agenda_panel',
+  'stage',
+  'game_table',
+  'room_door_a',
+  'room_door_b',
+  'room_door_c',
 ]);
 
 export const ExtendedChatChannelSchema = z.enum(['proximity', 'global', 'team', 'meeting', 'dm']);

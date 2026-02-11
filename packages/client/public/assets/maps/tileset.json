@@ -2,9 +2,9 @@
   "name": "tileset",
   "tilewidth": 32,
   "tileheight": 32,
-  "tilecount": 2,
-  "columns": 2,
+  "tilecount": 32,
+  "columns": 8,
   "image": "tileset.svg",
-  "imagewidth": 64,
-  "imageheight": 32
+  "imagewidth": 256,
+  "imageheight": 128
 }

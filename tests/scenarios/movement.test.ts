@@ -90,6 +90,7 @@ describe('Scenario C: Movement', () => {
           facing: 'right',
         },
         nearby: [],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: { roomId: 'lobby', mapId: 'lobby_map', tickRate: 20 },
       };
@@ -123,6 +124,7 @@ describe('Scenario C: Movement', () => {
           facing: 'down',
         },
         nearby: [],
+        facilities: [],
         serverTsMs: TestData.timestamp(),
         room: { roomId: 'lobby', mapId: 'lobby_map', tickRate: 20 },
       };

@@ -1,0 +1,100 @@
+{
+  "id": "arcade-host",
+  "name": "Drew the Game Master",
+  "sprite": "npc-arcade-host",
+  "zone": "arcade",
+  "defaultPosition": { "x": 2800, "y": 400 },
+  "schedule": [
+    { "startHour": 10, "endHour": 14, "state": "working", "position": { "x": 2800, "y": 400 } },
+    { "startHour": 14, "endHour": 15, "state": "break", "position": { "x": 2850, "y": 600 } },
+    { "startHour": 15, "endHour": 22, "state": "working", "position": { "x": 2800, "y": 400 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "*adjusts gaming headset* Oh hey! Welcome to the Arcade! I'm Drew, unofficial Game Master and official high-score guardian. Looking to play, compete, or just hang out?",
+      "options": [
+        { "text": "What games do you have?", "next": "game-list" },
+        { "text": "Any tournaments happening?", "next": "tournaments" },
+        { "text": "Show me the high scores!", "next": "high-scores" },
+        { "text": "Just browsing the arcade", "next": "browsing" }
+      ]
+    },
+    "game-list": {
+      "id": "game-list",
+      "text": "We've got classics and new stuff! There's 'Code Crusher' - a puzzle game, 'Sprint Runner' - for the speed demons, 'Tower Defense: Server Edition' - very popular with IT, and my personal favorite, 'Debugging Quest' - it's like an RPG but you fight bugs. Literal bugs. Made of code.",
+      "options": [
+        { "text": "Tell me about Code Crusher!", "next": "code-crusher" },
+        { "text": "Debugging Quest sounds fun!", "next": "debugging-quest" },
+        { "text": "What's the most popular game?", "next": "most-popular" }
+      ]
+    },
+    "code-crusher": {
+      "id": "code-crusher",
+      "text": "Code Crusher is pure strategy! You get blocks of code falling Tetris-style, and you have to arrange them into working functions. The better your code, the more points! Taylor from IT holds the record - their code is 'embarrassingly efficient' as they put it.",
+      "options": [
+        { "text": "I want to beat Taylor's record!", "next": "challenge-accepted" },
+        { "text": "Sounds stressful... I love it!", "next": "challenge-accepted" }
+      ]
+    },
+    "debugging-quest": {
+      "id": "debugging-quest",
+      "text": "Ah, a person of culture! In Debugging Quest, you're a hero traveling through the Codebase Kingdom. You fight null pointer exceptions, race against memory leaks, and the final boss? A legacy system that hasn't been updated since 2005. *shudders*",
+      "options": [
+        { "text": "That final boss sounds terrifying!", "next": "final-boss" },
+        { "text": "Sign me up!", "next": "challenge-accepted" }
+      ]
+    },
+    "final-boss": {
+      "id": "final-boss",
+      "text": "*whispers* Nobody has beaten the final boss yet. Some say it's impossible. Others say it requires... reading the documentation. The bravest warriors have tried. They came back changed. Muttering about deprecated functions.",
+      "options": [{ "text": "I'll be the one to defeat it!", "next": "challenge-accepted" }]
+    },
+    "most-popular": {
+      "id": "most-popular",
+      "text": "Right now? 'Sprint Runner' is on fire! Everyone's trying to beat the weekly challenge. It's basically 'how fast can you deploy without breaking production' - a skill that translates surprisingly well to real work. Jordan says it's 'concerning how accurate it is.'",
+      "options": [{ "text": "I'll give Sprint Runner a try!", "next": "challenge-accepted" }]
+    },
+    "challenge-accepted": {
+      "id": "challenge-accepted",
+      "text": "*grins* That's what I like to hear! Head to any machine and swipe your badge. First game is on the house! And if you beat any high scores, come find me - I've got a wall of fame that needs updating. Good luck, player!",
+      "options": [{ "text": "Time to game!", "next": null }]
+    },
+    "tournaments": {
+      "id": "tournaments",
+      "text": "Riley handles the big tournaments - they're the Event Coordinator extraordinaire. But I run the daily challenges! Today's challenge: beat Code Crusher level 10 without using any loops. It's... controversial. People have opinions.",
+      "options": [
+        { "text": "No loops?! That's evil!", "next": "no-loops" },
+        { "text": "What do I win?", "next": "daily-prizes" }
+      ]
+    },
+    "no-loops": {
+      "id": "no-loops",
+      "text": "*laughs* I know, I know! But it forces you to think recursively. Or just brute force it with copy-paste. No judgment here! Some of the most creative solutions came from desperate times. One person used only goto statements. Chaos.",
+      "options": [{ "text": "I respect the chaos!", "next": null }]
+    },
+    "daily-prizes": {
+      "id": "daily-prizes",
+      "text": "Today's prize is a custom avatar flair - a little pixelated crown! Plus bragging rights, which honestly is the main currency around here. Oh, and sometimes Jamie sends over free coffee for winners. Caffeine is the real prize.",
+      "options": [{ "text": "Crown AND coffee? I'm in!", "next": null }]
+    },
+    "high-scores": {
+      "id": "high-scores",
+      "text": "*gestures to massive digital leaderboard* Behold! The Hall of Legends! Top spot goes to Player_XX_Dragon with 999,999 in Sprint Runner. Second is Taylor_IT with 847,000 in Code Crusher. And in third... *squints* ...it just says 'Anonymous.' Again with the mystery!",
+      "options": [
+        { "text": "Who IS Anonymous?!", "next": "anonymous-player" },
+        { "text": "I'm coming for that top spot!", "next": "challenge-accepted" }
+      ]
+    },
+    "anonymous-player": {
+      "id": "anonymous-player",
+      "text": "Nobody knows! They only play at night, never show their face, and their play style is... *chef's kiss* ...perfection. Some think it's an AI agent. Others think it's the ghost of a developer who never shipped. I think it's probably just Chris on their lunch break.",
+      "options": [{ "text": "The arcade has deep lore!", "next": null }]
+    },
+    "browsing": {
+      "id": "browsing",
+      "text": "Take your time! Try the demo modes, check out the retro corner - we've got some classic 8-bit stuff there. And if you see a machine that says 'Out of Order,' ignore it. That's just Sprint Runner being dramatic. It works fine.",
+      "options": []
+    }
+  }
+}

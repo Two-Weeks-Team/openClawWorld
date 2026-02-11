@@ -69,6 +69,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build workspace packages
+        run: pnpm -r build
+
       - name: Type check
         run: pnpm typecheck
 
@@ -149,7 +152,7 @@ jobs:
   test:
     name: Unit Tests
     runs-on: [self-hosted, macOS, ARM64]
-    needs: install
+    needs: [install, build]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -173,6 +176,11 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
 
       - name: Run tests with coverage
         run: pnpm test -- --coverage

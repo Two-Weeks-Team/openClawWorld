@@ -145,9 +145,10 @@ export class ColyseusClient {
 
     const unsubscribers: (() => void)[] = [];
     for (const eventType of handlers) {
-      this.room.onMessage(eventType, (data: Record<string, unknown>) => {
+      const unsub = this.room.onMessage(eventType, (data: Record<string, unknown>) => {
         callback({ type: eventType, ...data } as Parameters<typeof callback>[0]);
       });
+      unsubscribers.push(unsub);
     }
 
     return () => {

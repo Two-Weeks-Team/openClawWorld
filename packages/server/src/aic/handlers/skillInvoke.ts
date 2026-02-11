@@ -26,7 +26,8 @@ export async function handleSkillInvoke(req: Request, res: Response): Promise<vo
   const body = req.validatedBody as SkillInvokeRequest;
   const { agentId, roomId, skillId, actionId, params } = body;
 
-  const txId = `tx_${uuidv4()}`;
+  // TODO(security): Validate req.authToken maps to agentId (requires token registry)
+  const txId = (body as { txId?: string }).txId ?? `tx_${uuidv4()}`;
 
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);

@@ -499,7 +499,7 @@ export const SkillEffectDefinitionSchema = z.object({
 
 export const SkillActionSchema = z.object({
   id: z.string().min(1).max(64),
-  label: z.string().min(1).max(128),
+  name: z.string().min(1).max(128),
   description: z.string().min(1).max(500),
   cooldownMs: z.number().int().min(0).max(3600000).optional(),
   castTimeMs: z.number().int().min(0).max(60000).optional(),

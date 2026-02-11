@@ -135,13 +135,17 @@ export class EntitySchema extends Schema {
   }
 
   getEffectiveSpeed(): number {
-    let multiplier = 1.0;
+    let latestMultiplier = 1.0;
+    let latestStartTime = 0;
     this.activeEffects.forEach(effect => {
-      if (!effect.isExpired()) {
-        multiplier *= effect.speedMultiplier;
+      if (!effect.isExpired() && effect.speedMultiplier !== 1.0) {
+        if (effect.startTime > latestStartTime) {
+          latestStartTime = effect.startTime;
+          latestMultiplier = effect.speedMultiplier;
+        }
       }
     });
-    return this.speed * multiplier;
+    return this.speed * latestMultiplier;
   }
 
   setSkillState(skillId: string, actionId: string): SkillStateSchema {
@@ -159,6 +163,18 @@ export class EntitySchema extends Schema {
   }
 
   addEffect(effect: ActiveEffectSchema): void {
+    let existingKey: string | null = null;
+    this.activeEffects.forEach((existing, key) => {
+      if (
+        existing.effectType === effect.effectType &&
+        existing.sourceEntityId === effect.sourceEntityId
+      ) {
+        existingKey = key;
+      }
+    });
+    if (existingKey) {
+      this.activeEffects.delete(existingKey);
+    }
     this.activeEffects.set(effect.id, effect);
   }
 

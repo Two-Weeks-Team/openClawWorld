@@ -185,6 +185,61 @@ export class GameRoom extends Room<{ state: RoomState }> {
       }
     );
 
+    this.onMessage(
+      'skill_invoke',
+      (
+        client,
+        data: {
+          skillId: string;
+          actionId: string;
+          targetId?: string;
+          params?: Record<string, unknown>;
+        }
+      ) => {
+        const entityId = this.clientEntities.get(client.sessionId);
+        if (!entityId || !this.skillService) return;
+
+        const entity = this.state.getEntity(entityId);
+        if (!entity) return;
+
+        const txId = `ws_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        void this.skillService
+          .invokeAction(
+            entityId,
+            data.skillId,
+            data.actionId,
+            {
+              targetId: data.targetId,
+              ...data.params,
+            },
+            txId
+          )
+          .then(outcome => {
+            client.send('skill.invoke_result', { txId, outcome });
+            if (outcome.type === 'pending') {
+              this.broadcast('skill.cast_started', {
+                txId,
+                skillId: data.skillId,
+                actionId: data.actionId,
+                casterId: entityId,
+                targetId: data.targetId,
+                completionTime: (outcome.data as { completionTime?: number })?.completionTime,
+              });
+            }
+          });
+      }
+    );
+
+    this.onMessage('skill_cancel', client => {
+      const entityId = this.clientEntities.get(client.sessionId);
+      if (!entityId || !this.skillService) return;
+
+      const cancelled = this.skillService.cancelAllCastsForAgent(entityId);
+      if (cancelled > 0) {
+        this.broadcast('skill.cast_cancelled', { casterId: entityId, reason: 'user_cancelled' });
+      }
+    });
+
     // Set up periodic cleanup of expired events (every minute)
     this.cleanupInterval = setInterval(() => {
       const removed = this.eventLog.cleanup();
@@ -287,6 +342,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (entityId) {
       if (this.zoneSystem) {
         this.zoneSystem.removeEntity(entityId, this.eventLog, this.state.roomId);
+      }
+
+      if (this.skillService) {
+        this.skillService.cleanupAgent(entityId);
       }
 
       this.state.removeEntity(entityId, 'human');

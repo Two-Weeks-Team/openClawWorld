@@ -2,6 +2,7 @@ import { Schema, type, MapSchema } from '@colyseus/schema';
 import { EntitySchema } from './EntitySchema.js';
 import { GameMap } from './GameMap.js';
 import { NPCSchema } from './NPCSchema.js';
+import { NoticeSchema } from './NoticeSchema.js';
 import { OrganizationSchema } from './OrganizationSchema.js';
 import { TeamSchema } from './TeamSchema.js';
 import { ZoneSchema } from './ZoneSchema.js';
@@ -39,6 +40,9 @@ export class RoomState extends Schema {
 
   @type({ map: NPCSchema })
   npcs: MapSchema<NPCSchema> = new MapSchema<NPCSchema>();
+
+  @type({ map: NoticeSchema })
+  notices: MapSchema<NoticeSchema> = new MapSchema<NoticeSchema>();
 
   constructor(roomId: string, mapId: string, tickRate?: number, gameMap?: GameMap) {
     super();

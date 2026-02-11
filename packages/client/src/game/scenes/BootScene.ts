@@ -1,6 +1,14 @@
 import Phaser from 'phaser';
 
-const ZONE_IDS = ['lobby', 'office', 'meeting-center', 'lounge-cafe', 'arcade', 'plaza'] as const;
+const ZONE_IDS = [
+  'lobby',
+  'office',
+  'meeting-center',
+  'lounge-cafe',
+  'arcade',
+  'plaza',
+  'village',
+] as const;
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -39,6 +47,13 @@ export class BootScene extends Phaser.Scene {
     graphics.fillRect(0, 0, 32, 32);
     graphics.generateTexture('selection-marker', 32, 32);
 
-    this.scene.start('GameScene');
+    const urlParams = new URLSearchParams(window.location.search);
+    const sceneParam = urlParams.get('scene');
+
+    if (sceneParam === 'gallery') {
+      this.scene.start('AssetGalleryScene');
+    } else {
+      this.scene.start('GameScene');
+    }
   }
 }

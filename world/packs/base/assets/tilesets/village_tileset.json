@@ -2,19 +2,21 @@
   "name": "village_tileset",
   "tilewidth": 32,
   "tileheight": 32,
-  "tilecount": 10,
-  "columns": 10,
+  "tilecount": 12,
+  "columns": 12,
   "license": "CC0",
   "tiles": [
     { "id": 0, "type": "empty", "collision": false },
-    { "id": 1, "type": "floor_lobby", "collision": false },
-    { "id": 2, "type": "floor_office", "collision": false },
-    { "id": 3, "type": "floor_plaza", "collision": false },
-    { "id": 4, "type": "floor_arcade", "collision": false },
+    { "id": 1, "type": "grass", "collision": false },
+    { "id": 2, "type": "road", "collision": false },
+    { "id": 3, "type": "floor_lobby", "collision": false },
+    { "id": 4, "type": "floor_office", "collision": false },
     { "id": 5, "type": "floor_meeting", "collision": false },
     { "id": 6, "type": "floor_lounge", "collision": false },
-    { "id": 7, "type": "wall", "collision": true },
-    { "id": 8, "type": "water", "collision": true },
-    { "id": 9, "type": "decoration", "collision": false }
+    { "id": 7, "type": "floor_arcade", "collision": false },
+    { "id": 8, "type": "floor_plaza", "collision": false },
+    { "id": 9, "type": "door", "collision": false, "isDoor": true },
+    { "id": 10, "type": "wall", "collision": true },
+    { "id": 11, "type": "water", "collision": true }
   ]
 }

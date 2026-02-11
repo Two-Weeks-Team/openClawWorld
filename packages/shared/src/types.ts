@@ -451,6 +451,56 @@ export type StatusResponseData = {
 // ============================================================================
 
 /**
+ * Tile types for the world map
+ * Based on the color interpretation system:
+ * - Green = outdoor grass (walkable)
+ * - Light Gray = road/plaza (walkable)
+ * - Brown = indoor floor (walkable)
+ * - Yellow = door (walkable, triggers zone transition)
+ * - Dark Gray = wall (collision)
+ * - Blue = water (collision)
+ */
+export type TileType =
+  | 'empty'
+  | 'grass'
+  | 'road'
+  | 'floor_lobby'
+  | 'floor_office'
+  | 'floor_meeting'
+  | 'floor_lounge'
+  | 'floor_arcade'
+  | 'floor_plaza'
+  | 'door'
+  | 'wall'
+  | 'water'
+  | 'decoration';
+
+/**
+ * Color to tile type mapping for TileInterpreter
+ */
+export type TileColorMapping = {
+  color: string; // Hex color like '#00FF00'
+  type: TileType;
+  collision: boolean;
+  isDoor?: boolean;
+};
+
+/**
+ * Parsed tile information
+ */
+export type TileInfo = {
+  type: TileType;
+  collision: boolean;
+  isDoor: boolean;
+  zoneId?: ZoneId;
+};
+
+/**
+ * World grid containing tile information for each position
+ */
+export type WorldGrid = TileInfo[][];
+
+/**
  * Represents a 2D collision grid where true = blocked, false = passable
  */
 export type CollisionGrid = boolean[][];

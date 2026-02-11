@@ -532,12 +532,12 @@ export class WorldPackLoader {
 
   private getDefaultZoneBounds(zoneId: ZoneId): ZoneBounds {
     const defaultBounds: Record<ZoneId, ZoneBounds> = {
-      plaza: { x: 192, y: 96, width: 736, height: 416 },
-      'north-block': { x: 1024, y: 192, width: 448, height: 448 },
-      'east-block': { x: 96, y: 928, width: 512, height: 576 },
-      'west-block': { x: 704, y: 928, width: 512, height: 320 },
-      'south-block': { x: 1344, y: 736, width: 608, height: 416 },
-      lake: { x: 1344, y: 1152, width: 608, height: 416 },
+      plaza: { x: 768, y: 768, width: 512, height: 512 },
+      'north-block': { x: 576, y: 64, width: 768, height: 384 },
+      'west-block': { x: 64, y: 704, width: 640, height: 640 },
+      'east-block': { x: 1472, y: 704, width: 576, height: 640 },
+      'south-block': { x: 576, y: 1472, width: 768, height: 384 },
+      lake: { x: 1408, y: 1408, width: 640, height: 640 },
     };
 
     return defaultBounds[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };

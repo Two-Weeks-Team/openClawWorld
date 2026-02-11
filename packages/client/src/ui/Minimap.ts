@@ -14,9 +14,9 @@ interface MinimapConfig {
 
 const DEFAULT_CONFIG: MinimapConfig = {
   width: 180,
-  height: 146,
+  height: 180,
   mapWidth: 2048,
-  mapHeight: 1664,
+  mapHeight: 2048,
   backgroundColor: 0x1a1a2e,
   borderColor: 0x4a90d9,
   playerColor: 0xffff00,

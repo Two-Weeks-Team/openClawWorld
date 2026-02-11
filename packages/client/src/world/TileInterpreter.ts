@@ -116,13 +116,14 @@ export class TileInterpreter {
       'road',
       'floor_plaza',
       'floor_north',
-      'floor_east',
       'floor_west',
+      'floor_east',
       'floor_south',
       'floor_lake',
       'door',
       'wall',
       'water',
+      'decoration',
     ];
 
     const type = tileTypes[tileId] || 'empty';

@@ -88,6 +88,8 @@ export class GameRoom extends Room<{ state: RoomState }> {
     const tickRate = options.tickRate ?? 20;
     const packPath = options.packPath ?? DEFAULT_WORLD_PACK_PATH;
 
+    this.autoDispose = false;
+
     let gameMap: GameMap | undefined;
 
     this.loadWorldPack(packPath);
@@ -118,6 +120,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     }
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
+    this.setMetadata({ roomId });
     this.facilityService = new FacilityService(this.state);
     registerAllFacilityHandlers(this.facilityService);
     this.loadFacilitiesFromWorldPack();

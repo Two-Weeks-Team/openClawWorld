@@ -7,6 +7,7 @@ import type {
   EventEnvelope,
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
+import { getColyseusRoomId } from '../roomRegistry.js';
 
 /** Maximum long-polling wait time in milliseconds (25 seconds) */
 const MAX_WAIT_MS = 25000;
@@ -97,18 +98,16 @@ export async function handlePollEvents(req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Find the room
-    const room = await matchMaker.query({ name: 'game', roomId });
+    const colyseusRoomId = getColyseusRoomId(roomId);
 
-    if (!room || room.length === 0) {
+    if (!colyseusRoomId) {
       res
         .status(404)
         .json(createErrorResponse('not_found', `Room with id '${roomId}' not found`, false));
       return;
     }
 
-    const roomRef = room[0];
-    const gameRoom = (await matchMaker.remoteRoomCall(roomRef.roomId, '')) as GameRoom;
+    const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId) as GameRoom | undefined;
 
     if (!gameRoom) {
       res

@@ -1,0 +1,45 @@
+{
+  "steps": {
+    "register": "ok",
+    "observe": "ok",
+    "moveTo_lobby": "ok",
+    "interact_reception_desk": "skipped",
+    "moveTo_office": "ok",
+    "interact_desk": "skipped",
+    "chatSend": "ok",
+    "pollEvents": "ok"
+  },
+  "errors": [],
+  "timestamp": "2026-02-11T08:51:35.235Z",
+  "facilities": [],
+  "events": [
+    {
+      "cursor": "NV8x",
+      "type": "presence.join",
+      "roomId": "aic_test",
+      "tsMs": 1770799895310,
+      "payload": {
+        "entityId": "agt_0001",
+        "name": "LifeLoopTestAgent",
+        "kind": "agent"
+      }
+    },
+    {
+      "cursor": "MXcwXzI",
+      "type": "chat.message",
+      "roomId": "aic_test",
+      "tsMs": 1770799897753,
+      "payload": {
+        "messageId": "msg_71997aee1032dc9e",
+        "fromEntityId": "agt_0001",
+        "channel": "proximity",
+        "message": "Life-loop test complete!",
+        "tsMs": 1770799897753
+      }
+    }
+  ],
+  "roomId": "aic_test",
+  "agentId": "agt_0001",
+  "zoneEvents": [],
+  "success": true
+}

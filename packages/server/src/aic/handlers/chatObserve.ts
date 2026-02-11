@@ -6,6 +6,7 @@ import type {
   AicErrorObject,
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
+import { getColyseusRoomId } from '../roomRegistry.js';
 
 function createErrorResponse(
   code: AicErrorObject['code'],
@@ -27,17 +28,16 @@ export async function handleChatObserve(req: Request, res: Response): Promise<vo
   const { agentId, roomId, windowSec, channel } = body;
 
   try {
-    const room = await matchMaker.query({ name: 'game', roomId });
+    const colyseusRoomId = getColyseusRoomId(roomId);
 
-    if (!room || room.length === 0) {
+    if (!colyseusRoomId) {
       res
         .status(404)
         .json(createErrorResponse('not_found', `Room with id '${roomId}' not found`, false));
       return;
     }
 
-    const roomRef = room[0];
-    const gameRoom = (await matchMaker.remoteRoomCall(roomRef.roomId, '')) as GameRoom;
+    const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId) as GameRoom | undefined;
 
     if (!gameRoom) {
       res

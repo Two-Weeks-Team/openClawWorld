@@ -3,6 +3,7 @@ import { matchMaker } from 'colyseus';
 import type { RegisterRequest, RegisterResponseData, AicErrorObject } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { EntitySchema } from '../../schemas/EntitySchema.js';
+import { registerRoom, getColyseusRoomId } from '../roomRegistry.js';
 
 let agentCounter = 0;
 
@@ -37,17 +38,27 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
   const { name, roomId } = body;
 
   try {
-    const room = await matchMaker.query({ name: 'game', roomId });
+    let colyseusRoomId = getColyseusRoomId(roomId);
 
-    if (!room || room.length === 0) {
-      res
-        .status(404)
-        .json(createErrorResponse('not_found', `Room with id '${roomId}' not found`, false));
-      return;
+    if (!colyseusRoomId) {
+      console.log(
+        `[RegisterHandler] No room found for '${roomId}', creating new room for AIC agents`
+      );
+      try {
+        const roomRef = await matchMaker.createRoom('game', { roomId });
+        colyseusRoomId = roomRef.roomId;
+        registerRoom(roomId, colyseusRoomId);
+        console.log(`[RegisterHandler] Created room ${colyseusRoomId} for AIC agents`);
+      } catch (createError) {
+        console.error(`[RegisterHandler] Failed to create room:`, createError);
+        res
+          .status(500)
+          .json(createErrorResponse('internal', `Failed to create room '${roomId}'`, true));
+        return;
+      }
     }
 
-    const roomRef = room[0];
-    const gameRoom = (await matchMaker.remoteRoomCall(roomRef.roomId, '')) as GameRoom;
+    const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId) as GameRoom | undefined;
 
     if (!gameRoom) {
       res

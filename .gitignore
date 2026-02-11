@@ -42,3 +42,16 @@ temp/
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Work artifacts
+.sisyphus/
+
+# Extracted/generated assets
+assets/extracted/
+assets/source/
+packages/client/public/assets/extracted/
+
+# Test screenshots
+*.png
+!/packages/client/public/**/*.png
+!/world/**/*.png

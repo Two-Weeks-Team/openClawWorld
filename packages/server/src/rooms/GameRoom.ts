@@ -259,10 +259,13 @@ export class GameRoom extends Room<{ state: RoomState }> {
     const consented = code === undefined;
 
     if (entityId) {
+      if (this.zoneSystem) {
+        this.zoneSystem.removeEntity(entityId, this.eventLog, this.state.roomId);
+      }
+
       this.state.removeEntity(entityId, 'human');
       this.clientEntities.delete(client.sessionId);
 
-      // Log presence.leave event
       const reason = consented ? 'consented' : 'disconnected';
       this.eventLog.append('presence.leave', this.state.roomId, {
         entityId,

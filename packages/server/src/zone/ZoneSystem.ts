@@ -13,6 +13,12 @@ export type ZoneEvent =
   | { type: 'zone.enter'; payload: ZoneEnterPayload }
   | { type: 'zone.exit'; payload: ZoneExitPayload };
 
+export type ZoneTransitionResult = {
+  previousZone: ZoneId | null;
+  currentZone: ZoneId | null;
+  changed: boolean;
+};
+
 export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = new Map([
   ['lobby', { x: 0, y: 0, width: 320, height: 320 }],
   ['office', { x: 320, y: 0, width: 320, height: 320 }],
@@ -24,9 +30,21 @@ export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = new Map([
 export class ZoneSystem {
   private zones: Map<ZoneId, ZoneBounds>;
   private entityZones: Map<string, ZoneId> = new Map();
+  private zonePopulations: Map<ZoneId, number> = new Map();
 
   constructor(zones: Map<ZoneId, ZoneBounds>) {
     this.zones = zones;
+    this.initializeZonePopulations();
+  }
+
+  private initializeZonePopulations(): void {
+    for (const zoneId of this.zones.keys()) {
+      this.zonePopulations.set(zoneId, 0);
+    }
+  }
+
+  getZoneAtPosition(x: number, y: number): ZoneId | null {
+    return this.detectZone(x, y);
   }
 
   detectZone(x: number, y: number): ZoneId | null {
@@ -44,6 +62,58 @@ export class ZoneSystem {
     );
   }
 
+  updateEntityZone(
+    entityId: string,
+    x: number,
+    y: number,
+    eventLog?: EventLog,
+    roomId?: string,
+    entity?: EntitySchema
+  ): ZoneTransitionResult {
+    const currentZone = this.detectZone(x, y);
+    const previousZone = this.entityZones.get(entityId) ?? null;
+    const changed = currentZone !== previousZone;
+
+    if (changed) {
+      if (previousZone !== null) {
+        const prevCount = this.zonePopulations.get(previousZone) ?? 0;
+        this.zonePopulations.set(previousZone, Math.max(0, prevCount - 1));
+
+        if (eventLog && roomId) {
+          const exitPayload: ZoneExitPayload = {
+            entityId,
+            zoneId: previousZone,
+            nextZoneId: currentZone,
+          };
+          eventLog.append('zone.exit', roomId, exitPayload);
+        }
+      }
+
+      if (currentZone !== null) {
+        const currCount = this.zonePopulations.get(currentZone) ?? 0;
+        this.zonePopulations.set(currentZone, currCount + 1);
+        this.entityZones.set(entityId, currentZone);
+
+        if (eventLog && roomId) {
+          const enterPayload: ZoneEnterPayload = {
+            entityId,
+            zoneId: currentZone,
+            previousZoneId: previousZone,
+          };
+          eventLog.append('zone.enter', roomId, enterPayload);
+        }
+
+        if (entity) {
+          entity.setZone(currentZone);
+        }
+      } else {
+        this.entityZones.delete(entityId);
+      }
+    }
+
+    return { previousZone, currentZone, changed };
+  }
+
   update(entities: Map<string, EntitySchema>, eventLog: EventLog, roomId: string): ZoneEvent[] {
     const events: ZoneEvent[] = [];
 
@@ -53,6 +123,9 @@ export class ZoneSystem {
 
       if (currentZone !== previousZone) {
         if (previousZone !== null) {
+          const prevCount = this.zonePopulations.get(previousZone) ?? 0;
+          this.zonePopulations.set(previousZone, Math.max(0, prevCount - 1));
+
           const exitPayload: ZoneExitPayload = {
             entityId,
             zoneId: previousZone,
@@ -63,6 +136,9 @@ export class ZoneSystem {
         }
 
         if (currentZone !== null) {
+          const currCount = this.zonePopulations.get(currentZone) ?? 0;
+          this.zonePopulations.set(currentZone, currCount + 1);
+
           const enterPayload: ZoneEnterPayload = {
             entityId,
             zoneId: currentZone,
@@ -83,11 +159,37 @@ export class ZoneSystem {
 
     for (const entityId of this.entityZones.keys()) {
       if (!entities.has(entityId)) {
-        this.entityZones.delete(entityId);
+        this.removeEntity(entityId);
       }
     }
 
     return events;
+  }
+
+  removeEntity(entityId: string, eventLog?: EventLog, roomId?: string): ZoneId | null {
+    const previousZone = this.entityZones.get(entityId) ?? null;
+
+    if (previousZone !== null) {
+      const prevCount = this.zonePopulations.get(previousZone) ?? 0;
+      this.zonePopulations.set(previousZone, Math.max(0, prevCount - 1));
+
+      this.entityZones.delete(entityId);
+
+      if (eventLog && roomId) {
+        const exitPayload: ZoneExitPayload = {
+          entityId,
+          zoneId: previousZone,
+          nextZoneId: null,
+        };
+        eventLog.append('zone.exit', roomId, exitPayload);
+      }
+    }
+
+    return previousZone;
+  }
+
+  getZonePopulation(zoneId: ZoneId): number {
+    return this.zonePopulations.get(zoneId) ?? 0;
   }
 
   getEntityZone(entityId: string): ZoneId | null {

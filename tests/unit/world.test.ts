@@ -9,7 +9,7 @@ import type { ParsedMap, ZoneId } from '@openclawworld/shared';
 
 const TILE_SIZE = 32;
 const MAP_WIDTH = 64;
-const MAP_HEIGHT = 52;
+const MAP_HEIGHT = 64;
 
 function createTestMap(blockedTiles: Array<{ tx: number; ty: number }> = []): ParsedMap {
   const collisionGrid: boolean[][] = [];
@@ -55,8 +55,15 @@ describe('World System Integration Tests', () => {
       zoneSystem.updateEntityZone('player_1', 100, 100, eventLog, 'room_1', entity);
       expect(zoneSystem.getEntityZone('player_1')).toBeNull();
 
-      entity.setPosition(640, 300);
-      const result = zoneSystem.updateEntityZone('player_1', 640, 300, eventLog, 'room_1', entity);
+      entity.setPosition(1024, 1024);
+      const result = zoneSystem.updateEntityZone(
+        'player_1',
+        1024,
+        1024,
+        eventLog,
+        'room_1',
+        entity
+      );
 
       expect(result.changed).toBe(true);
       expect(result.previousZone).toBeNull();
@@ -73,8 +80,8 @@ describe('World System Integration Tests', () => {
     });
 
     it('updates entity currentZone property on enter', () => {
-      entity.setPosition(640, 300);
-      zoneSystem.updateEntityZone('player_1', 640, 300, eventLog, 'room_1', entity);
+      entity.setPosition(1024, 1024);
+      zoneSystem.updateEntityZone('player_1', 1024, 1024, eventLog, 'room_1', entity);
 
       expect(entity.currentZone).toBe('plaza');
     });
@@ -90,8 +97,8 @@ describe('World System Integration Tests', () => {
       eventLog = new EventLog(60000, 1000);
       entity = new EntitySchema('player_1', 'human', 'TestPlayer', 'room_1');
 
-      entity.setPosition(640, 300);
-      zoneSystem.updateEntityZone('player_1', 640, 300, eventLog, 'room_1', entity);
+      entity.setPosition(1024, 1024);
+      zoneSystem.updateEntityZone('player_1', 1024, 1024, eventLog, 'room_1', entity);
       eventLog.getSince('', 100);
     });
 
@@ -113,8 +120,8 @@ describe('World System Integration Tests', () => {
     });
 
     it('emits both zone.exit and zone.enter when transitioning between zones', () => {
-      entity.setPosition(1200, 400);
-      const result = zoneSystem.updateEntityZone('player_1', 1200, 400, eventLog, 'room_1', entity);
+      entity.setPosition(960, 200);
+      const result = zoneSystem.updateEntityZone('player_1', 960, 200, eventLog, 'room_1', entity);
 
       expect(result.changed).toBe(true);
       expect(result.previousZone).toBe('plaza');
@@ -201,8 +208,8 @@ describe('World System Integration Tests', () => {
       eventLog = new EventLog(60000, 1000);
       entity = new EntitySchema('bot_1', 'agent', 'WanderBot', 'room_1');
 
-      entity.setPosition(640, 300);
-      entity.setTile(20, 9);
+      entity.setPosition(1024, 1024);
+      entity.setTile(32, 32);
 
       wanderBot = new WanderBot(
         {
@@ -227,8 +234,8 @@ describe('World System Integration Tests', () => {
     });
 
     it('bot can move to office zone', () => {
-      entity.setPosition(1200, 400);
-      entity.setTile(37, 12);
+      entity.setPosition(960, 200);
+      entity.setTile(30, 6);
 
       wanderBot.update(Date.now());
 
@@ -239,9 +246,9 @@ describe('World System Integration Tests', () => {
 
     it('bot visits at least 3 zones when manually moved', () => {
       const zonePositions: Array<{ zone: ZoneId; x: number; y: number }> = [
-        { zone: 'plaza', x: 640, y: 300 },
-        { zone: 'north-block', x: 1200, y: 400 },
-        { zone: 'east-block', x: 300, y: 1100 },
+        { zone: 'plaza', x: 1024, y: 1024 },
+        { zone: 'north-block', x: 960, y: 200 },
+        { zone: 'west-block', x: 300, y: 1000 },
       ];
 
       for (const { x, y } of zonePositions) {
@@ -253,7 +260,7 @@ describe('World System Integration Tests', () => {
       expect(visited.length).toBeGreaterThanOrEqual(3);
       expect(visited).toContain('plaza');
       expect(visited).toContain('north-block');
-      expect(visited).toContain('east-block');
+      expect(visited).toContain('west-block');
     });
 
     it('bot respects collision when trying to move', () => {
@@ -299,7 +306,7 @@ describe('World System Integration Tests', () => {
     it('zone events are logged when bot moves between zones', () => {
       eventLog.getSince('', 100);
 
-      entity.setPosition(1200, 400);
+      entity.setPosition(960, 200);
       wanderBot.update(Date.now());
 
       const { events } = eventLog.getSince('', 10);

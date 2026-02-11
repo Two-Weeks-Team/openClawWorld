@@ -20,11 +20,11 @@ export type ZoneTransitionResult = {
 };
 
 export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = new Map([
-  ['lobby', { x: 0, y: 0, width: 320, height: 320 }],
-  ['office', { x: 320, y: 0, width: 320, height: 320 }],
-  ['meeting-center', { x: 0, y: 320, width: 320, height: 320 }],
-  ['lounge-cafe', { x: 320, y: 320, width: 320, height: 320 }],
-  ['arcade', { x: 640, y: 0, width: 320, height: 640 }],
+  ['lobby', { x: 0, y: 0, width: 533, height: 640 }],
+  ['office', { x: 533, y: 0, width: 534, height: 640 }],
+  ['meeting-center', { x: 0, y: 640, width: 533, height: 640 }],
+  ['lounge-cafe', { x: 533, y: 640, width: 534, height: 640 }],
+  ['arcade', { x: 1067, y: 0, width: 533, height: 1280 }],
 ]);
 
 export class ZoneSystem {

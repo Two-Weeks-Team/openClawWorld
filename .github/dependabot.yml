@@ -1,0 +1,62 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Seoul'
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: 'chore(deps)'
+    labels:
+      - 'dependencies'
+      - 'automated'
+    groups:
+      typescript:
+        patterns:
+          - 'typescript*'
+          - '@types/*'
+      testing:
+        patterns:
+          - 'vitest*'
+          - '@vitest/*'
+          - 'playwright*'
+          - '@playwright/*'
+      eslint:
+        patterns:
+          - 'eslint*'
+          - '@eslint/*'
+      colyseus:
+        patterns:
+          - 'colyseus*'
+          - '@colyseus/*'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Seoul'
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(ci)'
+    labels:
+      - 'ci'
+      - 'automated'
+
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Asia/Seoul'
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: 'chore(docker)'
+    labels:
+      - 'docker'
+      - 'automated'

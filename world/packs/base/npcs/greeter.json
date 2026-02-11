@@ -1,0 +1,31 @@
+{
+  "id": "greeter",
+  "name": "Sam the Greeter",
+  "sprite": "npc-greeter",
+  "zone": "plaza",
+  "defaultPosition": { "x": 1024, "y": 1024 },
+  "schedule": [
+    { "startHour": 9, "endHour": 18, "state": "working", "position": { "x": 1024, "y": 1024 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Welcome to Grid-Town! I'm Sam, your friendly greeter. What would you like to know?",
+      "options": [
+        { "text": "What is this place?", "next": "about-town" },
+        { "text": "Where can I go?", "next": "directions" },
+        { "text": "Just passing through!", "next": null }
+      ]
+    },
+    "about-town": {
+      "id": "about-town",
+      "text": "Grid-Town is a vibrant community hub! We have offices to the north, a cozy cafe to the west, meeting rooms to the east, an arcade to the south, and a beautiful lake in the corner!",
+      "options": [{ "text": "Sounds great!", "next": null }]
+    },
+    "directions": {
+      "id": "directions",
+      "text": "North has the office block with workstations. West has the cafe - Jamie makes great coffee! East has meeting rooms. South has the arcade for fun. And the lake is perfect for a peaceful walk!",
+      "options": [{ "text": "Thanks for the info!", "next": null }]
+    }
+  }
+}

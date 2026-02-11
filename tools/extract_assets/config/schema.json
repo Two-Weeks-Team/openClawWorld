@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Asset Extraction Config",
+  "description": "Configuration for extracting sprites from source sheets",
+  "type": "object",
+  "required": ["sheetName", "inputPath", "outputTileSize", "mode"],
+  "properties": {
+    "sheetName": {
+      "type": "string",
+      "description": "Unique identifier for this sheet (terrain, props, interactables, npc)"
+    },
+    "inputPath": {
+      "type": "string",
+      "description": "Relative path to source PNG from assets/source/"
+    },
+    "outputTileSize": {
+      "type": "integer",
+      "default": 32,
+      "description": "Output tile size in pixels (default 32x32)"
+    },
+    "sourceImageSize": {
+      "type": "object",
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      },
+      "description": "Source image dimensions (auto-detected if not specified)"
+    },
+    "gridLine": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "thickness": { "type": "integer", "default": 1 },
+        "color": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "default": [0, 0, 0, 255],
+          "description": "RGBA color of grid lines to remove"
+        },
+        "tolerance": { "type": "integer", "default": 30 }
+      }
+    },
+    "crop": {
+      "type": "object",
+      "properties": {
+        "x": { "type": "integer" },
+        "y": { "type": "integer" },
+        "w": { "type": "integer" },
+        "h": { "type": "integer" }
+      },
+      "description": "Crop region before processing"
+    },
+    "excludeRects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": { "type": "integer" },
+          "y": { "type": "integer" },
+          "w": { "type": "integer" },
+          "h": { "type": "integer" },
+          "reason": { "type": "string" }
+        }
+      },
+      "description": "Rectangles to exclude (label areas)"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["grid", "rects"],
+      "description": "grid = uniform grid extraction, rects = explicit rectangles"
+    },
+    "grid": {
+      "type": "object",
+      "properties": {
+        "cols": { "type": "integer" },
+        "rows": { "type": "integer" },
+        "cellWidth": { "type": "integer", "description": "Source cell width in pixels" },
+        "cellHeight": { "type": "integer", "description": "Source cell height in pixels" }
+      },
+      "description": "Grid configuration for mode=grid"
+    },
+    "rects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "x", "y", "w", "h"],
+        "properties": {
+          "name": { "type": "string" },
+          "x": { "type": "integer" },
+          "y": { "type": "integer" },
+          "w": { "type": "integer" },
+          "h": { "type": "integer" }
+        }
+      },
+      "description": "Explicit rectangles for mode=rects"
+    },
+    "multiTile": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "startCol", "startRow", "cols", "rows"],
+        "properties": {
+          "name": { "type": "string" },
+          "startCol": { "type": "integer" },
+          "startRow": { "type": "integer" },
+          "cols": { "type": "integer" },
+          "rows": { "type": "integer" }
+        }
+      },
+      "description": "Multi-tile sprites that span multiple cells"
+    },
+    "blankDetector": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "mode": {
+          "type": "string",
+          "enum": ["transparent", "sample", "checkerboard"],
+          "default": "transparent"
+        },
+        "sampleRect": {
+          "type": "object",
+          "properties": {
+            "x": { "type": "integer" },
+            "y": { "type": "integer" },
+            "w": { "type": "integer" },
+            "h": { "type": "integer" }
+          }
+        },
+        "threshold": { "type": "number", "default": 0.98 }
+      }
+    },
+    "namingPrefix": {
+      "type": "string",
+      "description": "Prefix for frame names (e.g., 'terrain', 'props')"
+    },
+    "aliases": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Optional aliases for frames (semantic_name -> grid_name)"
+    }
+  }
+}

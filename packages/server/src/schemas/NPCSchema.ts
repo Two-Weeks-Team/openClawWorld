@@ -18,7 +18,7 @@ export class NPCSchema extends Schema {
   currentState: NpcState = 'idle';
 
   @type('string')
-  zone: ZoneId = 'lobby';
+  zone: ZoneId = 'plaza';
 
   @type('number')
   x: number = 0;

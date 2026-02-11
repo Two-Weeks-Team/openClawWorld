@@ -10,7 +10,7 @@ export class FacilitySchema extends Schema {
   type: string = '';
 
   @type('string')
-  zoneId: ZoneId = 'lobby';
+  zoneId: ZoneId = 'plaza';
 
   @type(Vector2Schema)
   position: Vector2Schema = new Vector2Schema();

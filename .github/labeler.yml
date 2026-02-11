@@ -1,0 +1,50 @@
+client:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/client/**/*'
+
+server:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/server/**/*'
+
+shared:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/shared/**/*'
+
+plugin:
+  - changed-files:
+      - any-glob-to-any-file: 'packages/plugin/**/*'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'tests/**/*'
+          - '**/*.test.ts'
+          - '**/*.spec.ts'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'
+          - 'docs/**/*'
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: '.github/**/*'
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'Dockerfile'
+          - 'docker-compose.yml'
+          - '.dockerignore'
+
+world:
+  - changed-files:
+      - any-glob-to-any-file: 'world/**/*'
+
+api:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'packages/server/src/aic/**/*'
+          - 'packages/server/src/openapi.ts'
+          - 'docs/aic/**/*'

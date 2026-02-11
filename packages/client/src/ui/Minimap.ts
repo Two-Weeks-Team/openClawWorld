@@ -14,9 +14,9 @@ interface MinimapConfig {
 
 const DEFAULT_CONFIG: MinimapConfig = {
   width: 180,
-  height: 144,
-  mapWidth: 3200,
-  mapHeight: 2560,
+  height: 180,
+  mapWidth: 2048,
+  mapHeight: 2048,
   backgroundColor: 0x1a1a2e,
   borderColor: 0x4a90d9,
   playerColor: 0xffff00,
@@ -25,11 +25,14 @@ const DEFAULT_CONFIG: MinimapConfig = {
 };
 
 const ZONE_COLORS: Record<string, number> = {
-  lobby: 0x3a5a40,
-  office: 0x4a6fa5,
-  'meeting-center': 0x8b4513,
-  'lounge-cafe': 0xdaa520,
-  arcade: 0x9932cc,
+  plaza: 0x808080, // gray - stone plaza
+  'north-block': 0x4a90d9, // blue - office
+  'west-block': 0xdaa520, // goldenrod - cafe
+  'east-block': 0x8b4513, // brown - meeting
+  'south-block': 0x9932cc, // purple - arcade
+  lake: 0x4169e1, // royal blue - water
+  water: 0x3a7ca5,
+  road: 0xa88b5a,
 };
 
 export class Minimap {
@@ -76,18 +79,58 @@ export class Minimap {
   private drawZones(): void {
     this.zoneGraphics.clear();
 
-    const zones = [
-      { id: 'lobby', x: 0, y: 0, w: 1280, h: 1280 },
-      { id: 'office', x: 1280, y: 0, w: 1280, h: 1280 },
-      { id: 'meeting-center', x: 0, y: 1280, w: 1280, h: 1280 },
-      { id: 'lounge-cafe', x: 1280, y: 1280, w: 1280, h: 1280 },
-      { id: 'arcade', x: 2560, y: 0, w: 640, h: 2560 },
-    ];
-
     const scaleX = (this.config.width - 8) / this.config.mapWidth;
     const scaleY = (this.config.height - 8) / this.config.mapHeight;
     const offsetX = 4;
     const offsetY = 4;
+
+    this.zoneGraphics.fillStyle(ZONE_COLORS.water, 0.8);
+    for (let y = 0; y < 3; y++) {
+      this.zoneGraphics.fillRect(
+        offsetX,
+        offsetY + y * 32 * scaleY,
+        this.config.width - 8,
+        32 * scaleY
+      );
+    }
+    for (let y = 3; y < 20; y++) {
+      this.zoneGraphics.fillRect(offsetX, offsetY + y * 32 * scaleY, 5 * 32 * scaleX, 32 * scaleY);
+    }
+
+    this.zoneGraphics.fillStyle(ZONE_COLORS.road, 0.6);
+    this.zoneGraphics.fillRect(
+      offsetX + 17 * 32 * scaleX,
+      offsetY + 12 * 32 * scaleY,
+      23 * 32 * scaleX,
+      4 * 32 * scaleY
+    );
+    this.zoneGraphics.fillRect(
+      offsetX + 17 * 32 * scaleX,
+      offsetY + 16 * 32 * scaleY,
+      4 * 32 * scaleX,
+      22 * 32 * scaleY
+    );
+    this.zoneGraphics.fillRect(
+      offsetX + 37 * 32 * scaleX,
+      offsetY + 18 * 32 * scaleY,
+      3 * 32 * scaleX,
+      15 * 32 * scaleY
+    );
+    this.zoneGraphics.fillRect(
+      offsetX + 17 * 32 * scaleX,
+      offsetY + 36 * 32 * scaleY,
+      41 * 32 * scaleX,
+      14 * 32 * scaleY
+    );
+
+    const zones = [
+      { id: 'plaza', x: 768, y: 768, w: 512, h: 512 },
+      { id: 'north-block', x: 576, y: 64, w: 768, h: 384 },
+      { id: 'west-block', x: 64, y: 704, w: 640, h: 640 },
+      { id: 'east-block', x: 1472, y: 704, w: 576, h: 640 },
+      { id: 'south-block', x: 576, y: 1472, w: 768, h: 384 },
+      { id: 'lake', x: 1408, y: 1408, w: 640, h: 640 },
+    ];
 
     for (const zone of zones) {
       const color = ZONE_COLORS[zone.id] || 0x333333;

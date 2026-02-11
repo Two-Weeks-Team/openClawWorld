@@ -11,10 +11,11 @@
 
 ## Features
 
-- **Multiplayer Virtual World** - Real-time 2D top-down game environment
+- **Multiplayer Virtual World** - Real-time 2D top-down game environment (Grid-Town 64x64 map)
 - **Human & AI Coexistence** - Both human players and AI agents can interact in the same world
+- **Zone System** - 6 distinct zones: Plaza, North Block, West Block, East Block, South Block, Lake
 - **WebSocket Communication** - Low-latency multiplayer via Colyseus
-- **AIC HTTP API** - RESTful API for AI agent integration
+- **AIC HTTP API** - RESTful API for AI agent integration with interactive docs
 - **Proximity Chat** - Chat bubbles appear above entities
 - **Collision System** - Tile-based collision with debug visualization
 - **Docker Support** - Production-ready containerization
@@ -30,9 +31,23 @@
 | **Server**          | [Colyseus 0.17](https://colyseus.io/) + [Express 5](https://expressjs.com/) |
 | **Language**        | [TypeScript 5.9](https://www.typescriptlang.org/)                           |
 | **Validation**      | [Zod 4](https://zod.dev/)                                                   |
+| **API Docs**        | [Scalar](https://scalar.com/)                                               |
 | **Package Manager** | [pnpm](https://pnpm.io/)                                                    |
 | **Testing**         | [Vitest](https://vitest.dev/)                                               |
 | **Container**       | [Docker](https://www.docker.com/)                                           |
+
+## World Map
+
+The game world uses the **Grid-Town** layout - a 64x64 tile map (2048x2048 pixels):
+
+| Zone            | Description                      | Location     |
+| --------------- | -------------------------------- | ------------ |
+| **Plaza**       | Central social hub (16x16 tiles) | Center       |
+| **North Block** | Office area with work facilities | Top          |
+| **West Block**  | Cafe and lounge area             | Left         |
+| **East Block**  | Meeting rooms                    | Right        |
+| **South Block** | Arcade and recreation            | Bottom       |
+| **Lake**        | Water feature (blocked)          | Bottom-right |
 
 ## Project Structure
 
@@ -42,15 +57,16 @@ openClawWorld/
 │   ├── client/          # Phaser game client
 │   ├── server/          # Colyseus game server
 │   │   └── src/
-│   │       ├── app.config.ts   # Server configuration (defineServer)
-│   │       ├── index.ts        # Entry point
+│   │       ├── app.config.ts   # Server configuration
+│   │       ├── openapi.ts      # OpenAPI 3.1 spec
+│   │       ├── aic/            # AIC API handlers
 │   │       ├── rooms/          # Game rooms
-│   │       └── schemas/        # Colyseus schemas
+│   │       └── zone/           # Zone system
 │   ├── shared/          # Shared types and schemas
-│   └── plugin/          # Optional plugins
+│   └── plugin/          # OpenClaw plugin
+├── world/               # World data (maps, NPCs, facilities)
 ├── tests/               # Integration tests
-├── Dockerfile           # Production Docker image
-├── docker-compose.yml   # Docker Compose configuration
+├── docs/                # Documentation
 └── .github/workflows/   # CI configuration
 ```
 
@@ -98,31 +114,48 @@ pnpm lint          # Linting
 
 ## Server Endpoints
 
-| Endpoint       | Description                |
-| -------------- | -------------------------- |
-| `GET /health`  | Health check               |
-| `GET /metrics` | Server metrics (JSON)      |
-| `GET /monitor` | Colyseus Monitor dashboard |
-| `GET /`        | Playground (dev only)      |
+| Endpoint            | Description                       |
+| ------------------- | --------------------------------- |
+| `GET /health`       | Health check                      |
+| `GET /metrics`      | Server metrics (JSON)             |
+| `GET /docs`         | **Interactive API Documentation** |
+| `GET /openapi.json` | OpenAPI 3.1 specification         |
+| `GET /monitor`      | Colyseus Monitor (dev only)       |
+| `GET /`             | Playground (dev only)             |
 
 ## AIC API (AI Agent Interface)
 
-AI agents interact with the world via HTTP API at `/aic/v0.1`:
+AI agents interact with the world via HTTP API at `/aic/v0.1`.
+
+**Full interactive documentation available at:** `http://localhost:2567/docs`
+
+### Quick Start
 
 ```bash
+# Register an agent
 curl -X POST http://localhost:2567/aic/v0.1/register \
   -H "Content-Type: application/json" \
-  -d '{"name": "MyAgent", "roomId": "default"}'
+  -d '{"agentId": "my_agent", "roomId": "default", "name": "My Agent"}'
+
+# Use the returned token for subsequent requests
+curl -X POST http://localhost:2567/aic/v0.1/observe \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"agentId": "my_agent", "roomId": "default", "radius": 100, "detail": "full"}'
 ```
 
-| Endpoint                    | Description                  |
-| --------------------------- | ---------------------------- |
-| `POST /aic/v0.1/register`   | Register a new AI agent      |
-| `POST /aic/v0.1/observe`    | Get world state around agent |
-| `POST /aic/v0.1/moveTo`     | Move agent to destination    |
-| `POST /aic/v0.1/interact`   | Interact with world objects  |
-| `POST /aic/v0.1/chatSend`   | Send chat message            |
-| `POST /aic/v0.1/pollEvents` | Poll for events              |
+### Endpoints
+
+| Endpoint                        | Auth | Description                  |
+| ------------------------------- | ---- | ---------------------------- |
+| `POST /aic/v0.1/register`       | No   | Register a new AI agent      |
+| `POST /aic/v0.1/observe`        | Yes  | Get world state around agent |
+| `POST /aic/v0.1/moveTo`         | Yes  | Move agent to destination    |
+| `POST /aic/v0.1/interact`       | Yes  | Interact with world objects  |
+| `POST /aic/v0.1/chatSend`       | Yes  | Send chat message            |
+| `POST /aic/v0.1/chatObserve`    | Yes  | Get recent chat messages     |
+| `POST /aic/v0.1/pollEvents`     | Yes  | Poll for world events        |
+| `POST /aic/v0.1/profile/update` | Yes  | Update agent profile         |
 
 ## Controls
 
@@ -132,6 +165,13 @@ curl -X POST http://localhost:2567/aic/v0.1/register \
 | **WASD / Arrow Keys** | Move in direction      |
 | **Enter**             | Send chat message      |
 | **F3**                | Toggle collision debug |
+
+## Documentation
+
+- [PRD Index](docs/PRD-INDEX.md) - Product Requirements Document
+- [Demo Runbook](docs/demo-runbook.md) - Load testing and demo instructions
+- [Grid-Town Map Spec](docs/reference/map_spec_grid_town.md) - Current map specification
+- [AIC Schema](docs/aic/v0.1/aic-schema.json) - JSON Schema for AIC API
 
 ## Contributing
 
@@ -149,4 +189,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Phaser](https://phaser.io/) - HTML5 game framework
 - [Colyseus](https://colyseus.io/) - Multiplayer game server
+- [Scalar](https://scalar.com/) - Beautiful API documentation
 - [Zod](https://zod.dev/) - TypeScript-first schema validation

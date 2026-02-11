@@ -1,0 +1,33 @@
+{
+  "id": "office-pm",
+  "name": "Jordan the PM",
+  "sprite": "npc-pm",
+  "zone": "north-block",
+  "defaultPosition": { "x": 1024, "y": 320 },
+  "schedule": [
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 1024, "y": 320 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 320, "y": 1024 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 1024, "y": 320 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Hey there! I'm Jordan, the project manager. Always busy with sprints and deadlines! Need something?",
+      "options": [
+        { "text": "How's the project going?", "next": "project-status" },
+        { "text": "Where's the kanban board?", "next": "kanban-location" },
+        { "text": "Keep up the good work!", "next": null }
+      ]
+    },
+    "project-status": {
+      "id": "project-status",
+      "text": "We're making good progress! A few blockers here and there, but the team is crushing it. Check out the kanban board to see the current sprint status!",
+      "options": [{ "text": "Good luck!", "next": null }]
+    },
+    "kanban-location": {
+      "id": "kanban-location",
+      "text": "The kanban terminal is right here in the north block! You can view tasks, create new ones, or update existing work items. It's our command center!",
+      "options": [{ "text": "I'll check it out!", "next": null }]
+    }
+  }
+}

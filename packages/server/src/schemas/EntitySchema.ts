@@ -93,7 +93,7 @@ export class EntitySchema extends Schema {
   facing: Facing = 'down';
 
   @type('string')
-  currentZone: ZoneId = 'lobby';
+  currentZone: ZoneId = 'plaza';
 
   @type('number')
   speed: number = 100;

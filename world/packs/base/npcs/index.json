@@ -1,16 +1,3 @@
 {
-  "npcs": [
-    "receptionist",
-    "security-guard",
-    "barista",
-    "it-help",
-    "pm",
-    "hr",
-    "sales-rep",
-    "event-host",
-    "tutorial-guide",
-    "quest-giver",
-    "meeting-host",
-    "arcade-host"
-  ]
+  "npcs": ["greeter", "office-pm", "meeting-host", "barista", "arcade-host", "ranger"]
 }

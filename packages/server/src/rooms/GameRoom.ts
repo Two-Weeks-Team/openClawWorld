@@ -84,7 +84,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     packPath?: string;
   }): void {
     const roomId = options.roomId ?? 'default';
-    const mapId = options.mapId ?? 'lobby';
+    const mapId = options.mapId ?? 'village';
     const tickRate = options.tickRate ?? 20;
     const packPath = options.packPath ?? DEFAULT_WORLD_PACK_PATH;
 

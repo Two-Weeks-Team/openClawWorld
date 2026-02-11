@@ -3,6 +3,10 @@ import { Callbacks } from '@colyseus/sdk';
 import { gameClient, type Entity } from '../../network/ColyseusClient';
 import { EventNotificationPanel, EVENT_COLORS } from '../../ui/EventNotificationPanel';
 import { Minimap } from '../../ui/Minimap';
+import { ZoneBanner } from '../../ui/ZoneBanner';
+import { TileInterpreter } from '../../world/TileInterpreter';
+import { ClientCollisionSystem } from '../../systems/CollisionSystem';
+import type { ZoneId } from '@openclawworld/shared';
 
 interface MapObject {
   id: number;
@@ -44,7 +48,10 @@ export class GameScene extends Phaser.Scene {
   private roomCheckInterval?: ReturnType<typeof setInterval>;
   private notificationPanel?: EventNotificationPanel;
   private minimap?: Minimap;
-  private previousZone?: string;
+  private zoneBanner?: ZoneBanner;
+  private tileInterpreter?: TileInterpreter;
+  private clientCollision?: ClientCollisionSystem;
+  private previousZone?: ZoneId;
   private chatInputFocused = false;
 
   constructor() {
@@ -72,8 +79,42 @@ export class GameScene extends Phaser.Scene {
 
     this.notificationPanel = new EventNotificationPanel(this);
     this.minimap = new Minimap(this);
+    this.zoneBanner = new ZoneBanner(this);
+
+    this.tileInterpreter = new TileInterpreter(32);
+    this.clientCollision = new ClientCollisionSystem();
+    this.initializeWorldGrid();
 
     this.setupKeyboardFocusHandling();
+  }
+
+  private initializeWorldGrid(): void {
+    if (!this.map || !this.tileInterpreter || !this.clientCollision) return;
+
+    const groundLayer = this.map.getLayer('ground');
+    const collisionLayer = this.map.getLayer('collision');
+
+    if (groundLayer?.data && collisionLayer?.data) {
+      const groundData: number[] = [];
+      const collisionData: number[] = [];
+
+      groundLayer.data.forEach(row => {
+        row.forEach(tile => groundData.push(tile.index));
+      });
+
+      collisionLayer.data.forEach(row => {
+        row.forEach(tile => collisionData.push(tile.index));
+      });
+
+      const worldGrid = this.tileInterpreter.loadFromTiledData(
+        this.map.width,
+        this.map.height,
+        groundData,
+        collisionData
+      );
+
+      this.clientCollision.setWorldGrid(worldGrid, 32);
+    }
   }
 
   private setupKeyboardFocusHandling(): void {
@@ -100,7 +141,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createMap() {
-    this.map = this.make.tilemap({ key: 'lobby' });
+    this.map = this.make.tilemap({ key: 'village' });
 
     const tileset = this.map.addTilesetImage('tileset', 'tileset');
     if (tileset) {
@@ -381,6 +422,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.notificationPanel?.destroy();
     this.minimap?.destroy();
+    this.zoneBanner?.destroy();
   }
 
   private setupRoomListeners() {
@@ -449,24 +491,25 @@ export class GameScene extends Phaser.Scene {
   }
 
   private checkZoneChange(entity: Entity): void {
-    const currentZone = (entity as unknown as { currentZone?: string }).currentZone;
+    const currentZone = (entity as unknown as { currentZone?: ZoneId }).currentZone;
     if (!currentZone) return;
 
     if (this.previousZone && this.previousZone !== currentZone) {
-      const zoneNames: Record<string, string> = {
-        lobby: 'Lobby',
-        office: 'Office',
-        'meeting-center': 'Meeting Center',
-        'lounge-cafe': 'Lounge Cafe',
-        arcade: 'Arcade',
-        plaza: 'Plaza',
-      };
-      const zoneName = zoneNames[currentZone] || currentZone;
+      this.zoneBanner?.showLeave(this.previousZone);
+      this.zoneBanner?.showEnter(currentZone);
+
+      this.notificationPanel?.addEvent(
+        'zone.exit',
+        `Left zone: ${this.previousZone}`,
+        EVENT_COLORS['zone.exit']
+      );
       this.notificationPanel?.addEvent(
         'zone.enter',
-        `Entered ${zoneName}`,
+        `Entered zone: ${currentZone}`,
         EVENT_COLORS['zone.enter']
       );
+    } else if (!this.previousZone && currentZone) {
+      this.zoneBanner?.showEnter(currentZone);
     }
 
     this.previousZone = currentZone;

@@ -20,7 +20,8 @@
     "clean": "pnpm -r clean && rm -rf node_modules",
     "dev:server": "pnpm --filter @openclawworld/server dev",
     "dev:client": "pnpm --filter @openclawworld/client dev",
-    "load-test": "tsx scripts/load-test.ts"
+    "load-test": "tsx scripts/load-test.ts",
+    "extract:assets": "python tools/extract_assets/extract.py --all"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

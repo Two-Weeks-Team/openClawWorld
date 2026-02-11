@@ -1,10 +1,12 @@
 import { defineServer, defineRoom, monitor, playground } from 'colyseus';
 import cors from 'cors';
 import express from 'express';
+import { apiReference } from '@scalar/express-api-reference';
 import { GameRoom } from './rooms/GameRoom.js';
 import { MeetingRoom } from './rooms/MeetingRoom.js';
 import { aicRouter, requestIdMiddleware, errorHandler, notFoundHandler } from './aic/index.js';
 import { getMetricsCollector } from './metrics/MetricsCollector.js';
+import { openApiSpec } from './openapi.js';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
 
@@ -46,6 +48,25 @@ const server = defineServer({
       const metrics = getMetricsCollector().getMetricsJSON();
       res.json(metrics);
     });
+
+    app.get('/openapi.json', (_req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.json(openApiSpec);
+    });
+
+    app.use(
+      '/docs',
+      apiReference({
+        url: '/openapi.json',
+        theme: 'default',
+        layout: 'modern',
+        darkMode: true,
+        metaData: {
+          title: 'OpenClawWorld API Documentation',
+          description: 'Interactive API documentation for the AIC (Agent Interface Contract) API',
+        },
+      })
+    );
 
     const metricsCollector = getMetricsCollector();
     app.use('/aic/v0.1', (_req, _res, next) => {

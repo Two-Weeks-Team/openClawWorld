@@ -7,5 +7,14 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 1300,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          phaser: ['phaser'],
+          colyseus: ['@colyseus/sdk'],
+        },
+      },
+    },
   },
 });

@@ -10,17 +10,17 @@ describe('FacilitySchema', () => {
 
       expect(facility.id).toBe('');
       expect(facility.type).toBe('');
-      expect(facility.zoneId).toBe('lobby');
+      expect(facility.zoneId).toBe('plaza');
       expect(facility.position.x).toBe(0);
       expect(facility.position.y).toBe(0);
     });
 
     it('creates a facility with provided values', () => {
-      const facility = new FacilitySchema('fac_001', 'reception_desk', 'office', 100, 200);
+      const facility = new FacilitySchema('fac_001', 'reception_desk', 'north-block', 100, 200);
 
       expect(facility.id).toBe('fac_001');
       expect(facility.type).toBe('reception_desk');
-      expect(facility.zoneId).toBe('office');
+      expect(facility.zoneId).toBe('north-block');
       expect(facility.position.x).toBe(100);
       expect(facility.position.y).toBe(200);
     });
@@ -28,7 +28,7 @@ describe('FacilitySchema', () => {
 
   describe('setPosition', () => {
     it('updates the facility position', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 0, 0);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 0, 0);
 
       facility.setPosition(150, 250);
 
@@ -39,7 +39,7 @@ describe('FacilitySchema', () => {
 
   describe('state management', () => {
     it('sets and gets state values', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       facility.setState('isOpen', 'true');
 
@@ -47,13 +47,13 @@ describe('FacilitySchema', () => {
     });
 
     it('returns undefined for non-existent state key', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       expect(facility.getState('nonExistent')).toBeUndefined();
     });
 
     it('overwrites existing state values', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       facility.setState('isOpen', 'true');
       facility.setState('isOpen', 'false');
@@ -64,7 +64,7 @@ describe('FacilitySchema', () => {
 
   describe('affordance management', () => {
     it('adds affordances', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       facility.addAffordance('open');
       facility.addAffordance('close');
@@ -74,7 +74,7 @@ describe('FacilitySchema', () => {
     });
 
     it('does not add duplicate affordances', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       facility.addAffordance('open');
       facility.addAffordance('open');
@@ -83,7 +83,7 @@ describe('FacilitySchema', () => {
     });
 
     it('removes affordances', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       facility.addAffordance('open');
       facility.addAffordance('close');
@@ -94,7 +94,7 @@ describe('FacilitySchema', () => {
     });
 
     it('checks if affordance exists', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       facility.addAffordance('open');
 
@@ -103,7 +103,7 @@ describe('FacilitySchema', () => {
     });
 
     it('sets all affordances at once', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby');
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza');
 
       facility.addAffordance('open');
       facility.setAffordances(['enter', 'exit', 'inspect']);
@@ -118,13 +118,13 @@ describe('FacilityService', () => {
   let service: FacilityService;
 
   beforeEach(() => {
-    state = new RoomState('default', 'lobby');
+    state = new RoomState('default', 'plaza');
     service = new FacilityService(state);
   });
 
   describe('registerFacility', () => {
     it('adds a facility to the room state', () => {
-      const facility = new FacilitySchema('fac_001', 'reception_desk', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'reception_desk', 'plaza', 100, 100);
 
       service.registerFacility(facility);
 
@@ -134,7 +134,7 @@ describe('FacilityService', () => {
 
   describe('unregisterFacility', () => {
     it('removes a facility from the room state', () => {
-      const facility = new FacilitySchema('fac_001', 'reception_desk', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'reception_desk', 'plaza', 100, 100);
       service.registerFacility(facility);
 
       const result = service.unregisterFacility('fac_001');
@@ -152,7 +152,7 @@ describe('FacilityService', () => {
 
   describe('getFacility', () => {
     it('returns facility by ID', () => {
-      const facility = new FacilitySchema('fac_001', 'reception_desk', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'reception_desk', 'plaza', 100, 100);
       service.registerFacility(facility);
 
       const found = service.getFacility('fac_001');
@@ -169,11 +169,13 @@ describe('FacilityService', () => {
 
   describe('getFacilitiesInZone', () => {
     it('returns facilities in a specific zone', () => {
-      service.registerFacility(new FacilitySchema('fac_001', 'reception_desk', 'lobby', 100, 100));
-      service.registerFacility(new FacilitySchema('fac_002', 'gate', 'lobby', 200, 100));
-      service.registerFacility(new FacilitySchema('fac_003', 'meeting_door', 'office', 300, 100));
+      service.registerFacility(new FacilitySchema('fac_001', 'reception_desk', 'plaza', 100, 100));
+      service.registerFacility(new FacilitySchema('fac_002', 'gate', 'plaza', 200, 100));
+      service.registerFacility(
+        new FacilitySchema('fac_003', 'meeting_door', 'north-block', 300, 100)
+      );
 
-      const lobbyFacilities = service.getFacilitiesInZone('lobby');
+      const lobbyFacilities = service.getFacilitiesInZone('plaza');
 
       expect(lobbyFacilities).toHaveLength(2);
       expect(lobbyFacilities.map(f => f.id)).toContain('fac_001');
@@ -181,7 +183,7 @@ describe('FacilityService', () => {
     });
 
     it('returns empty array for zone with no facilities', () => {
-      const facilities = service.getFacilitiesInZone('arcade');
+      const facilities = service.getFacilitiesInZone('south-block');
 
       expect(facilities).toHaveLength(0);
     });
@@ -189,7 +191,7 @@ describe('FacilityService', () => {
 
   describe('getAffordances', () => {
     it('returns affordances from facility schema', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       facility.setAffordances(['open', 'close', 'inspect']);
       service.registerFacility(facility);
 
@@ -205,7 +207,7 @@ describe('FacilityService', () => {
     });
 
     it('uses custom affordance resolver when registered', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       facility.setAffordances(['open', 'close']);
       service.registerFacility(facility);
 
@@ -227,7 +229,7 @@ describe('FacilityService', () => {
     });
 
     it('returns invalid_action for unavailable action', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       facility.setAffordances(['open']);
       service.registerFacility(facility);
 
@@ -238,7 +240,7 @@ describe('FacilityService', () => {
     });
 
     it('returns invalid_action when no handler registered', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       facility.setAffordances(['open']);
       service.registerFacility(facility);
 
@@ -249,7 +251,7 @@ describe('FacilityService', () => {
     });
 
     it('executes registered handler', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       facility.setAffordances(['open']);
       service.registerFacility(facility);
 
@@ -266,7 +268,7 @@ describe('FacilityService', () => {
     });
 
     it('passes params to handler', () => {
-      const facility = new FacilitySchema('fac_001', 'reception_desk', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'reception_desk', 'plaza', 100, 100);
       facility.setAffordances(['check_in']);
       service.registerFacility(facility);
 
@@ -284,7 +286,7 @@ describe('FacilityService', () => {
 
   describe('setState', () => {
     it('sets state on existing facility', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       service.registerFacility(facility);
 
       const result = service.setState('fac_001', 'isOpen', 'true');
@@ -302,7 +304,7 @@ describe('FacilityService', () => {
 
   describe('getState', () => {
     it('gets state from existing facility', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       facility.setState('isOpen', 'true');
       service.registerFacility(facility);
 
@@ -320,7 +322,7 @@ describe('FacilityService', () => {
 
   describe('registerHandler and unregisterHandler', () => {
     it('registers and uses handler', () => {
-      const facility = new FacilitySchema('fac_001', 'door', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'door', 'plaza', 100, 100);
       facility.setAffordances(['knock']);
       service.registerFacility(facility);
 
@@ -354,7 +356,7 @@ describe('FacilityService', () => {
 
   describe('hasFacility', () => {
     it('returns true for existing facility', () => {
-      service.registerFacility(new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100));
+      service.registerFacility(new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100));
 
       expect(service.hasFacility('fac_001')).toBe(true);
     });
@@ -366,8 +368,8 @@ describe('FacilityService', () => {
 
   describe('getAllFacilities', () => {
     it('returns all registered facilities', () => {
-      service.registerFacility(new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100));
-      service.registerFacility(new FacilitySchema('fac_002', 'door', 'office', 200, 100));
+      service.registerFacility(new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100));
+      service.registerFacility(new FacilitySchema('fac_002', 'door', 'north-block', 200, 100));
 
       const all = service.getAllFacilities();
 
@@ -383,9 +385,9 @@ describe('FacilityService', () => {
 
   describe('getFacilitiesByType', () => {
     it('returns facilities of specific type', () => {
-      service.registerFacility(new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100));
-      service.registerFacility(new FacilitySchema('fac_002', 'gate', 'office', 200, 100));
-      service.registerFacility(new FacilitySchema('fac_003', 'door', 'lobby', 300, 100));
+      service.registerFacility(new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100));
+      service.registerFacility(new FacilitySchema('fac_002', 'gate', 'north-block', 200, 100));
+      service.registerFacility(new FacilitySchema('fac_003', 'door', 'plaza', 300, 100));
 
       const gates = service.getFacilitiesByType('gate');
 
@@ -402,7 +404,7 @@ describe('FacilityService', () => {
 
   describe('setFacilityPosition', () => {
     it('updates facility position', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       service.registerFacility(facility);
 
       const result = service.setFacilityPosition('fac_001', 200, 300);
@@ -421,17 +423,17 @@ describe('FacilityService', () => {
 
   describe('setFacilityZone', () => {
     it('updates facility zone', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       service.registerFacility(facility);
 
-      const result = service.setFacilityZone('fac_001', 'office');
+      const result = service.setFacilityZone('fac_001', 'north-block');
 
       expect(result).toBe(true);
-      expect(facility.zoneId).toBe('office');
+      expect(facility.zoneId).toBe('north-block');
     });
 
     it('returns false for non-existent facility', () => {
-      const result = service.setFacilityZone('non-existent', 'office');
+      const result = service.setFacilityZone('non-existent', 'north-block');
 
       expect(result).toBe(false);
     });
@@ -439,18 +441,18 @@ describe('FacilityService', () => {
 
   describe('createFacility', () => {
     it('creates and registers a new facility', () => {
-      const facility = service.createFacility('fac_001', 'gate', 'lobby', 100, 200);
+      const facility = service.createFacility('fac_001', 'gate', 'plaza', 100, 200);
 
       expect(facility.id).toBe('fac_001');
       expect(facility.type).toBe('gate');
-      expect(facility.zoneId).toBe('lobby');
+      expect(facility.zoneId).toBe('plaza');
       expect(facility.position.x).toBe(100);
       expect(facility.position.y).toBe(200);
       expect(service.hasFacility('fac_001')).toBe(true);
     });
 
     it('creates facility with affordances', () => {
-      const facility = service.createFacility('fac_001', 'gate', 'lobby', 100, 200, [
+      const facility = service.createFacility('fac_001', 'gate', 'plaza', 100, 200, [
         'open',
         'close',
         'lock',
@@ -465,12 +467,12 @@ describe('RoomState facility integration', () => {
   let state: RoomState;
 
   beforeEach(() => {
-    state = new RoomState('default', 'lobby');
+    state = new RoomState('default', 'plaza');
   });
 
   describe('addFacility', () => {
     it('adds facility to state', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
 
       state.addFacility(facility);
 
@@ -480,7 +482,7 @@ describe('RoomState facility integration', () => {
 
   describe('removeFacility', () => {
     it('removes facility from state', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       state.addFacility(facility);
 
       const result = state.removeFacility('fac_001');
@@ -498,7 +500,7 @@ describe('RoomState facility integration', () => {
 
   describe('getFacility', () => {
     it('returns facility by ID', () => {
-      const facility = new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100);
+      const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       state.addFacility(facility);
 
       const found = state.getFacility('fac_001');
@@ -515,8 +517,8 @@ describe('RoomState facility integration', () => {
 
   describe('getAllFacilities', () => {
     it('returns all facilities', () => {
-      state.addFacility(new FacilitySchema('fac_001', 'gate', 'lobby', 100, 100));
-      state.addFacility(new FacilitySchema('fac_002', 'door', 'office', 200, 100));
+      state.addFacility(new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100));
+      state.addFacility(new FacilitySchema('fac_002', 'door', 'north-block', 200, 100));
 
       const all = state.getAllFacilities();
 

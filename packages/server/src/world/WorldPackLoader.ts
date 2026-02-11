@@ -247,7 +247,7 @@ export class WorldPackLoader {
       throw new WorldPackError('maps directory not found', this.packPath);
     }
 
-    const unifiedMapPath = join(mapsDir, 'village_outdoor.json');
+    const unifiedMapPath = join(mapsDir, 'grid_town_outdoor.json');
     if (existsSync(unifiedMapPath)) {
       return this.loadUnifiedMap(unifiedMapPath, zones);
     }
@@ -373,44 +373,29 @@ export class WorldPackLoader {
 
   private getNpcZone(npcId: string, zoneId: ZoneId): boolean {
     const npcZoneMap: Record<string, ZoneId> = {
-      receptionist: 'lobby',
-      'security-guard': 'lobby',
-      'tutorial-guide': 'lobby',
-      pm: 'office',
-      'it-help': 'office',
-      hr: 'office',
-      'meeting-host': 'meeting-center',
-      barista: 'lounge-cafe',
-      'arcade-host': 'arcade',
-      'event-host': 'plaza',
-      'sales-rep': 'plaza',
-      'quest-giver': 'plaza',
+      greeter: 'plaza',
+      'office-pm': 'north-block',
+      'meeting-host': 'east-block',
+      barista: 'west-block',
+      'arcade-host': 'south-block',
+      ranger: 'lake',
     };
     return npcZoneMap[npcId] === zoneId;
   }
 
   private getFacilityZone(facilityId: string, zoneId: ZoneId): boolean {
     const facilityZoneMap: Record<string, ZoneId> = {
-      reception_desk: 'lobby',
-      notice_board: 'lobby',
-      gate: 'lobby',
-      pond_edge: 'lobby',
-      kanban_terminal: 'office',
-      whiteboard: 'office',
-      printer: 'office',
-      watercooler: 'office',
-      schedule_kiosk: 'meeting-center',
-      voting_kiosk: 'meeting-center',
-      room_door_a: 'meeting-center',
-      room_door_b: 'meeting-center',
-      room_door_c: 'meeting-center',
-      agenda_panel: 'meeting-center',
-      cafe_counter: 'lounge-cafe',
-      vending_machine: 'lounge-cafe',
-      arcade_cabinets: 'arcade',
-      small_stage: 'arcade',
-      game_table: 'arcade',
-      fountain: 'plaza',
+      notice_board: 'plaza',
+      signpost: 'plaza',
+      kanban_terminal: 'north-block',
+      whiteboard: 'north-block',
+      schedule_kiosk: 'east-block',
+      room_door_a: 'east-block',
+      cafe_counter: 'west-block',
+      vending_machine: 'west-block',
+      arcade_cabinets: 'south-block',
+      game_table: 'south-block',
+      pond_edge: 'lake',
     };
     return facilityZoneMap[facilityId] === zoneId;
   }
@@ -547,12 +532,12 @@ export class WorldPackLoader {
 
   private getDefaultZoneBounds(zoneId: ZoneId): ZoneBounds {
     const defaultBounds: Record<ZoneId, ZoneBounds> = {
-      lobby: { x: 192, y: 96, width: 736, height: 416 },
-      office: { x: 1024, y: 192, width: 448, height: 448 },
-      'meeting-center': { x: 96, y: 928, width: 512, height: 576 },
-      'lounge-cafe': { x: 704, y: 928, width: 512, height: 320 },
-      arcade: { x: 1344, y: 736, width: 608, height: 416 },
-      plaza: { x: 1344, y: 1152, width: 608, height: 416 },
+      plaza: { x: 768, y: 768, width: 512, height: 512 },
+      'north-block': { x: 576, y: 64, width: 768, height: 384 },
+      'west-block': { x: 64, y: 704, width: 640, height: 640 },
+      'east-block': { x: 1472, y: 704, width: 576, height: 640 },
+      'south-block': { x: 576, y: 1472, width: 768, height: 384 },
+      lake: { x: 1408, y: 1408, width: 640, height: 640 },
     };
 
     return defaultBounds[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };
@@ -637,7 +622,7 @@ export class WorldPackLoader {
       id: raw.id ?? npcId,
       name: raw.name ?? npcId,
       role: (raw.role as NpcDefinition['role']) ?? 'receptionist',
-      zone: (raw.zone as ZoneId) ?? 'lobby',
+      zone: (raw.zone as ZoneId) ?? 'plaza',
       spawnPosition: {
         x: position.x ?? 0,
         y: position.y ?? 0,

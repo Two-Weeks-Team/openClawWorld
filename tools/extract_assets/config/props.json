@@ -1,0 +1,52 @@
+{
+  "sheetName": "props",
+  "inputPath": "props.png",
+  "outputTileSize": 32,
+  "sourceImageSize": { "width": 2048, "height": 2048 },
+  "gridLine": {
+    "enabled": true,
+    "thickness": 2,
+    "color": [0, 0, 0, 255],
+    "tolerance": 50
+  },
+  "mode": "grid",
+  "grid": {
+    "cols": 10,
+    "rows": 10,
+    "cellWidth": 204,
+    "cellHeight": 204
+  },
+  "excludeRects": [
+    { "x": 0, "y": 0, "w": 410, "h": 40, "reason": "Sign LOBBY label area" },
+    { "x": 410, "y": 0, "w": 410, "h": 40, "reason": "Sign OFFICE label area" },
+    { "x": 820, "y": 0, "w": 410, "h": 40, "reason": "Sign MEETING label area" },
+    { "x": 1230, "y": 0, "w": 410, "h": 40, "reason": "Sign LOUNGE label area" },
+    { "x": 1640, "y": 0, "w": 408, "h": 40, "reason": "Sign ARCADE/PLAZA label area" }
+  ],
+  "multiTile": [
+    { "name": "fence_horizontal", "startCol": 0, "startRow": 0, "cols": 2, "rows": 1 },
+    { "name": "hedge_horizontal", "startCol": 0, "startRow": 2, "cols": 2, "rows": 1 },
+    { "name": "hedge_vertical", "startCol": 2, "startRow": 2, "cols": 1, "rows": 2 },
+    { "name": "lamp_post", "startCol": 4, "startRow": 0, "cols": 1, "rows": 2 },
+    { "name": "table_long", "startCol": 0, "startRow": 4, "cols": 3, "rows": 1 },
+    { "name": "bulletin_board", "startCol": 3, "startRow": 4, "cols": 2, "rows": 1 },
+    { "name": "bridge", "startCol": 0, "startRow": 8, "cols": 4, "rows": 1 },
+    { "name": "bunting", "startCol": 5, "startRow": 8, "cols": 3, "rows": 1 }
+  ],
+  "blankDetector": {
+    "enabled": true,
+    "mode": "transparent",
+    "threshold": 0.95
+  },
+  "namingPrefix": "props",
+  "aliases": {
+    "sign_lobby": "props_0_5",
+    "sign_office": "props_0_6",
+    "sign_meeting": "props_0_7",
+    "sign_lounge": "props_0_8",
+    "sign_arcade": "props_0_9",
+    "bench": "props_3_0",
+    "flower_pot": "props_5_0",
+    "trash_can": "props_6_0"
+  }
+}

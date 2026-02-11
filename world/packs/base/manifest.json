@@ -1,7 +1,7 @@
 {
   "name": "base",
   "version": "1.0.0",
-  "description": "Work & Life World - Base Pack",
-  "zones": ["lobby", "office", "meeting-center", "lounge-cafe", "arcade", "plaza"],
-  "entryZone": "lobby"
+  "description": "Grid-Town World - Base Pack",
+  "zones": ["plaza", "north-block", "west-block", "east-block", "south-block", "lake"],
+  "entryZone": "plaza"
 }

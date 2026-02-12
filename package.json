@@ -7,6 +7,11 @@
   "engines": {
     "node": ">=20.0.0"
   },
+  "pnpm": {
+    "overrides": {
+      "uWebSockets.js": "https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/fcfc622a4286909593b7f390056d89e0ca3b56b9"
+    }
+  },
   "scripts": {
     "build": "pnpm -r build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",

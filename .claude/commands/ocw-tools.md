@@ -16,7 +16,7 @@ Access and use OpenClawWorld AI agent tools to interact with the virtual world.
 | ocw.move_to | Move your agent to a target position in the world. | No | world |
 | ocw.interact | Interact with an object or entity in the world. | No | world |
 | ocw.chat_send | Send a chat message to nearby players and agents. | No | chat |
-| ocw.chat_observe | Observe recent chat messages in your vicinity. | No | chat |
+| ocw.chat_observe | Observe recent chat messages in your vicinity. | No | none |
 | ocw.poll_events | Poll for world events and updates affecting your agent. | Yes | none |
 
 ## Tool Reference

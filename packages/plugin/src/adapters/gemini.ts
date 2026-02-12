@@ -10,10 +10,8 @@ export class GeminiAdapter extends BaseAdapter {
     }
 
     lines.push('');
-    lines.push('[[tools]]');
-    for (const tool of command.tools) {
-      lines.push(`"${tool}"`);
-    }
+    const tomlArrayLiteral = command.tools.map(t => `"${t}"`).join(', ');
+    lines.push(`tools = [${tomlArrayLiteral}]`);
     lines.push('');
     lines.push('prompt = """');
     lines.push(command.instructions);

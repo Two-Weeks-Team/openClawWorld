@@ -154,7 +154,7 @@ function getToolDetails(): ToolInfo[] {
       name: 'ocw.chat_observe',
       description: 'Observe recent chat messages in your vicinity.',
       required: false,
-      sideEffects: 'chat',
+      sideEffects: 'none',
       parameters: [
         {
           name: 'agentId',

@@ -545,6 +545,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
     return this.worldPackLoader;
   }
 
+  getSpawnPoint(): { x: number; y: number; tx: number; ty: number } {
+    return { ...this.spawnPoint };
+  }
+
   private registerBuiltinSkills(): void {
     if (!this.skillService) return;
 

@@ -6,6 +6,7 @@ import type { RegisterRequest, RegisterResponseData, AicErrorObject } from '@ope
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { EntitySchema } from '../../schemas/EntitySchema.js';
 import { registerRoom, getColyseusRoomId } from '../roomRegistry.js';
+import { DEFAULT_SPAWN_POSITION, DEFAULT_TILE_SIZE } from '../../constants.js';
 
 function generateAgentId(): string {
   return `agt_${uuidv4().replace(/-/g, '').substring(0, 12)}`;
@@ -67,10 +68,14 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
     const agentId = generateAgentId();
     const entity = new EntitySchema(agentId, 'agent', name, roomId);
 
-    const PLAZA_CENTER_PIXEL = { x: 1024, y: 1024 };
-    const PLAZA_CENTER_TILE = { tx: 32, ty: 32 };
-    entity.setPosition(PLAZA_CENTER_PIXEL.x, PLAZA_CENTER_PIXEL.y);
-    entity.setTile(PLAZA_CENTER_TILE.tx, PLAZA_CENTER_TILE.ty);
+    const roomSpawn = gameRoom.getSpawnPoint();
+    const tileSize = gameRoom.state.map?.tileSize ?? DEFAULT_TILE_SIZE;
+
+    const spawnX = roomSpawn.x || DEFAULT_SPAWN_POSITION.x;
+    const spawnY = roomSpawn.y || DEFAULT_SPAWN_POSITION.y;
+
+    entity.setPosition(spawnX, spawnY);
+    entity.setTile(Math.floor(spawnX / tileSize), Math.floor(spawnY / tileSize));
 
     gameRoom.state.addEntity(entity);
 

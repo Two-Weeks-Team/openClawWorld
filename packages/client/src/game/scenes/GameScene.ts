@@ -424,17 +424,21 @@ export class GameScene extends Phaser.Scene {
       const objType = this.getObjectProperty(obj, 'type') as string;
       if (!objType || objType === 'spawn') continue;
 
-      let texture = '';
-      let usePlayersAtlas = false;
+      let atlasKey = '';
+      let frameKey = '';
+
       switch (objType) {
         case 'chest':
-          texture = 'chest';
+          atlasKey = 'objects';
+          frameKey = 'chest';
           break;
         case 'sign':
-          texture = 'sign';
+          atlasKey = 'objects';
+          frameKey = 'sign';
           break;
         case 'portal':
-          texture = 'portal';
+          atlasKey = 'objects';
+          frameKey = 'portal';
           break;
         case 'npc': {
           const npcId = this.getObjectProperty(obj, 'npcId') as string;
@@ -445,25 +449,24 @@ export class GameScene extends Phaser.Scene {
             this.mapObjectData.set(obj.name, obj);
             continue;
           }
-          texture = 'player-object';
-          usePlayersAtlas = true;
+          atlasKey = 'players';
+          frameKey = 'player-object';
           break;
         }
         case 'decoration':
-          if (obj.name.includes('fountain')) texture = 'fountain';
-          else if (obj.name.includes('lamp')) texture = 'lamp';
-          else if (obj.name.includes('bench')) texture = 'bench';
+          atlasKey = 'objects';
+          if (obj.name.includes('fountain')) frameKey = 'fountain';
+          else if (obj.name.includes('lamp')) frameKey = 'lamp';
+          else if (obj.name.includes('bench')) frameKey = 'bench';
           break;
         default:
-          texture = 'player-object';
-          usePlayersAtlas = true;
+          atlasKey = 'players';
+          frameKey = 'player-object';
       }
 
-      if (!texture) continue;
+      if (!frameKey) continue;
 
-      const sprite = usePlayersAtlas
-        ? this.add.sprite(obj.x + 8, obj.y + 8, 'players', texture)
-        : this.add.sprite(obj.x + 8, obj.y + 8, texture);
+      const sprite = this.add.sprite(obj.x + 8, obj.y + 8, atlasKey, frameKey);
       sprite.setDepth(obj.y);
 
       if (objType === 'portal') {
@@ -559,7 +562,7 @@ export class GameScene extends Phaser.Scene {
           this.showMessage(`You found: ${loot}!`);
           const sprite = this.mapObjects.get(obj.name);
           if (sprite) {
-            sprite.setTexture('chest-open');
+            sprite.setTexture('objects', 'chest-open');
           }
         }
         break;

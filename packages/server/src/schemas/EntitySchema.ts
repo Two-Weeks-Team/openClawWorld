@@ -100,6 +100,9 @@ export class EntitySchema extends Schema {
   @type('number')
   speed: number = 100;
 
+  @type('number')
+  lastActivityAt: number = Date.now();
+
   @type({ map: 'string' })
   meta: MapSchema<string> = new MapSchema<string>();
 
@@ -136,6 +139,14 @@ export class EntitySchema extends Schema {
 
   clearZone(): void {
     this.currentZone = '';
+  }
+
+  updateActivity(): void {
+    this.lastActivityAt = Date.now();
+  }
+
+  isStale(timeoutMs: number): boolean {
+    return Date.now() - this.lastActivityAt > timeoutMs;
   }
 
   getEffectiveSpeed(): number {

@@ -1,5 +1,6 @@
 export { requestIdMiddleware, REQUEST_ID_HEADER } from './requestId.js';
 export { authMiddleware } from './auth.js';
+export { activityTrackerMiddleware } from './activityTracker.js';
 export { errorHandler, notFoundHandler, ApiError } from './errorHandler.js';
 export {
   RateLimits,

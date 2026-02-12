@@ -15,6 +15,7 @@ import {
 } from '@openclawworld/shared';
 import {
   authMiddleware,
+  activityTrackerMiddleware,
   validateRequest,
   observeRateLimiter,
   pollEventsRateLimiter,
@@ -51,6 +52,7 @@ router.post(
 
 // All routes below require authentication
 router.use(authMiddleware);
+router.use(activityTrackerMiddleware);
 
 router.post(
   '/unregister',

@@ -536,37 +536,89 @@ class GitHubIssueReporter {
     this.dryRun = dryRun;
   }
 
-  async checkDuplicate(title: string): Promise<{ isDuplicate: boolean; existingNumber?: string }> {
+  async checkDuplicate(
+    title: string,
+    issue: Issue
+  ): Promise<{ isDuplicate: boolean; existingNumber?: string; isSimilar?: boolean }> {
     try {
-      const searchTitle = title
+      const normalizedTitle = title
         .replace(/\[.*?\]/g, '')
         .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, ' ')
+        .replace(/\s+/g, ' ')
         .substring(0, 50);
-      const result = execFileSync(
+
+      const openResult = execFileSync(
         'gh',
         [
           'issue',
           'list',
           '--state',
           'open',
-          '--search',
-          searchTitle,
+          '--label',
+          'resident-agent',
           '--json',
-          'number,title',
+          'number,title,createdAt,labels',
           '--limit',
-          '10',
+          '50',
         ],
         { encoding: 'utf-8' }
       );
-      const issues = JSON.parse(result);
-      if (issues.length > 0) {
-        return { isDuplicate: true, existingNumber: String(issues[0].number) };
+      const openIssues = JSON.parse(openResult);
+
+      for (const existingIssue of openIssues) {
+        const existingNormalized = existingIssue.title
+          .replace(/\[.*?\]/g, '')
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, ' ')
+          .replace(/\s+/g, ' ');
+
+        if (
+          existingNormalized.includes(normalizedTitle) ||
+          normalizedTitle.includes(existingNormalized)
+        ) {
+          return {
+            isDuplicate: true,
+            existingNumber: String(existingIssue.number),
+            isSimilar: false,
+          };
+        }
+
+        const existingArea = existingIssue.labels?.find(
+          (l: string) => l.toLowerCase() === issue.area.toLowerCase()
+        );
+
+        if (existingArea) {
+          const similarity = this.calculateSimilarity(normalizedTitle, existingNormalized);
+          if (similarity > 0.7) {
+            return {
+              isDuplicate: true,
+              existingNumber: String(existingIssue.number),
+              isSimilar: true,
+            };
+          }
+        }
       }
+
       return { isDuplicate: false };
     } catch (error) {
       console.error('[checkDuplicate] gh issue list failed:', error);
       return { isDuplicate: true };
     }
+  }
+
+  private calculateSimilarity(str1: string, str2: string): number {
+    const words1 = new Set(str1.split(' ').filter(w => w.length > 2));
+    const words2 = new Set(str2.split(' ').filter(w => w.length > 2));
+
+    if (words1.size === 0 || words2.size === 0) return 0;
+
+    const intersection = new Set(Array.from(words1).filter(w => words2.has(w)));
+    const union = new Set([...Array.from(words1), ...Array.from(words2)]);
+
+    return intersection.size / union.size;
   }
 
   async createIssue(issue: Issue): Promise<string | null> {
@@ -581,7 +633,7 @@ class GitHubIssueReporter {
       return `dry-run-${Date.now()}`;
     }
 
-    const dupCheck = await this.checkDuplicate(title);
+    const dupCheck = await this.checkDuplicate(title, issue);
     if (dupCheck.isDuplicate) {
       if (dupCheck.existingNumber) {
         await this.addComment(

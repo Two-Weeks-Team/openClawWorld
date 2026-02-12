@@ -42,6 +42,7 @@ export class GameScene extends Phaser.Scene {
   private debugInfoPanel?: Phaser.GameObjects.Container;
   private debugLegend?: Phaser.GameObjects.Container;
   private debugZoneLabels: Phaser.GameObjects.Text[] = [];
+  private zoneNameLabels: Phaser.GameObjects.Text[] = [];
   private interactionPrompt?: Phaser.GameObjects.Container;
   private nearbyObject?: MapObject;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -77,6 +78,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.createMap();
     this.renderMapObjects();
+    this.createZoneNameLabels();
     this.setupInput();
     this.setupDebugToggle();
     this.setupInteractionKey();
@@ -334,6 +336,61 @@ export class GameScene extends Phaser.Scene {
       const mapWidth = this.map.widthInPixels;
       const mapHeight = this.map.heightInPixels;
       this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+    }
+  }
+
+  private createZoneNameLabels(): void {
+    const ZONE_DISPLAY_NAMES: Record<ZoneId, string> = {
+      lobby: 'LOBBY',
+      office: 'OFFICE',
+      'central-park': 'CENTRAL PARK',
+      arcade: 'ARCADE',
+      meeting: 'MEETING',
+      'lounge-cafe': 'LOUNGE CAFÉ',
+      plaza: 'PLAZA',
+      lake: 'LAKE',
+    };
+
+    for (const [zoneId, bounds] of Object.entries(ZONE_BOUNDS) as [
+      ZoneId,
+      (typeof ZONE_BOUNDS)[ZoneId],
+    ][]) {
+      const displayName = ZONE_DISPLAY_NAMES[zoneId];
+      const color = ZONE_COLORS[zoneId];
+
+      const label = this.add.text(bounds.x + bounds.width / 2, bounds.y + 20, displayName, {
+        fontSize: '14px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+        stroke: '#000000',
+        strokeThickness: 3,
+        shadow: {
+          offsetX: 1,
+          offsetY: 1,
+          color: '#000000',
+          blur: 2,
+          stroke: true,
+          fill: true,
+        },
+      });
+      label.setOrigin(0.5, 0);
+      label.setDepth(50);
+      label.setAlpha(0.85);
+
+      const bgWidth = label.width + 16;
+      const bgHeight = label.height + 8;
+      const bg = this.add.graphics();
+      bg.fillStyle(color, 0.3);
+      bg.fillRoundedRect(
+        bounds.x + bounds.width / 2 - bgWidth / 2,
+        bounds.y + 16,
+        bgWidth,
+        bgHeight,
+        4
+      );
+      bg.setDepth(49);
+
+      this.zoneNameLabels.push(label);
     }
   }
 

@@ -10,18 +10,28 @@ import { openApiSpec } from './openapi.js';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
 
-function getCorsOrigin(): string | string[] | boolean {
+const LOCALHOST_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:2567',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:2567',
+];
+
+function getCorsOrigin(): string[] | false {
   if (NODE_ENV === 'development') {
-    return true;
+    return LOCALHOST_ORIGINS;
   }
   const allowedOrigins = process.env.ALLOWED_ORIGINS;
-  if (!allowedOrigins) {
+  if (!allowedOrigins || allowedOrigins.trim() === '') {
     console.warn(
       '[SECURITY] ALLOWED_ORIGINS not set in production. CORS will reject all cross-origin requests.'
     );
     return false;
   }
-  return allowedOrigins.split(',').map(origin => origin.trim());
+  return allowedOrigins
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(origin => origin.length > 0);
 }
 
 const server = defineServer({

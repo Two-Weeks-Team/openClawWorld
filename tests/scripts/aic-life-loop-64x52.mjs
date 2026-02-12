@@ -275,32 +275,58 @@ async function runLifeLoop() {
   console.log('Events received:', results.events.length);
   console.log('Success:', results.success);
 
-  // Save to evidence file (sanitized to prevent arbitrary data injection)
+  // Save to evidence file
+  // Note: This writes test execution metadata to a local evidence file.
+  // The data is sanitized by creating new primitive values (not referencing network data directly).
   const fs = await import('fs');
   const path = await import('path');
   const evidenceDir = '.sisyphus/evidence/B3';
+  const evidenceFile = 'B3-T02-life-loop.json';
 
-  const sanitizedResults = {
-    success: Boolean(results.success),
-    timestamp: String(results.timestamp || new Date().toISOString()),
-    roomId: String(results.roomId || ''),
-    agentId: String(results.agentId || ''),
-    steps: Object.fromEntries(
-      Object.entries(results.steps || {}).map(([k, v]) => [String(k), String(v)])
-    ),
-    errors: (results.errors || []).map(e => String(e)).slice(0, 100),
-    facilitiesCount: Array.isArray(results.facilities) ? results.facilities.length : 0,
-    eventsCount: Array.isArray(results.events) ? results.events.length : 0,
-    zoneEventsCount: Array.isArray(results.zoneEvents) ? results.zoneEvents.length : 0,
+  function toSafeString(value, maxLen = 256) {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    return str.length > maxLen ? str.slice(0, maxLen) : str;
+  }
+
+  function toSafeInt(value, defaultVal = 0) {
+    const num = parseInt(String(value), 10);
+    return Number.isFinite(num) ? num : defaultVal;
+  }
+
+  const evidenceData = {
+    testName: 'aic-life-loop-64x52',
+    success: results.errors.length === 0,
+    timestamp: new Date().toISOString(),
+    roomId: toSafeString(results.roomId, 64),
+    agentId: toSafeString(results.agentId, 64),
+    steps: {},
+    errorCount: toSafeInt(results.errors?.length),
+    facilitiesCount: toSafeInt(results.facilities?.length),
+    eventsCount: toSafeInt(results.events?.length),
+    zoneEventsCount: toSafeInt(results.zoneEvents?.length),
   };
+
+  const allowedStepKeys = [
+    'matchmake',
+    'register',
+    'observe',
+    'moveTo',
+    'interact',
+    'chatSend',
+    'pollEvents',
+  ];
+  for (const key of allowedStepKeys) {
+    if (results.steps && Object.prototype.hasOwnProperty.call(results.steps, key)) {
+      evidenceData.steps[key] = toSafeString(results.steps[key], 32);
+    }
+  }
 
   try {
     fs.mkdirSync(evidenceDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(evidenceDir, 'B3-T02-life-loop.json'),
-      JSON.stringify(sanitizedResults, null, 2)
-    );
-    console.log(`\nEvidence saved to ${evidenceDir}/B3-T02-life-loop.json`);
+    const outputPath = path.join(evidenceDir, evidenceFile);
+    fs.writeFileSync(outputPath, JSON.stringify(evidenceData, null, 2));
+    console.log(`\nEvidence saved to ${outputPath}`);
   } catch (fsError) {
     console.error('Failed to save evidence:', fsError.message);
   }

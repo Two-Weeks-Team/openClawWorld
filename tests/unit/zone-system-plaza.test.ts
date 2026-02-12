@@ -3,7 +3,7 @@ import { ZoneSystem, DEFAULT_ZONE_BOUNDS } from '../../packages/server/src/zone/
 import { EventLog } from '../../packages/server/src/events/EventLog.js';
 import { EntitySchema } from '../../packages/server/src/schemas/EntitySchema.js';
 
-describe('ZoneSystem - Plaza Zone (64x64 Grid-Town layout)', () => {
+describe('ZoneSystem - Plaza Zone (8-zone Grid-Town layout)', () => {
   let zoneSystem: ZoneSystem;
   let eventLog: EventLog;
 
@@ -13,16 +13,16 @@ describe('ZoneSystem - Plaza Zone (64x64 Grid-Town layout)', () => {
   });
 
   describe('detectZone', () => {
-    it('returns plaza for position inside plaza bounds (1024, 1024)', () => {
-      expect(zoneSystem.detectZone(1024, 1024)).toBe('plaza');
+    it('returns plaza for position inside plaza bounds (1472, 1472)', () => {
+      expect(zoneSystem.detectZone(1472, 1472)).toBe('plaza');
     });
 
-    it('returns plaza for position at plaza origin (768, 768)', () => {
-      expect(zoneSystem.detectZone(768, 768)).toBe('plaza');
+    it('returns plaza for position at plaza origin (1216, 1216)', () => {
+      expect(zoneSystem.detectZone(1216, 1216)).toBe('plaza');
     });
 
-    it('returns plaza for position at plaza bottom-right boundary (1279, 1279)', () => {
-      expect(zoneSystem.detectZone(1279, 1279)).toBe('plaza');
+    it('returns plaza for position at plaza bottom-right boundary (1727, 1727)', () => {
+      expect(zoneSystem.detectZone(1727, 1727)).toBe('plaza');
     });
 
     it('returns null for position outside all zones', () => {
@@ -30,7 +30,7 @@ describe('ZoneSystem - Plaza Zone (64x64 Grid-Town layout)', () => {
     });
 
     it('returns null for position just outside plaza to the right', () => {
-      expect(zoneSystem.detectZone(1280, 1024)).toBeNull();
+      expect(zoneSystem.detectZone(1728, 1472)).toBeNull();
     });
   });
 
@@ -40,8 +40,8 @@ describe('ZoneSystem - Plaza Zone (64x64 Grid-Town layout)', () => {
 
       const result = zoneSystem.updateEntityZone(
         'entity_1',
-        1024,
-        1024,
+        1472,
+        1472,
         eventLog,
         'room_1',
         entity
@@ -62,13 +62,13 @@ describe('ZoneSystem - Plaza Zone (64x64 Grid-Town layout)', () => {
     it('updates entity currentZone to plaza when entity enters', () => {
       const entity = new EntitySchema('entity_1', 'human', 'Test', 'room_1');
 
-      zoneSystem.updateEntityZone('entity_1', 1024, 1024, eventLog, 'room_1', entity);
+      zoneSystem.updateEntityZone('entity_1', 1472, 1472, eventLog, 'room_1', entity);
 
       expect(entity.currentZone).toBe('plaza');
     });
 
     it('tracks entity zone correctly for plaza', () => {
-      zoneSystem.updateEntityZone('entity_1', 1024, 1024);
+      zoneSystem.updateEntityZone('entity_1', 1472, 1472);
 
       expect(zoneSystem.getEntityZone('entity_1')).toBe('plaza');
     });
@@ -76,15 +76,15 @@ describe('ZoneSystem - Plaza Zone (64x64 Grid-Town layout)', () => {
 
   describe('zone population', () => {
     it('returns correct population for plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 1000, 1000);
-      zoneSystem.updateEntityZone('entity_2', 1100, 1100);
+      zoneSystem.updateEntityZone('entity_1', 1300, 1300);
+      zoneSystem.updateEntityZone('entity_2', 1400, 1400);
 
       expect(zoneSystem.getZonePopulation('plaza')).toBe(2);
     });
 
     it('returns entities in plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 1000, 1000);
-      zoneSystem.updateEntityZone('entity_2', 1100, 1100);
+      zoneSystem.updateEntityZone('entity_1', 1300, 1300);
+      zoneSystem.updateEntityZone('entity_2', 1400, 1400);
 
       const entities = zoneSystem.getEntitiesInZone('plaza');
 
@@ -106,7 +106,7 @@ describe('ZoneSystem - Plaza Zone (64x64 Grid-Town layout)', () => {
     it('returns correct bounds for plaza zone', () => {
       const bounds = zoneSystem.getZoneBounds('plaza');
 
-      expect(bounds).toEqual({ x: 768, y: 768, width: 512, height: 512 });
+      expect(bounds).toEqual({ x: 1216, y: 1216, width: 512, height: 512 });
     });
   });
 });

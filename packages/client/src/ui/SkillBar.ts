@@ -7,8 +7,8 @@ export type SkillSlot = {
   enabled: boolean;
 };
 
-const SLOT_SIZE = 48;
-const SLOT_PADDING = 4;
+const SLOT_SIZE = 56;
+const SLOT_PADDING = 6;
 const COOLDOWN_OVERLAY_ALPHA = 0.7;
 
 export class SkillBar {
@@ -46,7 +46,7 @@ export class SkillBar {
       bg.strokeRoundedRect(x, 0, SLOT_SIZE, SLOT_SIZE, 6);
 
       const icon = this.scene.add.text(x + SLOT_SIZE / 2, SLOT_SIZE / 2, '', {
-        fontSize: '24px',
+        fontSize: '28px',
       });
       icon.setOrigin(0.5);
 
@@ -54,8 +54,8 @@ export class SkillBar {
       cooldownOverlay.setVisible(false);
 
       const keyLabel = this.scene.add.text(x + 4, 4, `${i + 1}`, {
-        fontSize: '10px',
-        color: '#888888',
+        fontSize: '12px',
+        color: '#aaaaaa',
       });
 
       this.container.add([bg, icon, cooldownOverlay, keyLabel]);

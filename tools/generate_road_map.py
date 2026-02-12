@@ -11,7 +11,7 @@ import math
 
 MAP_WIDTH = 64
 MAP_HEIGHT = 52
-TILE_SIZE = 32
+TILE_SIZE = 16
 
 GRASS = 0
 ROAD = 1

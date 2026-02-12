@@ -186,6 +186,9 @@ interface LoopState {
 // Constants
 // ============================================================================
 
+/** Tile size in pixels - must match MAP_CONFIG.tileSize in shared/world.ts */
+const TILE_SIZE = 16;
+
 const MAX_CYCLES_WITHOUT_OBSERVE = 2;
 const NAVIGATE_WEIGHT_DAMPENING = 0.5;
 const ENTITY_APPROACH_WEIGHT_DAMPENING = 0.3;
@@ -1676,7 +1679,10 @@ class ResidentAgent {
         const label = `navigate:${facility.type}`;
         candidates.push({
           action: () =>
-            this.moveTo(Math.floor(facility.position.x / 32), Math.floor(facility.position.y / 32)),
+            this.moveTo(
+              Math.floor(facility.position.x / TILE_SIZE),
+              Math.floor(facility.position.y / TILE_SIZE)
+            ),
           weight:
             this.getRolePreference(facility.type, 'navigate') *
             this.computeNoveltyMultiplier(label) *
@@ -1693,7 +1699,10 @@ class ResidentAgent {
       const label = `navigate:entity:${entity.entityId.substring(0, 8)}`;
       candidates.push({
         action: () =>
-          this.moveTo(Math.floor(entity.position.x / 32), Math.floor(entity.position.y / 32)),
+          this.moveTo(
+            Math.floor(entity.position.x / TILE_SIZE),
+            Math.floor(entity.position.y / TILE_SIZE)
+          ),
         weight:
           this.getRolePreference('entity', 'approach') *
           this.computeNoveltyMultiplier(label) *

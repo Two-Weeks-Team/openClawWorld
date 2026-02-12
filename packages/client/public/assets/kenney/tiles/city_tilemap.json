@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "image": "city_tilemap.png",
+    "size": { "w": 592, "h": 448 },
+    "scale": 1,
+    "format": "RGBA8888",
+    "app": "kenney-roguelike-city",
+    "tileSize": 16,
+    "spacing": 1,
+    "columns": 37,
+    "rows": 28,
+    "tileCount": 1036
+  },
+  "frames": {}
+}

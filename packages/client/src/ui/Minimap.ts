@@ -182,10 +182,13 @@ export class Minimap {
     const offsetX = 4;
     const offsetY = 4;
 
+    const worldViewWidth = camera.zoom > 0 ? camera.width / camera.zoom : 0;
+    const worldViewHeight = camera.zoom > 0 ? camera.height / camera.zoom : 0;
+
     const viewX = offsetX + camera.scrollX * scaleX;
     const viewY = offsetY + camera.scrollY * scaleY;
-    const viewW = camera.width * scaleX;
-    const viewH = camera.height * scaleY;
+    const viewW = worldViewWidth * scaleX;
+    const viewH = worldViewHeight * scaleY;
 
     this.viewportGraphics.lineStyle(1, 0xffffff, 0.8);
     this.viewportGraphics.strokeRect(viewX, viewY, viewW, viewH);

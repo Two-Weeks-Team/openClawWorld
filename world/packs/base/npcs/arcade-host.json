@@ -2,12 +2,12 @@
   "id": "arcade-host",
   "name": "Drew the Game Master",
   "sprite": "npc-arcade-host",
-  "zone": "south-block",
-  "defaultPosition": { "x": 640, "y": 1632 },
+  "zone": "arcade",
+  "defaultPosition": { "x": 1600, "y": 768 },
   "schedule": [
-    { "startHour": 10, "endHour": 14, "state": "working", "position": { "x": 640, "y": 1632 } },
-    { "startHour": 14, "endHour": 15, "state": "break", "position": { "x": 690, "y": 1732 } },
-    { "startHour": 15, "endHour": 22, "state": "working", "position": { "x": 640, "y": 1632 } }
+    { "startHour": 10, "endHour": 14, "state": "working", "position": { "x": 1600, "y": 768 } },
+    { "startHour": 14, "endHour": 15, "state": "break", "position": { "x": 800, "y": 1440 } },
+    { "startHour": 15, "endHour": 22, "state": "working", "position": { "x": 1600, "y": 768 } }
   ],
   "dialogue": {
     "greeting": {

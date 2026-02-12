@@ -1,0 +1,31 @@
+{
+  "id": "security",
+  "name": "Max the Guard",
+  "sprite": "npc-security",
+  "zone": "lobby",
+  "defaultPosition": { "x": 384, "y": 192 },
+  "schedule": [
+    { "startHour": 0, "endHour": 24, "state": "working", "position": { "x": 384, "y": 192 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Welcome to Grid-Town! I'm Max, head of security. Please enjoy your stay and let me know if you see anything suspicious!",
+      "options": [
+        { "text": "Is this place safe?", "next": "safety" },
+        { "text": "What are the rules here?", "next": "rules" },
+        { "text": "Just passing through!", "next": null }
+      ]
+    },
+    "safety": {
+      "id": "safety",
+      "text": "Absolutely! Grid-Town is one of the safest communities around. We have 24/7 monitoring and a friendly community that looks out for each other.",
+      "options": [{ "text": "Good to know!", "next": null }]
+    },
+    "rules": {
+      "id": "rules",
+      "text": "Simple rules: Be respectful to others, don't block pathways, and have fun! If you need help, talk to Sam the Greeter or visit the info board.",
+      "options": [{ "text": "Got it, thanks!", "next": null }]
+    }
+  }
+}

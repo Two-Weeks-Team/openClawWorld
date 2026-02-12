@@ -399,25 +399,32 @@ export class WorldPackLoader {
 
   private getFacilityZone(facilityId: string, zoneId: ZoneId): boolean {
     const facilityZoneMap: Record<string, ZoneId> = {
-      reception_desk: 'lobby',
-      info_board: 'lobby',
-      kanban_board: 'office',
-      desk_cluster: 'office',
+      'reception-desk': 'lobby',
+      'info-board': 'lobby',
+      'desk-cluster': 'office',
+      'kanban-board': 'office',
       whiteboard: 'office',
       signpost: 'central-park',
-      bench: 'central-park',
-      arcade_cabinet: 'arcade',
-      prize_counter: 'arcade',
-      game_table: 'arcade',
-      meeting_room: 'meeting',
-      schedule_board: 'meeting',
-      cafe_counter: 'lounge-cafe',
-      vending_machine: 'lounge-cafe',
-      seating_area: 'lounge-cafe',
+      'bench-park-1': 'central-park',
+      'bench-park-2': 'central-park',
+      'arcade-cabinet-1': 'arcade',
+      'arcade-cabinet-2': 'arcade',
+      'arcade-cabinet-3': 'arcade',
+      'prize-counter': 'arcade',
+      'game-table': 'arcade',
+      'meeting-room-a': 'meeting',
+      'meeting-room-c': 'meeting',
+      'schedule-board': 'meeting',
+      'cafe-counter': 'lounge-cafe',
+      'vending-machine': 'lounge-cafe',
+      'seating-area': 'lounge-cafe',
       fountain: 'plaza',
-      pond_edge: 'lake',
+      'bench-1': 'plaza',
+      'bench-2': 'plaza',
+      'pond-edge': 'lake',
     };
-    return facilityZoneMap[facilityId] === zoneId;
+    const normalizedId = facilityId.replace(/_/g, '-');
+    return facilityZoneMap[normalizedId] === zoneId;
   }
 
   private loadZoneMap(zoneId: ZoneId): ZoneMapData {

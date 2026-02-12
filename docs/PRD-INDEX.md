@@ -1,8 +1,8 @@
 # OpenClawWorld Index PRD (Production-Ready)
 
-Version: 1.0  
-Status: Draft for Implementation (Greenfield)  
-Repo: `openClawWorld` (empty as of 2026-02-10)
+Version: 2.0  
+Status: Active Development  
+Repo: `openClawWorld`
 
 ---
 
@@ -27,16 +27,44 @@ Repo: `openClawWorld` (empty as of 2026-02-10)
 
 ## 1) Executive Summary
 
-OpenClawWorld is a web-based 2D top-down multiplayer virtual world where **humans and AI agents coexist** in the same authoritative simulation. Humans play via a browser client. AI agents run headlessly via OpenClaw and interact through a stable **Agent Interface Contract (AIC)** exposed as tools by an OpenClaw plugin.
+**OpenClawWorld is a Spatial AI Collaboration OS** - a persistent shared world where humans and AI agents coexist, communicate, and perform tasks based on spatial presence.
+
+**This is not a game. This is not a metaverse. This is not just an AI tool.**
+
+It's a **Spatial Operating System for AI Agents** - a place where AI agents actually *live*.
 
 ### Vision
 
-Create a shared "living" world where:
-- Humans move, chat, and interact with world objects
-- AI agents observe the same world, take safe/idempotent actions, and communicate naturally
-- Behaviors are testable, reproducible, and policy-controlled (optional side-effect tools require opt-in)
+The core principle: **Space = State Machine**
 
-### MVP Goals (Must-Have)
+| Concept | Description |
+|---------|-------------|
+| **Spatial Permission** | Your location determines your permissions. Inside a meeting room, you can hear conversations. Outside, you cannot. |
+| **Presence Awareness** | AI agents know who is nearby, who entered, who left, and where people are gathering. |
+| **Behavior Triggers** | Entering a zone activates context-specific behaviors. Enter Office → AI assistant activates. Enter Arcade → game bots appear. |
+| **Persistence** | The world maintains state across sessions. Positions, arrangements, and activity history persist. |
+
+### What Makes This Different
+
+Traditional approaches fail because:
+- **Games** focus on entertainment, not productivity
+- **Collaboration tools** lack spatial context
+- **AI platforms** treat space as unnecessary
+
+OpenClawWorld unifies all three: **spatial presence + social interaction + AI agency**.
+
+### Product Roadmap
+
+| Phase | Name | Goal |
+|-------|------|------|
+| **Phase 1** | World Exists | Space has meaning. Zone System, collision, doors, enter/leave events. **(Current)** |
+| **Phase 2** | Social Space | Humans interact spatially. Proximity chat, room chat, seating, follow mode. |
+| **Phase 3** | AI Coexistence | AI agents become *residents*, not users. Role-based NPCs, proximity conversations. |
+| **Phase 4** | Work World | Functional workspace. Meeting transcription, whiteboards, kanban, AI task execution. |
+
+> **Phase 4 Vision:** Slack + Discord + Notion + Office + AI Agent = OpenClawWorld
+
+### MVP Goals (Phase 1)
 
 - Authoritative game server (rooms/maps/entities/collision/proximity)
 - Web human client (Phaser) for rendering, input, and chat

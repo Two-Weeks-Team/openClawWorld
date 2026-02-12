@@ -9,7 +9,13 @@ import { ClientCollisionSystem } from '../../systems/CollisionSystem';
 import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
 import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
-import { ZONE_BOUNDS, ZONE_COLORS, DEBUG_COLORS, DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
+import {
+  ZONE_BOUNDS,
+  ZONE_COLORS,
+  ZONE_DISPLAY_NAMES,
+  DEBUG_COLORS,
+  DEFAULT_SPAWN_POINT,
+} from '@openclawworld/shared';
 
 interface MapObject {
   id: number;
@@ -42,6 +48,8 @@ export class GameScene extends Phaser.Scene {
   private debugInfoPanel?: Phaser.GameObjects.Container;
   private debugLegend?: Phaser.GameObjects.Container;
   private debugZoneLabels: Phaser.GameObjects.Text[] = [];
+  private zoneNameLabels: Phaser.GameObjects.Text[] = [];
+  private zoneNameBackgrounds: Phaser.GameObjects.Graphics[] = [];
   private interactionPrompt?: Phaser.GameObjects.Container;
   private nearbyObject?: MapObject;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -77,6 +85,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     this.createMap();
     this.renderMapObjects();
+    this.createZoneNameLabels();
     this.setupInput();
     this.setupDebugToggle();
     this.setupInteractionKey();
@@ -334,6 +343,51 @@ export class GameScene extends Phaser.Scene {
       const mapWidth = this.map.widthInPixels;
       const mapHeight = this.map.heightInPixels;
       this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
+    }
+  }
+
+  private createZoneNameLabels(): void {
+    for (const [zoneId, bounds] of Object.entries(ZONE_BOUNDS) as [
+      ZoneId,
+      (typeof ZONE_BOUNDS)[ZoneId],
+    ][]) {
+      const displayName = ZONE_DISPLAY_NAMES[zoneId];
+      const color = ZONE_COLORS[zoneId];
+
+      const label = this.add.text(bounds.x + bounds.width / 2, bounds.y + 20, displayName, {
+        fontSize: '14px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+        stroke: '#000000',
+        strokeThickness: 3,
+        shadow: {
+          offsetX: 1,
+          offsetY: 1,
+          color: '#000000',
+          blur: 2,
+          stroke: true,
+          fill: true,
+        },
+      });
+      label.setOrigin(0.5, 0);
+      label.setDepth(50);
+      label.setAlpha(0.85);
+
+      const bgWidth = label.width + 16;
+      const bgHeight = label.height + 8;
+      const bg = this.add.graphics();
+      bg.fillStyle(color, 0.3);
+      bg.fillRoundedRect(
+        bounds.x + bounds.width / 2 - bgWidth / 2,
+        bounds.y + 16,
+        bgWidth,
+        bgHeight,
+        4
+      );
+      bg.setDepth(49);
+
+      this.zoneNameLabels.push(label);
+      this.zoneNameBackgrounds.push(bg);
     }
   }
 
@@ -687,11 +741,13 @@ export class GameScene extends Phaser.Scene {
     ];
 
     const zoneItems: Array<{ label: string; color: number }> = [
+      { label: 'Lobby', color: ZONE_COLORS.lobby },
+      { label: 'Office', color: ZONE_COLORS.office },
+      { label: 'Central Park', color: ZONE_COLORS['central-park'] },
+      { label: 'Arcade', color: ZONE_COLORS.arcade },
+      { label: 'Meeting', color: ZONE_COLORS.meeting },
+      { label: 'Lounge Cafe', color: ZONE_COLORS['lounge-cafe'] },
       { label: 'Plaza', color: ZONE_COLORS.plaza },
-      { label: 'North Block', color: ZONE_COLORS['north-block'] },
-      { label: 'West Block', color: ZONE_COLORS['west-block'] },
-      { label: 'East Block', color: ZONE_COLORS['east-block'] },
-      { label: 'South Block', color: ZONE_COLORS['south-block'] },
       { label: 'Lake', color: ZONE_COLORS.lake },
     ];
 
@@ -815,6 +871,10 @@ export class GameScene extends Phaser.Scene {
       clearInterval(this.roomCheckInterval);
       this.roomCheckInterval = undefined;
     }
+    this.zoneNameLabels.forEach(label => label.destroy());
+    this.zoneNameLabels = [];
+    this.zoneNameBackgrounds.forEach(bg => bg.destroy());
+    this.zoneNameBackgrounds = [];
     this.notificationPanel?.destroy();
     this.minimap?.destroy();
     this.zoneBanner?.destroy();

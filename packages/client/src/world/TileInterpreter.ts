@@ -28,10 +28,10 @@ const COLOR_RANGES: ColorRange[] = [
 // Floor types that map to zones still in the new 8-zone system are preserved
 const ZONE_FLOOR_TYPES: Map<TileType, ZoneId> = new Map([
   ['floor_plaza', 'plaza'],
-  ['floor_north', 'lobby'], // north area -> lobby in new system
-  ['floor_west', 'meeting'], // west area -> meeting room in new system
-  ['floor_east', 'arcade'], // east area -> arcade in new system
-  ['floor_south', 'lounge-cafe'], // south area -> lounge-cafe in new system
+  ['floor_north', 'office'],
+  ['floor_west', 'meeting'],
+  ['floor_east', 'arcade'],
+  ['floor_south', 'lounge-cafe'],
   ['floor_lake', 'lake'],
 ]);
 

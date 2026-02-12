@@ -166,12 +166,36 @@ curl -X POST http://localhost:2567/aic/v0.1/observe \
 | **Enter**             | Send chat message      |
 | **F3**                | Toggle collision debug |
 
+## Claude Code Commands
+
+This project includes custom [Claude Code](https://docs.anthropic.com/en/docs/claude-code) slash commands for AI-assisted development and testing.
+
+### Available Commands
+
+| Command                         | Description                                        |
+| ------------------------------- | -------------------------------------------------- |
+| `/openclaw-resident-agent-loop` | Autonomous agent loop for continuous bug discovery |
+
+### Quick Start
+
+```bash
+# Commands are auto-loaded when opening the project with Claude Code
+cd openClawWorld
+claude
+
+# Run the resident agent loop
+/openclaw-resident-agent-loop --stress=medium --agents=10
+```
+
+See [.claude/README.md](.claude/README.md) for detailed installation and usage instructions.
+
 ## Documentation
 
 - [PRD Index](docs/PRD-INDEX.md) - Product Requirements Document
 - [Demo Runbook](docs/demo-runbook.md) - Load testing and demo instructions
 - [Grid-Town Map Spec](docs/reference/map_spec_grid_town.md) - Current map specification
 - [AIC Schema](docs/aic/v0.1/aic-schema.json) - JSON Schema for AIC API
+- [Claude Commands](.claude/README.md) - Claude Code slash commands guide
 
 ## Contributing
 

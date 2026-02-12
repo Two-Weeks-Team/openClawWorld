@@ -16,15 +16,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image('tileset', 'assets/maps/tileset.png');
 
     this.load.atlas('players', 'assets/sprites/players.png', 'assets/sprites/players.json');
-
-    this.load.svg('chest', 'assets/sprites/chest.svg', { width: 32, height: 32 });
-    this.load.svg('chest-open', 'assets/sprites/chest-open.svg', { width: 32, height: 32 });
-    this.load.svg('sign', 'assets/sprites/sign.svg', { width: 32, height: 32 });
-    this.load.svg('portal', 'assets/sprites/portal.svg', { width: 32, height: 32 });
-    this.load.svg('fountain', 'assets/sprites/fountain.svg', { width: 32, height: 32 });
-    this.load.svg('lamp', 'assets/sprites/lamp.svg', { width: 32, height: 32 });
-    this.load.svg('bench', 'assets/sprites/bench.svg', { width: 32, height: 32 });
-
+    this.load.atlas('objects', 'assets/sprites/objects.png', 'assets/sprites/objects.json');
     this.load.atlas('npcs', 'assets/sprites/npcs.png', 'assets/sprites/npcs.json');
   }
 

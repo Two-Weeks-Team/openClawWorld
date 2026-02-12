@@ -1,0 +1,153 @@
+#!/usr/bin/env python3
+"""Extract object sprites from Kenney Roguelike packs.
+
+Extracts decorative objects and interactive items from:
+- Roguelike City Pack: fountain, bench, lamp, sign
+- Roguelike Interior Pack: chest, chest-open, portal
+
+Output: objects.png atlas + objects.json (Phaser atlas format)
+"""
+
+from PIL import Image
+import json
+import os
+
+KENNEY_PATH = "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets"
+
+# City Pack individual tiles (no spacing needed)
+CITY_TILES_DIR = f"{KENNEY_PATH}/Roguelike City Pack/Tiles"
+
+# Interior Pack tilesheet (has 1px spacing)
+INTERIOR_SPRITESHEET = (
+    f"{KENNEY_PATH}/Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png"
+)
+
+OUTPUT_PNG = "packages/client/public/assets/sprites/objects.png"
+OUTPUT_JSON = "packages/client/public/assets/sprites/objects.json"
+
+TILE_SIZE = 16
+SPACING = 1  # For spaced tilesheets
+
+# Object mapping using individual tile files for City Pack
+# Tile numbers determined from Kenney Roguelike City Pack analysis
+# Row 20-23 contains decorative objects
+CITY_OBJECTS = [
+    # Fountain - water feature (tile 919 is a nice fountain base)
+    {"id": "fountain", "tile_num": 919, "desc": "Fountain - plaza decoration"},
+    # Bench - seating (tile 958 is a wooden bench)
+    {"id": "bench", "tile_num": 958, "desc": "Bench - park seating"},
+    # Lamp - street lighting (tile 765 is a lamp post)
+    {"id": "lamp", "tile_num": 765, "desc": "Lamp - street light"},
+    # Sign - information board (tile 882 is a signpost)
+    {"id": "sign", "tile_num": 882, "desc": "Sign - information board"},
+]
+
+# Interior objects using spritesheet coordinates (col, row)
+# Interior Pack: 27 cols x 18 rows, 1px spacing
+INTERIOR_OBJECTS = [
+    # Chest closed - treasure container (around row 12-13)
+    {"id": "chest", "col": 24, "row": 12, "desc": "Chest - closed treasure"},
+    # Chest open - opened container
+    {"id": "chest-open", "col": 25, "row": 12, "desc": "Chest - opened"},
+    # Portal - magical doorway (around row 15-16)
+    {"id": "portal", "col": 0, "row": 17, "desc": "Portal - magical doorway"},
+]
+
+
+def load_city_tile(tile_num: int) -> Image.Image:
+    """Load individual tile from City Pack Tiles folder."""
+    tile_path = f"{CITY_TILES_DIR}/tile_{tile_num:04d}.png"
+    if not os.path.exists(tile_path):
+        raise FileNotFoundError(f"City tile not found: {tile_path}")
+    return Image.open(tile_path).convert("RGBA")
+
+
+def get_interior_tile(img: Image.Image, col: int, row: int) -> Image.Image:
+    """Extract tile from Interior spritesheet with 1px spacing."""
+    x = col * (TILE_SIZE + SPACING)
+    y = row * (TILE_SIZE + SPACING)
+    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+
+
+def main():
+    print("=== Extracting Object Sprites from Kenney Packs ===\n")
+
+    # Load Interior spritesheet
+    interior_img = Image.open(INTERIOR_SPRITESHEET).convert("RGBA")
+    print(f"Interior spritesheet size: {interior_img.size}")
+
+    # Calculate output dimensions
+    all_objects = CITY_OBJECTS + INTERIOR_OBJECTS
+    num_objects = len(all_objects)
+    output_width = num_objects * TILE_SIZE
+    output_height = TILE_SIZE
+
+    # Create output atlas
+    output_img = Image.new("RGBA", (output_width, output_height), (0, 0, 0, 0))
+    frames = {}
+
+    idx = 0
+
+    # Extract City Pack objects (individual tiles)
+    print("\n--- City Pack Objects ---")
+    for obj in CITY_OBJECTS:
+        try:
+            tile = load_city_tile(obj["tile_num"])
+            out_x = idx * TILE_SIZE
+            output_img.paste(tile, (out_x, 0))
+
+            frames[obj["id"]] = {
+                "frame": {"x": out_x, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+                "sourceSize": {"w": TILE_SIZE, "h": TILE_SIZE},
+                "spriteSourceSize": {"x": 0, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+            }
+            print(f"  {obj['id']}: tile_{obj['tile_num']:04d} -> x={out_x}")
+            idx += 1
+        except FileNotFoundError as e:
+            print(f"  WARNING: {e}")
+
+    # Extract Interior Pack objects (spritesheet)
+    print("\n--- Interior Pack Objects ---")
+    for obj in INTERIOR_OBJECTS:
+        tile = get_interior_tile(interior_img, obj["col"], obj["row"])
+        out_x = idx * TILE_SIZE
+        output_img.paste(tile, (out_x, 0))
+
+        frames[obj["id"]] = {
+            "frame": {"x": out_x, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+            "sourceSize": {"w": TILE_SIZE, "h": TILE_SIZE},
+            "spriteSourceSize": {"x": 0, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+        }
+        print(f"  {obj['id']}: ({obj['col']}, {obj['row']}) -> x={out_x}")
+        idx += 1
+
+    # Save output PNG
+    os.makedirs(os.path.dirname(OUTPUT_PNG), exist_ok=True)
+    output_img.save(OUTPUT_PNG)
+    print(f"\nSaved object spritesheet to {OUTPUT_PNG}")
+    print(f"Output size: {output_img.size} ({idx} objects)")
+
+    # Create Phaser atlas JSON
+    atlas_json = {
+        "frames": frames,
+        "meta": {
+            "image": "objects.png",
+            "size": {"w": output_width, "h": output_height},
+            "scale": 1,
+            "format": "RGBA8888",
+        },
+    }
+
+    with open(OUTPUT_JSON, "w") as f:
+        json.dump(atlas_json, f, indent=2)
+    print(f"Saved object atlas JSON to {OUTPUT_JSON}")
+
+    # Print summary
+    print("\n=== Object Atlas Summary ===")
+    print(f"Total objects: {len(frames)}")
+    for obj_id in frames:
+        print(f"  - {obj_id}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { ZONE_BOUNDS, ZONE_COLORS, MAP_CONFIG, ZONE_IDS } from '@openclawworld/shared';
 
 interface MinimapConfig {
   width: number;
@@ -15,8 +16,8 @@ interface MinimapConfig {
 const DEFAULT_CONFIG: MinimapConfig = {
   width: 180,
   height: 180,
-  mapWidth: 2048,
-  mapHeight: 2048,
+  mapWidth: MAP_CONFIG.pixelWidth,
+  mapHeight: MAP_CONFIG.pixelHeight,
   backgroundColor: 0x1a1a2e,
   borderColor: 0x4a90d9,
   playerColor: 0xffff00,
@@ -24,13 +25,7 @@ const DEFAULT_CONFIG: MinimapConfig = {
   agentColor: 0xff00ff,
 };
 
-const ZONE_COLORS: Record<string, number> = {
-  plaza: 0x808080, // gray - stone plaza
-  'north-block': 0x4a90d9, // blue - office
-  'west-block': 0xdaa520, // goldenrod - cafe
-  'east-block': 0x8b4513, // brown - meeting
-  'south-block': 0x9932cc, // purple - arcade
-  lake: 0x4169e1, // royal blue - water
+const EXTRA_COLORS = {
   water: 0x3a7ca5,
   road: 0xa88b5a,
 };
@@ -84,7 +79,7 @@ export class Minimap {
     const offsetX = 4;
     const offsetY = 4;
 
-    this.zoneGraphics.fillStyle(ZONE_COLORS.water, 0.8);
+    this.zoneGraphics.fillStyle(EXTRA_COLORS.water, 0.8);
     for (let y = 0; y < 3; y++) {
       this.zoneGraphics.fillRect(
         offsetX,
@@ -97,7 +92,7 @@ export class Minimap {
       this.zoneGraphics.fillRect(offsetX, offsetY + y * 32 * scaleY, 5 * 32 * scaleX, 32 * scaleY);
     }
 
-    this.zoneGraphics.fillStyle(ZONE_COLORS.road, 0.6);
+    this.zoneGraphics.fillStyle(EXTRA_COLORS.road, 0.6);
     this.zoneGraphics.fillRect(
       offsetX + 17 * 32 * scaleX,
       offsetY + 12 * 32 * scaleY,
@@ -123,31 +118,23 @@ export class Minimap {
       14 * 32 * scaleY
     );
 
-    const zones = [
-      { id: 'plaza', x: 768, y: 768, w: 512, h: 512 },
-      { id: 'north-block', x: 576, y: 64, w: 768, h: 384 },
-      { id: 'west-block', x: 64, y: 704, w: 640, h: 640 },
-      { id: 'east-block', x: 1472, y: 704, w: 576, h: 640 },
-      { id: 'south-block', x: 576, y: 1472, w: 768, h: 384 },
-      { id: 'lake', x: 1408, y: 1408, w: 640, h: 640 },
-    ];
-
-    for (const zone of zones) {
-      const color = ZONE_COLORS[zone.id] || 0x333333;
+    for (const zoneId of ZONE_IDS) {
+      const bounds = ZONE_BOUNDS[zoneId];
+      const color = ZONE_COLORS[zoneId];
       this.zoneGraphics.fillStyle(color, 0.6);
       this.zoneGraphics.fillRect(
-        offsetX + zone.x * scaleX,
-        offsetY + zone.y * scaleY,
-        zone.w * scaleX,
-        zone.h * scaleY
+        offsetX + bounds.x * scaleX,
+        offsetY + bounds.y * scaleY,
+        bounds.width * scaleX,
+        bounds.height * scaleY
       );
 
       this.zoneGraphics.lineStyle(1, 0xffffff, 0.3);
       this.zoneGraphics.strokeRect(
-        offsetX + zone.x * scaleX,
-        offsetY + zone.y * scaleY,
-        zone.w * scaleX,
-        zone.h * scaleY
+        offsetX + bounds.x * scaleX,
+        offsetY + bounds.y * scaleY,
+        bounds.width * scaleX,
+        bounds.height * scaleY
       );
     }
   }

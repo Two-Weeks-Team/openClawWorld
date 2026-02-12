@@ -9,6 +9,7 @@ import { ClientCollisionSystem } from '../../systems/CollisionSystem';
 import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
 import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
+import { ZONE_BOUNDS, ZONE_COLORS, DEBUG_COLORS, DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
 
 interface MapObject {
   id: number;
@@ -35,8 +36,12 @@ export class GameScene extends Phaser.Scene {
   private map?: Phaser.Tilemaps.Tilemap;
   private marker?: Phaser.GameObjects.Graphics;
   private collisionDebug?: Phaser.GameObjects.Graphics;
+  private zoneDebug?: Phaser.GameObjects.Graphics;
   private debugEnabled = false;
   private debugIndicator?: Phaser.GameObjects.Text;
+  private debugInfoPanel?: Phaser.GameObjects.Container;
+  private debugLegend?: Phaser.GameObjects.Container;
+  private debugZoneLabels: Phaser.GameObjects.Text[] = [];
   private interactionPrompt?: Phaser.GameObjects.Container;
   private nearbyObject?: MapObject;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -539,32 +544,241 @@ export class GameScene extends Phaser.Scene {
       this.collisionDebug = this.add.graphics();
       this.collisionDebug.setDepth(1000);
     }
+    if (!this.zoneDebug) {
+      this.zoneDebug = this.add.graphics();
+      this.zoneDebug.setDepth(999);
+    }
 
     this.collisionDebug.clear();
+    this.zoneDebug.clear();
 
     if (this.debugIndicator) this.debugIndicator.destroy();
+    if (this.debugLegend) this.debugLegend.destroy();
+    if (this.debugInfoPanel) this.debugInfoPanel.destroy();
+    this.debugZoneLabels.forEach(label => label.destroy());
+    this.debugZoneLabels = [];
 
-    if (this.debugEnabled && this.map) {
-      this.debugIndicator = this.add.text(10, 10, 'DEBUG: Collision ON (F3)', {
-        fontSize: '12px',
-        color: '#ff0000',
-        backgroundColor: '#000000',
-        padding: { x: 4, y: 2 },
-      });
-      this.debugIndicator.setScrollFactor(0);
-      this.debugIndicator.setDepth(2000);
+    if (!this.debugEnabled || !this.map) return;
 
-      const collisionLayer = this.map.getLayer('collision');
-      if (collisionLayer) {
-        collisionLayer.data.forEach((row, y) => {
-          row.forEach((tile, x) => {
-            if (tile.index > 0) {
-              this.collisionDebug?.fillStyle(0xff0000, 0.3);
-              this.collisionDebug?.fillRect(x * 32, y * 32, 32, 32);
-            }
-          });
-        });
+    this.drawDebugMapBoundary();
+    this.drawDebugZones();
+    this.drawDebugCollisionTiles();
+    this.drawDebugSpawnPoint();
+    this.createDebugLegend();
+    this.createDebugInfoPanel();
+  }
+
+  private drawDebugMapBoundary(): void {
+    if (!this.map || !this.zoneDebug) return;
+    const mapWidth = this.map.width * 32;
+    const mapHeight = this.map.height * 32;
+
+    this.zoneDebug.lineStyle(3, DEBUG_COLORS.mapBorder, 0.8);
+    this.zoneDebug.strokeRect(0, 0, mapWidth, mapHeight);
+  }
+
+  private drawDebugZones(): void {
+    if (!this.zoneDebug) return;
+
+    const myEntity = gameClient.entityId ? this.entityData.get(gameClient.entityId) : null;
+    const currentZone = myEntity
+      ? (myEntity as unknown as { currentZone?: ZoneId }).currentZone
+      : null;
+
+    for (const [zoneId, bounds] of Object.entries(ZONE_BOUNDS) as [
+      ZoneId,
+      (typeof ZONE_BOUNDS)[ZoneId],
+    ][]) {
+      const color = ZONE_COLORS[zoneId];
+      const isCurrentZone = zoneId === currentZone;
+
+      this.zoneDebug.fillStyle(color, isCurrentZone ? 0.35 : 0.15);
+      this.zoneDebug.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+      this.zoneDebug.lineStyle(isCurrentZone ? 3 : 2, color, isCurrentZone ? 1 : 0.6);
+      this.zoneDebug.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+
+      if (isCurrentZone) {
+        this.zoneDebug.lineStyle(2, DEBUG_COLORS.currentZone, 0.8);
+        this.zoneDebug.strokeRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
       }
+
+      const label = this.add.text(
+        bounds.x + bounds.width / 2,
+        bounds.y + 12,
+        zoneId.toUpperCase(),
+        { fontSize: '10px', color: '#ffffff', fontStyle: 'bold' }
+      );
+      label.setOrigin(0.5, 0);
+      label.setDepth(1001);
+      label.setAlpha(0.8);
+      this.debugZoneLabels.push(label);
+    }
+  }
+
+  private drawDebugCollisionTiles(): void {
+    if (!this.map || !this.collisionDebug) return;
+
+    const collisionLayer = this.map.getLayer('collision');
+    if (!collisionLayer) return;
+
+    let blockedCount = 0;
+    collisionLayer.data.forEach((row, y) => {
+      row.forEach((tile, x) => {
+        if (tile.index > 0) {
+          blockedCount++;
+          this.collisionDebug?.fillStyle(DEBUG_COLORS.collision, 0.4);
+          this.collisionDebug?.fillRect(x * 32, y * 32, 32, 32);
+          this.collisionDebug?.lineStyle(1, DEBUG_COLORS.collision, 0.6);
+          this.collisionDebug?.strokeRect(x * 32, y * 32, 32, 32);
+        }
+      });
+    });
+
+    (this as unknown as { _debugBlockedCount: number })._debugBlockedCount = blockedCount;
+  }
+
+  private drawDebugSpawnPoint(): void {
+    if (!this.zoneDebug) return;
+
+    const { x: spawnX, y: spawnY } = DEFAULT_SPAWN_POINT;
+    const size = 16;
+
+    this.zoneDebug.fillStyle(DEBUG_COLORS.spawn, 0.8);
+    this.zoneDebug.fillCircle(spawnX, spawnY, size);
+    this.zoneDebug.lineStyle(2, 0x000000, 1);
+    this.zoneDebug.strokeCircle(spawnX, spawnY, size);
+
+    this.zoneDebug.lineStyle(3, DEBUG_COLORS.spawn, 1);
+    this.zoneDebug.lineBetween(spawnX, spawnY - size - 5, spawnX, spawnY - size + 5);
+    this.zoneDebug.lineBetween(spawnX - 5, spawnY - size, spawnX + 5, spawnY - size);
+  }
+
+  private createDebugLegend(): void {
+    const x = 10;
+    const y = 10;
+    const lineHeight = 16;
+    const boxSize = 12;
+
+    this.debugLegend = this.add.container(x, y);
+    this.debugLegend.setScrollFactor(0);
+    this.debugLegend.setDepth(2000);
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x000000, 0.85);
+    bg.fillRoundedRect(0, 0, 180, 200, 6);
+    this.debugLegend.add(bg);
+
+    const title = this.add.text(8, 6, 'DEBUG MODE (F3)', {
+      fontSize: '11px',
+      color: '#ffff00',
+      fontStyle: 'bold',
+    });
+    this.debugLegend.add(title);
+
+    const items: Array<{ label: string; color: number; type: 'fill' | 'stroke' }> = [
+      { label: 'Collision Tiles', color: DEBUG_COLORS.collision, type: 'fill' },
+      { label: 'Map Boundary', color: DEBUG_COLORS.mapBorder, type: 'stroke' },
+      { label: 'Spawn Point', color: DEBUG_COLORS.spawn, type: 'fill' },
+      { label: 'Current Zone', color: DEBUG_COLORS.currentZone, type: 'stroke' },
+    ];
+
+    const zoneItems: Array<{ label: string; color: number }> = [
+      { label: 'Plaza', color: ZONE_COLORS.plaza },
+      { label: 'North Block', color: ZONE_COLORS['north-block'] },
+      { label: 'West Block', color: ZONE_COLORS['west-block'] },
+      { label: 'East Block', color: ZONE_COLORS['east-block'] },
+      { label: 'South Block', color: ZONE_COLORS['south-block'] },
+      { label: 'Lake', color: ZONE_COLORS.lake },
+    ];
+
+    let yOffset = 24;
+
+    for (const item of items) {
+      const itemGfx = this.add.graphics();
+      if (item.type === 'fill') {
+        itemGfx.fillStyle(item.color, 0.8);
+        itemGfx.fillRect(8, yOffset, boxSize, boxSize);
+      } else {
+        itemGfx.lineStyle(2, item.color, 1);
+        itemGfx.strokeRect(8, yOffset, boxSize, boxSize);
+      }
+      this.debugLegend.add(itemGfx);
+
+      const itemLabel = this.add.text(26, yOffset, item.label, {
+        fontSize: '10px',
+        color: '#ffffff',
+      });
+      this.debugLegend.add(itemLabel);
+      yOffset += lineHeight;
+    }
+
+    yOffset += 4;
+    const zoneSeparator = this.add.text(8, yOffset, '--- Zones ---', {
+      fontSize: '9px',
+      color: '#888888',
+    });
+    this.debugLegend.add(zoneSeparator);
+    yOffset += 14;
+
+    for (const zone of zoneItems) {
+      const zoneGfx = this.add.graphics();
+      zoneGfx.fillStyle(zone.color, 0.6);
+      zoneGfx.fillRect(8, yOffset, boxSize, boxSize);
+      zoneGfx.lineStyle(1, zone.color, 1);
+      zoneGfx.strokeRect(8, yOffset, boxSize, boxSize);
+      this.debugLegend.add(zoneGfx);
+
+      const zoneLabel = this.add.text(26, yOffset, zone.label, {
+        fontSize: '10px',
+        color: '#ffffff',
+      });
+      this.debugLegend.add(zoneLabel);
+      yOffset += lineHeight;
+    }
+  }
+
+  private createDebugInfoPanel(): void {
+    const screenWidth = this.cameras.main.width;
+    const x = screenWidth - 200;
+    const y = 10;
+
+    this.debugInfoPanel = this.add.container(x, y);
+    this.debugInfoPanel.setScrollFactor(0);
+    this.debugInfoPanel.setDepth(2000);
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x000000, 0.85);
+    bg.fillRoundedRect(0, 0, 190, 100, 6);
+    this.debugInfoPanel.add(bg);
+
+    const myEntity = gameClient.entityId ? this.entityData.get(gameClient.entityId) : null;
+    const currentZone = myEntity
+      ? ((myEntity as unknown as { currentZone?: ZoneId }).currentZone ?? 'none')
+      : 'N/A';
+    const tile = myEntity?.tile ?? { tx: 0, ty: 0 };
+    const pos = myEntity?.pos ?? { x: 0, y: 0 };
+    const blockedCount =
+      (this as unknown as { _debugBlockedCount?: number })._debugBlockedCount ?? 0;
+
+    const isBlocked = this.clientCollision?.isBlocked(tile.tx, tile.ty) ?? false;
+
+    const lines = [
+      `Tile: (${tile.tx}, ${tile.ty})`,
+      `Position: (${Math.round(pos.x)}, ${Math.round(pos.y)})`,
+      `Zone: ${currentZone}`,
+      `Blocked: ${isBlocked ? 'YES' : 'no'}`,
+      `Total blocked tiles: ${blockedCount}`,
+    ];
+
+    let yOffset = 8;
+    for (const line of lines) {
+      const text = this.add.text(8, yOffset, line, {
+        fontSize: '11px',
+        color: line.includes('YES') ? '#ff6666' : '#ffffff',
+      });
+      this.debugInfoPanel.add(text);
+      yOffset += 16;
     }
   }
 
@@ -967,6 +1181,14 @@ export class GameScene extends Phaser.Scene {
     this.updateMinimap();
     this.skillBar?.update(now);
     this.castBar?.update(now);
+    this.updateDebugInfoPanel();
+  }
+
+  private updateDebugInfoPanel(): void {
+    if (!this.debugEnabled || !this.debugInfoPanel) return;
+
+    this.debugInfoPanel.destroy();
+    this.createDebugInfoPanel();
   }
 
   private updateMinimap(): void {

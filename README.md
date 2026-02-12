@@ -184,7 +184,7 @@ cd openClawWorld
 claude
 
 # Run the resident agent loop
-/openclaw-resident-agent-loop --stress=medium --agents=10
+/openclaw-resident-agent-loop --stress medium --agents 10
 ```
 
 See [.claude/README.md](.claude/README.md) for detailed installation and usage instructions.

@@ -42,7 +42,7 @@ Runs an autonomous agent loop that continuously tests the OpenClawWorld server a
 /openclaw-resident-agent-loop
 
 # With arguments:
-/openclaw-resident-agent-loop --stress=high --agents=20
+/openclaw-resident-agent-loop --stress high --agents 20
 /openclaw-resident-agent-loop --chaos --dry-run
 ```
 

@@ -27,6 +27,7 @@
     "dev:server": "pnpm --filter @openclawworld/server dev",
     "dev:client": "pnpm --filter @openclawworld/client dev",
     "load-test": "tsx scripts/load-test.ts",
+    "resident-agent-loop": "tsx scripts/resident-agent-loop.ts",
     "extract:assets": "python tools/extract_assets/extract.py --all"
   },
   "devDependencies": {

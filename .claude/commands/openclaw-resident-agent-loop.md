@@ -1,7 +1,7 @@
 ---
 description: "OpenClawWorld Issue-First Autonomous Society Orchestrator - Continuous world simulation and bug discovery with GitHub issue output only"
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep, Task, WebFetch
-argument-hint: [--stress=low|medium|high] [--agents=N] [--chaos] [--dry-run] [--resume]
+argument-hint: [--stress low|medium|high] [--agents N] [--chaos] [--dry-run] [--resume]
 ---
 
 # /openclaw-resident-agent-loop - Issue-First Autonomous Society Orchestrator

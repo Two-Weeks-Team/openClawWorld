@@ -11,8 +11,9 @@
  */
 
 import { randomBytes } from 'crypto';
-import { execSync, spawn } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
+import { homedir } from 'os';
 import { join } from 'path';
 
 // ============================================================================
@@ -139,7 +140,7 @@ const ISSUE_AREAS = [
   'Docs',
 ] as const;
 
-const STATE_DIR = join(process.env.HOME || '~', '.openclaw-resident-agent');
+const STATE_DIR = join(homedir(), '.openclaw-resident-agent');
 const STATE_FILE = join(STATE_DIR, 'state.json');
 const ARTIFACTS_DIR = join(process.cwd(), 'artifacts', 'resident-agent');
 
@@ -232,8 +233,20 @@ class GitHubIssueReporter {
         .replace(/\[.*?\]/g, '')
         .trim()
         .substring(0, 50);
-      const result = execSync(
-        `gh issue list --state open --search "${searchTitle}" --json number,title --limit 10`,
+      const result = execFileSync(
+        'gh',
+        [
+          'issue',
+          'list',
+          '--state',
+          'open',
+          '--search',
+          searchTitle,
+          '--json',
+          'number,title',
+          '--limit',
+          '10',
+        ],
         { encoding: 'utf-8' }
       );
       const issues = JSON.parse(result);
@@ -262,8 +275,9 @@ class GitHubIssueReporter {
 
     try {
       const labels = ['resident-agent', issue.area.toLowerCase(), issue.severity.toLowerCase()];
-      const result = execSync(
-        `gh issue create --title "${title.replace(/"/g, '\\"')}" --body "${body.replace(/"/g, '\\"').replace(/\n/g, '\\n')}" --label "${labels.join(',')}"`,
+      const result = execFileSync(
+        'gh',
+        ['issue', 'create', '--title', title, '--body', body, '--label', labels.join(',')],
         { encoding: 'utf-8' }
       );
       const issueUrl = result.trim();
@@ -282,7 +296,7 @@ class GitHubIssueReporter {
     }
 
     try {
-      execSync(`gh issue comment ${issueNumber} --body "${comment.replace(/"/g, '\\"')}"`, {
+      execFileSync('gh', ['issue', 'comment', issueNumber, '--body', comment], {
         encoding: 'utf-8',
       });
     } catch (error) {
@@ -701,7 +715,6 @@ class ResidentAgent {
       }
       this.state.lastAction = 'observe';
     } catch (error) {
-      this.state.errorCount++;
       throw error;
     }
   }
@@ -725,7 +738,6 @@ class ResidentAgent {
       if (!response.ok) throw new Error(`Move failed: ${response.status}`);
       this.state.lastAction = `moveTo(${tx}, ${ty})`;
     } catch (error) {
-      this.state.errorCount++;
       throw error;
     }
   }
@@ -750,7 +762,6 @@ class ResidentAgent {
       if (!response.ok) throw new Error(`Chat failed: ${response.status}`);
       this.state.lastAction = `chat("${message.substring(0, 20)}...")`;
     } catch (error) {
-      this.state.errorCount++;
       throw error;
     }
   }
@@ -784,7 +795,6 @@ class ResidentAgent {
         );
       }
     } catch (error) {
-      this.state.errorCount++;
       throw error;
     }
   }
@@ -953,9 +963,11 @@ class ResidentAgentLoop {
     for (let i = 0; i < this.config.agentCount; i++) {
       const role = ROLES[i % ROLES.length];
       const agent = new ResidentAgent(this.config.serverUrl, role, this.config.cycleDelayMs);
-      await agent.register(this.config.roomId);
-      this.agents.push(agent);
-      this.state.agents.push(agent.getState().agentId);
+      const registered = await agent.register(this.config.roomId);
+      if (registered) {
+        this.agents.push(agent);
+        this.state.agents.push(agent.getState().agentId);
+      }
     }
 
     console.log(`✅ ${this.agents.length} agents initialized`);
@@ -1002,12 +1014,19 @@ class ResidentAgentLoop {
     for (let i = 0; i < count; i++) {
       const agentRole = role || ROLES[Math.floor(Math.random() * ROLES.length)];
       const agent = new ResidentAgent(this.config.serverUrl, agentRole, this.config.cycleDelayMs);
-      agent.register(this.config.roomId).then(() => {
-        agent.start();
-      });
-      this.agents.push(agent);
+      agent
+        .register(this.config.roomId)
+        .then(success => {
+          if (success) {
+            this.agents.push(agent);
+            this.state.agentCount = this.agents.length;
+            void agent.start();
+          }
+        })
+        .catch(err => {
+          console.error('  Failed to add agent:', err);
+        });
     }
-    this.state.agentCount = this.agents.length;
   }
 
   setCycleDelay(ms: number): void {
@@ -1064,7 +1083,12 @@ function parseArgs(): Config {
       case '--agents':
       case '-a':
         if (nextArg) {
-          config.agentCount = parseInt(nextArg, 10);
+          const parsed = parseInt(nextArg, 10);
+          if (!Number.isNaN(parsed) && parsed > 0) {
+            config.agentCount = parsed;
+          } else {
+            console.warn(`Invalid --agents value: ${nextArg}, using default`);
+          }
           i++;
         }
         break;
@@ -1097,7 +1121,12 @@ function parseArgs(): Config {
         break;
       case '--delay':
         if (nextArg) {
-          config.cycleDelayMs = parseInt(nextArg, 10);
+          const parsed = parseInt(nextArg, 10);
+          if (!Number.isNaN(parsed) && parsed > 0) {
+            config.cycleDelayMs = parsed;
+          } else {
+            console.warn(`Invalid --delay value: ${nextArg}, using default`);
+          }
           i++;
         }
         break;

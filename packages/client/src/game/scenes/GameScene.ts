@@ -354,21 +354,27 @@ export class GameScene extends Phaser.Scene {
       const displayName = ZONE_DISPLAY_NAMES[zoneId];
       const color = ZONE_COLORS[zoneId];
 
-      const label = this.add.text(bounds.x + bounds.width / 2, bounds.y + 20, displayName, {
-        fontSize: '14px',
-        color: '#ffffff',
-        fontStyle: 'bold',
-        stroke: '#000000',
-        strokeThickness: 3,
-        shadow: {
-          offsetX: 1,
-          offsetY: 1,
-          color: '#000000',
-          blur: 2,
-          stroke: true,
-          fill: true,
-        },
-      });
+      const labelOffsetY = Math.max(8, Math.min(24, bounds.height * 0.08));
+      const label = this.add.text(
+        bounds.x + bounds.width / 2,
+        bounds.y + labelOffsetY,
+        displayName,
+        {
+          fontSize: '16px',
+          color: '#ffffff',
+          fontStyle: 'bold',
+          stroke: '#000000',
+          strokeThickness: 3,
+          shadow: {
+            offsetX: 1,
+            offsetY: 1,
+            color: '#000000',
+            blur: 2,
+            stroke: true,
+            fill: true,
+          },
+        }
+      );
       label.setOrigin(0.5, 0);
       label.setDepth(50);
       label.setAlpha(0.85);
@@ -379,7 +385,7 @@ export class GameScene extends Phaser.Scene {
       bg.fillStyle(color, 0.3);
       bg.fillRoundedRect(
         bounds.x + bounds.width / 2 - bgWidth / 2,
-        bounds.y + 16,
+        bounds.y + labelOffsetY - 4,
         bgWidth,
         bgHeight,
         4
@@ -660,11 +666,12 @@ export class GameScene extends Phaser.Scene {
         this.zoneDebug.strokeRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
       }
 
+      const debugLabelOffsetY = Math.max(6, Math.min(16, bounds.height * 0.05));
       const label = this.add.text(
         bounds.x + bounds.width / 2,
-        bounds.y + 12,
+        bounds.y + debugLabelOffsetY,
         zoneId.toUpperCase(),
-        { fontSize: '10px', color: '#ffffff', fontStyle: 'bold' }
+        { fontSize: '12px', color: '#ffffff', fontStyle: 'bold' }
       );
       label.setOrigin(0.5, 0);
       label.setDepth(1001);

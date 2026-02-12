@@ -18,6 +18,45 @@ import { MAP_CONFIG, ZONE_IDS, ZONE_BOUNDS } from '@openclawworld/shared';
 function isValidZoneId(value: string): value is ZoneId {
   return (ZONE_IDS as readonly string[]).includes(value);
 }
+
+// Cached static zone data (zones and mapSize never change at runtime)
+let cachedStaticZonesData: { zones: ZoneInfo[]; mapSize: MapMetadata['mapSize'] } | null = null;
+
+function getStaticZonesData(gameRoom: GameRoom): {
+  zones: ZoneInfo[];
+  mapSize: MapMetadata['mapSize'];
+} {
+  if (cachedStaticZonesData) {
+    return cachedStaticZonesData;
+  }
+
+  const worldPack = gameRoom.getWorldPack();
+  const zones: ZoneInfo[] = [];
+
+  for (const zoneId of ZONE_IDS) {
+    const bounds = ZONE_BOUNDS[zoneId];
+    const zoneMapData = worldPack?.maps.get(zoneId);
+    const entrances = zoneMapData?.entrances ?? [];
+
+    zones.push({
+      id: zoneId,
+      bounds,
+      entrances,
+    });
+  }
+
+  cachedStaticZonesData = {
+    zones,
+    mapSize: {
+      width: MAP_CONFIG.pixelWidth,
+      height: MAP_CONFIG.pixelHeight,
+      tileSize: MAP_CONFIG.tileSize,
+    },
+  };
+
+  return cachedStaticZonesData;
+}
+
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
 import type { FacilitySchema } from '../../schemas/FacilitySchema.js';
@@ -92,29 +131,12 @@ function createErrorResponse(
 }
 
 function buildMapMetadata(gameRoom: GameRoom, currentZone: string | null): MapMetadata {
-  const worldPack = gameRoom.getWorldPack();
-  const zones: ZoneInfo[] = [];
-
-  for (const zoneId of ZONE_IDS) {
-    const bounds = ZONE_BOUNDS[zoneId];
-    const zoneMapData = worldPack?.maps.get(zoneId);
-    const entrances = zoneMapData?.entrances ?? [];
-
-    zones.push({
-      id: zoneId,
-      bounds,
-      entrances,
-    });
-  }
+  const staticData = getStaticZonesData(gameRoom);
 
   return {
     currentZone: currentZone && isValidZoneId(currentZone) ? currentZone : null,
-    zones,
-    mapSize: {
-      width: MAP_CONFIG.pixelWidth,
-      height: MAP_CONFIG.pixelHeight,
-      tileSize: MAP_CONFIG.tileSize,
-    },
+    zones: staticData.zones,
+    mapSize: staticData.mapSize,
   };
 }
 

@@ -196,6 +196,14 @@ const API_HISTORY_MAX_LENGTH = 100;
 const INTERACTION_HISTORY_MAX_LENGTH = 50;
 const ACTION_LOG_MAX_LENGTH = 20;
 
+const CANDIDATE_STARVATION_MIN_CYCLES = 20;
+const CANDIDATE_STARVATION_CONSECUTIVE_EMPTY_REQUIRED = 8;
+const CANDIDATE_STARVATION_RECENT_OBSERVE_WINDOW_MS = 15000;
+const CANDIDATE_STARVATION_MIN_MOVE_ATTEMPTS = 5;
+const CANDIDATE_STARVATION_MIN_TRAVEL_DISTANCE_PX = 256;
+const CANDIDATE_STARVATION_GRACE_PERIOD_MS = 30000;
+const CANDIDATE_STARVATION_COOLDOWN_MS = 30 * 60 * 1000;
+
 const ENDPOINT_TO_CATEGORY: Record<string, string> = {
   observe: 'observe',
   moveTo: 'navigate',
@@ -754,6 +762,12 @@ class IssueDetector {
   private recentlyReportedAreas: Map<string, number> = new Map();
   private currentCycle = 0;
 
+  private consecutiveEmptyCycles: Map<string, number> = new Map();
+  private agentRegisterTimes: Map<string, number> = new Map();
+  private agentStarvationCooldowns: Map<string, number> = new Map();
+  private agentPositionHistory: Map<string, Array<{ x: number; y: number; timestamp: number }>> =
+    new Map();
+
   private isOnCooldown(area: string): boolean {
     const lastReported = this.recentlyReportedAreas.get(area);
     if (lastReported === undefined) return false;
@@ -766,6 +780,34 @@ class IssueDetector {
 
   incrementCycle(): void {
     this.currentCycle++;
+  }
+
+  recordAgentRegister(agentId: string): void {
+    this.agentRegisterTimes.set(agentId, Date.now());
+    this.consecutiveEmptyCycles.set(agentId, 0);
+  }
+
+  recordAgentPosition(agentId: string, x: number, y: number): void {
+    const history = this.agentPositionHistory.get(agentId) ?? [];
+    history.push({ x, y, timestamp: Date.now() });
+    if (history.length > 20) history.shift();
+    this.agentPositionHistory.set(agentId, history);
+  }
+
+  private getTravelDistanceRecent(agentId: string, withinMs: number): number {
+    const history = this.agentPositionHistory.get(agentId) ?? [];
+    if (history.length < 2) return 0;
+    const now = Date.now();
+    const recentHistory = history.filter(h => now - h.timestamp <= withinMs);
+    if (recentHistory.length < 2) return 0;
+    let totalDistance = 0;
+    for (let i = 1; i < recentHistory.length; i++) {
+      totalDistance += Math.hypot(
+        recentHistory[i].x - recentHistory[i - 1].x,
+        recentHistory[i].y - recentHistory[i - 1].y
+      );
+    }
+    return totalDistance;
   }
 
   private buildAgentStates(agents: ResidentAgent[]): AgentStateSnapshot[] {
@@ -1351,29 +1393,79 @@ class IssueDetector {
   }
 
   detectCandidateStarvation(agents: ResidentAgent[]): Issue | null {
+    const now = Date.now();
+
     for (const agent of agents) {
       const state = agent.getState();
-      if (state.cycleCount < 10) continue;
 
-      if (state.observedFacilities.size === 0 && state.observedEntities.size === 0) {
+      if (state.role === 'afk' || state.role === 'observer') continue;
+
+      if (state.cycleCount < CANDIDATE_STARVATION_MIN_CYCLES) continue;
+
+      const registerTime = this.agentRegisterTimes.get(state.agentId) ?? 0;
+      if (now - registerTime < CANDIDATE_STARVATION_GRACE_PERIOD_MS) continue;
+
+      const cooldownExpiry = this.agentStarvationCooldowns.get(state.agentId) ?? 0;
+      if (now < cooldownExpiry) continue;
+
+      this.recordAgentPosition(state.agentId, state.position.x, state.position.y);
+
+      const isEmpty = state.observedFacilities.size === 0 && state.observedEntities.size === 0;
+
+      if (isEmpty) {
+        const currentCount = (this.consecutiveEmptyCycles.get(state.agentId) ?? 0) + 1;
+        this.consecutiveEmptyCycles.set(state.agentId, currentCount);
+
+        if (currentCount < CANDIDATE_STARVATION_CONSECUTIVE_EMPTY_REQUIRED) continue;
+
+        const recentObserves = state.apiCallHistory.filter(
+          h =>
+            h.endpoint === 'observe' &&
+            h.success &&
+            now - h.timestamp <= CANDIDATE_STARVATION_RECENT_OBSERVE_WINDOW_MS
+        );
+        if (recentObserves.length === 0) continue;
+
+        const recentMoveAttempts = state.apiCallHistory.filter(
+          h => h.endpoint === 'moveTo' && now - h.timestamp <= 60000
+        ).length;
+        const travelDistance = this.getTravelDistanceRecent(state.agentId, 60000);
+
+        const hasMovementEvidence =
+          recentMoveAttempts >= CANDIDATE_STARVATION_MIN_MOVE_ATTEMPTS ||
+          travelDistance >= CANDIDATE_STARVATION_MIN_TRAVEL_DISTANCE_PX;
+
+        if (!hasMovementEvidence) continue;
+
+        this.agentStarvationCooldowns.set(state.agentId, now + CANDIDATE_STARVATION_COOLDOWN_MS);
+
         return {
           area: 'Movement',
           title: `Candidate starvation for ${state.agentId}`,
-          description: 'Agent has been running for 10+ cycles but sees no facilities or entities',
+          description: `Agent has been running for ${state.cycleCount}+ cycles with ${currentCount} consecutive empty observations`,
           expectedBehavior: 'Agent should navigate to areas with facilities and entities',
-          observedBehavior: 'Empty observedFacilities and observedEntities after 10+ cycles',
-          reproductionSteps: ['Run agent for 10+ cycles', 'Check if observedFacilities is empty'],
+          observedBehavior: `Empty observedFacilities and observedEntities for ${currentCount} consecutive cycles despite movement attempts`,
+          reproductionSteps: [
+            `Run agent for ${CANDIDATE_STARVATION_MIN_CYCLES}+ cycles`,
+            `Verify ${CANDIDATE_STARVATION_CONSECUTIVE_EMPTY_REQUIRED}+ consecutive empty observations`,
+            'Check movement evidence exists',
+          ],
           severity: 'Minor',
           frequency: 'rare',
           evidence: {
             agentIds: [state.agentId],
-            timestamps: [Date.now()],
+            timestamps: [now],
             logs: [
               `Cycle count: ${state.cycleCount}`,
+              `Consecutive empty: ${currentCount}`,
               `Position: (${state.position.x}, ${state.position.y})`,
+              `Recent move attempts: ${recentMoveAttempts}`,
+              `Travel distance (60s): ${Math.round(travelDistance)}px`,
             ],
           },
         };
+      } else {
+        this.consecutiveEmptyCycles.set(state.agentId, 0);
       }
     }
     return null;
@@ -2316,6 +2408,7 @@ class ResidentAgentLoop {
       if (registered) {
         this.agents.push(agent);
         this.state.agents.push(agent.getState().agentId);
+        this.issueDetector.recordAgentRegister(agent.getState().agentId);
       }
     }
 
@@ -2382,6 +2475,7 @@ class ResidentAgentLoop {
             this.agents.push(agent);
             this.state.agents.push(agent.getState().agentId);
             this.state.agentCount = this.agents.length;
+            this.issueDetector.recordAgentRegister(agent.getState().agentId);
             void agent.start();
           }
         })

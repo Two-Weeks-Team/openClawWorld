@@ -2,10 +2,10 @@
   "id": "ranger",
   "name": "River the Ranger",
   "sprite": "npc-ranger",
-  "zone": "lake",
-  "defaultPosition": { "x": 1408, "y": 1408 },
+  "zone": "central-park",
+  "defaultPosition": { "x": 1024, "y": 800 },
   "schedule": [
-    { "startHour": 6, "endHour": 18, "state": "patrolling", "position": { "x": 1408, "y": 1408 } }
+    { "startHour": 6, "endHour": 18, "state": "patrolling", "position": { "x": 1024, "y": 800 } }
   ],
   "dialogue": {
     "greeting": {

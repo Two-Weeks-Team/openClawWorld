@@ -643,8 +643,16 @@ export type TeamMember = {
   joinedAt: number;
 };
 
-// Zones
-export type ZoneId = 'plaza' | 'north-block' | 'west-block' | 'east-block' | 'south-block' | 'lake';
+// Zones (8 detailed zones based on map layout)
+export type ZoneId =
+  | 'lobby' // Top-left: Reception, entrance
+  | 'office' // Top-right: Workstations, kanban board
+  | 'central-park' // Center: Green space, benches
+  | 'arcade' // Middle-right: Game cabinets, entertainment
+  | 'meeting' // Bottom-left: Meeting rooms (Room A, C)
+  | 'lounge-cafe' // Bottom-center: Cafe counter, seating
+  | 'plaza' // Bottom-right: Fountain, social hub
+  | 'lake'; // Top-left corner: Water feature (blocked)
 
 export type Zone = {
   id: ZoneId;

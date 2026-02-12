@@ -31,19 +31,20 @@ function createTestPack(
   mkdirSync(resolve(TEST_PACK_PATH, 'npcs'), { recursive: true });
 
   if (!overrides.skipManifest) {
+    const defaultZones = overrides.zones ?? ['lobby'];
     const manifest = {
       name: 'test-pack',
       version: '1.0.0',
       description: 'Test pack',
-      zones: (overrides.zones ?? ['plaza']) as ZoneId[],
-      entryZone: 'plaza' as ZoneId,
+      zones: defaultZones as ZoneId[],
+      entryZone: 'lobby' as ZoneId,
       ...overrides.manifest,
     };
     writeFileSync(resolve(TEST_PACK_PATH, 'manifest.json'), JSON.stringify(manifest, null, 2));
   }
 
   if (!overrides.skipMaps) {
-    const zones = overrides.zones ?? ['plaza'];
+    const zones = overrides.zones ?? ['lobby'];
     for (const zoneId of zones) {
       if (overrides.invalidMapJson) {
         writeFileSync(resolve(TEST_PACK_PATH, 'maps', `${zoneId}.json`), 'invalid json');
@@ -143,13 +144,14 @@ describe('WorldPackLoader', () => {
     });
 
     it('loads pack with multiple zones', () => {
-      createTestPack({ zones: ['plaza', 'north-block'] });
+      createTestPack({ zones: ['lobby', 'plaza', 'office'] });
       const loader = new WorldPackLoader(TEST_PACK_PATH);
       const pack = loader.loadPack();
 
-      expect(pack.maps.size).toBe(2);
+      expect(pack.maps.size).toBe(3);
+      expect(pack.maps.has('lobby' as const)).toBe(true);
       expect(pack.maps.has('plaza' as const)).toBe(true);
-      expect(pack.maps.has('north-block' as const)).toBe(true);
+      expect(pack.maps.has('office' as const)).toBe(true);
     });
   });
 
@@ -185,7 +187,7 @@ describe('WorldPackLoader', () => {
           name: 'test',
           version: '1.0.0',
           zones: ['plaza'],
-          entryZone: 'north-block',
+          entryZone: 'office',
         })
       );
 
@@ -200,9 +202,9 @@ describe('WorldPackLoader', () => {
       const loader = new WorldPackLoader(TEST_PACK_PATH);
       loader.loadPack();
 
-      const zoneMap = loader.getZoneMap('plaza');
+      const zoneMap = loader.getZoneMap('lobby');
       expect(zoneMap).toBeDefined();
-      expect(zoneMap?.zoneId).toBe('plaza');
+      expect(zoneMap?.zoneId).toBe('lobby');
       expect(zoneMap?.width).toBe(10);
       expect(zoneMap?.height).toBe(10);
     });
@@ -212,7 +214,7 @@ describe('WorldPackLoader', () => {
       const loader = new WorldPackLoader(TEST_PACK_PATH);
       loader.loadPack();
 
-      const zoneMap = loader.getZoneMap('nonexistent' as 'plaza');
+      const zoneMap = loader.getZoneMap('nonexistent' as 'lobby');
       expect(zoneMap).toBeUndefined();
     });
 
@@ -231,12 +233,12 @@ describe('WorldPackLoader', () => {
 
   describe('getAllZoneMaps', () => {
     it('returns all loaded zone maps', () => {
-      createTestPack({ zones: ['plaza', 'north-block'] });
+      createTestPack({ zones: ['lobby', 'plaza', 'office'] });
       const loader = new WorldPackLoader(TEST_PACK_PATH);
       loader.loadPack();
 
       const allMaps = loader.getAllZoneMaps();
-      expect(allMaps.size).toBe(2);
+      expect(allMaps.size).toBe(3);
     });
 
     it('returns empty map before pack is loaded', () => {
@@ -268,8 +270,8 @@ describe('WorldPackLoader', () => {
 
       expect(pack.manifest.name).toBe('base');
       expect(pack.manifest.zones).toContain('plaza');
-      expect(pack.manifest.zones).toContain('north-block');
-      expect(pack.manifest.entryZone).toBe('plaza');
+      expect(pack.manifest.zones).toContain('office');
+      expect(pack.manifest.entryZone).toBe('lobby');
     });
 
     it('has correct zone data for plaza', () => {
@@ -292,9 +294,9 @@ describe('MapLoader zone support', () => {
     it('loads zone map from pack path', () => {
       createTestPack();
       const loader = new MapLoader();
-      const parsedMap = loader.loadZoneMap(TEST_PACK_PATH, 'plaza');
+      const parsedMap = loader.loadZoneMap(TEST_PACK_PATH, 'lobby');
 
-      expect(parsedMap.mapId).toBe('plaza');
+      expect(parsedMap.mapId).toBe('lobby');
       expect(parsedMap.width).toBe(10);
       expect(parsedMap.height).toBe(10);
     });
@@ -312,11 +314,11 @@ describe('MapLoader zone support', () => {
       const packLoader = new WorldPackLoader(TEST_PACK_PATH);
       packLoader.loadPack();
 
-      const zoneMapData = packLoader.getZoneMap('plaza')!;
+      const zoneMapData = packLoader.getZoneMap('lobby')!;
       const mapLoader = new MapLoader();
       const parsedMap = mapLoader.loadZoneMapFromData(zoneMapData);
 
-      expect(parsedMap.mapId).toBe('plaza');
+      expect(parsedMap.mapId).toBe('lobby');
       expect(parsedMap.tileSize).toBe(32);
       expect(parsedMap.collisionGrid.length).toBe(10);
     });
@@ -324,7 +326,7 @@ describe('MapLoader zone support', () => {
 
   describe('mergeZoneMaps', () => {
     it('merges multiple zone maps', () => {
-      createTestPack({ zones: ['plaza', 'north-block'] });
+      createTestPack({ zones: ['lobby', 'plaza', 'office'] });
       const packLoader = new WorldPackLoader(TEST_PACK_PATH);
       packLoader.loadPack();
 

@@ -2,6 +2,6 @@
   "name": "base",
   "version": "1.0.0",
   "description": "Grid-Town World - Base Pack",
-  "zones": ["plaza", "north-block", "west-block", "east-block", "south-block", "lake"],
-  "entryZone": "plaza"
+  "zones": ["lobby", "office", "central-park", "arcade", "meeting", "lounge-cafe", "plaza", "lake"],
+  "entryZone": "lobby"
 }

@@ -687,11 +687,13 @@ export class GameScene extends Phaser.Scene {
     ];
 
     const zoneItems: Array<{ label: string; color: number }> = [
+      { label: 'Lobby', color: ZONE_COLORS.lobby },
+      { label: 'Office', color: ZONE_COLORS.office },
+      { label: 'Central Park', color: ZONE_COLORS['central-park'] },
+      { label: 'Arcade', color: ZONE_COLORS.arcade },
+      { label: 'Meeting', color: ZONE_COLORS.meeting },
+      { label: 'Lounge Cafe', color: ZONE_COLORS['lounge-cafe'] },
       { label: 'Plaza', color: ZONE_COLORS.plaza },
-      { label: 'North Block', color: ZONE_COLORS['north-block'] },
-      { label: 'West Block', color: ZONE_COLORS['west-block'] },
-      { label: 'East Block', color: ZONE_COLORS['east-block'] },
-      { label: 'South Block', color: ZONE_COLORS['south-block'] },
       { label: 'Lake', color: ZONE_COLORS.lake },
     ];
 

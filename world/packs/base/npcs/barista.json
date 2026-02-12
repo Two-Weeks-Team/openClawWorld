@@ -2,12 +2,12 @@
   "id": "barista",
   "name": "Jamie the Barista",
   "sprite": "npc-barista",
-  "zone": "west-block",
-  "defaultPosition": { "x": 320, "y": 1024 },
+  "zone": "lounge-cafe",
+  "defaultPosition": { "x": 800, "y": 1440 },
   "schedule": [
-    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 320, "y": 1024 } },
-    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 370, "y": 1124 } },
-    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 320, "y": 1024 } }
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 800, "y": 1440 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 850, "y": 1500 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 800, "y": 1440 } }
   ],
   "dialogue": {
     "greeting": {

@@ -2,11 +2,13 @@ import Phaser from 'phaser';
 import type { ZoneId } from '@openclawworld/shared';
 
 const ZONE_DISPLAY_NAMES: Record<ZoneId, string> = {
-  plaza: 'Central Plaza',
-  'north-block': 'North Block',
-  'west-block': 'West Block',
-  'east-block': 'East Block',
-  'south-block': 'South Block',
+  lobby: 'Lobby',
+  office: 'Office',
+  'central-park': 'Central Park',
+  arcade: 'Arcade',
+  meeting: 'Meeting Center',
+  'lounge-cafe': 'Lounge Cafe',
+  plaza: 'Plaza',
   lake: 'Lake',
 };
 

@@ -1,0 +1,32 @@
+{
+  "id": "it-help",
+  "name": "Casey the IT Support",
+  "sprite": "npc-it",
+  "zone": "office",
+  "defaultPosition": { "x": 1728, "y": 256 },
+  "schedule": [
+    { "startHour": 9, "endHour": 18, "state": "working", "position": { "x": 1728, "y": 256 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 800, "y": 1440 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Hey! I'm Casey from IT Support. Having technical troubles? I'm your go-to person!",
+      "options": [
+        { "text": "My computer is slow!", "next": "slow-computer" },
+        { "text": "How do I use the kanban board?", "next": "kanban-help" },
+        { "text": "Everything's fine, thanks!", "next": null }
+      ]
+    },
+    "slow-computer": {
+      "id": "slow-computer",
+      "text": "Classic issue! Try closing some browser tabs first - I bet you have at least 50 open. If that doesn't work, try restarting. Still slow? Submit a ticket and I'll take a look!",
+      "options": [{ "text": "I'll try that!", "next": null }]
+    },
+    "kanban-help": {
+      "id": "kanban-help",
+      "text": "The kanban board is pretty intuitive! Just drag cards between columns: To Do, In Progress, and Done. You can also add new tasks with the + button. Talk to Jordan if you need to be added to a project!",
+      "options": [{ "text": "Thanks for the help!", "next": null }]
+    }
+  }
+}

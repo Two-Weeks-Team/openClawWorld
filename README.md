@@ -13,7 +13,7 @@
 
 - **Multiplayer Virtual World** - Real-time 2D top-down game environment (Grid-Town 64x64 map)
 - **Human & AI Coexistence** - Both human players and AI agents can interact in the same world
-- **Zone System** - 6 distinct zones: Plaza, North Block, West Block, East Block, South Block, Lake
+- **Zone System** - 8 distinct zones: Lobby, Office, Central Park, Arcade, Meeting, Lounge Cafe, Plaza, Lake
 - **WebSocket Communication** - Low-latency multiplayer via Colyseus
 - **AIC HTTP API** - RESTful API for AI agent integration with interactive docs
 - **Proximity Chat** - Chat bubbles appear above entities
@@ -40,14 +40,16 @@
 
 The game world uses the **Grid-Town** layout - a 64x64 tile map (2048x2048 pixels):
 
-| Zone            | Description                      | Location     |
-| --------------- | -------------------------------- | ------------ |
-| **Plaza**       | Central social hub (16x16 tiles) | Center       |
-| **North Block** | Office area with work facilities | Top          |
-| **West Block**  | Cafe and lounge area             | Left         |
-| **East Block**  | Meeting rooms                    | Right        |
-| **South Block** | Arcade and recreation            | Bottom       |
-| **Lake**        | Water feature (blocked)          | Bottom-right |
+| Zone             | Description                      | Location      | NPCs                    |
+| ---------------- | -------------------------------- | ------------- | ----------------------- |
+| **Lobby**        | Reception, entrance, info boards | Top-left      | Greeter, Security Guard |
+| **Office**       | Workstations, kanban board       | Top-right     | PM, IT Support          |
+| **Central Park** | Green space, benches, signpost   | Center        | Park Ranger             |
+| **Arcade**       | Game cabinets, prize counter     | Middle-right  | Game Master             |
+| **Meeting**      | Meeting rooms (Room A, Room C)   | Bottom-left   | Meeting Coordinator     |
+| **Lounge Cafe**  | Cafe counter, seating, vending   | Bottom-center | Barista                 |
+| **Plaza**        | Fountain, benches, social hub    | Bottom-right  | Fountain Keeper         |
+| **Lake**         | Water feature (blocked)          | Top-left edge | -                       |
 
 ## Project Structure
 

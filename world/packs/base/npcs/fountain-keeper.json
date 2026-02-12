@@ -1,0 +1,31 @@
+{
+  "id": "fountain-keeper",
+  "name": "Quinn the Fountain Keeper",
+  "sprite": "npc-keeper",
+  "zone": "plaza",
+  "defaultPosition": { "x": 1440, "y": 1344 },
+  "schedule": [
+    { "startHour": 6, "endHour": 20, "state": "working", "position": { "x": 1440, "y": 1344 } }
+  ],
+  "dialogue": {
+    "greeting": {
+      "id": "greeting",
+      "text": "Hello there! I'm Quinn, the plaza's fountain keeper. This fountain has been the heart of Grid-Town for years!",
+      "options": [
+        { "text": "Tell me about the fountain", "next": "fountain-history" },
+        { "text": "Is there anything special here?", "next": "plaza-secrets" },
+        { "text": "Nice meeting you!", "next": null }
+      ]
+    },
+    "fountain-history": {
+      "id": "fountain-history",
+      "text": "This fountain was built when Grid-Town was founded. They say if you make a wish here at midnight, it might come true! Not that I've ever seen any magic... but who knows?",
+      "options": [{ "text": "I'll remember that!", "next": null }]
+    },
+    "plaza-secrets": {
+      "id": "plaza-secrets",
+      "text": "The plaza is the social hub of Grid-Town! This is where people gather for events, announcements, and just to hang out. Keep an eye on the notice boards for community events!",
+      "options": [{ "text": "Sounds lively!", "next": null }]
+    }
+  }
+}

@@ -16,11 +16,11 @@ describe('FacilitySchema', () => {
     });
 
     it('creates a facility with provided values', () => {
-      const facility = new FacilitySchema('fac_001', 'reception_desk', 'north-block', 100, 200);
+      const facility = new FacilitySchema('fac_001', 'reception_desk', 'office', 100, 200);
 
       expect(facility.id).toBe('fac_001');
       expect(facility.type).toBe('reception_desk');
-      expect(facility.zoneId).toBe('north-block');
+      expect(facility.zoneId).toBe('office');
       expect(facility.position.x).toBe(100);
       expect(facility.position.y).toBe(200);
     });
@@ -171,19 +171,17 @@ describe('FacilityService', () => {
     it('returns facilities in a specific zone', () => {
       service.registerFacility(new FacilitySchema('fac_001', 'reception_desk', 'plaza', 100, 100));
       service.registerFacility(new FacilitySchema('fac_002', 'gate', 'plaza', 200, 100));
-      service.registerFacility(
-        new FacilitySchema('fac_003', 'meeting_door', 'north-block', 300, 100)
-      );
+      service.registerFacility(new FacilitySchema('fac_003', 'meeting_door', 'office', 300, 100));
 
-      const lobbyFacilities = service.getFacilitiesInZone('plaza');
+      const plazaFacilities = service.getFacilitiesInZone('plaza');
 
-      expect(lobbyFacilities).toHaveLength(2);
-      expect(lobbyFacilities.map(f => f.id)).toContain('fac_001');
-      expect(lobbyFacilities.map(f => f.id)).toContain('fac_002');
+      expect(plazaFacilities).toHaveLength(2);
+      expect(plazaFacilities.map(f => f.id)).toContain('fac_001');
+      expect(plazaFacilities.map(f => f.id)).toContain('fac_002');
     });
 
     it('returns empty array for zone with no facilities', () => {
-      const facilities = service.getFacilitiesInZone('south-block');
+      const facilities = service.getFacilitiesInZone('arcade');
 
       expect(facilities).toHaveLength(0);
     });
@@ -369,7 +367,7 @@ describe('FacilityService', () => {
   describe('getAllFacilities', () => {
     it('returns all registered facilities', () => {
       service.registerFacility(new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100));
-      service.registerFacility(new FacilitySchema('fac_002', 'door', 'north-block', 200, 100));
+      service.registerFacility(new FacilitySchema('fac_002', 'door', 'office', 200, 100));
 
       const all = service.getAllFacilities();
 
@@ -386,7 +384,7 @@ describe('FacilityService', () => {
   describe('getFacilitiesByType', () => {
     it('returns facilities of specific type', () => {
       service.registerFacility(new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100));
-      service.registerFacility(new FacilitySchema('fac_002', 'gate', 'north-block', 200, 100));
+      service.registerFacility(new FacilitySchema('fac_002', 'gate', 'office', 200, 100));
       service.registerFacility(new FacilitySchema('fac_003', 'door', 'plaza', 300, 100));
 
       const gates = service.getFacilitiesByType('gate');
@@ -426,14 +424,14 @@ describe('FacilityService', () => {
       const facility = new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100);
       service.registerFacility(facility);
 
-      const result = service.setFacilityZone('fac_001', 'north-block');
+      const result = service.setFacilityZone('fac_001', 'office');
 
       expect(result).toBe(true);
-      expect(facility.zoneId).toBe('north-block');
+      expect(facility.zoneId).toBe('office');
     });
 
     it('returns false for non-existent facility', () => {
-      const result = service.setFacilityZone('non-existent', 'north-block');
+      const result = service.setFacilityZone('non-existent', 'office');
 
       expect(result).toBe(false);
     });
@@ -441,11 +439,11 @@ describe('FacilityService', () => {
 
   describe('createFacility', () => {
     it('creates and registers a new facility', () => {
-      const facility = service.createFacility('fac_001', 'gate', 'plaza', 100, 200);
+      const facility = service.createFacility('fac_001', 'gate', 'lobby', 100, 200);
 
       expect(facility.id).toBe('fac_001');
       expect(facility.type).toBe('gate');
-      expect(facility.zoneId).toBe('plaza');
+      expect(facility.zoneId).toBe('lobby');
       expect(facility.position.x).toBe(100);
       expect(facility.position.y).toBe(200);
       expect(service.hasFacility('fac_001')).toBe(true);
@@ -518,7 +516,7 @@ describe('RoomState facility integration', () => {
   describe('getAllFacilities', () => {
     it('returns all facilities', () => {
       state.addFacility(new FacilitySchema('fac_001', 'gate', 'plaza', 100, 100));
-      state.addFacility(new FacilitySchema('fac_002', 'door', 'north-block', 200, 100));
+      state.addFacility(new FacilitySchema('fac_002', 'door', 'office', 200, 100));
 
       const all = state.getAllFacilities();
 

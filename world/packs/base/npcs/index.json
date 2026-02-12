@@ -1,3 +1,13 @@
 {
-  "npcs": ["greeter", "office-pm", "meeting-host", "barista", "arcade-host", "ranger"]
+  "npcs": [
+    "greeter",
+    "security",
+    "office-pm",
+    "it-help",
+    "meeting-host",
+    "barista",
+    "arcade-host",
+    "ranger",
+    "fountain-keeper"
+  ]
 }

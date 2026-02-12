@@ -1,9 +1,9 @@
 {
   "zoneId": "lounge-cafe",
   "name": "Lounge Cafe",
-  "bounds": { "x": 533, "y": 640, "width": 534, "height": 640 },
-  "spawnPoints": [{ "x": 160, "y": 160 }],
-  "npcs": ["barista", "sales-rep"],
+  "bounds": { "x": 576, "y": 1216, "width": 640, "height": 448 },
+  "spawnPoints": [{ "x": 800, "y": 1440 }],
+  "npcs": ["barista"],
   "facilities": ["cafe-counter", "seating-area", "vending-machine"],
   "width": 16,
   "height": 20,

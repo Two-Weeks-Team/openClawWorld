@@ -25,10 +25,10 @@ const COLOR_RANGES: ColorRange[] = [
 
 const ZONE_FLOOR_TYPES: Map<TileType, ZoneId> = new Map([
   ['floor_plaza', 'plaza'],
-  ['floor_north', 'north-block'],
-  ['floor_west', 'west-block'],
-  ['floor_east', 'east-block'],
-  ['floor_south', 'south-block'],
+  ['floor_north', 'office'],
+  ['floor_west', 'meeting'],
+  ['floor_east', 'arcade'],
+  ['floor_south', 'lounge-cafe'],
   ['floor_lake', 'lake'],
 ]);
 

@@ -55,6 +55,14 @@ interface AgentState {
   errorCount: number;
   observedEntities: Map<string, EntitySnapshot>;
   chatHistory: ChatMessage[];
+  observedFacilities: Map<string, FacilitySnapshot>;
+  eventCursor: string | null;
+  installedSkills: string[];
+  profileStatus: string;
+  apiCallHistory: ApiCallRecord[];
+  interactionHistory: InteractionRecord[];
+  actionLog: string[];
+  cycleCount: number;
 }
 
 interface EntitySnapshot {
@@ -87,6 +95,37 @@ interface IssueEvidence {
   timestamps: number[];
   logs: string[];
   positions?: { x: number; y: number }[];
+}
+
+interface FacilitySnapshot {
+  facilityId: string;
+  type: string;
+  name: string;
+  position: { x: number; y: number };
+  affords: { action: string; label: string }[];
+  distance: number;
+  timestamp: number;
+}
+
+interface ApiCallRecord {
+  endpoint: string;
+  timestamp: number;
+  success: boolean;
+  responseTime: number;
+}
+
+interface InteractionRecord {
+  targetId: string;
+  action: string;
+  outcome: string; // 'ok' | 'no_effect' | 'invalid_action' | 'too_far'
+  timestamp: number;
+}
+
+interface ActionCandidate {
+  action: () => Promise<void>;
+  weight: number;
+  label: string;
+  category: string;
 }
 
 interface LoopState {
@@ -138,7 +177,184 @@ const ISSUE_AREAS = [
   'Persistence',
   'Performance',
   'Docs',
+  'Behavior',
+  'Coverage',
 ] as const;
+
+const EXPECTED_ENDPOINTS = [
+  'register',
+  'unregister',
+  'observe',
+  'moveTo',
+  'interact',
+  'chatSend',
+  'chatObserve',
+  'pollEvents',
+  'profileUpdate',
+  'skillList',
+  'skillInstall',
+  'skillInvoke',
+] as const;
+
+const ROLE_PREFERENCES: Record<AgentRole, Record<string, number>> = {
+  explorer: {
+    navigate: 0.4,
+    'notice_board:read': 0.3,
+    pollEvents: 0.25,
+    'notice_board:post': 0.1,
+    'portal:use': 0.25,
+    chat: 0.05,
+    chatObserve: 0.05,
+    profileUpdate: 0.03,
+    skillList: 0.03,
+    wander: 0.3,
+    'entity:approach': 0.05,
+  },
+  worker: {
+    kanban_terminal: 0.45,
+    whiteboard: 0.3,
+    navigate: 0.15,
+    chat: 0.08,
+    profileUpdate: 0.1,
+    pollEvents: 0.05,
+    chatObserve: 0.05,
+    skillList: 0.05,
+    wander: 0.02,
+    'entity:approach': 0.05,
+  },
+  socializer: {
+    chat: 0.35,
+    chatObserve: 0.25,
+    cafe_counter: 0.2,
+    'entity:approach': 0.2,
+    profileUpdate: 0.15,
+    pollEvents: 0.1,
+    navigate: 0.1,
+    skillList: 0.03,
+    wander: 0.05,
+  },
+  coordinator: {
+    schedule_kiosk: 0.35,
+    room_door: 0.25,
+    chat: 0.2,
+    'notice_board:post': 0.15,
+    navigate: 0.15,
+    pollEvents: 0.1,
+    chatObserve: 0.1,
+    profileUpdate: 0.08,
+    skillList: 0.03,
+    wander: 0.03,
+    'entity:approach': 0.1,
+  },
+  helper: {
+    'entity:approach': 0.35,
+    chatObserve: 0.3,
+    chat: 0.25,
+    pollEvents: 0.2,
+    skillList: 0.15,
+    navigate: 0.1,
+    profileUpdate: 0.05,
+    wander: 0.05,
+  },
+  merchant: {
+    vending_machine: 0.35,
+    cafe_counter: 0.25,
+    'notice_board:post': 0.2,
+    chat: 0.2,
+    navigate: 0.15,
+    pollEvents: 0.05,
+    chatObserve: 0.1,
+    profileUpdate: 0.05,
+    skillList: 0.03,
+    wander: 0.05,
+    'entity:approach': 0.05,
+  },
+  observer: {
+    pollEvents: 0.4,
+    observe: 0.3,
+    profileUpdate: 0.1,
+    skillList: 0.1,
+    chat: 0.02,
+    chatObserve: 0.05,
+    navigate: 0.05,
+    wander: 0.02,
+    'entity:approach': 0.02,
+  },
+  afk: {
+    profileUpdate: 0.3,
+    observe: 0.2,
+    pollEvents: 0.1,
+    chat: 0.01,
+    chatObserve: 0.01,
+    navigate: 0.01,
+    skillList: 0.01,
+    wander: 0.01,
+    'entity:approach': 0.01,
+  },
+  chaos: {
+    navigate: 0.15,
+    chat: 0.15,
+    chatObserve: 0.15,
+    pollEvents: 0.15,
+    profileUpdate: 0.15,
+    skillList: 0.15,
+    wander: 0.2,
+    'entity:approach': 0.15,
+    reregister: 0.08,
+  },
+  spammer: {
+    chat: 0.5,
+    chatObserve: 0.15,
+    navigate: 0.05,
+    pollEvents: 0.05,
+    profileUpdate: 0.05,
+    skillList: 0.02,
+    wander: 0.05,
+    'entity:approach': 0.03,
+  },
+};
+
+const ROLE_CHAT_MESSAGES: Record<AgentRole, string[]> = {
+  explorer: ['Found a new area!', "What's over there?", 'Exploring...', 'Interesting path here.'],
+  worker: ['Back to work.', 'Task updated.', 'Checking the board.', 'Deadline approaching.'],
+  socializer: [
+    'Hello everyone!',
+    'Nice day!',
+    "How's it going?",
+    'Great to see you!',
+    'Hey there!',
+  ],
+  coordinator: ['Team sync in 5!', "Let's meet at the plaza.", 'Agenda updated.', 'Room booked.'],
+  helper: [
+    'Anyone need help?',
+    'I can assist!',
+    'Let me know if you need anything.',
+    'Happy to help!',
+  ],
+  merchant: [
+    'Items for sale!',
+    'Check out the vending machine.',
+    'Trading services available.',
+    'Good deals today!',
+  ],
+  observer: ['Monitoring...', 'All clear.', 'Noted.', 'Interesting activity detected.'],
+  afk: ['...', 'brb', 'afk'],
+  chaos: ['CHAOS!', 'Random action!', 'Testing boundaries!', 'Expect the unexpected!', '🔥'],
+  spammer: ['Spam 1', 'Spam 2', 'Spam 3', 'Testing', 'Hello', 'Ping', 'Message', 'Test'],
+};
+
+const ROLE_STATUSES: Record<AgentRole, string[]> = {
+  explorer: ['online', 'online', 'online', 'focus'],
+  worker: ['focus', 'focus', 'online', 'dnd'],
+  socializer: ['online', 'online', 'online'],
+  coordinator: ['online', 'focus', 'dnd'],
+  helper: ['online', 'online'],
+  merchant: ['online', 'online'],
+  observer: ['focus', 'focus', 'online'],
+  afk: ['afk', 'afk', 'afk', 'offline'],
+  chaos: ['online', 'focus', 'dnd', 'afk', 'offline'],
+  spammer: ['online', 'online'],
+};
 
 const STATE_DIR = join(homedir(), '.openclaw-resident-agent');
 const STATE_FILE = join(STATE_DIR, 'state.json');
@@ -227,7 +443,7 @@ class GitHubIssueReporter {
     this.dryRun = dryRun;
   }
 
-  async checkDuplicate(title: string): Promise<boolean> {
+  async checkDuplicate(title: string): Promise<{ isDuplicate: boolean; existingNumber?: string }> {
     try {
       const searchTitle = title
         .replace(/\[.*?\]/g, '')
@@ -250,11 +466,13 @@ class GitHubIssueReporter {
         { encoding: 'utf-8' }
       );
       const issues = JSON.parse(result);
-      return issues.length > 0;
+      if (issues.length > 0) {
+        return { isDuplicate: true, existingNumber: String(issues[0].number) };
+      }
+      return { isDuplicate: false };
     } catch (error) {
       console.error('[checkDuplicate] gh issue list failed:', error);
-      // Treat as duplicate to safely prevent creating issues on failure
-      return true;
+      return { isDuplicate: true };
     }
   }
 
@@ -270,8 +488,17 @@ class GitHubIssueReporter {
       return `dry-run-${Date.now()}`;
     }
 
-    if (await this.checkDuplicate(title)) {
-      console.log('[Issue] Duplicate found, skipping');
+    const dupCheck = await this.checkDuplicate(title);
+    if (dupCheck.isDuplicate) {
+      if (dupCheck.existingNumber) {
+        await this.addComment(
+          dupCheck.existingNumber,
+          `Re-observed at ${formatTimestamp()}. Issue is still reproducible.`
+        );
+        console.log(`[Issue] Duplicate found (#${dupCheck.existingNumber}), added comment`);
+      } else {
+        console.log('[Issue] Duplicate found, skipping');
+      }
       return null;
     }
 
@@ -350,6 +577,22 @@ class IssueDetector {
   private knownPositions: Map<string, { x: number; y: number; timestamp: number }> = new Map();
   private chatMessages: Map<string, ChatMessage[]> = new Map();
   private detectedIssues: Issue[] = [];
+  private recentlyReportedAreas: Map<string, number> = new Map();
+  private currentCycle = 0;
+
+  private isOnCooldown(area: string): boolean {
+    const lastReported = this.recentlyReportedAreas.get(area);
+    if (lastReported === undefined) return false;
+    return this.currentCycle - lastReported < 3;
+  }
+
+  markReported(area: string): void {
+    this.recentlyReportedAreas.set(area, this.currentCycle);
+  }
+
+  incrementCycle(): void {
+    this.currentCycle++;
+  }
 
   detectPositionDesync(agents: ResidentAgent[]): Issue | null {
     for (const agent of agents) {
@@ -519,17 +762,405 @@ class IssueDetector {
     return null;
   }
 
+  detectEntityCountDivergence(agents: ResidentAgent[]): Issue | null {
+    const zoneAgents: Map<string, { agentId: string; entityCount: number }[]> = new Map();
+    for (const agent of agents) {
+      const state = agent.getState();
+      const zone = `${Math.floor(state.position.x / 512)}_${Math.floor(state.position.y / 512)}`;
+      if (!zoneAgents.has(zone)) zoneAgents.set(zone, []);
+      zoneAgents.get(zone)!.push({
+        agentId: state.agentId,
+        entityCount: state.observedEntities.size,
+      });
+    }
+
+    for (const [zone, entries] of Array.from(zoneAgents.entries())) {
+      if (entries.length < 2) continue;
+      const counts = entries.map(e => e.entityCount);
+      const max = Math.max(...counts);
+      const min = Math.min(...counts);
+      if (max > 0 && min >= 0 && (max - min) / Math.max(max, 1) > 0.5) {
+        return {
+          area: 'Sync',
+          title: `Entity count divergence in zone ${zone}`,
+          description: 'Agents in the same zone see significantly different entity counts',
+          expectedBehavior: 'Agents in the same zone should see similar entity counts',
+          observedBehavior: `Entity counts range from ${min} to ${max} in zone ${zone}`,
+          reproductionSteps: [
+            'Spawn multiple agents in same zone',
+            'Compare observed entity counts',
+          ],
+          severity: 'Major',
+          frequency: 'sometimes',
+          evidence: {
+            agentIds: entries.map(e => e.agentId),
+            timestamps: [Date.now()],
+            logs: entries.map(e => `${e.agentId}: ${e.entityCount} entities`),
+          },
+        };
+      }
+    }
+    return null;
+  }
+
+  detectFacilityStateDivergence(agents: ResidentAgent[]): Issue | null {
+    const facilityViews: Map<string, { agentId: string; affords: string[] }[]> = new Map();
+    for (const agent of agents) {
+      const state = agent.getState();
+      for (const [fId, fSnap] of Array.from(state.observedFacilities.entries())) {
+        if (!facilityViews.has(fId)) facilityViews.set(fId, []);
+        facilityViews.get(fId)!.push({
+          agentId: state.agentId,
+          affords: fSnap.affords.map(a => a.action).sort(),
+        });
+      }
+    }
+
+    for (const [facilityId, views] of Array.from(facilityViews.entries())) {
+      if (views.length < 2) continue;
+      const baseline = views[0].affords.join(',');
+      for (let i = 1; i < views.length; i++) {
+        const current = views[i].affords.join(',');
+        if (current !== baseline) {
+          return {
+            area: 'Sync',
+            title: `Facility state divergence for ${facilityId}`,
+            description: 'Different agents see different affordances for the same facility',
+            expectedBehavior: 'All agents should see the same facility affordances',
+            observedBehavior: `${views[0].agentId} sees [${baseline}] but ${views[i].agentId} sees [${current}]`,
+            reproductionSteps: [
+              'Have multiple agents observe same facility',
+              'Compare affordance lists',
+            ],
+            severity: 'Major',
+            frequency: 'sometimes',
+            evidence: {
+              agentIds: [views[0].agentId, views[i].agentId],
+              timestamps: [Date.now()],
+              logs: [`${views[0].agentId}: ${baseline}`, `${views[i].agentId}: ${current}`],
+            },
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  detectObserveInconsistency(agents: ResidentAgent[]): Issue | null {
+    const positionBuckets: Map<string, { agentId: string; facilityIds: string[] }[]> = new Map();
+    for (const agent of agents) {
+      const state = agent.getState();
+      const bucket = `${Math.floor(state.position.x / 100)}_${Math.floor(state.position.y / 100)}`;
+      if (!positionBuckets.has(bucket)) positionBuckets.set(bucket, []);
+      positionBuckets.get(bucket)!.push({
+        agentId: state.agentId,
+        facilityIds: Array.from(state.observedFacilities.keys()).sort(),
+      });
+    }
+
+    for (const [bucket, entries] of Array.from(positionBuckets.entries())) {
+      if (entries.length < 2) continue;
+      const baseline = entries[0].facilityIds.join(',');
+      for (let i = 1; i < entries.length; i++) {
+        const current = entries[i].facilityIds.join(',');
+        if (current !== baseline && baseline.length > 0 && current.length > 0) {
+          return {
+            area: 'Sync',
+            title: `Observe inconsistency at position bucket ${bucket}`,
+            description: 'Agents at the same position see different facility lists',
+            expectedBehavior: 'Agents at the same position should see the same facilities',
+            observedBehavior: `${entries[0].agentId} sees [${baseline}] vs ${entries[i].agentId} sees [${current}]`,
+            reproductionSteps: [
+              'Place multiple agents at same position',
+              'Compare observe results',
+            ],
+            severity: 'Major',
+            frequency: 'sometimes',
+            evidence: {
+              agentIds: [entries[0].agentId, entries[i].agentId],
+              timestamps: [Date.now()],
+              logs: [`${entries[0].agentId}: ${baseline}`, `${entries[i].agentId}: ${current}`],
+            },
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  detectInteractFailurePattern(agents: ResidentAgent[]): Issue | null {
+    for (const agent of agents) {
+      const state = agent.getState();
+      const recentInteractions = state.interactionHistory.slice(-10);
+      const failures = recentInteractions.filter(
+        h => h.outcome === 'too_far' || h.outcome === 'invalid_action'
+      );
+      if (recentInteractions.length >= 5 && failures.length >= 4) {
+        return {
+          area: 'Interactables',
+          title: `Repeated interact failures for ${state.agentId}`,
+          description: 'Agent experiences repeated interaction failures despite attempting',
+          expectedBehavior: 'Interactions should succeed when agent is within range',
+          observedBehavior: `${failures.length}/${recentInteractions.length} recent interactions failed`,
+          reproductionSteps: [
+            'Agent attempts to interact with facilities',
+            'Most interactions fail with too_far or invalid_action',
+          ],
+          severity: 'Major',
+          frequency: 'sometimes',
+          evidence: {
+            agentIds: [state.agentId],
+            timestamps: failures.map(f => f.timestamp),
+            logs: failures.map(f => `${f.targetId}:${f.action} → ${f.outcome}`),
+          },
+        };
+      }
+    }
+    return null;
+  }
+
+  detectEventGaps(agents: ResidentAgent[]): Issue | null {
+    for (const agent of agents) {
+      const state = agent.getState();
+      if (!state.eventCursor) continue;
+      const cursorNum = parseInt(state.eventCursor, 10);
+      if (Number.isNaN(cursorNum)) continue;
+      const pollCalls = state.apiCallHistory.filter(h => h.endpoint === 'pollEvents' && h.success);
+      if (pollCalls.length < 3) continue;
+      const lastTwo = pollCalls.slice(-2);
+      const timeDiff = lastTwo[1].timestamp - lastTwo[0].timestamp;
+      if (timeDiff > 30000) {
+        return {
+          area: 'AIC',
+          title: `Event polling gap for ${state.agentId}`,
+          description: 'Large gap between successful pollEvents calls may indicate missed events',
+          expectedBehavior: 'PollEvents should be called regularly to avoid missing events',
+          observedBehavior: `${Math.floor(timeDiff / 1000)}s gap between poll calls`,
+          reproductionSteps: ['Monitor pollEvents call frequency', 'Check for gaps > 30s'],
+          severity: 'Minor',
+          frequency: 'sometimes',
+          evidence: {
+            agentIds: [state.agentId],
+            timestamps: lastTwo.map(p => p.timestamp),
+            logs: [`Gap: ${timeDiff}ms`, `Cursor: ${state.eventCursor}`],
+          },
+        };
+      }
+    }
+    return null;
+  }
+
+  detectLowApiCoverage(agents: ResidentAgent[]): Issue | null {
+    if (this.currentCycle < 10) return null;
+    const usedEndpoints = new Set<string>();
+    for (const agent of agents) {
+      for (const record of agent.getState().apiCallHistory) {
+        usedEndpoints.add(record.endpoint);
+      }
+    }
+    const coverage = usedEndpoints.size / EXPECTED_ENDPOINTS.length;
+    if (coverage < 0.5) {
+      return {
+        area: 'AIC',
+        title: 'Low API endpoint coverage',
+        description: 'Less than 50% of available API endpoints are being exercised',
+        expectedBehavior: 'Agents should collectively exercise most API endpoints',
+        observedBehavior: `Only ${usedEndpoints.size}/${EXPECTED_ENDPOINTS.length} endpoints used (${Math.round(coverage * 100)}%)`,
+        reproductionSteps: ['Run agent loop for 10+ cycles', 'Check API coverage metrics'],
+        severity: 'Minor',
+        frequency: 'always',
+        evidence: {
+          agentIds: agents.map(a => a.getState().agentId),
+          timestamps: [Date.now()],
+          logs: [
+            `Used: ${Array.from(usedEndpoints).join(', ')}`,
+            `Missing: ${EXPECTED_ENDPOINTS.filter(e => !usedEndpoints.has(e)).join(', ')}`,
+          ],
+        },
+      };
+    }
+    return null;
+  }
+
+  detectRoleComplianceAnomaly(agents: ResidentAgent[]): Issue | null {
+    for (const agent of agents) {
+      const state = agent.getState();
+      if (state.actionLog.length < 10) continue;
+
+      const categoryCount: Record<string, number> = {};
+      for (const label of state.actionLog) {
+        const cat = label.split(':')[0];
+        categoryCount[cat] = (categoryCount[cat] ?? 0) + 1;
+      }
+
+      const prefs = ROLE_PREFERENCES[state.role];
+      const topPrefKeys = Object.entries(prefs)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([k]) => k);
+
+      const topActionCats = Object.entries(categoryCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([k]) => k);
+
+      const overlap = topPrefKeys.filter(k =>
+        topActionCats.some(ac => ac === k || k.includes(ac) || ac.includes(k))
+      );
+
+      if (overlap.length === 0) {
+        return {
+          area: 'Behavior',
+          title: `Role compliance anomaly for ${state.role} agent ${state.agentId}`,
+          description: 'Agent actions do not match expected role preferences',
+          expectedBehavior: `${state.role} should prefer: ${topPrefKeys.join(', ')}`,
+          observedBehavior: `Actual top actions: ${topActionCats.join(', ')}`,
+          reproductionSteps: [
+            'Run agent for 10+ cycles',
+            'Compare action distribution to role preferences',
+          ],
+          severity: 'Minor',
+          frequency: 'sometimes',
+          evidence: {
+            agentIds: [state.agentId],
+            timestamps: [Date.now()],
+            logs: Object.entries(categoryCount).map(([k, v]) => `${k}: ${v}`),
+          },
+        };
+      }
+    }
+    return null;
+  }
+
+  detectLowDecisionEntropy(agents: ResidentAgent[]): Issue | null {
+    for (const agent of agents) {
+      const state = agent.getState();
+      if (state.actionLog.length < 10) continue;
+      if (state.role === 'afk') continue;
+
+      const uniqueLabels = new Set(state.actionLog).size;
+      if (uniqueLabels < 3) {
+        return {
+          area: 'Behavior',
+          title: `Low decision entropy for ${state.agentId}`,
+          description:
+            'Agent is making very few unique decisions, suggesting the decision engine is degenerate',
+          expectedBehavior: 'Agents should make at least 3 distinct types of decisions',
+          observedBehavior: `Only ${uniqueLabels} unique actions in last ${state.actionLog.length} cycles`,
+          reproductionSteps: ['Run agent for 10+ cycles', 'Check unique action count in actionLog'],
+          severity: 'Minor',
+          frequency: 'sometimes',
+          evidence: {
+            agentIds: [state.agentId],
+            timestamps: [Date.now()],
+            logs: [`Unique labels: ${uniqueLabels}`, `Actions: ${state.actionLog.join(', ')}`],
+          },
+        };
+      }
+    }
+    return null;
+  }
+
+  detectIdleWithOpportunity(agents: ResidentAgent[]): Issue | null {
+    for (const agent of agents) {
+      const state = agent.getState();
+      if (state.role === 'afk' || state.role === 'observer') continue;
+      if (state.actionLog.length < 10) continue;
+
+      const hasNearbyFacility = Array.from(state.observedFacilities.values()).some(
+        f => f.distance < 100
+      );
+      if (!hasNearbyFacility) continue;
+
+      const recentInteracts = state.actionLog.slice(-10).filter(l => l.startsWith('interact:'));
+      if (recentInteracts.length === 0) {
+        return {
+          area: 'Behavior',
+          title: `Idle with opportunity for ${state.agentId}`,
+          description: 'Agent is near interactable facilities but has not interacted recently',
+          expectedBehavior: 'Agents near facilities should occasionally interact with them',
+          observedBehavior: 'No interact actions in last 10 cycles despite nearby facilities',
+          reproductionSteps: [
+            'Place agent near facility',
+            'Monitor for 10 cycles',
+            'Check for interact actions',
+          ],
+          severity: 'Minor',
+          frequency: 'sometimes',
+          evidence: {
+            agentIds: [state.agentId],
+            timestamps: [Date.now()],
+            logs: [
+              `Nearby facilities: ${Array.from(state.observedFacilities.values())
+                .filter(f => f.distance < 100)
+                .map(f => f.facilityId)
+                .join(', ')}`,
+              `Recent actions: ${state.actionLog.slice(-10).join(', ')}`,
+            ],
+          },
+        };
+      }
+    }
+    return null;
+  }
+
+  detectCandidateStarvation(agents: ResidentAgent[]): Issue | null {
+    for (const agent of agents) {
+      const state = agent.getState();
+      if (state.cycleCount < 10) continue;
+
+      if (state.observedFacilities.size === 0 && state.observedEntities.size === 0) {
+        return {
+          area: 'Movement',
+          title: `Candidate starvation for ${state.agentId}`,
+          description: 'Agent has been running for 10+ cycles but sees no facilities or entities',
+          expectedBehavior: 'Agent should navigate to areas with facilities and entities',
+          observedBehavior: 'Empty observedFacilities and observedEntities after 10+ cycles',
+          reproductionSteps: ['Run agent for 10+ cycles', 'Check if observedFacilities is empty'],
+          severity: 'Minor',
+          frequency: 'rare',
+          evidence: {
+            agentIds: [state.agentId],
+            timestamps: [Date.now()],
+            logs: [
+              `Cycle count: ${state.cycleCount}`,
+              `Position: (${state.position.x}, ${state.position.y})`,
+            ],
+          },
+        };
+      }
+    }
+    return null;
+  }
+
   runAllDetections(agents: ResidentAgent[]): Issue | null {
+    this.incrementCycle();
+
     const detectors = [
       () => this.detectPositionDesync(agents),
       () => this.detectChatMismatch(agents),
       () => this.detectStuckAgent(agents),
       () => this.detectHighErrorRate(agents),
+      () => this.detectEntityCountDivergence(agents),
+      () => this.detectFacilityStateDivergence(agents),
+      () => this.detectObserveInconsistency(agents),
+      () => this.detectInteractFailurePattern(agents),
+      () => this.detectEventGaps(agents),
+      () => this.detectLowApiCoverage(agents),
+      () => this.detectRoleComplianceAnomaly(agents),
+      () => this.detectLowDecisionEntropy(agents),
+      () => this.detectIdleWithOpportunity(agents),
+      () => this.detectCandidateStarvation(agents),
     ];
+
+    for (let i = detectors.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [detectors[i], detectors[j]] = [detectors[j], detectors[i]];
+    }
 
     for (const detect of detectors) {
       const issue = detect();
-      if (issue) {
+      if (issue && !this.isOnCooldown(issue.area)) {
         return issue;
       }
     }
@@ -603,6 +1234,14 @@ class ResidentAgent {
       errorCount: 0,
       observedEntities: new Map(),
       chatHistory: [],
+      observedFacilities: new Map(),
+      eventCursor: null,
+      installedSkills: [],
+      profileStatus: 'online',
+      apiCallHistory: [],
+      interactionHistory: [],
+      actionLog: [],
+      cycleCount: 0,
     };
   }
 
@@ -657,6 +1296,7 @@ class ResidentAgent {
 
   stop(): void {
     this.running = false;
+    this.unregister().catch(() => {});
   }
 
   setCycleDelay(ms: number): void {
@@ -668,41 +1308,218 @@ class ResidentAgent {
   }
 
   private async performRoleBehavior(): Promise<void> {
-    switch (this.state.role) {
-      case 'explorer':
-        await this.exploreWorld();
-        break;
-      case 'worker':
-        await this.workCycle();
-        break;
-      case 'socializer':
-        await this.socialize();
-        break;
-      case 'coordinator':
-        await this.coordinate();
-        break;
-      case 'helper':
-        await this.help();
-        break;
-      case 'merchant':
-        await this.trade();
-        break;
-      case 'observer':
-        await this.observe();
-        break;
-      case 'afk':
-        await this.idleBehavior();
-        break;
-      case 'chaos':
-        await this.chaosBehavior();
-        break;
-      case 'spammer':
-        await this.spamBehavior();
-        break;
+    const lastObserveIdx = this.state.actionLog.lastIndexOf('observe');
+    if (lastObserveIdx === -1 || this.state.actionLog.length - lastObserveIdx > 2) {
+      await this.observe();
+    }
+
+    const candidates = this.buildCandidates();
+    const chosen = this.selectAction(candidates);
+
+    console.log(
+      `[${this.state.agentId}][${this.state.role}] → ${chosen.label} (w=${chosen.weight.toFixed(3)})`
+    );
+    await chosen.action();
+
+    this.state.actionLog.push(chosen.label);
+    if (this.state.actionLog.length > 20) {
+      this.state.actionLog.shift();
+    }
+    this.state.cycleCount++;
+  }
+
+  private selectAction(candidates: ActionCandidate[]): ActionCandidate {
+    if (candidates.length === 0) {
+      return {
+        action: () => this.observe(),
+        weight: 1,
+        label: 'observe:fallback',
+        category: 'observe',
+      };
+    }
+    const totalWeight = candidates.reduce((sum, c) => sum + c.weight, 0);
+    if (totalWeight <= 0) return candidates[0];
+    let roll = Math.random() * totalWeight;
+    for (const candidate of candidates) {
+      roll -= candidate.weight;
+      if (roll <= 0) return candidate;
+    }
+    return candidates[candidates.length - 1];
+  }
+
+  private getRolePreference(facilityTypeOrKey: string, action?: string): number {
+    const prefs = ROLE_PREFERENCES[this.state.role];
+    if (action) {
+      const exactKey = `${facilityTypeOrKey}:${action}`;
+      if (prefs[exactKey] !== undefined) return prefs[exactKey];
+      if (prefs[facilityTypeOrKey] !== undefined) return prefs[facilityTypeOrKey];
+      if (prefs[action] !== undefined) return prefs[action];
+    } else {
+      if (prefs[facilityTypeOrKey] !== undefined) return prefs[facilityTypeOrKey];
+    }
+    return 0.01;
+  }
+
+  private computeNoveltyMultiplier(label: string): number {
+    const recentCount = this.state.actionLog.filter(l => l === label).length;
+    if (recentCount === 0) return 1.0;
+    if (recentCount === 1) return 0.7;
+    if (recentCount === 2) return 0.4;
+    return 0.1;
+  }
+
+  private generateRoleChat(): string {
+    const messages = ROLE_CHAT_MESSAGES[this.state.role];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }
+
+  private pickRoleStatus(): string {
+    const statuses = ROLE_STATUSES[this.state.role];
+    return statuses[Math.floor(Math.random() * statuses.length)];
+  }
+
+  private buildCandidates(): ActionCandidate[] {
+    const candidates: ActionCandidate[] = [];
+    const { observedFacilities, observedEntities, position, role } = this.state;
+
+    candidates.push({
+      action: () => this.observe(),
+      weight: 0.15 * this.computeNoveltyMultiplier('observe'),
+      label: 'observe',
+      category: 'observe',
+    });
+
+    candidates.push({
+      action: () => this.pollEvents(),
+      weight: this.getRolePreference('pollEvents') * this.computeNoveltyMultiplier('pollEvents'),
+      label: 'pollEvents',
+      category: 'observe',
+    });
+
+    candidates.push({
+      action: () => this.chatObserve(),
+      weight: this.getRolePreference('chatObserve') * this.computeNoveltyMultiplier('chatObserve'),
+      label: 'chatObserve',
+      category: 'social',
+    });
+
+    for (const facility of Array.from(observedFacilities.values())) {
+      if (facility.distance < 100) {
+        for (const afford of facility.affords) {
+          const label = `interact:${facility.type}:${afford.action}`;
+          candidates.push({
+            action: async () => {
+              await this.interact(facility.facilityId, afford.action);
+            },
+            weight:
+              this.getRolePreference(facility.type, afford.action) *
+              this.computeNoveltyMultiplier(label),
+            label,
+            category: 'interact',
+          });
+        }
+      } else {
+        const label = `navigate:${facility.type}`;
+        candidates.push({
+          action: () =>
+            this.moveTo(Math.floor(facility.position.x / 32), Math.floor(facility.position.y / 32)),
+          weight:
+            this.getRolePreference(facility.type, 'navigate') *
+            this.computeNoveltyMultiplier(label) *
+            0.5,
+          label,
+          category: 'navigate',
+        });
+      }
+    }
+
+    for (const entity of Array.from(observedEntities.values())) {
+      const dist = Math.hypot(entity.position.x - position.x, entity.position.y - position.y);
+      if (dist > 200) continue;
+      const label = `navigate:entity:${entity.entityId.substring(0, 8)}`;
+      candidates.push({
+        action: () =>
+          this.moveTo(Math.floor(entity.position.x / 32), Math.floor(entity.position.y / 32)),
+        weight:
+          this.getRolePreference('entity', 'approach') * this.computeNoveltyMultiplier(label) * 0.3,
+        label,
+        category: 'navigate',
+      });
+    }
+
+    const chatLabel = `chat:${role}`;
+    candidates.push({
+      action: () => this.chat(this.generateRoleChat()),
+      weight: this.getRolePreference('chat') * this.computeNoveltyMultiplier(chatLabel),
+      label: chatLabel,
+      category: 'social',
+    });
+
+    const profileLabel = `profileUpdate:${role}`;
+    candidates.push({
+      action: () => this.profileUpdate({ status: this.pickRoleStatus() }),
+      weight: this.getRolePreference('profileUpdate') * this.computeNoveltyMultiplier(profileLabel),
+      label: profileLabel,
+      category: 'profile',
+    });
+
+    candidates.push({
+      action: () => this.skillList(),
+      weight: this.getRolePreference('skillList') * this.computeNoveltyMultiplier('skillList'),
+      label: 'skillList',
+      category: 'skill',
+    });
+
+    const tx = Math.floor(Math.random() * 64);
+    const ty = Math.floor(Math.random() * 64);
+    candidates.push({
+      action: () => this.moveTo(tx, ty),
+      weight: this.getRolePreference('wander') * this.computeNoveltyMultiplier('navigate:wander'),
+      label: 'navigate:wander',
+      category: 'navigate',
+    });
+
+    if (role === 'chaos') {
+      candidates.push({
+        action: async () => {
+          await this.unregister();
+          await sleep(500);
+          await this.register('default');
+          await this.observe();
+        },
+        weight: 0.08 * this.computeNoveltyMultiplier('chaos:reregister'),
+        label: 'chaos:reregister',
+        category: 'lifecycle',
+      });
+    }
+
+    if (this.state.errorCount > 5) {
+      const recentErrors = this.state.apiCallHistory.filter(h => !h.success).slice(-5);
+      const errorEndpoints = new Set(recentErrors.map(e => e.endpoint));
+      for (const candidate of candidates) {
+        if (errorEndpoints.has(candidate.category)) {
+          candidate.weight *= 0.3;
+        }
+      }
+    }
+
+    return candidates;
+  }
+
+  private recordApiCall(endpoint: string, startMs: number, success: boolean): void {
+    this.state.apiCallHistory.push({
+      endpoint,
+      timestamp: Date.now(),
+      success,
+      responseTime: Date.now() - startMs,
+    });
+    if (this.state.apiCallHistory.length > 100) {
+      this.state.apiCallHistory = this.state.apiCallHistory.slice(-50);
     }
   }
 
   private async observe(): Promise<void> {
+    const startMs = Date.now();
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/observe`, {
         method: 'POST',
@@ -724,13 +1541,27 @@ class ResidentAgent {
       if (result.status === 'ok') {
         if (result.data.nearby) {
           for (const entity of result.data.nearby) {
-            if (entity.pos?.x != null && entity.pos?.y != null) {
-              this.state.observedEntities.set(entity.id, {
-                entityId: entity.id,
-                position: { x: entity.pos.x, y: entity.pos.y },
+            if (entity.entity?.pos?.x != null && entity.entity?.pos?.y != null) {
+              this.state.observedEntities.set(entity.entity.id, {
+                entityId: entity.entity.id,
+                position: { x: entity.entity.pos.x, y: entity.entity.pos.y },
                 timestamp: Date.now(),
               });
             }
+          }
+        }
+        if (result.data.facilities) {
+          this.state.observedFacilities.clear();
+          for (const f of result.data.facilities) {
+            this.state.observedFacilities.set(f.id, {
+              facilityId: f.id,
+              type: f.type,
+              name: f.name ?? f.id,
+              position: { x: f.position?.x ?? 0, y: f.position?.y ?? 0 },
+              affords: f.affords ?? [],
+              distance: f.distance ?? 9999,
+              timestamp: Date.now(),
+            });
           }
         }
         this.state.position = {
@@ -738,13 +1569,16 @@ class ResidentAgent {
           y: result.data.self?.pos?.y ?? this.state.position.y,
         };
       }
+      this.recordApiCall('observe', startMs, true);
       this.state.lastAction = 'observe';
     } catch (error) {
+      this.recordApiCall('observe', startMs, false);
       throw error;
     }
   }
 
   private async moveTo(tx: number, ty: number): Promise<void> {
+    const startMs = Date.now();
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/moveTo`, {
         method: 'POST',
@@ -761,13 +1595,16 @@ class ResidentAgent {
       });
 
       if (!response.ok) throw new Error(`Move failed: ${response.status}`);
+      this.recordApiCall('moveTo', startMs, true);
       this.state.lastAction = `moveTo(${tx}, ${ty})`;
     } catch (error) {
+      this.recordApiCall('moveTo', startMs, false);
       throw error;
     }
   }
 
   private async chat(message: string, channel = 'global'): Promise<void> {
+    const startMs = Date.now();
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/chatSend`, {
         method: 'POST',
@@ -785,13 +1622,16 @@ class ResidentAgent {
       });
 
       if (!response.ok) throw new Error(`Chat failed: ${response.status}`);
+      this.recordApiCall('chatSend', startMs, true);
       this.state.lastAction = `chat("${message.substring(0, 20)}...")`;
     } catch (error) {
+      this.recordApiCall('chatSend', startMs, false);
       throw error;
     }
   }
 
   private async chatObserve(): Promise<void> {
+    const startMs = Date.now();
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/chatObserve`, {
         method: 'POST',
@@ -825,68 +1665,234 @@ class ResidentAgent {
           })
         );
       }
+      this.recordApiCall('chatObserve', startMs, true);
     } catch (error) {
+      this.recordApiCall('chatObserve', startMs, false);
       throw error;
     }
   }
 
-  private async exploreWorld(): Promise<void> {
-    await this.observe();
-    const tx = Math.floor(Math.random() * 64);
-    const ty = Math.floor(Math.random() * 64);
-    await this.moveTo(tx, ty);
-  }
+  private async interact(
+    targetId: string,
+    action: string,
+    params?: Record<string, unknown>
+  ): Promise<string> {
+    const startMs = Date.now();
+    try {
+      const response = await fetch(`${this.serverUrl}/aic/v0.1/interact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.state.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.state.agentId,
+          roomId: 'default',
+          txId: generateTxId(),
+          targetId,
+          action,
+          ...(params && { params }),
+        }),
+      });
 
-  private async workCycle(): Promise<void> {
-    await this.observe();
-    const tx = (Math.floor(this.state.position.x / 32) + 1) % 64;
-    const ty = Math.floor(this.state.position.y / 32);
-    await this.moveTo(tx, ty);
-  }
+      if (!response.ok) throw new Error(`Interact failed: ${response.status}`);
 
-  private async socialize(): Promise<void> {
-    await this.observe();
-    await this.chatObserve();
-    const greetings = ['Hello!', 'Hi there!', 'Hey!', 'Good day!', 'Greetings!'];
-    const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-    await this.chat(greeting);
-  }
-
-  private async coordinate(): Promise<void> {
-    await this.observe();
-    await this.chat("Team, let's meet at the plaza!");
-    await this.moveTo(32, 32); // Move to center
-  }
-
-  private async help(): Promise<void> {
-    await this.observe();
-    await this.chatObserve();
-    await this.chat('Anyone need help?');
-  }
-
-  private async trade(): Promise<void> {
-    await this.observe();
-    await this.chat('Trading services available!');
-  }
-
-  private async idleBehavior(): Promise<void> {
-    await this.observe();
-  }
-
-  private async chaosBehavior(): Promise<void> {
-    await this.observe();
-    for (let i = 0; i < 5; i++) {
-      const tx = Math.floor(Math.random() * 64);
-      const ty = Math.floor(Math.random() * 64);
-      await this.moveTo(tx, ty);
-      await this.chat(`Chaos ${i}!`);
+      const result = await response.json();
+      const outcome = result.data?.outcome?.type ?? 'unknown';
+      this.state.interactionHistory.push({ targetId, action, outcome, timestamp: Date.now() });
+      if (this.state.interactionHistory.length > 50) {
+        this.state.interactionHistory = this.state.interactionHistory.slice(-25);
+      }
+      this.recordApiCall('interact', startMs, true);
+      this.state.lastAction = `interact(${targetId}, ${action})`;
+      return outcome;
+    } catch (error) {
+      this.recordApiCall('interact', startMs, false);
+      throw error;
     }
   }
 
-  private async spamBehavior(): Promise<void> {
-    for (let i = 0; i < 10; i++) {
-      await this.chat(`Spam message ${i} from ${this.state.agentId}`);
-      await sleep(100);
+  private async pollEvents(waitMs = 0): Promise<void> {
+    const startMs = Date.now();
+    try {
+      const response = await fetch(`${this.serverUrl}/aic/v0.1/pollEvents`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.state.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.state.agentId,
+          roomId: 'default',
+          ...(this.state.eventCursor && { sinceCursor: this.state.eventCursor }),
+          limit: 50,
+          ...(waitMs > 0 && { waitMs: Math.min(waitMs, 1000) }),
+        }),
+      });
+
+      if (!response.ok) throw new Error(`PollEvents failed: ${response.status}`);
+
+      const result = await response.json();
+      if (result.status === 'ok') {
+        if (result.data.nextCursor) {
+          this.state.eventCursor = result.data.nextCursor;
+        }
+      }
+      this.recordApiCall('pollEvents', startMs, true);
+      this.state.lastAction = 'pollEvents';
+    } catch (error) {
+      this.recordApiCall('pollEvents', startMs, false);
+      throw error;
+    }
+  }
+
+  private async profileUpdate(fields: {
+    status?: string;
+    statusMessage?: string;
+    title?: string;
+    department?: string;
+  }): Promise<void> {
+    const startMs = Date.now();
+    try {
+      const response = await fetch(`${this.serverUrl}/aic/v0.1/profile/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.state.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.state.agentId,
+          roomId: 'default',
+          ...fields,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`ProfileUpdate failed: ${response.status}`);
+      if (fields.status) this.state.profileStatus = fields.status;
+      this.recordApiCall('profileUpdate', startMs, true);
+      this.state.lastAction = `profileUpdate(${fields.status ?? 'fields'})`;
+    } catch (error) {
+      this.recordApiCall('profileUpdate', startMs, false);
+      throw error;
+    }
+  }
+
+  private async skillList(category?: string): Promise<void> {
+    const startMs = Date.now();
+    try {
+      const response = await fetch(`${this.serverUrl}/aic/v0.1/skill/list`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.state.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.state.agentId,
+          roomId: 'default',
+          ...(category && { category }),
+        }),
+      });
+
+      if (!response.ok) throw new Error(`SkillList failed: ${response.status}`);
+
+      const result = await response.json();
+      if (result.status === 'ok' && result.data?.skills) {
+        this.state.installedSkills = result.data.skills
+          .filter((s: { installed?: boolean }) => s.installed)
+          .map((s: { id: string }) => s.id);
+      }
+      this.recordApiCall('skillList', startMs, true);
+      this.state.lastAction = 'skillList';
+    } catch (error) {
+      this.recordApiCall('skillList', startMs, false);
+      throw error;
+    }
+  }
+
+  private async skillInstall(skillId: string): Promise<void> {
+    const startMs = Date.now();
+    try {
+      const response = await fetch(`${this.serverUrl}/aic/v0.1/skill/install`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.state.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.state.agentId,
+          roomId: 'default',
+          txId: generateTxId(),
+          skillId,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`SkillInstall failed: ${response.status}`);
+      if (!this.state.installedSkills.includes(skillId)) {
+        this.state.installedSkills.push(skillId);
+      }
+      this.recordApiCall('skillInstall', startMs, true);
+      this.state.lastAction = `skillInstall(${skillId})`;
+    } catch (error) {
+      this.recordApiCall('skillInstall', startMs, false);
+      throw error;
+    }
+  }
+
+  private async skillInvoke(
+    skillId: string,
+    actionId: string,
+    targetId?: string,
+    params?: Record<string, unknown>
+  ): Promise<void> {
+    const startMs = Date.now();
+    try {
+      const response = await fetch(`${this.serverUrl}/aic/v0.1/skill/invoke`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.state.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.state.agentId,
+          roomId: 'default',
+          txId: generateTxId(),
+          skillId,
+          actionId,
+          ...(targetId && { targetId }),
+          ...(params && { params }),
+        }),
+      });
+
+      if (!response.ok) throw new Error(`SkillInvoke failed: ${response.status}`);
+      this.recordApiCall('skillInvoke', startMs, true);
+      this.state.lastAction = `skillInvoke(${skillId}:${actionId})`;
+    } catch (error) {
+      this.recordApiCall('skillInvoke', startMs, false);
+      throw error;
+    }
+  }
+
+  private async unregister(): Promise<void> {
+    const startMs = Date.now();
+    try {
+      const response = await fetch(`${this.serverUrl}/aic/v0.1/unregister`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.state.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.state.agentId,
+          roomId: 'default',
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Unregister failed: ${response.status}`);
+      this.recordApiCall('unregister', startMs, true);
+      this.state.lastAction = 'unregister';
+    } catch (error) {
+      this.recordApiCall('unregister', startMs, false);
+      throw error;
     }
   }
 }
@@ -1012,6 +2018,7 @@ class ResidentAgentLoop {
     const issue = this.issueDetector.runAllDetections(this.agents);
 
     if (issue) {
+      this.issueDetector.markReported(issue.area);
       const issueUrl = await this.issueReporter.createIssue(issue);
       if (issueUrl) {
         this.state.totalIssuesCreated++;
@@ -1033,9 +2040,20 @@ class ResidentAgentLoop {
       }
     }
 
+    const usedEndpoints = new Set<string>();
+    for (const agent of this.agents) {
+      for (const record of agent.getState().apiCallHistory) {
+        usedEndpoints.add(record.endpoint);
+      }
+    }
+    const coverage = Math.round((usedEndpoints.size / EXPECTED_ENDPOINTS.length) * 100);
+
     console.log(`  Agents: ${this.agents.length}`);
     console.log(`  Total Issues: ${this.state.totalIssuesCreated}`);
     console.log(`  Escalations: ${this.state.escalationCount}`);
+    console.log(
+      `  API Coverage: ${usedEndpoints.size}/${EXPECTED_ENDPOINTS.length} (${coverage}%)`
+    );
 
     saveState(this.state);
   }

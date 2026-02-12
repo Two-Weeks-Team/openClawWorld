@@ -13,24 +13,24 @@ describe('ZoneSystem - Plaza Zone (8-zone Grid-Town layout)', () => {
   });
 
   describe('detectZone', () => {
-    it('returns plaza for position inside plaza bounds (1472, 1472)', () => {
-      expect(zoneSystem.detectZone(1472, 1472)).toBe('plaza');
+    it('returns plaza for position inside plaza bounds (736, 736)', () => {
+      expect(zoneSystem.detectZone(736, 736)).toBe('plaza');
     });
 
-    it('returns plaza for position at plaza origin (1216, 1216)', () => {
-      expect(zoneSystem.detectZone(1216, 1216)).toBe('plaza');
+    it('returns plaza for position at plaza origin (608, 608)', () => {
+      expect(zoneSystem.detectZone(608, 608)).toBe('plaza');
     });
 
-    it('returns plaza for position at plaza bottom-right boundary (1727, 1727)', () => {
-      expect(zoneSystem.detectZone(1727, 1727)).toBe('plaza');
+    it('returns plaza for position at plaza bottom-right boundary (863, 863)', () => {
+      expect(zoneSystem.detectZone(863, 863)).toBe('plaza');
     });
 
     it('returns null for position outside all zones', () => {
-      expect(zoneSystem.detectZone(5000, 500)).toBeNull();
+      expect(zoneSystem.detectZone(2500, 250)).toBeNull();
     });
 
     it('returns null for position just outside plaza to the right', () => {
-      expect(zoneSystem.detectZone(1728, 1472)).toBeNull();
+      expect(zoneSystem.detectZone(864, 736)).toBeNull();
     });
   });
 
@@ -38,14 +38,7 @@ describe('ZoneSystem - Plaza Zone (8-zone Grid-Town layout)', () => {
     it('fires zone.enter event when entity enters plaza', () => {
       const entity = new EntitySchema('entity_1', 'human', 'Test', 'room_1');
 
-      const result = zoneSystem.updateEntityZone(
-        'entity_1',
-        1472,
-        1472,
-        eventLog,
-        'room_1',
-        entity
-      );
+      const result = zoneSystem.updateEntityZone('entity_1', 736, 736, eventLog, 'room_1', entity);
 
       expect(result.currentZone).toBe('plaza');
       expect(result.changed).toBe(true);
@@ -62,13 +55,13 @@ describe('ZoneSystem - Plaza Zone (8-zone Grid-Town layout)', () => {
     it('updates entity currentZone to plaza when entity enters', () => {
       const entity = new EntitySchema('entity_1', 'human', 'Test', 'room_1');
 
-      zoneSystem.updateEntityZone('entity_1', 1472, 1472, eventLog, 'room_1', entity);
+      zoneSystem.updateEntityZone('entity_1', 736, 736, eventLog, 'room_1', entity);
 
       expect(entity.currentZone).toBe('plaza');
     });
 
     it('tracks entity zone correctly for plaza', () => {
-      zoneSystem.updateEntityZone('entity_1', 1472, 1472);
+      zoneSystem.updateEntityZone('entity_1', 736, 736);
 
       expect(zoneSystem.getEntityZone('entity_1')).toBe('plaza');
     });
@@ -76,15 +69,15 @@ describe('ZoneSystem - Plaza Zone (8-zone Grid-Town layout)', () => {
 
   describe('zone population', () => {
     it('returns correct population for plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 1300, 1300);
-      zoneSystem.updateEntityZone('entity_2', 1400, 1400);
+      zoneSystem.updateEntityZone('entity_1', 700, 700);
+      zoneSystem.updateEntityZone('entity_2', 750, 750);
 
       expect(zoneSystem.getZonePopulation('plaza')).toBe(2);
     });
 
     it('returns entities in plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 1300, 1300);
-      zoneSystem.updateEntityZone('entity_2', 1400, 1400);
+      zoneSystem.updateEntityZone('entity_1', 700, 700);
+      zoneSystem.updateEntityZone('entity_2', 750, 750);
 
       const entities = zoneSystem.getEntitiesInZone('plaza');
 
@@ -106,7 +99,7 @@ describe('ZoneSystem - Plaza Zone (8-zone Grid-Town layout)', () => {
     it('returns correct bounds for plaza zone', () => {
       const bounds = zoneSystem.getZoneBounds('plaza');
 
-      expect(bounds).toEqual({ x: 1216, y: 1216, width: 512, height: 512 });
+      expect(bounds).toEqual({ x: 608, y: 608, width: 256, height: 256 });
     });
   });
 });

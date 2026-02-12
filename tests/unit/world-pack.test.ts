@@ -57,8 +57,8 @@ function createTestPack(
           facilities: [],
           width: 10,
           height: 10,
-          tilewidth: 32,
-          tileheight: 32,
+          tilewidth: 16,
+          tileheight: 16,
           layers: [
             {
               id: 1,
@@ -317,7 +317,7 @@ describe('MapLoader zone support', () => {
       const parsedMap = mapLoader.loadZoneMapFromData(zoneMapData);
 
       expect(parsedMap.mapId).toBe('plaza');
-      expect(parsedMap.tileSize).toBe(32);
+      expect(parsedMap.tileSize).toBe(16);
       expect(parsedMap.collisionGrid.length).toBe(10);
     });
   });

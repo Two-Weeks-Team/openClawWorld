@@ -3,9 +3,9 @@
   "name": "Quinn the Fountain Keeper",
   "sprite": "npc-keeper",
   "zone": "plaza",
-  "defaultPosition": { "x": 1440, "y": 1344 },
+  "defaultPosition": { "x": 720, "y": 672 },
   "schedule": [
-    { "startHour": 6, "endHour": 20, "state": "working", "position": { "x": 1440, "y": 1344 } }
+    { "startHour": 6, "endHour": 20, "state": "working", "position": { "x": 720, "y": 672 } }
   ],
   "dialogue": {
     "greeting": {

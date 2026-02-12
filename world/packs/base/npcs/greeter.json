@@ -3,9 +3,9 @@
   "name": "Sam the Greeter",
   "sprite": "npc-greeter",
   "zone": "lobby",
-  "defaultPosition": { "x": 320, "y": 256 },
+  "defaultPosition": { "x": 160, "y": 128 },
   "schedule": [
-    { "startHour": 9, "endHour": 18, "state": "working", "position": { "x": 320, "y": 256 } }
+    { "startHour": 9, "endHour": 18, "state": "working", "position": { "x": 160, "y": 128 } }
   ],
   "dialogue": {
     "greeting": {

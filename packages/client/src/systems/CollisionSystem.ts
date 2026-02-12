@@ -4,9 +4,9 @@ export class ClientCollisionSystem {
   private worldGrid: WorldGrid | null = null;
   private width: number = 0;
   private height: number = 0;
-  private tileSize: number = 32;
+  private tileSize: number = 16;
 
-  setWorldGrid(grid: WorldGrid, tileSize: number = 32): void {
+  setWorldGrid(grid: WorldGrid, tileSize: number = 16): void {
     this.worldGrid = grid;
     this.tileSize = tileSize;
     this.height = grid.length;

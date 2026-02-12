@@ -2,8 +2,8 @@
   "name": "village_tileset",
   "tilewidth": 32,
   "tileheight": 32,
-  "tilecount": 12,
-  "columns": 12,
+  "tilecount": 14,
+  "columns": 14,
   "license": "CC0",
   "tiles": [
     { "id": 0, "type": "empty", "collision": false },
@@ -15,8 +15,10 @@
     { "id": 6, "type": "floor_lounge", "collision": false },
     { "id": 7, "type": "floor_arcade", "collision": false },
     { "id": 8, "type": "floor_plaza", "collision": false },
-    { "id": 9, "type": "door", "collision": false, "isDoor": true },
-    { "id": 10, "type": "wall", "collision": true },
-    { "id": 11, "type": "water", "collision": true }
+    { "id": 9, "type": "floor_lake", "collision": false },
+    { "id": 10, "type": "door", "collision": false, "isDoor": true },
+    { "id": 11, "type": "wall", "collision": true },
+    { "id": 12, "type": "water", "collision": true },
+    { "id": 13, "type": "decoration", "collision": false }
   ]
 }

@@ -143,13 +143,13 @@ describe('WorldPackLoader', () => {
     });
 
     it('loads pack with multiple zones', () => {
-      createTestPack({ zones: ['plaza', 'north-block'] });
+      createTestPack({ zones: ['plaza', 'office'] });
       const loader = new WorldPackLoader(TEST_PACK_PATH);
       const pack = loader.loadPack();
 
       expect(pack.maps.size).toBe(2);
       expect(pack.maps.has('plaza' as const)).toBe(true);
-      expect(pack.maps.has('north-block' as const)).toBe(true);
+      expect(pack.maps.has('office' as const)).toBe(true);
     });
   });
 
@@ -185,7 +185,7 @@ describe('WorldPackLoader', () => {
           name: 'test',
           version: '1.0.0',
           zones: ['plaza'],
-          entryZone: 'north-block',
+          entryZone: 'office',
         })
       );
 
@@ -231,7 +231,7 @@ describe('WorldPackLoader', () => {
 
   describe('getAllZoneMaps', () => {
     it('returns all loaded zone maps', () => {
-      createTestPack({ zones: ['plaza', 'north-block'] });
+      createTestPack({ zones: ['plaza', 'office'] });
       const loader = new WorldPackLoader(TEST_PACK_PATH);
       loader.loadPack();
 
@@ -268,8 +268,8 @@ describe('WorldPackLoader', () => {
 
       expect(pack.manifest.name).toBe('base');
       expect(pack.manifest.zones).toContain('plaza');
-      expect(pack.manifest.zones).toContain('north-block');
-      expect(pack.manifest.entryZone).toBe('plaza');
+      expect(pack.manifest.zones).toContain('office');
+      expect(pack.manifest.entryZone).toBe('central-park');
     });
 
     it('has correct zone data for plaza', () => {
@@ -324,7 +324,7 @@ describe('MapLoader zone support', () => {
 
   describe('mergeZoneMaps', () => {
     it('merges multiple zone maps', () => {
-      createTestPack({ zones: ['plaza', 'north-block'] });
+      createTestPack({ zones: ['plaza', 'office'] });
       const packLoader = new WorldPackLoader(TEST_PACK_PATH);
       packLoader.loadPack();
 

@@ -1,6 +1,8 @@
 # OpenClawWorld Demo Runbook
 
-This runbook provides step-by-step instructions for running the OpenClawWorld server demo and load testing with 15 participants.
+This runbook provides step-by-step instructions for running the OpenClawWorld server demo and load testing with 15 participants (5 humans + 10 AI agents).
+
+**Demo Goal:** Demonstrate humans and AI agents coexisting in the same spatial environment, with location-based interactions and presence awareness.
 
 ## Prerequisites
 

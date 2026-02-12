@@ -251,8 +251,10 @@ class GitHubIssueReporter {
       );
       const issues = JSON.parse(result);
       return issues.length > 0;
-    } catch {
-      return false;
+    } catch (error) {
+      console.error('[checkDuplicate] gh issue list failed:', error);
+      // Treat as duplicate to safely prevent creating issues on failure
+      return true;
     }
   }
 
@@ -397,24 +399,41 @@ class IssueDetector {
   }
 
   detectChatMismatch(agents: ResidentAgent[]): Issue | null {
-    const messageSets: Map<string, Set<string>> = new Map();
+    const agentChatData: Map<string, { messages: ChatMessage[]; latestTs: number }> = new Map();
 
     for (const agent of agents) {
       const state = agent.getState();
-      const messages = state.chatHistory.map(m => `${m.from}:${m.message}`);
-      messageSets.set(state.agentId, new Set(messages));
+      const latestTs =
+        state.chatHistory.length > 0 ? Math.max(...state.chatHistory.map(m => m.timestamp)) : 0;
+      agentChatData.set(state.agentId, { messages: state.chatHistory, latestTs });
     }
 
-    const agentIds = Array.from(messageSets.keys());
+    const agentIds = Array.from(agentChatData.keys());
+    if (agentIds.length < 2) return null;
+
+    const latestTimestamps = Array.from(agentChatData.values()).map(d => d.latestTs);
+    const commonCutoff = Math.min(...latestTimestamps.filter(ts => ts > 0));
+    if (commonCutoff === 0 || commonCutoff === Infinity) return null;
+
+    const filteredSets: Map<string, Set<string>> = new Map();
+    for (const [agentId, data] of Array.from(agentChatData.entries())) {
+      const filtered = data.messages
+        .filter(m => m.timestamp <= commonCutoff)
+        .map(m => `${m.from}:${m.message}`);
+      filteredSets.set(agentId, new Set(filtered));
+    }
+
     for (let i = 0; i < agentIds.length; i++) {
       for (let j = i + 1; j < agentIds.length; j++) {
-        const set1 = messageSets.get(agentIds[i])!;
-        const set2 = messageSets.get(agentIds[j])!;
+        const set1 = filteredSets.get(agentIds[i])!;
+        const set2 = filteredSets.get(agentIds[j])!;
 
         const diff1 = Array.from(set1).filter(m => !set2.has(m));
         const diff2 = Array.from(set2).filter(m => !set1.has(m));
 
         if (diff1.length > 0 || diff2.length > 0) {
+          const data1 = agentChatData.get(agentIds[i])!;
+          const data2 = agentChatData.get(agentIds[j])!;
           return {
             area: 'Chat',
             title: 'Chat message mismatch between agents',
@@ -430,10 +449,11 @@ class IssueDetector {
             frequency: 'sometimes',
             evidence: {
               agentIds: [agentIds[i], agentIds[j]],
-              timestamps: [Date.now()],
+              timestamps: [commonCutoff, data1.latestTs, data2.latestTs],
               logs: [
-                `Agent ${agentIds[i]} unique: ${diff1.join(', ')}`,
-                `Agent ${agentIds[j]} unique: ${diff2.join(', ')}`,
+                `Common cutoff: ${commonCutoff}`,
+                `Agent ${agentIds[i]} latest: ${data1.latestTs}, unique: ${diff1.join(', ')}`,
+                `Agent ${agentIds[j]} latest: ${data2.latestTs}, unique: ${diff2.join(', ')}`,
               ],
             },
           };
@@ -709,8 +729,8 @@ class ResidentAgent {
           });
         }
         this.state.position = {
-          x: result.data.self?.x || this.state.position.x,
-          y: result.data.self?.y || this.state.position.y,
+          x: result.data.self?.x ?? this.state.position.x,
+          y: result.data.self?.y ?? this.state.position.y,
         };
       }
       this.state.lastAction = 'observe';
@@ -1019,6 +1039,7 @@ class ResidentAgentLoop {
         .then(success => {
           if (success) {
             this.agents.push(agent);
+            this.state.agents.push(agent.getState().agentId);
             this.state.agentCount = this.agents.length;
             void agent.start();
           }

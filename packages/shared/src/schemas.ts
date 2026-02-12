@@ -444,8 +444,8 @@ export const ZoneIdSchema = z.enum([
 export const EntranceDirectionSchema = z.enum(['north', 'south', 'east', 'west']);
 
 export const BuildingEntranceSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+  id: z.string().min(1).max(128),
+  name: z.string().min(1).max(128),
   position: Vec2Schema,
   size: z.object({ width: z.number(), height: z.number() }),
   zone: ZoneIdSchema,
@@ -468,9 +468,9 @@ export const MapMetadataSchema = z.object({
   currentZone: ZoneIdSchema.nullable(),
   zones: z.array(ZoneInfoSchema),
   mapSize: z.object({
-    width: z.number(),
-    height: z.number(),
-    tileSize: z.number(),
+    width: z.number().int().min(1),
+    height: z.number().int().min(1),
+    tileSize: z.number().int().min(1),
   }),
 });
 

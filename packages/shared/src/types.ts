@@ -668,7 +668,7 @@ export type EntranceDirection = 'north' | 'south' | 'east' | 'west';
 export type BuildingEntrance = {
   id: string;
   name: string;
-  position: { x: number; y: number };
+  position: Vec2;
   size: { width: number; height: number };
   zone: ZoneId;
   direction: EntranceDirection;

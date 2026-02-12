@@ -14,6 +14,10 @@ import type {
   ZoneId,
 } from '@openclawworld/shared';
 import { MAP_CONFIG, ZONE_IDS, ZONE_BOUNDS } from '@openclawworld/shared';
+
+function isValidZoneId(value: string): value is ZoneId {
+  return (ZONE_IDS as readonly string[]).includes(value);
+}
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
 import type { FacilitySchema } from '../../schemas/FacilitySchema.js';
@@ -104,7 +108,7 @@ function buildMapMetadata(gameRoom: GameRoom, currentZone: string | null): MapMe
   }
 
   return {
-    currentZone: currentZone as ZoneId | null,
+    currentZone: currentZone && isValidZoneId(currentZone) ? currentZone : null,
     zones,
     mapSize: {
       width: MAP_CONFIG.pixelWidth,

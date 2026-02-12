@@ -1,14 +1,16 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve, join } from 'path';
-import type {
-  ZoneId,
-  NpcDefinition,
-  Vec2,
-  TiledLayer,
-  TiledObject,
-  ZoneBounds,
-  BuildingEntrance,
-  EntranceDirection,
+import {
+  ZoneIdSchema,
+  EntranceDirectionSchema,
+  ZONE_BOUNDS,
+  type ZoneId,
+  type NpcDefinition,
+  type Vec2,
+  type TiledLayer,
+  type TiledObject,
+  type ZoneBounds,
+  type BuildingEntrance,
 } from '@openclawworld/shared';
 
 export type PackManifest = {
@@ -563,17 +565,20 @@ export class WorldPackLoader {
 
       if (!zoneProp?.value || !directionProp?.value || !connectsToProp?.value) continue;
 
-      const direction = directionProp.value as EntranceDirection;
-      if (!['north', 'south', 'east', 'west'].includes(direction)) continue;
+      const zoneResult = ZoneIdSchema.safeParse(zoneProp.value);
+      const directionResult = EntranceDirectionSchema.safeParse(directionProp.value);
+      const connectsToResult = ZoneIdSchema.safeParse(connectsToProp.value);
+
+      if (!zoneResult.success || !directionResult.success || !connectsToResult.success) continue;
 
       entrances.push({
         id: String(obj.id),
         name: obj.name,
         position: { x: obj.x, y: obj.y },
         size: { width: obj.width, height: obj.height },
-        zone: zoneProp.value as ZoneId,
-        direction,
-        connectsTo: connectsToProp.value as ZoneId,
+        zone: zoneResult.data,
+        direction: directionResult.data,
+        connectsTo: connectsToResult.data,
       });
     }
 
@@ -581,18 +586,7 @@ export class WorldPackLoader {
   }
 
   private getDefaultZoneBounds(zoneId: ZoneId): ZoneBounds {
-    const defaultBounds: Record<ZoneId, ZoneBounds> = {
-      lobby: { x: 192, y: 64, width: 384, height: 384 },
-      office: { x: 1344, y: 64, width: 640, height: 448 },
-      'central-park': { x: 640, y: 512, width: 768, height: 640 },
-      arcade: { x: 1408, y: 512, width: 576, height: 512 },
-      meeting: { x: 64, y: 896, width: 512, height: 576 },
-      'lounge-cafe': { x: 576, y: 1216, width: 640, height: 448 },
-      plaza: { x: 1216, y: 1216, width: 512, height: 512 },
-      lake: { x: 64, y: 64, width: 128, height: 448 },
-    };
-
-    return defaultBounds[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };
+    return ZONE_BOUNDS[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };
   }
 
   private formatZoneName(zoneId: ZoneId): string {

@@ -13,7 +13,7 @@
     }
   },
   "scripts": {
-    "sync-maps": "bash scripts/sync-maps.sh",
+    "sync-maps": "node scripts/sync-maps.mjs",
     "build": "pnpm run sync-maps && pnpm -r build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",

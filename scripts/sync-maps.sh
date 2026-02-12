@@ -23,4 +23,10 @@ echo "  -> Server: $SERVER_MAP"
 echo "  -> Client: $CLIENT_MAP"
 echo ""
 echo "MD5 checksums:"
-md5 "$SOURCE_MAP" "$SERVER_MAP" "$CLIENT_MAP" 2>/dev/null || md5sum "$SOURCE_MAP" "$SERVER_MAP" "$CLIENT_MAP"
+if command -v md5sum &> /dev/null; then
+  md5sum "$SOURCE_MAP" "$SERVER_MAP" "$CLIENT_MAP"
+elif command -v md5 &> /dev/null; then
+  md5 "$SOURCE_MAP" "$SERVER_MAP" "$CLIENT_MAP"
+else
+  echo "Warning: Could not find md5 or md5sum to verify checksums."
+fi

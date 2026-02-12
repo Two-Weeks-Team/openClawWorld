@@ -1,6 +1,13 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve, join } from 'path';
-import type { ZoneId, NpcDefinition, Vec2, TiledLayer, TiledObject } from '@openclawworld/shared';
+import type {
+  ZoneId,
+  NpcDefinition,
+  Vec2,
+  TiledLayer,
+  TiledObject,
+  ZoneBounds,
+} from '@openclawworld/shared';
 
 export type PackManifest = {
   name: string;
@@ -10,12 +17,7 @@ export type PackManifest = {
   entryZone: ZoneId;
 };
 
-export type ZoneBounds = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+export type { ZoneBounds } from '@openclawworld/shared';
 
 export type SpawnPoint = {
   x: number;

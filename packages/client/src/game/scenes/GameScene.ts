@@ -67,6 +67,8 @@ export class GameScene extends Phaser.Scene {
   private selectedSkillSlot: number | null = null;
   private entityEffects: Map<string, Set<string>> = new Map();
   private builtinSkills: SkillDefinition[] = [];
+  private _debugBlockedCount = 0;
+  private debugInfoTexts: Phaser.GameObjects.Text[] = [];
 
   constructor() {
     super('GameScene');
@@ -554,7 +556,10 @@ export class GameScene extends Phaser.Scene {
 
     if (this.debugIndicator) this.debugIndicator.destroy();
     if (this.debugLegend) this.debugLegend.destroy();
-    if (this.debugInfoPanel) this.debugInfoPanel.destroy();
+    if (this.debugInfoPanel) {
+      this.debugInfoPanel.destroy();
+      this.debugInfoTexts = [];
+    }
     this.debugZoneLabels.forEach(label => label.destroy());
     this.debugZoneLabels = [];
 
@@ -581,9 +586,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.zoneDebug) return;
 
     const myEntity = gameClient.entityId ? this.entityData.get(gameClient.entityId) : null;
-    const currentZone = myEntity
-      ? (myEntity as unknown as { currentZone?: ZoneId }).currentZone
-      : null;
+    const currentZone = myEntity?.currentZone ?? null;
 
     for (const [zoneId, bounds] of Object.entries(ZONE_BOUNDS) as [
       ZoneId,
@@ -635,7 +638,7 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
-    (this as unknown as { _debugBlockedCount: number })._debugBlockedCount = blockedCount;
+    this._debugBlockedCount = blockedCount;
   }
 
   private drawDebugSpawnPoint(): void {
@@ -752,34 +755,47 @@ export class GameScene extends Phaser.Scene {
     bg.fillRoundedRect(0, 0, 190, 100, 6);
     this.debugInfoPanel.add(bg);
 
+    // Create text objects once and store references
+    this.debugInfoTexts = [];
+    let yOffset = 8;
+    for (let i = 0; i < 5; i++) {
+      const text = this.add.text(8, yOffset, '', {
+        fontSize: '11px',
+        color: '#ffffff',
+      });
+      this.debugInfoPanel.add(text);
+      this.debugInfoTexts.push(text);
+      yOffset += 16;
+    }
+
+    this.refreshDebugInfoText();
+  }
+
+  private refreshDebugInfoText(): void {
+    if (this.debugInfoTexts.length < 5) return;
+
     const myEntity = gameClient.entityId ? this.entityData.get(gameClient.entityId) : null;
-    const currentZone = myEntity
-      ? ((myEntity as unknown as { currentZone?: ZoneId }).currentZone ?? 'none')
-      : 'N/A';
+    const currentZone = myEntity?.currentZone ?? 'none';
     const tile = myEntity?.tile ?? { tx: 0, ty: 0 };
     const pos = myEntity?.pos ?? { x: 0, y: 0 };
-    const blockedCount =
-      (this as unknown as { _debugBlockedCount?: number })._debugBlockedCount ?? 0;
+    const blockedCount = this._debugBlockedCount;
 
     const isBlocked = this.clientCollision?.isBlocked(tile.tx, tile.ty) ?? false;
 
-    const lines = [
-      `Tile: (${tile.tx}, ${tile.ty})`,
-      `Position: (${Math.round(pos.x)}, ${Math.round(pos.y)})`,
-      `Zone: ${currentZone}`,
-      `Blocked: ${isBlocked ? 'YES' : 'no'}`,
-      `Total blocked tiles: ${blockedCount}`,
-    ];
+    this.debugInfoTexts[0].setText(`Tile: (${tile.tx}, ${tile.ty})`);
+    this.debugInfoTexts[0].setColor('#ffffff');
 
-    let yOffset = 8;
-    for (const line of lines) {
-      const text = this.add.text(8, yOffset, line, {
-        fontSize: '11px',
-        color: line.includes('YES') ? '#ff6666' : '#ffffff',
-      });
-      this.debugInfoPanel.add(text);
-      yOffset += 16;
-    }
+    this.debugInfoTexts[1].setText(`Position: (${Math.round(pos.x)}, ${Math.round(pos.y)})`);
+    this.debugInfoTexts[1].setColor('#ffffff');
+
+    this.debugInfoTexts[2].setText(`Zone: ${currentZone}`);
+    this.debugInfoTexts[2].setColor('#ffffff');
+
+    this.debugInfoTexts[3].setText(`Blocked: ${isBlocked ? 'YES' : 'no'}`);
+    this.debugInfoTexts[3].setColor(isBlocked ? '#ff6666' : '#ffffff');
+
+    this.debugInfoTexts[4].setText(`Total blocked tiles: ${blockedCount}`);
+    this.debugInfoTexts[4].setColor('#ffffff');
   }
 
   private connectToServer() {
@@ -965,7 +981,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private checkZoneChange(entity: Entity): void {
-    const currentZone = (entity as unknown as { currentZone?: ZoneId }).currentZone ?? null;
+    const currentZone = entity.currentZone ?? null;
 
     if (currentZone === this.previousZone) return;
 
@@ -1186,9 +1202,7 @@ export class GameScene extends Phaser.Scene {
 
   private updateDebugInfoPanel(): void {
     if (!this.debugEnabled || !this.debugInfoPanel) return;
-
-    this.debugInfoPanel.destroy();
-    this.createDebugInfoPanel();
+    this.refreshDebugInfoText();
   }
 
   private updateMinimap(): void {

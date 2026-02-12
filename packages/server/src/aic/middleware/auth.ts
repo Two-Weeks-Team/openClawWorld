@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { AicErrorObject } from '@openclawworld/shared';
+import { getAgentIdFromToken, getRoomIdFromToken } from '../tokenRegistry.js';
 
 const AUTH_HEADER = 'Authorization';
 const BEARER_PREFIX = 'Bearer ';
@@ -41,6 +42,19 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction):
     return;
   }
 
+  const agentId = getAgentIdFromToken(token);
+  const roomId = getRoomIdFromToken(token);
+
+  if (!agentId) {
+    res.status(401).json({
+      status: 'error',
+      error: createAuthError('Invalid or expired token'),
+    });
+    return;
+  }
+
   req.authToken = token;
+  req.authAgentId = agentId;
+  req.authRoomId = roomId ?? undefined;
   next();
 }

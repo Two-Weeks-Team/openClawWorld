@@ -312,7 +312,9 @@ export const PresenceJoinPayloadSchema = z.object({
 
 export const PresenceLeavePayloadSchema = z.object({
   entityId: IdEntitySchema,
-  reason: z.enum(['disconnect', 'kicked', 'room_closed']),
+  name: z.string().min(1).max(64).optional(),
+  kind: EntityKindSchema.optional(),
+  reason: z.enum(['disconnect', 'kicked', 'room_closed', 'unregister', 'timeout']),
 });
 
 export const ProximityEnterPayloadSchema = z.object({
@@ -392,6 +394,16 @@ export const RegisterResponseDataSchema = z.object({
   agentId: IdEntitySchema,
   roomId: IdRoomSchema,
   sessionToken: z.string().regex(/^[a-zA-Z0-9._-]{8,256}$/, 'Invalid sessionToken format'),
+});
+
+export const UnregisterRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+});
+
+export const UnregisterResponseDataSchema = z.object({
+  agentId: IdEntitySchema,
+  unregisteredAt: TsMsSchema,
 });
 
 // ============================================================================

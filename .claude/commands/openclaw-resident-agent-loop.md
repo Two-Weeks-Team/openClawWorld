@@ -308,7 +308,98 @@ Detectors are shuffled each cycle to avoid ordering bias. Each detector has a pe
 
 **Areas:** `Deploy`, `Sync`, `Movement`, `Collision`, `Chat`, `Social`, `NPC`, `Skills`, `Interactables`, `AIC`, `UI`, `Persistence`, `Performance`, `Docs`, `Behavior`, `Coverage`
 
-**Labels:** `resident-agent`, `<area>`, `<severity>`
+**Labels:** `resident-agent`, `<area>`, `<severity>` (label:resident-agent is always maintained)
+
+### Issue Template Sections
+
+Each automatically generated issue now includes detailed debugging information:
+
+#### 1. Build Info
+
+- Commit SHA
+- Timestamp
+
+#### 2. Environment
+
+- Agents involved
+- Labels (with `label:resident-agent` explicitly noted)
+
+#### 3. Bug Description
+
+- **Expected Behavior**: What should have happened
+- **Observed Behavior**: What actually happened
+- **Reproduction Steps**: Step-by-step instructions to reproduce
+
+#### 4. Metadata
+
+- Frequency: `always`, `sometimes`, or `rare`
+- Severity: `Critical`, `Major`, or `Minor`
+- Area: Issue category
+
+#### 5. Server Information
+
+- Server version
+- Environment (development/production)
+- Server timestamp
+
+#### 6. API Coverage
+
+- Endpoints used vs. total (e.g., 8/12)
+- Coverage percentage
+
+#### 7. Agent States at Time of Incident
+
+Markdown table showing:
+
+- Agent ID, Role, Position
+- Last Action, Error Count, Cycle Count
+- Observed Entities, Observed Facilities
+- Event Cursor (if applicable)
+
+#### 8. HTTP Request Details (for API errors)
+
+- **Endpoint**: API endpoint called
+- **Status Code**: HTTP response code
+- **Error Code**: Application error code (if applicable)
+- **Error Message**: Detailed error message
+- **Request Body**: Full JSON request payload
+- **Response Body**: Full JSON response/error
+
+#### 9. Recent Actions
+
+Last N actions performed by agents
+
+#### 10. Logs
+
+Extended log output (up to 30 lines)
+
+#### 11. Screenshots (if available)
+
+Automatically attached screenshots showing visual state
+
+---
+
+## Issue Evidence Collection
+
+The agent system now captures detailed evidence for debugging:
+
+### AgentState.lastError
+
+Each agent tracks its last error with:
+
+- `endpoint`: API endpoint that failed
+- `httpStatusCode`: HTTP status code
+- `errorCode`: Application error code
+- `errorMessage`: Error message
+- `requestBody`: Request payload (JSON string)
+- `responseBody`: Response body (JSON string)
+- `timestamp`: When error occurred
+
+### IssueDetector Enhancements
+
+- `buildAgentStates()`: Captures full agent state snapshots
+- `getApiCoverage()`: Calculates API endpoint coverage
+- All detectors now populate detailed evidence fields
 
 ---
 
@@ -442,3 +533,33 @@ Press `Ctrl+C` to gracefully shutdown (unregisters all agents) and save state.
 | `scripts/resident-agent-loop.ts`        | Main implementation                 |
 | `~/.openclaw-resident-agent/state.json` | Persistent state                    |
 | `artifacts/resident-agent/`             | Issue artifacts (screenshots, logs) |
+
+## Artifact Collection
+
+### Screenshots
+
+Screenshots are captured automatically when:
+
+- Visual anomalies detected (position desync, rendering issues)
+- UI inconsistencies observed
+- Manual debugging enabled (`--screenshot` flag)
+
+Storage: `artifacts/resident-agent/screenshots/`
+
+### Debug Logs
+
+Extended logs captured per issue:
+
+- HTTP request/response pairs
+- Agent state transitions
+- API call history
+- Error traces with full context
+
+### Temporary Files
+
+During issue creation:
+
+- `/tmp/issue-body-*.md` - Formatted issue content
+- Automatically cleaned up after successful creation
+
+---

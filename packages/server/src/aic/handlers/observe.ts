@@ -9,7 +9,15 @@ import type {
   ObservedFacility,
   RoomInfo,
   AicErrorObject,
+  MapMetadata,
+  ZoneInfo,
+  ZoneId,
 } from '@openclawworld/shared';
+import { MAP_CONFIG, ZONE_IDS, ZONE_BOUNDS } from '@openclawworld/shared';
+
+function isValidZoneId(value: string): value is ZoneId {
+  return (ZONE_IDS as readonly string[]).includes(value);
+}
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
 import type { FacilitySchema } from '../../schemas/FacilitySchema.js';
@@ -79,6 +87,33 @@ function createErrorResponse(
       code,
       message,
       retryable,
+    },
+  };
+}
+
+function buildMapMetadata(gameRoom: GameRoom, currentZone: string | null): MapMetadata {
+  const worldPack = gameRoom.getWorldPack();
+  const zones: ZoneInfo[] = [];
+
+  for (const zoneId of ZONE_IDS) {
+    const bounds = ZONE_BOUNDS[zoneId];
+    const zoneMapData = worldPack?.maps.get(zoneId);
+    const entrances = zoneMapData?.entrances ?? [];
+
+    zones.push({
+      id: zoneId,
+      bounds,
+      entrances,
+    });
+  }
+
+  return {
+    currentZone: currentZone && isValidZoneId(currentZone) ? currentZone : null,
+    zones,
+    mapSize: {
+      width: MAP_CONFIG.pixelWidth,
+      height: MAP_CONFIG.pixelHeight,
+      tileSize: MAP_CONFIG.tileSize,
     },
   };
 }
@@ -173,6 +208,7 @@ export async function handleObserve(req: Request, res: Response): Promise<void> 
       facilities: nearbyFacilities,
       serverTsMs: Date.now(),
       room: roomInfo,
+      mapMetadata: buildMapMetadata(gameRoom, agentEntity.currentZone || null),
     };
 
     res.status(200).json({

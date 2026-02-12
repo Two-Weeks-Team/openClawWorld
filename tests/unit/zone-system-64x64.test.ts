@@ -3,7 +3,7 @@ import { ZoneSystem, DEFAULT_ZONE_BOUNDS } from '../../packages/server/src/zone/
 import { EventLog } from '../../packages/server/src/events/EventLog.js';
 import { EntitySchema } from '../../packages/server/src/schemas/EntitySchema.js';
 
-describe('ZoneSystem - New 8-Zone Layout', () => {
+describe('ZoneSystem - 64x64 Grid-Town Layout (2048x2048 pixels)', () => {
   let zoneSystem: ZoneSystem;
   let eventLog: EventLog;
 
@@ -12,7 +12,7 @@ describe('ZoneSystem - New 8-Zone Layout', () => {
     eventLog = new EventLog(60000, 1000);
   });
 
-  describe('DEFAULT_ZONE_BOUNDS matches new 8-zone spec', () => {
+  describe('DEFAULT_ZONE_BOUNDS matches 8-zone Grid-Town spec', () => {
     it('contains all 8 zones', () => {
       expect(DEFAULT_ZONE_BOUNDS.size).toBe(8);
       expect(DEFAULT_ZONE_BOUNDS.has('lobby')).toBe(true);
@@ -66,8 +66,72 @@ describe('ZoneSystem - New 8-Zone Layout', () => {
     });
   });
 
-  describe('detectZone with new 8-zone layout positions', () => {
-    describe('plaza zone (1216,1216) to (1727,1727)', () => {
+  describe('detectZone with 8-zone Grid-Town positions', () => {
+    describe('lobby zone (192,64) to (576,448)', () => {
+      it('detects lobby at center (384,256)', () => {
+        expect(zoneSystem.detectZone(384, 256)).toBe('lobby');
+      });
+
+      it('detects lobby at origin (192,64)', () => {
+        expect(zoneSystem.detectZone(192, 64)).toBe('lobby');
+      });
+
+      it('detects lobby just inside right edge (575,256)', () => {
+        expect(zoneSystem.detectZone(575, 256)).toBe('lobby');
+      });
+    });
+
+    describe('office zone (1344,64) to (1984,512)', () => {
+      it('detects office at center (1664,288)', () => {
+        expect(zoneSystem.detectZone(1664, 288)).toBe('office');
+      });
+
+      it('detects office at origin (1344,64)', () => {
+        expect(zoneSystem.detectZone(1344, 64)).toBe('office');
+      });
+    });
+
+    describe('central-park zone (640,512) to (1408,1152)', () => {
+      it('detects central-park at center (1024,832)', () => {
+        expect(zoneSystem.detectZone(1024, 832)).toBe('central-park');
+      });
+
+      it('detects central-park at origin (640,512)', () => {
+        expect(zoneSystem.detectZone(640, 512)).toBe('central-park');
+      });
+    });
+
+    describe('arcade zone (1408,512) to (1984,1024)', () => {
+      it('detects arcade at center (1696,768)', () => {
+        expect(zoneSystem.detectZone(1696, 768)).toBe('arcade');
+      });
+
+      it('detects arcade at origin (1408,512)', () => {
+        expect(zoneSystem.detectZone(1408, 512)).toBe('arcade');
+      });
+    });
+
+    describe('meeting zone (64,896) to (576,1472)', () => {
+      it('detects meeting at center (320,1184)', () => {
+        expect(zoneSystem.detectZone(320, 1184)).toBe('meeting');
+      });
+
+      it('detects meeting at origin (64,896)', () => {
+        expect(zoneSystem.detectZone(64, 896)).toBe('meeting');
+      });
+    });
+
+    describe('lounge-cafe zone (576,1216) to (1216,1664)', () => {
+      it('detects lounge-cafe at center (896,1440)', () => {
+        expect(zoneSystem.detectZone(896, 1440)).toBe('lounge-cafe');
+      });
+
+      it('detects lounge-cafe at origin (576,1216)', () => {
+        expect(zoneSystem.detectZone(576, 1216)).toBe('lounge-cafe');
+      });
+    });
+
+    describe('plaza zone (1216,1216) to (1728,1728)', () => {
       it('detects plaza at center (1472,1472)', () => {
         expect(zoneSystem.detectZone(1472, 1472)).toBe('plaza');
       });
@@ -79,111 +143,15 @@ describe('ZoneSystem - New 8-Zone Layout', () => {
       it('detects plaza just inside right edge (1727,1472)', () => {
         expect(zoneSystem.detectZone(1727, 1472)).toBe('plaza');
       });
-
-      it('returns null just outside plaza right edge (1728,1472)', () => {
-        expect(zoneSystem.detectZone(1728, 1472)).toBeNull();
-      });
-
-      it('detects plaza just inside bottom edge (1472,1727)', () => {
-        expect(zoneSystem.detectZone(1472, 1727)).toBe('plaza');
-      });
     });
 
-    describe('lobby zone (192,64) to (575,447)', () => {
-      it('detects lobby at center (384,256)', () => {
-        expect(zoneSystem.detectZone(384, 256)).toBe('lobby');
-      });
-
-      it('detects lobby at origin (192,64)', () => {
-        expect(zoneSystem.detectZone(192, 64)).toBe('lobby');
-      });
-
-      it('detects lobby just inside bottom-right (575,447)', () => {
-        expect(zoneSystem.detectZone(575, 447)).toBe('lobby');
-      });
-    });
-
-    describe('office zone (1344,64) to (1983,511)', () => {
-      it('detects office at center (1664,288)', () => {
-        expect(zoneSystem.detectZone(1664, 288)).toBe('office');
-      });
-
-      it('detects office at origin (1344,64)', () => {
-        expect(zoneSystem.detectZone(1344, 64)).toBe('office');
-      });
-
-      it('detects office just inside bottom-right (1983,511)', () => {
-        expect(zoneSystem.detectZone(1983, 511)).toBe('office');
-      });
-    });
-
-    describe('central-park zone (640,512) to (1407,1151)', () => {
-      it('detects central-park at center (1024,832)', () => {
-        expect(zoneSystem.detectZone(1024, 832)).toBe('central-park');
-      });
-
-      it('detects central-park at origin (640,512)', () => {
-        expect(zoneSystem.detectZone(640, 512)).toBe('central-park');
-      });
-
-      it('detects central-park just inside bottom-right (1407,1151)', () => {
-        expect(zoneSystem.detectZone(1407, 1151)).toBe('central-park');
-      });
-    });
-
-    describe('arcade zone (1408,512) to (1983,1023)', () => {
-      it('detects arcade at center (1696,768)', () => {
-        expect(zoneSystem.detectZone(1696, 768)).toBe('arcade');
-      });
-
-      it('detects arcade at origin (1408,512)', () => {
-        expect(zoneSystem.detectZone(1408, 512)).toBe('arcade');
-      });
-
-      it('detects arcade just inside bottom-right (1983,1023)', () => {
-        expect(zoneSystem.detectZone(1983, 1023)).toBe('arcade');
-      });
-    });
-
-    describe('meeting zone (64,896) to (575,1471)', () => {
-      it('detects meeting at center (320,1184)', () => {
-        expect(zoneSystem.detectZone(320, 1184)).toBe('meeting');
-      });
-
-      it('detects meeting at origin (64,896)', () => {
-        expect(zoneSystem.detectZone(64, 896)).toBe('meeting');
-      });
-
-      it('detects meeting just inside bottom-right (575,1471)', () => {
-        expect(zoneSystem.detectZone(575, 1471)).toBe('meeting');
-      });
-    });
-
-    describe('lounge-cafe zone (576,1216) to (1215,1663)', () => {
-      it('detects lounge-cafe at center (896,1440)', () => {
-        expect(zoneSystem.detectZone(896, 1440)).toBe('lounge-cafe');
-      });
-
-      it('detects lounge-cafe at origin (576,1216)', () => {
-        expect(zoneSystem.detectZone(576, 1216)).toBe('lounge-cafe');
-      });
-
-      it('detects lounge-cafe just inside bottom-right (1215,1663)', () => {
-        expect(zoneSystem.detectZone(1215, 1663)).toBe('lounge-cafe');
-      });
-    });
-
-    describe('lake zone (64,64) to (191,511)', () => {
+    describe('lake zone (64,64) to (192,512)', () => {
       it('detects lake at center (128,288)', () => {
         expect(zoneSystem.detectZone(128, 288)).toBe('lake');
       });
 
       it('detects lake at origin (64,64)', () => {
         expect(zoneSystem.detectZone(64, 64)).toBe('lake');
-      });
-
-      it('detects lake just inside bottom-right (191,511)', () => {
-        expect(zoneSystem.detectZone(191, 511)).toBe('lake');
       });
     });
 
@@ -196,71 +164,60 @@ describe('ZoneSystem - New 8-Zone Layout', () => {
         expect(zoneSystem.detectZone(2100, 2100)).toBeNull();
       });
 
-      it('returns null for gap between zones (1000,100)', () => {
-        expect(zoneSystem.detectZone(1000, 100)).toBeNull();
+      it('returns null for gap between zones', () => {
+        expect(zoneSystem.detectZone(600, 200)).toBeNull();
       });
     });
   });
 
   describe('spawn points are inside correct zones', () => {
-    it('spawn_plaza position (1472,1472) is inside plaza', () => {
-      expect(zoneSystem.detectZone(1472, 1472)).toBe('plaza');
-    });
-
-    it('spawn_lobby position (384,256) is inside lobby', () => {
+    it('spawn position (384,256) is inside lobby', () => {
       expect(zoneSystem.detectZone(384, 256)).toBe('lobby');
     });
 
-    it('spawn_office position (1664,288) is inside office', () => {
+    it('spawn position (1664,288) is inside office', () => {
       expect(zoneSystem.detectZone(1664, 288)).toBe('office');
     });
 
-    it('spawn_central_park position (1024,832) is inside central-park', () => {
+    it('spawn position (1024,832) is inside central-park', () => {
       expect(zoneSystem.detectZone(1024, 832)).toBe('central-park');
     });
 
-    it('spawn_arcade position (1696,768) is inside arcade', () => {
+    it('spawn position (1696,768) is inside arcade', () => {
       expect(zoneSystem.detectZone(1696, 768)).toBe('arcade');
     });
 
-    it('spawn_meeting position (320,1184) is inside meeting', () => {
+    it('spawn position (320,1184) is inside meeting', () => {
       expect(zoneSystem.detectZone(320, 1184)).toBe('meeting');
     });
 
-    it('spawn_lounge_cafe position (896,1440) is inside lounge-cafe', () => {
+    it('spawn position (896,1440) is inside lounge-cafe', () => {
       expect(zoneSystem.detectZone(896, 1440)).toBe('lounge-cafe');
     });
 
-    it('spawn_lake position (128,288) is inside lake', () => {
+    it('spawn position (1472,1472) is inside plaza', () => {
+      expect(zoneSystem.detectZone(1472, 1472)).toBe('plaza');
+    });
+
+    it('spawn position (128,288) is inside lake', () => {
       expect(zoneSystem.detectZone(128, 288)).toBe('lake');
     });
   });
 
-  describe('zone transitions in new 8-zone layout', () => {
-    it('transitions from central-park to office via movement', () => {
-      zoneSystem.updateEntityZone('entity_1', 1100, 832, eventLog, 'room_1');
-      expect(zoneSystem.getEntityZone('entity_1')).toBe('central-park');
+  describe('zone transitions in 8-zone Grid-Town layout', () => {
+    it('transitions from lobby to central-park via vertical movement', () => {
+      zoneSystem.updateEntityZone('entity_1', 384, 256, eventLog, 'room_1');
+      expect(zoneSystem.getEntityZone('entity_1')).toBe('lobby');
 
-      const result = zoneSystem.updateEntityZone('entity_1', 1400, 288, eventLog, 'room_1');
+      const result = zoneSystem.updateEntityZone('entity_1', 700, 600, eventLog, 'room_1');
 
-      expect(result.previousZone).toBe('central-park');
-      expect(result.currentZone).toBe('office');
+      expect(result.previousZone).toBe('lobby');
+      expect(result.currentZone).toBe('central-park');
       expect(result.changed).toBe(true);
     });
 
-    it('transitions from central-park to meeting via movement', () => {
-      zoneSystem.updateEntityZone('entity_1', 700, 900, eventLog, 'room_1');
-      expect(zoneSystem.getEntityZone('entity_1')).toBe('central-park');
-
-      const result = zoneSystem.updateEntityZone('entity_1', 300, 1100, eventLog, 'room_1');
-
-      expect(result.previousZone).toBe('central-park');
-      expect(result.currentZone).toBe('meeting');
-      expect(result.changed).toBe(true);
-    });
-
-    it('transitions from central-park to arcade via movement', () => {
-      zoneSystem.updateEntityZone('entity_1', 1300, 832, eventLog, 'room_1');
+    it('transitions from central-park to arcade via horizontal movement', () => {
+      zoneSystem.updateEntityZone('entity_1', 1000, 700, eventLog, 'room_1');
       expect(zoneSystem.getEntityZone('entity_1')).toBe('central-park');
 
       const result = zoneSystem.updateEntityZone('entity_1', 1500, 700, eventLog, 'room_1');
@@ -270,79 +227,90 @@ describe('ZoneSystem - New 8-Zone Layout', () => {
       expect(result.changed).toBe(true);
     });
 
-    it('transitions from central-park to lounge-cafe via movement', () => {
-      zoneSystem.updateEntityZone('entity_1', 900, 1150, eventLog, 'room_1');
+    it('transitions from central-park to lounge-cafe via vertical movement', () => {
+      zoneSystem.updateEntityZone('entity_1', 800, 800, eventLog, 'room_1');
       expect(zoneSystem.getEntityZone('entity_1')).toBe('central-park');
 
-      const result = zoneSystem.updateEntityZone('entity_1', 896, 1300, eventLog, 'room_1');
+      const result = zoneSystem.updateEntityZone('entity_1', 800, 1300, eventLog, 'room_1');
 
       expect(result.previousZone).toBe('central-park');
       expect(result.currentZone).toBe('lounge-cafe');
       expect(result.changed).toBe(true);
     });
 
+    it('transitions from lounge-cafe to plaza via horizontal movement', () => {
+      zoneSystem.updateEntityZone('entity_1', 800, 1400, eventLog, 'room_1');
+      expect(zoneSystem.getEntityZone('entity_1')).toBe('lounge-cafe');
+
+      const result = zoneSystem.updateEntityZone('entity_1', 1300, 1400, eventLog, 'room_1');
+
+      expect(result.previousZone).toBe('lounge-cafe');
+      expect(result.currentZone).toBe('plaza');
+      expect(result.changed).toBe(true);
+    });
+
     it('emits zone.exit and zone.enter events on transition', () => {
       const entity = new EntitySchema('entity_1', 'human', 'Test', 'room_1');
 
-      zoneSystem.updateEntityZone('entity_1', 1100, 832, eventLog, 'room_1', entity);
-      zoneSystem.updateEntityZone('entity_1', 1400, 288, eventLog, 'room_1', entity);
+      zoneSystem.updateEntityZone('entity_1', 384, 256, eventLog, 'room_1', entity);
+      zoneSystem.updateEntityZone('entity_1', 700, 600, eventLog, 'room_1', entity);
 
       const { events } = eventLog.getSince('', 10);
 
-      const exitCentralPark = events.find(
-        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'central-park'
+      const exitLobby = events.find(
+        e => e.type === 'zone.exit' && (e.payload as { zoneId: string }).zoneId === 'lobby'
       );
-      const enterOffice = events.find(
-        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'office'
+      const enterCentralPark = events.find(
+        e => e.type === 'zone.enter' && (e.payload as { zoneId: string }).zoneId === 'central-park'
       );
 
-      expect(exitCentralPark).toBeDefined();
-      expect(enterOffice).toBeDefined();
-      expect((exitCentralPark?.payload as { nextZoneId: string }).nextZoneId).toBe('office');
-      expect((enterOffice?.payload as { previousZoneId: string }).previousZoneId).toBe(
-        'central-park'
+      expect(exitLobby).toBeDefined();
+      expect(enterCentralPark).toBeDefined();
+      expect((exitLobby?.payload as { nextZoneId: string }).nextZoneId).toBe('central-park');
+      expect((enterCentralPark?.payload as { previousZoneId: string }).previousZoneId).toBe(
+        'lobby'
       );
     });
   });
 
-  describe('zone populations in new 8-zone layout', () => {
+  describe('zone populations in 8-zone Grid-Town layout', () => {
     it('tracks population across all 8 zones', () => {
-      zoneSystem.updateEntityZone('e1', 1472, 1472);
-      zoneSystem.updateEntityZone('e2', 384, 256);
-      zoneSystem.updateEntityZone('e3', 1664, 288);
-      zoneSystem.updateEntityZone('e4', 1024, 832);
-      zoneSystem.updateEntityZone('e5', 1696, 768);
-      zoneSystem.updateEntityZone('e6', 320, 1184);
-      zoneSystem.updateEntityZone('e7', 896, 1440);
-      zoneSystem.updateEntityZone('e8', 128, 288);
+      zoneSystem.updateEntityZone('e1', 384, 256); // lobby
+      zoneSystem.updateEntityZone('e2', 1664, 288); // office
+      zoneSystem.updateEntityZone('e3', 1024, 832); // central-park
+      zoneSystem.updateEntityZone('e4', 1696, 768); // arcade
+      zoneSystem.updateEntityZone('e5', 320, 1184); // meeting
+      zoneSystem.updateEntityZone('e6', 896, 1440); // lounge-cafe
+      zoneSystem.updateEntityZone('e7', 1472, 1472); // plaza
+      zoneSystem.updateEntityZone('e8', 128, 288); // lake
 
-      expect(zoneSystem.getZonePopulation('plaza')).toBe(1);
       expect(zoneSystem.getZonePopulation('lobby')).toBe(1);
       expect(zoneSystem.getZonePopulation('office')).toBe(1);
       expect(zoneSystem.getZonePopulation('central-park')).toBe(1);
       expect(zoneSystem.getZonePopulation('arcade')).toBe(1);
       expect(zoneSystem.getZonePopulation('meeting')).toBe(1);
       expect(zoneSystem.getZonePopulation('lounge-cafe')).toBe(1);
+      expect(zoneSystem.getZonePopulation('plaza')).toBe(1);
       expect(zoneSystem.getZonePopulation('lake')).toBe(1);
     });
 
     it('getEntitiesInZone returns correct entities', () => {
-      zoneSystem.updateEntityZone('agent_1', 1400, 1400); // plaza
-      zoneSystem.updateEntityZone('agent_2', 1500, 1500); // plaza
-      zoneSystem.updateEntityZone('agent_3', 1664, 288); // office
+      zoneSystem.updateEntityZone('agent_1', 1024, 832); // central-park
+      zoneSystem.updateEntityZone('agent_2', 1100, 900); // central-park
+      zoneSystem.updateEntityZone('agent_3', 1696, 768); // arcade
 
-      const plazaEntities = zoneSystem.getEntitiesInZone('plaza');
-      const officeEntities = zoneSystem.getEntitiesInZone('office');
+      const centralParkEntities = zoneSystem.getEntitiesInZone('central-park');
+      const arcadeEntities = zoneSystem.getEntitiesInZone('arcade');
 
-      expect(plazaEntities).toHaveLength(2);
-      expect(plazaEntities).toContain('agent_1');
-      expect(plazaEntities).toContain('agent_2');
-      expect(officeEntities).toHaveLength(1);
-      expect(officeEntities).toContain('agent_3');
+      expect(centralParkEntities).toHaveLength(2);
+      expect(centralParkEntities).toContain('agent_1');
+      expect(centralParkEntities).toContain('agent_2');
+      expect(arcadeEntities).toHaveLength(1);
+      expect(arcadeEntities).toContain('agent_3');
     });
   });
 
-  describe('getZoneBounds returns new 8-zone spec values', () => {
+  describe('getZoneBounds returns 8-zone Grid-Town spec values', () => {
     it('returns correct bounds for all zones', () => {
       expect(zoneSystem.getZoneBounds('lobby')).toEqual({
         x: 192,

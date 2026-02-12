@@ -112,7 +112,7 @@ describe('Facility Handlers Coverage', () => {
 
   describe('whiteboard handlers', () => {
     beforeEach(() => {
-      const facility = new FacilitySchema('whiteboard_1', 'whiteboard', 'office', 300, 100);
+      const facility = new FacilitySchema('whiteboard_1', 'whiteboard', 'arcade', 300, 100);
       facility.setAffordances(FACILITY_AFFORDANCES.whiteboard);
       service.registerFacility(facility);
     });

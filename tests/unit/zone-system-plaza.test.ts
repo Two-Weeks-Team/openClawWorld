@@ -3,7 +3,7 @@ import { ZoneSystem, DEFAULT_ZONE_BOUNDS } from '../../packages/server/src/zone/
 import { EventLog } from '../../packages/server/src/events/EventLog.js';
 import { EntitySchema } from '../../packages/server/src/schemas/EntitySchema.js';
 
-describe('ZoneSystem - Plaza Zone (New 8-Zone layout)', () => {
+describe('ZoneSystem - Plaza Zone (8-zone Grid-Town layout)', () => {
   let zoneSystem: ZoneSystem;
   let eventLog: EventLog;
 
@@ -76,15 +76,15 @@ describe('ZoneSystem - Plaza Zone (New 8-Zone layout)', () => {
 
   describe('zone population', () => {
     it('returns correct population for plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 1400, 1400);
-      zoneSystem.updateEntityZone('entity_2', 1500, 1500);
+      zoneSystem.updateEntityZone('entity_1', 1300, 1300);
+      zoneSystem.updateEntityZone('entity_2', 1400, 1400);
 
       expect(zoneSystem.getZonePopulation('plaza')).toBe(2);
     });
 
     it('returns entities in plaza zone', () => {
-      zoneSystem.updateEntityZone('entity_1', 1400, 1400);
-      zoneSystem.updateEntityZone('entity_2', 1500, 1500);
+      zoneSystem.updateEntityZone('entity_1', 1300, 1300);
+      zoneSystem.updateEntityZone('entity_2', 1400, 1400);
 
       const entities = zoneSystem.getEntitiesInZone('plaza');
 

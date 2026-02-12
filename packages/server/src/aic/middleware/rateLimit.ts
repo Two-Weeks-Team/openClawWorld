@@ -2,6 +2,17 @@ import rateLimit from 'express-rate-limit';
 import type { Request, Response } from 'express';
 import type { AicErrorCode } from '@openclawworld/shared';
 
+function normalizeIpv6(ip: string): string {
+  if (!ip.includes(':')) return ip;
+  return ip.split(':').slice(0, 4).join(':');
+}
+
+function getClientKey(req: Request): string {
+  if (req.authToken) return req.authToken;
+  const ip = req.ip ?? 'unknown';
+  return normalizeIpv6(ip);
+}
+
 export const RateLimits = {
   observe: { windowMs: 1000, max: 5 },
   pollEvents: { windowMs: 1000, max: 10 },
@@ -34,9 +45,8 @@ function createRateLimiter(windowMs: number, max: number) {
     max,
     standardHeaders: true,
     legacyHeaders: false,
-    keyGenerator: (req: Request): string => {
-      return req.authToken ?? req.ip ?? 'unknown';
-    },
+    keyGenerator: getClientKey,
+    validate: { ip: false },
     handler: (_req: Request, res: Response): void => {
       res.status(429).json(createRateLimitResponse());
     },

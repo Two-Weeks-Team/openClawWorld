@@ -6,7 +6,7 @@ const ZONE_DISPLAY_NAMES: Record<ZoneId, string> = {
   office: 'Office',
   'central-park': 'Central Park',
   arcade: 'Arcade',
-  meeting: 'Meeting Center',
+  meeting: 'Meeting Room',
   'lounge-cafe': 'Lounge Cafe',
   plaza: 'Plaza',
   lake: 'Lake',

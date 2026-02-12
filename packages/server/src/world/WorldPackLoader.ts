@@ -1,12 +1,16 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve, join } from 'path';
-import type {
-  ZoneId,
-  NpcDefinition,
-  Vec2,
-  TiledLayer,
-  TiledObject,
-  ZoneBounds,
+import {
+  ZoneIdSchema,
+  EntranceDirectionSchema,
+  ZONE_BOUNDS,
+  type ZoneId,
+  type NpcDefinition,
+  type Vec2,
+  type TiledLayer,
+  type TiledObject,
+  type ZoneBounds,
+  type BuildingEntrance,
 } from '@openclawworld/shared';
 
 export type PackManifest = {
@@ -37,6 +41,7 @@ export type ZoneMapData = {
   objects: TiledObject[];
   npcs: string[];
   facilities: string[];
+  entrances: BuildingEntrance[];
 };
 
 export type FacilityDefinition = {
@@ -299,9 +304,12 @@ export class WorldPackLoader {
     const spawnPoints = this.extractSpawnPointsFromUnified(raw);
     const objects = this.extractObjects(raw.layers ?? []);
 
+    const allEntrances = this.extractBuildingEntrances(objects);
+
     for (const zoneId of zones) {
       const zoneSpawns = spawnPoints.filter(sp => sp.zone === zoneId);
       const zoneObjects = this.filterObjectsByZone(objects, zoneId);
+      const zoneEntrances = allEntrances.filter(e => e.zone === zoneId);
 
       maps.set(zoneId, {
         zoneId,
@@ -316,6 +324,7 @@ export class WorldPackLoader {
         objects: zoneObjects,
         npcs: (raw.npcs ?? []).filter(npc => this.getNpcZone(npc, zoneId)),
         facilities: (raw.facilities ?? []).filter(f => this.getFacilityZone(f, zoneId)),
+        entrances: zoneEntrances,
       });
     }
 
@@ -379,10 +388,10 @@ export class WorldPackLoader {
       security: 'lobby',
       'office-pm': 'office',
       'it-help': 'office',
+      ranger: 'central-park',
+      'arcade-host': 'arcade',
       'meeting-host': 'meeting',
       barista: 'lounge-cafe',
-      'arcade-host': 'arcade',
-      ranger: 'central-park',
       'fountain-keeper': 'plaza',
     };
     return npcZoneMap[npcId] === zoneId;
@@ -480,6 +489,8 @@ export class WorldPackLoader {
     const spawnPoints = this.extractSpawnPoints(raw);
     const objects = this.extractObjects(raw.layers);
 
+    const entrances = this.extractBuildingEntrances(objects);
+
     return {
       zoneId: mapZoneId,
       name,
@@ -493,6 +504,7 @@ export class WorldPackLoader {
       objects,
       npcs: raw.npcs ?? [],
       facilities: raw.facilities ?? [],
+      entrances,
     };
   }
 
@@ -546,19 +558,40 @@ export class WorldPackLoader {
     return objects;
   }
 
-  private getDefaultZoneBounds(zoneId: ZoneId): ZoneBounds {
-    const defaultBounds: Record<ZoneId, ZoneBounds> = {
-      lobby: { x: 192, y: 64, width: 384, height: 384 },
-      office: { x: 1344, y: 64, width: 640, height: 448 },
-      'central-park': { x: 640, y: 512, width: 768, height: 640 },
-      arcade: { x: 1408, y: 512, width: 576, height: 512 },
-      meeting: { x: 64, y: 896, width: 512, height: 576 },
-      'lounge-cafe': { x: 576, y: 1216, width: 640, height: 448 },
-      plaza: { x: 1216, y: 1216, width: 512, height: 512 },
-      lake: { x: 64, y: 64, width: 128, height: 448 },
-    };
+  private extractBuildingEntrances(objects: TiledObject[]): BuildingEntrance[] {
+    const entrances: BuildingEntrance[] = [];
 
-    return defaultBounds[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };
+    for (const obj of objects) {
+      if (obj.type !== 'building_entrance') continue;
+
+      const zoneProp = obj.properties?.find(p => p.name === 'zone');
+      const directionProp = obj.properties?.find(p => p.name === 'direction');
+      const connectsToProp = obj.properties?.find(p => p.name === 'connectsTo');
+
+      if (!zoneProp?.value || !directionProp?.value || !connectsToProp?.value) continue;
+
+      const zoneResult = ZoneIdSchema.safeParse(zoneProp.value);
+      const directionResult = EntranceDirectionSchema.safeParse(directionProp.value);
+      const connectsToResult = ZoneIdSchema.safeParse(connectsToProp.value);
+
+      if (!zoneResult.success || !directionResult.success || !connectsToResult.success) continue;
+
+      entrances.push({
+        id: String(obj.id),
+        name: obj.name,
+        position: { x: obj.x, y: obj.y },
+        size: { width: obj.width, height: obj.height },
+        zone: zoneResult.data,
+        direction: directionResult.data,
+        connectsTo: connectsToResult.data,
+      });
+    }
+
+    return entrances;
+  }
+
+  private getDefaultZoneBounds(zoneId: ZoneId): ZoneBounds {
+    return ZONE_BOUNDS[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };
   }
 
   private formatZoneName(zoneId: ZoneId): string {

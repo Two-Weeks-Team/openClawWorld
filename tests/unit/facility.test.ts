@@ -173,15 +173,15 @@ describe('FacilityService', () => {
       service.registerFacility(new FacilitySchema('fac_002', 'gate', 'plaza', 200, 100));
       service.registerFacility(new FacilitySchema('fac_003', 'meeting_door', 'office', 300, 100));
 
-      const plazaFacilities = service.getFacilitiesInZone('plaza');
+      const lobbyFacilities = service.getFacilitiesInZone('plaza');
 
-      expect(plazaFacilities).toHaveLength(2);
-      expect(plazaFacilities.map(f => f.id)).toContain('fac_001');
-      expect(plazaFacilities.map(f => f.id)).toContain('fac_002');
+      expect(lobbyFacilities).toHaveLength(2);
+      expect(lobbyFacilities.map(f => f.id)).toContain('fac_001');
+      expect(lobbyFacilities.map(f => f.id)).toContain('fac_002');
     });
 
     it('returns empty array for zone with no facilities', () => {
-      const facilities = service.getFacilitiesInZone('arcade');
+      const facilities = service.getFacilitiesInZone('lounge-cafe');
 
       expect(facilities).toHaveLength(0);
     });
@@ -439,11 +439,11 @@ describe('FacilityService', () => {
 
   describe('createFacility', () => {
     it('creates and registers a new facility', () => {
-      const facility = service.createFacility('fac_001', 'gate', 'lobby', 100, 200);
+      const facility = service.createFacility('fac_001', 'gate', 'plaza', 100, 200);
 
       expect(facility.id).toBe('fac_001');
       expect(facility.type).toBe('gate');
-      expect(facility.zoneId).toBe('lobby');
+      expect(facility.zoneId).toBe('plaza');
       expect(facility.position.x).toBe(100);
       expect(facility.position.y).toBe(200);
       expect(service.hasFacility('fac_001')).toBe(true);

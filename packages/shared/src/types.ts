@@ -166,6 +166,7 @@ export type ObserveResponseData = {
   facilities: ObservedFacility[];
   serverTsMs: number;
   room: RoomInfo;
+  mapMetadata?: MapMetadata;
 };
 
 export type MoveToResult = 'accepted' | 'rejected' | 'no_op';
@@ -643,16 +644,16 @@ export type TeamMember = {
   joinedAt: number;
 };
 
-// Zones (8 detailed zones based on map layout)
+// Zones
 export type ZoneId =
-  | 'lobby' // Top-left: Reception, entrance
-  | 'office' // Top-right: Workstations, kanban board
-  | 'central-park' // Center: Green space, benches
-  | 'arcade' // Middle-right: Game cabinets, entertainment
-  | 'meeting' // Bottom-left: Meeting rooms (Room A, C)
-  | 'lounge-cafe' // Bottom-center: Cafe counter, seating
-  | 'plaza' // Bottom-right: Fountain, social hub
-  | 'lake'; // Top-left corner: Water feature (blocked)
+  | 'lobby'
+  | 'office'
+  | 'central-park'
+  | 'arcade'
+  | 'meeting'
+  | 'lounge-cafe'
+  | 'plaza'
+  | 'lake';
 
 export type Zone = {
   id: ZoneId;
@@ -660,6 +661,30 @@ export type Zone = {
   description?: string;
   bounds: { x: number; y: number; width: number; height: number };
   allowedRoles?: OrgRole[]; // If set, only these roles can enter
+};
+
+export type EntranceDirection = 'north' | 'south' | 'east' | 'west';
+
+export type BuildingEntrance = {
+  id: string;
+  name: string;
+  position: Vec2;
+  size: { width: number; height: number };
+  zone: ZoneId;
+  direction: EntranceDirection;
+  connectsTo: ZoneId;
+};
+
+export type ZoneInfo = {
+  id: ZoneId;
+  bounds: { x: number; y: number; width: number; height: number };
+  entrances: BuildingEntrance[];
+};
+
+export type MapMetadata = {
+  currentZone: ZoneId | null;
+  zones: ZoneInfo[];
+  mapSize: { width: number; height: number; tileSize: number };
 };
 
 // Meetings

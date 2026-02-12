@@ -22,14 +22,14 @@ const COLOR_RANGES: ColorRange[] = [
   { r: [0, 100], g: [150, 255], b: [0, 100], type: 'grass', collision: false },
   { r: [200, 255], g: [200, 255], b: [0, 100], type: 'door', collision: false, isDoor: true },
   { r: [60, 100], g: [50, 80], b: [40, 70], type: 'wall', collision: true },
-  { r: [180, 220], g: [180, 220], b: [180, 220], type: 'road', collision: false },
+  { r: [181, 220], g: [181, 220], b: [181, 220], type: 'road', collision: false },
   { r: [150, 180], g: [150, 180], b: [150, 180], type: 'floor_plaza', collision: false },
   { r: [170, 200], g: [200, 230], b: [210, 240], type: 'floor_office', collision: false },
   { r: [190, 220], g: [200, 230], b: [190, 220], type: 'floor_meeting', collision: false },
   { r: [200, 230], g: [180, 210], b: [150, 180], type: 'floor_arcade', collision: false },
-  { r: [140, 170], g: [140, 170], b: [140, 170], type: 'floor_lounge', collision: false },
+  { r: [131, 149], g: [131, 149], b: [131, 149], type: 'floor_lounge', collision: false },
   { r: [100, 130], g: [140, 170], b: [200, 230], type: 'floor_lake', collision: false },
-  { r: [160, 190], g: [180, 210], b: [200, 230], type: 'floor_lobby', collision: false },
+  { r: [160, 169], g: [180, 199], b: [200, 209], type: 'floor_lobby', collision: false },
 ];
 
 const ZONE_FLOOR_TYPES: Map<TileType, ZoneId> = new Map([

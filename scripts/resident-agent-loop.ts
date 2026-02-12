@@ -149,6 +149,16 @@ interface LoopState {
 // Constants
 // ============================================================================
 
+const MAX_CYCLES_WITHOUT_OBSERVE = 2;
+const NAVIGATE_WEIGHT_DAMPENING = 0.5;
+const ENTITY_APPROACH_WEIGHT_DAMPENING = 0.3;
+const INTERACTION_HISTORY_WINDOW = 10;
+const MIN_INTERACTIONS_FOR_FAILURE_DETECTION = 5;
+const INTERACTION_FAILURE_THRESHOLD = 4;
+const API_HISTORY_MAX_LENGTH = 100;
+const INTERACTION_HISTORY_MAX_LENGTH = 50;
+const ACTION_LOG_MAX_LENGTH = 20;
+
 const ROLES: AgentRole[] = [
   'explorer',
   'worker',
@@ -891,11 +901,14 @@ class IssueDetector {
   detectInteractFailurePattern(agents: ResidentAgent[]): Issue | null {
     for (const agent of agents) {
       const state = agent.getState();
-      const recentInteractions = state.interactionHistory.slice(-10);
+      const recentInteractions = state.interactionHistory.slice(-INTERACTION_HISTORY_WINDOW);
       const failures = recentInteractions.filter(
         h => h.outcome === 'too_far' || h.outcome === 'invalid_action'
       );
-      if (recentInteractions.length >= 5 && failures.length >= 4) {
+      if (
+        recentInteractions.length >= MIN_INTERACTIONS_FOR_FAILURE_DETECTION &&
+        failures.length >= INTERACTION_FAILURE_THRESHOLD
+      ) {
         return {
           area: 'Interactables',
           title: `Repeated interact failures for ${state.agentId}`,
@@ -1309,7 +1322,10 @@ class ResidentAgent {
 
   private async performRoleBehavior(): Promise<void> {
     const lastObserveIdx = this.state.actionLog.lastIndexOf('observe');
-    if (lastObserveIdx === -1 || this.state.actionLog.length - lastObserveIdx > 2) {
+    if (
+      lastObserveIdx === -1 ||
+      this.state.actionLog.length - lastObserveIdx > MAX_CYCLES_WITHOUT_OBSERVE
+    ) {
       await this.observe();
     }
 
@@ -1322,7 +1338,7 @@ class ResidentAgent {
     await chosen.action();
 
     this.state.actionLog.push(chosen.label);
-    if (this.state.actionLog.length > 20) {
+    if (this.state.actionLog.length > ACTION_LOG_MAX_LENGTH) {
       this.state.actionLog.shift();
     }
     this.state.cycleCount++;
@@ -1426,7 +1442,7 @@ class ResidentAgent {
           weight:
             this.getRolePreference(facility.type, 'navigate') *
             this.computeNoveltyMultiplier(label) *
-            0.5,
+            NAVIGATE_WEIGHT_DAMPENING,
           label,
           category: 'navigate',
         });
@@ -1441,7 +1457,9 @@ class ResidentAgent {
         action: () =>
           this.moveTo(Math.floor(entity.position.x / 32), Math.floor(entity.position.y / 32)),
         weight:
-          this.getRolePreference('entity', 'approach') * this.computeNoveltyMultiplier(label) * 0.3,
+          this.getRolePreference('entity', 'approach') *
+          this.computeNoveltyMultiplier(label) *
+          ENTITY_APPROACH_WEIGHT_DAMPENING,
         label,
         category: 'navigate',
       });
@@ -1513,8 +1531,8 @@ class ResidentAgent {
       success,
       responseTime: Date.now() - startMs,
     });
-    if (this.state.apiCallHistory.length > 100) {
-      this.state.apiCallHistory = this.state.apiCallHistory.slice(-50);
+    if (this.state.apiCallHistory.length >= API_HISTORY_MAX_LENGTH) {
+      this.state.apiCallHistory.shift();
     }
   }
 
@@ -1700,8 +1718,8 @@ class ResidentAgent {
       const result = await response.json();
       const outcome = result.data?.outcome?.type ?? 'unknown';
       this.state.interactionHistory.push({ targetId, action, outcome, timestamp: Date.now() });
-      if (this.state.interactionHistory.length > 50) {
-        this.state.interactionHistory = this.state.interactionHistory.slice(-25);
+      if (this.state.interactionHistory.length >= INTERACTION_HISTORY_MAX_LENGTH) {
+        this.state.interactionHistory.shift();
       }
       this.recordApiCall('interact', startMs, true);
       this.state.lastAction = `interact(${targetId}, ${action})`;

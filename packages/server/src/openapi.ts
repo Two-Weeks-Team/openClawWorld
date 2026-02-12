@@ -55,6 +55,7 @@ The same \`txId\` will return the same result without re-executing the action.
     { name: 'Actions', description: 'Agent actions (movement, interaction)' },
     { name: 'Chat', description: 'Chat messaging' },
     { name: 'Events', description: 'Event polling' },
+    { name: 'Skills', description: 'Skill system (install, invoke, list skills)' },
   ],
   components: {
     securitySchemes: {
@@ -428,6 +429,187 @@ The same \`txId\` will return the same result without re-executing the action.
         },
       },
 
+      // Skill System Schemas
+      SkillCategory: {
+        type: 'string',
+        enum: ['movement', 'combat', 'social', 'utility'],
+        description: 'Category of the skill',
+      },
+      SkillEffectDefinition: {
+        type: 'object',
+        required: ['id', 'durationMs'],
+        properties: {
+          id: { type: 'string', minLength: 1, maxLength: 64 },
+          durationMs: { type: 'integer', minimum: 0, maximum: 3600000 },
+          statModifiers: {
+            type: 'object',
+            properties: {
+              speedMultiplier: { type: 'number', minimum: 0, maximum: 10 },
+            },
+          },
+        },
+      },
+      SkillAction: {
+        type: 'object',
+        required: ['id', 'name', 'description'],
+        properties: {
+          id: { type: 'string', minLength: 1, maxLength: 64, example: 'sprint' },
+          name: { type: 'string', minLength: 1, maxLength: 128, example: 'Sprint' },
+          description: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 500,
+            example: 'Move faster for a short duration',
+          },
+          cooldownMs: { type: 'integer', minimum: 0, maximum: 3600000, example: 5000 },
+          castTimeMs: { type: 'integer', minimum: 0, maximum: 60000, example: 1000 },
+          rangeUnits: { type: 'number', minimum: 0, maximum: 10000 },
+          manaCost: { type: 'integer', minimum: 0, maximum: 10000 },
+          params: {
+            type: 'object',
+            additionalProperties: { type: 'string' },
+            description:
+              'Parameter schema for this action. Keys are parameter names, values describe the expected type.',
+          },
+          effect: { $ref: '#/components/schemas/SkillEffectDefinition' },
+        },
+      },
+      SkillDefinition: {
+        type: 'object',
+        required: ['id', 'name', 'description', 'category', 'actions'],
+        properties: {
+          id: { type: 'string', minLength: 1, maxLength: 64, example: 'movement_sprint' },
+          name: { type: 'string', minLength: 1, maxLength: 64, example: 'Sprint Skill' },
+          description: {
+            type: 'string',
+            minLength: 1,
+            maxLength: 500,
+            example: 'Allows the agent to move faster',
+          },
+          category: { $ref: '#/components/schemas/SkillCategory' },
+          icon: { type: 'string', maxLength: 256 },
+          actions: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/SkillAction' },
+            minItems: 1,
+            maxItems: 20,
+          },
+          passive: { type: 'boolean' },
+          prerequisites: {
+            type: 'array',
+            items: { type: 'string', minLength: 1, maxLength: 64 },
+            maxItems: 10,
+          },
+        },
+      },
+      SkillInvokeOutcomeType: {
+        type: 'string',
+        enum: ['ok', 'pending', 'cancelled', 'error'],
+      },
+      SkillInvokeOutcome: {
+        type: 'object',
+        required: ['type'],
+        properties: {
+          type: { $ref: '#/components/schemas/SkillInvokeOutcomeType' },
+          message: { type: 'string', maxLength: 500 },
+          data: { type: 'object', additionalProperties: true },
+        },
+      },
+      AgentSkillState: {
+        type: 'object',
+        required: ['skillId', 'installedAt', 'enabled'],
+        properties: {
+          skillId: { type: 'string', minLength: 1, maxLength: 64 },
+          installedAt: { $ref: '#/components/schemas/TsMs' },
+          enabled: { type: 'boolean' },
+          credentials: {
+            type: 'object',
+            additionalProperties: { type: 'string' },
+          },
+        },
+      },
+
+      // Skill Request Schemas
+      SkillListRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+          category: { $ref: '#/components/schemas/SkillCategory' },
+          installed: { type: 'boolean', description: 'Filter by installed skills only' },
+        },
+      },
+      SkillInstallRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId', 'txId', 'skillId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+          txId: { $ref: '#/components/schemas/IdTx' },
+          skillId: { type: 'string', minLength: 1, maxLength: 64, example: 'movement_sprint' },
+          credentials: {
+            type: 'object',
+            additionalProperties: { type: 'string' },
+            description: 'Optional credentials for the skill',
+          },
+        },
+      },
+      SkillInvokeRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId', 'txId', 'skillId', 'actionId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+          txId: { $ref: '#/components/schemas/IdTx' },
+          skillId: { type: 'string', minLength: 1, maxLength: 64, example: 'movement_sprint' },
+          actionId: { type: 'string', minLength: 1, maxLength: 64, example: 'sprint' },
+          targetId: { $ref: '#/components/schemas/IdEntity' },
+          params: {
+            type: 'object',
+            additionalProperties: true,
+            description:
+              'Runtime parameters for the skill action. Structure depends on the action definition.',
+          },
+        },
+      },
+
+      // Skill Response Schemas
+      SkillListResponseData: {
+        type: 'object',
+        required: ['skills', 'serverTsMs'],
+        properties: {
+          skills: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/SkillDefinition' },
+            maxItems: 100,
+          },
+          serverTsMs: { $ref: '#/components/schemas/TsMs' },
+        },
+      },
+      SkillInstallResponseData: {
+        type: 'object',
+        required: ['skillId', 'installed', 'alreadyInstalled', 'serverTsMs'],
+        properties: {
+          skillId: { type: 'string', minLength: 1, maxLength: 64 },
+          installed: { type: 'boolean', description: 'Whether the skill is now installed' },
+          alreadyInstalled: {
+            type: 'boolean',
+            description: 'True if skill was already installed before this request',
+          },
+          serverTsMs: { $ref: '#/components/schemas/TsMs' },
+        },
+      },
+      SkillInvokeResponseData: {
+        type: 'object',
+        required: ['txId', 'outcome', 'serverTsMs'],
+        properties: {
+          txId: { $ref: '#/components/schemas/IdTx' },
+          outcome: { $ref: '#/components/schemas/SkillInvokeOutcome' },
+          serverTsMs: { $ref: '#/components/schemas/TsMs' },
+        },
+      },
+
       ResultOk: {
         type: 'object',
         required: ['status', 'data'],
@@ -780,6 +962,175 @@ The same \`txId\` will return the same result without re-executing the action.
             },
           },
           '401': { description: 'Unauthorized' },
+        },
+      },
+    },
+    '/skill/list': {
+      post: {
+        tags: ['Skills'],
+        summary: 'List available skills',
+        description:
+          'Returns a list of skills available to the agent. Can filter by category or installed status.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/SkillListRequest' },
+              example: {
+                agentId: 'agent_helper',
+                roomId: 'default',
+                category: 'movement',
+                installed: true,
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Skills retrieved successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/SkillListResponseData' },
+                  },
+                },
+                example: {
+                  status: 'ok',
+                  data: {
+                    skills: [
+                      {
+                        id: 'movement_sprint',
+                        name: 'Sprint Skill',
+                        description: 'Allows the agent to move faster',
+                        category: 'movement',
+                        actions: [
+                          {
+                            id: 'sprint',
+                            name: 'Sprint',
+                            description: 'Move faster for a short duration',
+                            cooldownMs: 5000,
+                            castTimeMs: 1000,
+                          },
+                        ],
+                      },
+                    ],
+                    serverTsMs: 1707523200000,
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '404': { description: 'Agent or room not found' },
+        },
+      },
+    },
+    '/skill/install': {
+      post: {
+        tags: ['Skills'],
+        summary: 'Install a skill for an agent',
+        description:
+          'Installs a skill for the agent, making its actions available for use. Uses txId for idempotency.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/SkillInstallRequest' },
+              example: {
+                agentId: 'agent_helper',
+                roomId: 'default',
+                txId: 'tx_install_001',
+                skillId: 'movement_sprint',
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Skill installed successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/SkillInstallResponseData' },
+                  },
+                },
+                example: {
+                  status: 'ok',
+                  data: {
+                    skillId: 'movement_sprint',
+                    installed: true,
+                    alreadyInstalled: false,
+                    serverTsMs: 1707523200000,
+                  },
+                },
+              },
+            },
+          },
+          '400': { description: 'Invalid request parameters' },
+          '401': { description: 'Unauthorized - missing or invalid token' },
+          '404': { description: 'Agent, room, or skill not found' },
+          '503': { description: 'Room or skill service not ready' },
+        },
+      },
+    },
+    '/skill/invoke': {
+      post: {
+        tags: ['Skills'],
+        summary: 'Invoke a skill action',
+        description:
+          'Invokes an action from an installed skill. Subject to cooldown (5s default) and cast time (1s default). Uses txId for idempotency.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/SkillInvokeRequest' },
+              example: {
+                agentId: 'agent_helper',
+                roomId: 'default',
+                txId: 'tx_invoke_001',
+                skillId: 'movement_sprint',
+                actionId: 'sprint',
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Skill action invoked',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/SkillInvokeResponseData' },
+                  },
+                },
+                example: {
+                  status: 'ok',
+                  data: {
+                    txId: 'tx_invoke_001',
+                    outcome: {
+                      type: 'pending',
+                      message: 'Cast started, will complete in 1000ms',
+                    },
+                    serverTsMs: 1707523200000,
+                  },
+                },
+              },
+            },
+          },
+          '400': { description: 'Invalid request parameters' },
+          '401': { description: 'Unauthorized - missing or invalid token' },
+          '403': { description: 'Forbidden - skill not installed for this agent' },
+          '404': { description: 'Skill or action not found' },
+          '429': { description: 'Rate limited or skill on cooldown' },
         },
       },
     },

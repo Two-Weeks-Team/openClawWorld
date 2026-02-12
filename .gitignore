@@ -46,6 +46,9 @@ temp/
 # Work artifacts
 .sisyphus/
 
+# Kenney Game Assets (purchased - do not commit)
+docs/reference/Kenney Game Assets All-in-1*/
+
 # Extracted/generated assets
 assets/extracted/
 assets/source/

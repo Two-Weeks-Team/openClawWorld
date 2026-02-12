@@ -201,13 +201,57 @@ export const RoomInfoSchema = z.object({
   tickRate: z.int().min(1).max(60),
 });
 
+export const ZoneIdSchema = z.enum([
+  'lobby',
+  'office',
+  'central-park',
+  'arcade',
+  'meeting',
+  'lounge-cafe',
+  'plaza',
+  'lake',
+]);
+
+export const EntranceDirectionSchema = z.enum(['north', 'south', 'east', 'west']);
+
+export const BuildingEntranceSchema = z.object({
+  id: z.string().min(1).max(128),
+  name: z.string().min(1).max(128),
+  position: Vec2Schema,
+  size: z.object({ width: z.number(), height: z.number() }),
+  zone: ZoneIdSchema,
+  direction: EntranceDirectionSchema,
+  connectsTo: ZoneIdSchema,
+});
+
+export const ZoneInfoSchema = z.object({
+  id: ZoneIdSchema,
+  bounds: z.object({
+    x: z.number(),
+    y: z.number(),
+    width: z.number(),
+    height: z.number(),
+  }),
+  entrances: z.array(BuildingEntranceSchema),
+});
+
+export const MapMetadataSchema = z.object({
+  currentZone: ZoneIdSchema.nullable(),
+  zones: z.array(ZoneInfoSchema),
+  mapSize: z.object({
+    width: z.number().int().min(1),
+    height: z.number().int().min(1),
+    tileSize: z.number().int().min(1),
+  }),
+});
+
 export const ObserveResponseDataSchema = z.object({
   self: EntityBaseSchema,
   nearby: z.array(ObservedEntitySchema).max(500),
   facilities: z.array(ObservedFacilitySchema).max(100),
   serverTsMs: TsMsSchema,
   room: RoomInfoSchema,
-  mapMetadata: z.lazy(() => MapMetadataSchema).optional(),
+  mapMetadata: MapMetadataSchema.optional(),
 });
 
 export const MoveToResultSchema = z.enum(['accepted', 'rejected', 'no_op']);
@@ -429,50 +473,6 @@ export const StatusResponseDataSchema = z.object({
 // ============================================================================
 
 export const OrgRoleSchema = z.enum(['owner', 'admin', 'member', 'guest']);
-
-export const ZoneIdSchema = z.enum([
-  'lobby',
-  'office',
-  'central-park',
-  'arcade',
-  'meeting',
-  'lounge-cafe',
-  'plaza',
-  'lake',
-]);
-
-export const EntranceDirectionSchema = z.enum(['north', 'south', 'east', 'west']);
-
-export const BuildingEntranceSchema = z.object({
-  id: z.string().min(1).max(128),
-  name: z.string().min(1).max(128),
-  position: Vec2Schema,
-  size: z.object({ width: z.number(), height: z.number() }),
-  zone: ZoneIdSchema,
-  direction: EntranceDirectionSchema,
-  connectsTo: ZoneIdSchema,
-});
-
-export const ZoneInfoSchema = z.object({
-  id: ZoneIdSchema,
-  bounds: z.object({
-    x: z.number(),
-    y: z.number(),
-    width: z.number(),
-    height: z.number(),
-  }),
-  entrances: z.array(BuildingEntranceSchema),
-});
-
-export const MapMetadataSchema = z.object({
-  currentZone: ZoneIdSchema.nullable(),
-  zones: z.array(ZoneInfoSchema),
-  mapSize: z.object({
-    width: z.number().int().min(1),
-    height: z.number().int().min(1),
-    tileSize: z.number().int().min(1),
-  }),
-});
 
 export const MeetingStatusSchema = z.enum(['scheduled', 'in_progress', 'ended', 'cancelled']);
 

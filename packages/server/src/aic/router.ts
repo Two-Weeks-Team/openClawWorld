@@ -7,6 +7,7 @@ import {
   ChatObserveRequestSchema,
   PollEventsRequestSchema,
   RegisterRequestSchema,
+  UnregisterRequestSchema,
   ProfileUpdateRequestSchema,
   SkillListRequestSchema,
   SkillInstallRequestSchema,
@@ -32,6 +33,7 @@ import { handleChatSend } from './handlers/chatSend.js';
 import { handleChatObserve } from './handlers/chatObserve.js';
 import { handlePollEvents } from './handlers/pollEvents.js';
 import { handleRegister } from './handlers/register.js';
+import { handleUnregister } from './handlers/unregister.js';
 import { handleProfileUpdate } from './handlers/profileUpdate.js';
 import { handleSkillList } from './handlers/skillList.js';
 import { handleSkillInstall } from './handlers/skillInstall.js';
@@ -49,6 +51,13 @@ router.post(
 
 // All routes below require authentication
 router.use(authMiddleware);
+
+router.post(
+  '/unregister',
+  interactRateLimiter,
+  validateRequest(UnregisterRequestSchema),
+  handleUnregister
+);
 
 router.post('/observe', observeRateLimiter, validateRequest(ObserveRequestSchema), handleObserve);
 

@@ -220,6 +220,23 @@ The same \`txId\` will return the same result without re-executing the action.
         },
       },
 
+      UnregisterRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+        },
+      },
+      UnregisterResponseData: {
+        type: 'object',
+        required: ['agentId', 'unregisteredAt'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdEntity' },
+          unregisteredAt: { $ref: '#/components/schemas/TsMs' },
+        },
+      },
+
       ObserveRequest: {
         type: 'object',
         required: ['agentId', 'roomId', 'radius', 'detail'],
@@ -675,6 +692,65 @@ The same \`txId\` will return the same result without re-executing the action.
           },
           '400': {
             description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ResultError' },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/unregister': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Unregister an AI agent',
+        description:
+          'Gracefully disconnect an AI agent from the server. Removes the agent entity from the game world and emits a presence.leave event.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/UnregisterRequest' },
+              example: {
+                agentId: 'agt_abc123def456',
+                roomId: 'default',
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Unregistration successful',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/UnregisterResponseData' },
+                  },
+                },
+                example: {
+                  status: 'ok',
+                  data: {
+                    agentId: 'agt_abc123def456',
+                    unregisteredAt: 1707609600000,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Unauthorized - missing or invalid token',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ResultError' },
+              },
+            },
+          },
+          '404': {
+            description: 'Agent or room not found',
             content: {
               'application/json': {
                 schema: { $ref: '#/components/schemas/ResultError' },

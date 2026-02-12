@@ -282,7 +282,7 @@ export type PresenceJoinPayload = {
 
 export type PresenceLeavePayload = {
   entityId: string;
-  reason: 'disconnect' | 'kicked' | 'room_closed';
+  reason: 'disconnect' | 'kicked' | 'room_closed' | 'unregister' | 'timeout';
 };
 
 export type ProximityEnterPayload = {
@@ -427,6 +427,20 @@ export type RegisterResponseData = {
   agentId: string;
   roomId: string;
   sessionToken: string;
+};
+
+// ============================================================================
+// Agent Unregistration Types
+// ============================================================================
+
+export type UnregisterRequest = {
+  agentId: string;
+  roomId: string;
+};
+
+export type UnregisterResponseData = {
+  agentId: string;
+  unregisteredAt: number;
 };
 
 // ============================================================================

@@ -159,6 +159,20 @@ const API_HISTORY_MAX_LENGTH = 100;
 const INTERACTION_HISTORY_MAX_LENGTH = 50;
 const ACTION_LOG_MAX_LENGTH = 20;
 
+const ENDPOINT_TO_CATEGORY: Record<string, string> = {
+  observe: 'observe',
+  moveTo: 'navigate',
+  chatSend: 'social',
+  chatObserve: 'social',
+  interact: 'interact',
+  pollEvents: 'observe',
+  profileUpdate: 'profile',
+  skillList: 'skill',
+  skillInstall: 'skill',
+  skillInvoke: 'skill',
+  unregister: 'lifecycle',
+};
+
 const ROLES: AgentRole[] = [
   'explorer',
   'worker',
@@ -936,8 +950,7 @@ class IssueDetector {
     for (const agent of agents) {
       const state = agent.getState();
       if (!state.eventCursor) continue;
-      const cursorNum = parseInt(state.eventCursor, 10);
-      if (Number.isNaN(cursorNum)) continue;
+      if (Number.isNaN(parseInt(state.eventCursor, 10))) continue;
       const pollCalls = state.apiCallHistory.filter(h => h.endpoint === 'pollEvents' && h.success);
       if (pollCalls.length < 3) continue;
       const lastTwo = pollCalls.slice(-2);
@@ -1000,10 +1013,10 @@ class IssueDetector {
       const state = agent.getState();
       if (state.actionLog.length < 10) continue;
 
-      const categoryCount: Record<string, number> = {};
+      const baseCategoryCount: Record<string, number> = {};
       for (const label of state.actionLog) {
-        const cat = label.split(':')[0];
-        categoryCount[cat] = (categoryCount[cat] ?? 0) + 1;
+        const base = label.split(':')[0];
+        baseCategoryCount[base] = (baseCategoryCount[base] ?? 0) + 1;
       }
 
       const prefs = ROLE_PREFERENCES[state.role];
@@ -1012,13 +1025,16 @@ class IssueDetector {
         .slice(0, 3)
         .map(([k]) => k);
 
-      const topActionCats = Object.entries(categoryCount)
+      const topActionCats = Object.entries(baseCategoryCount)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 3)
         .map(([k]) => k);
 
-      const overlap = topPrefKeys.filter(k =>
-        topActionCats.some(ac => ac === k || k.includes(ac) || ac.includes(k))
+      const topPrefBases = topPrefKeys.map(k => k.split(':')[0]);
+      const overlap = topPrefKeys.filter((k, i) =>
+        topActionCats.some(
+          ac => ac === k || ac === topPrefBases[i] || k.includes(ac) || ac.includes(k)
+        )
       );
 
       if (overlap.length === 0) {
@@ -1037,7 +1053,7 @@ class IssueDetector {
           evidence: {
             agentIds: [state.agentId],
             timestamps: [Date.now()],
-            logs: Object.entries(categoryCount).map(([k, v]) => `${k}: ${v}`),
+            logs: Object.entries(baseCategoryCount).map(([k, v]) => `${k}: ${v}`),
           },
         };
       }
@@ -1312,6 +1328,11 @@ class ResidentAgent {
     this.unregister().catch(() => {});
   }
 
+  async stopGracefully(): Promise<void> {
+    this.running = false;
+    await this.unregister().catch(() => {});
+  }
+
   setCycleDelay(ms: number): void {
     this.cycleDelayMs = ms;
   }
@@ -1488,6 +1509,28 @@ class ResidentAgent {
       category: 'skill',
     });
 
+    if (this.state.installedSkills.length === 0) {
+      candidates.push({
+        action: () => this.skillInstall('default'),
+        weight:
+          this.getRolePreference('skillList') *
+          0.5 *
+          this.computeNoveltyMultiplier('skillInstall:default'),
+        label: 'skillInstall:default',
+        category: 'skill',
+      });
+    }
+
+    for (const skillId of this.state.installedSkills) {
+      const label = `skillInvoke:${skillId}`;
+      candidates.push({
+        action: () => this.skillInvoke(skillId, 'use'),
+        weight: this.getRolePreference('skillList') * 0.3 * this.computeNoveltyMultiplier(label),
+        label,
+        category: 'skill',
+      });
+    }
+
     const tx = Math.floor(Math.random() * 64);
     const ty = Math.floor(Math.random() * 64);
     candidates.push({
@@ -1503,6 +1546,12 @@ class ResidentAgent {
           await this.unregister();
           await sleep(500);
           await this.register('default');
+          this.state.observedEntities.clear();
+          this.state.observedFacilities.clear();
+          this.state.interactionHistory = [];
+          this.state.actionLog = [];
+          this.state.eventCursor = null;
+          this.state.errorCount = 0;
           await this.observe();
         },
         weight: 0.08 * this.computeNoveltyMultiplier('chaos:reregister'),
@@ -1513,9 +1562,11 @@ class ResidentAgent {
 
     if (this.state.errorCount > 5) {
       const recentErrors = this.state.apiCallHistory.filter(h => !h.success).slice(-5);
-      const errorEndpoints = new Set(recentErrors.map(e => e.endpoint));
+      const errorCategories = new Set(
+        recentErrors.map(e => ENDPOINT_TO_CATEGORY[e.endpoint] ?? e.endpoint)
+      );
       for (const candidate of candidates) {
-        if (errorEndpoints.has(candidate.category)) {
+        if (errorCategories.has(candidate.category)) {
           candidate.weight *= 0.3;
         }
       }
@@ -1531,7 +1582,7 @@ class ResidentAgent {
       success,
       responseTime: Date.now() - startMs,
     });
-    if (this.state.apiCallHistory.length >= API_HISTORY_MAX_LENGTH) {
+    if (this.state.apiCallHistory.length > API_HISTORY_MAX_LENGTH) {
       this.state.apiCallHistory.shift();
     }
   }
@@ -1558,6 +1609,7 @@ class ResidentAgent {
       const result = await response.json();
       if (result.status === 'ok') {
         if (result.data.nearby) {
+          this.state.observedEntities.clear();
           for (const entity of result.data.nearby) {
             if (entity.entity?.pos?.x != null && entity.entity?.pos?.y != null) {
               this.state.observedEntities.set(entity.entity.id, {
@@ -1718,7 +1770,7 @@ class ResidentAgent {
       const result = await response.json();
       const outcome = result.data?.outcome?.type ?? 'unknown';
       this.state.interactionHistory.push({ targetId, action, outcome, timestamp: Date.now() });
-      if (this.state.interactionHistory.length >= INTERACTION_HISTORY_MAX_LENGTH) {
+      if (this.state.interactionHistory.length > INTERACTION_HISTORY_MAX_LENGTH) {
         this.state.interactionHistory.shift();
       }
       this.recordApiCall('interact', startMs, true);
@@ -2123,6 +2175,13 @@ class ResidentAgentLoop {
     console.log('\n🛑 Resident Agent Loop stopped');
     saveState(this.state);
   }
+
+  async stopGracefully(): Promise<void> {
+    this.running = false;
+    await Promise.allSettled(this.agents.map(a => a.stopGracefully()));
+    console.log('\n🛑 Resident Agent Loop stopped');
+    saveState(this.state);
+  }
 }
 
 // ============================================================================
@@ -2242,15 +2301,15 @@ async function main(): Promise<void> {
   const config = parseArgs();
   const loop = new ResidentAgentLoop(config);
 
-  process.on('SIGINT', () => {
+  process.on('SIGINT', async () => {
     console.log('\n\nReceived SIGINT, shutting down...');
-    loop.stop();
+    await loop.stopGracefully();
     process.exit(0);
   });
 
-  process.on('SIGTERM', () => {
+  process.on('SIGTERM', async () => {
     console.log('\n\nReceived SIGTERM, shutting down...');
-    loop.stop();
+    await loop.stopGracefully();
     process.exit(0);
   });
 

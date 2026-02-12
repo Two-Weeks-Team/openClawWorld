@@ -192,7 +192,7 @@ Each agent makes non-deterministic decisions every cycle using a weighted random
 
 ### How It Works
 
-```
+```text
 ROLE_PREFERENCES (weight table per role)
              |
              v

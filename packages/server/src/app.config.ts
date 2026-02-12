@@ -10,6 +10,20 @@ import { openApiSpec } from './openapi.js';
 
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
 
+function getCorsOrigin(): string | string[] | boolean {
+  if (NODE_ENV === 'development') {
+    return true;
+  }
+  const allowedOrigins = process.env.ALLOWED_ORIGINS;
+  if (!allowedOrigins) {
+    console.warn(
+      '[SECURITY] ALLOWED_ORIGINS not set in production. CORS will reject all cross-origin requests.'
+    );
+    return false;
+  }
+  return allowedOrigins.split(',').map(origin => origin.trim());
+}
+
 const server = defineServer({
   rooms: {
     game: defineRoom(GameRoom),
@@ -19,7 +33,7 @@ const server = defineServer({
   express: app => {
     app.use(
       cors({
-        origin: NODE_ENV === 'development' ? '*' : (process.env.ALLOWED_ORIGINS?.split(',') ?? '*'),
+        origin: getCorsOrigin(),
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
         exposedHeaders: [

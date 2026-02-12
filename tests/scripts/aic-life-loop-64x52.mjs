@@ -275,16 +275,30 @@ async function runLifeLoop() {
   console.log('Events received:', results.events.length);
   console.log('Success:', results.success);
 
-  // Save to evidence file
+  // Save to evidence file (sanitized to prevent arbitrary data injection)
   const fs = await import('fs');
   const path = await import('path');
   const evidenceDir = '.sisyphus/evidence/B3';
+
+  const sanitizedResults = {
+    success: Boolean(results.success),
+    timestamp: String(results.timestamp || new Date().toISOString()),
+    roomId: String(results.roomId || ''),
+    agentId: String(results.agentId || ''),
+    steps: Object.fromEntries(
+      Object.entries(results.steps || {}).map(([k, v]) => [String(k), String(v)])
+    ),
+    errors: (results.errors || []).map(e => String(e)).slice(0, 100),
+    facilitiesCount: Array.isArray(results.facilities) ? results.facilities.length : 0,
+    eventsCount: Array.isArray(results.events) ? results.events.length : 0,
+    zoneEventsCount: Array.isArray(results.zoneEvents) ? results.zoneEvents.length : 0,
+  };
 
   try {
     fs.mkdirSync(evidenceDir, { recursive: true });
     fs.writeFileSync(
       path.join(evidenceDir, 'B3-T02-life-loop.json'),
-      JSON.stringify(results, null, 2)
+      JSON.stringify(sanitizedResults, null, 2)
     );
     console.log(`\nEvidence saved to ${evidenceDir}/B3-T02-life-loop.json`);
   } catch (fsError) {

@@ -18,6 +18,57 @@ import { MAP_CONFIG, ZONE_IDS, ZONE_BOUNDS } from '@openclawworld/shared';
 function isValidZoneId(value: string): value is ZoneId {
   return (ZONE_IDS as readonly string[]).includes(value);
 }
+
+// Cached static zone data per worldPack (keyed by pack name@version)
+// Using Map to support multiple worldPacks and prevent cross-room data leakage
+const cachedStaticZonesDataByPack = new Map<
+  string,
+  { zones: ZoneInfo[]; mapSize: MapMetadata['mapSize'] }
+>();
+
+function getStaticZonesData(gameRoom: GameRoom): {
+  zones: ZoneInfo[];
+  mapSize: MapMetadata['mapSize'];
+} {
+  const worldPack = gameRoom.getWorldPack();
+  // Use worldPack identifier as cache key, fallback to '__default__' if not available
+  const cacheKey = worldPack?.manifest
+    ? `${worldPack.manifest.name}@${worldPack.manifest.version}`
+    : '__default__';
+
+  const cached = cachedStaticZonesDataByPack.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
+  const zones: ZoneInfo[] = [];
+
+  for (const zoneId of ZONE_IDS) {
+    const bounds = ZONE_BOUNDS[zoneId];
+    const zoneMapData = worldPack?.maps.get(zoneId);
+    const entrances = zoneMapData?.entrances ?? [];
+
+    zones.push({
+      id: zoneId,
+      bounds,
+      entrances,
+    });
+  }
+
+  const staticData = {
+    zones,
+    mapSize: {
+      width: MAP_CONFIG.pixelWidth,
+      height: MAP_CONFIG.pixelHeight,
+      tileSize: MAP_CONFIG.tileSize,
+    },
+  };
+
+  cachedStaticZonesDataByPack.set(cacheKey, staticData);
+
+  return staticData;
+}
+
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
 import type { FacilitySchema } from '../../schemas/FacilitySchema.js';
@@ -92,29 +143,12 @@ function createErrorResponse(
 }
 
 function buildMapMetadata(gameRoom: GameRoom, currentZone: string | null): MapMetadata {
-  const worldPack = gameRoom.getWorldPack();
-  const zones: ZoneInfo[] = [];
-
-  for (const zoneId of ZONE_IDS) {
-    const bounds = ZONE_BOUNDS[zoneId];
-    const zoneMapData = worldPack?.maps.get(zoneId);
-    const entrances = zoneMapData?.entrances ?? [];
-
-    zones.push({
-      id: zoneId,
-      bounds,
-      entrances,
-    });
-  }
+  const staticData = getStaticZonesData(gameRoom);
 
   return {
     currentZone: currentZone && isValidZoneId(currentZone) ? currentZone : null,
-    zones,
-    mapSize: {
-      width: MAP_CONFIG.pixelWidth,
-      height: MAP_CONFIG.pixelHeight,
-      tileSize: MAP_CONFIG.tileSize,
-    },
+    zones: staticData.zones,
+    mapSize: staticData.mapSize,
   };
 }
 

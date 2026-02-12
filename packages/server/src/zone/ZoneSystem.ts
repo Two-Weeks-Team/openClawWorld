@@ -142,11 +142,9 @@ export class ZoneSystem {
           events.push({ type: 'zone.enter', payload: enterPayload });
           eventLog.append('zone.enter', roomId, enterPayload);
           entity.setZone(currentZone);
-        }
-
-        if (currentZone !== null) {
           this.entityZones.set(entityId, currentZone);
         } else {
+          entity.clearZone();
           this.entityZones.delete(entityId);
         }
       }

@@ -95,7 +95,7 @@ export class EntitySchema extends Schema {
   facing: Facing = 'down';
 
   @type('string')
-  currentZone: ZoneId = 'plaza';
+  currentZone: string = '';
 
   @type('number')
   speed: number = 100;
@@ -130,8 +130,12 @@ export class EntitySchema extends Schema {
     this.facing = facing;
   }
 
-  setZone(zone: ZoneId): void {
-    this.currentZone = zone;
+  setZone(zone: ZoneId | null): void {
+    this.currentZone = zone ?? '';
+  }
+
+  clearZone(): void {
+    this.currentZone = '';
   }
 
   getEffectiveSpeed(): number {

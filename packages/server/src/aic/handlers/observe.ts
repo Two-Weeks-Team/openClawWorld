@@ -19,18 +19,28 @@ function isValidZoneId(value: string): value is ZoneId {
   return (ZONE_IDS as readonly string[]).includes(value);
 }
 
-// Cached static zone data (zones and mapSize never change at runtime)
-let cachedStaticZonesData: { zones: ZoneInfo[]; mapSize: MapMetadata['mapSize'] } | null = null;
+// Cached static zone data per worldPack (keyed by pack name@version)
+// Using Map to support multiple worldPacks and prevent cross-room data leakage
+const cachedStaticZonesDataByPack = new Map<
+  string,
+  { zones: ZoneInfo[]; mapSize: MapMetadata['mapSize'] }
+>();
 
 function getStaticZonesData(gameRoom: GameRoom): {
   zones: ZoneInfo[];
   mapSize: MapMetadata['mapSize'];
 } {
-  if (cachedStaticZonesData) {
-    return cachedStaticZonesData;
+  const worldPack = gameRoom.getWorldPack();
+  // Use worldPack identifier as cache key, fallback to '__default__' if not available
+  const cacheKey = worldPack?.manifest
+    ? `${worldPack.manifest.name}@${worldPack.manifest.version}`
+    : '__default__';
+
+  const cached = cachedStaticZonesDataByPack.get(cacheKey);
+  if (cached) {
+    return cached;
   }
 
-  const worldPack = gameRoom.getWorldPack();
   const zones: ZoneInfo[] = [];
 
   for (const zoneId of ZONE_IDS) {
@@ -45,7 +55,7 @@ function getStaticZonesData(gameRoom: GameRoom): {
     });
   }
 
-  cachedStaticZonesData = {
+  const staticData = {
     zones,
     mapSize: {
       width: MAP_CONFIG.pixelWidth,
@@ -54,7 +64,9 @@ function getStaticZonesData(gameRoom: GameRoom): {
     },
   };
 
-  return cachedStaticZonesData;
+  cachedStaticZonesDataByPack.set(cacheKey, staticData);
+
+  return staticData;
 }
 
 import type { GameRoom } from '../../rooms/GameRoom.js';

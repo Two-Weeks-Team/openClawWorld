@@ -423,63 +423,51 @@ describe('ZoneSystem - 64x64 Grid-Town Layout (1024x1024 pixels)', () => {
   });
 
   describe('zone boundary edge cases', () => {
-    describe('lake/lobby boundary at x=192', () => {
-      // Lake: (64,64) to (192,512) - ends at x=191 (exclusive)
-      // Lobby: (192,64) to (576,448) - starts at x=192 (inclusive)
-
-      it('detects lake at x=191 (last pixel before lobby)', () => {
-        expect(zoneSystem.detectZone(191, 100)).toBe('lake');
+    describe('lake/lobby boundary at x=96', () => {
+      it('detects lake at x=95 (last pixel before lobby)', () => {
+        expect(zoneSystem.detectZone(95, 100)).toBe('lake');
       });
 
-      it('detects lobby at x=192 (first pixel of lobby)', () => {
-        expect(zoneSystem.detectZone(192, 100)).toBe('lobby');
+      it('detects lobby at x=96 (first pixel of lobby)', () => {
+        expect(zoneSystem.detectZone(96, 100)).toBe('lobby');
       });
 
-      it('detects lake at x=64 (left edge of lake)', () => {
-        expect(zoneSystem.detectZone(64, 100)).toBe('lake');
+      it('detects lake at x=32 (left edge of lake)', () => {
+        expect(zoneSystem.detectZone(32, 100)).toBe('lake');
       });
     });
 
-    describe('central-park/arcade boundary at x=1408', () => {
-      // Central-park: (640,512) to (1408,1152) - ends at x=1407
-      // Arcade: (1408,512) to (1984,1024) - starts at x=1408
-
-      it('detects central-park at x=1407 (last pixel before arcade)', () => {
-        expect(zoneSystem.detectZone(1407, 700)).toBe('central-park');
+    describe('central-park/arcade boundary at x=704', () => {
+      it('detects central-park at x=703 (last pixel before arcade)', () => {
+        expect(zoneSystem.detectZone(703, 300)).toBe('central-park');
       });
 
-      it('detects arcade at x=1408 (first pixel of arcade)', () => {
-        expect(zoneSystem.detectZone(1408, 700)).toBe('arcade');
+      it('detects arcade at x=704 (first pixel of arcade)', () => {
+        expect(zoneSystem.detectZone(704, 300)).toBe('arcade');
       });
     });
 
-    describe('lounge-cafe/plaza boundary at x=1216', () => {
-      // Lounge-cafe: (576,1216) to (1216,1664) - ends at x=1215
-      // Plaza: (1216,1216) to (1728,1728) - starts at x=1216
-
-      it('detects lounge-cafe at x=1215 (last pixel before plaza)', () => {
-        expect(zoneSystem.detectZone(1215, 1300)).toBe('lounge-cafe');
+    describe('lounge-cafe/plaza boundary at x=608', () => {
+      it('detects lounge-cafe at x=607 (last pixel before plaza)', () => {
+        expect(zoneSystem.detectZone(607, 700)).toBe('lounge-cafe');
       });
 
-      it('detects plaza at x=1216 (first pixel of plaza)', () => {
-        expect(zoneSystem.detectZone(1216, 1300)).toBe('plaza');
+      it('detects plaza at x=608 (first pixel of plaza)', () => {
+        expect(zoneSystem.detectZone(608, 700)).toBe('plaza');
       });
     });
 
     describe('vertical boundaries', () => {
-      // Lake: y=64 to y=512 (ends at y=511)
-      // Meeting: y=896 to y=1472 (starts at y=896)
-
-      it('detects lake at y=511 (last pixel before gap)', () => {
-        expect(zoneSystem.detectZone(100, 511)).toBe('lake');
+      it('detects lake at y=255 (last pixel of lake)', () => {
+        expect(zoneSystem.detectZone(50, 255)).toBe('lake');
       });
 
       it('detects null in gap between lake and meeting', () => {
-        expect(zoneSystem.detectZone(100, 600)).toBeNull();
+        expect(zoneSystem.detectZone(50, 300)).toBeNull();
       });
 
-      it('detects meeting at y=896 (first pixel of meeting)', () => {
-        expect(zoneSystem.detectZone(100, 896)).toBe('meeting');
+      it('detects meeting at y=448 (first pixel of meeting)', () => {
+        expect(zoneSystem.detectZone(50, 448)).toBe('meeting');
       });
     });
   });

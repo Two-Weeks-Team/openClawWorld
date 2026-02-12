@@ -182,8 +182,8 @@ export class Minimap {
     const offsetX = 4;
     const offsetY = 4;
 
-    const worldViewWidth = camera.width / camera.zoom;
-    const worldViewHeight = camera.height / camera.zoom;
+    const worldViewWidth = camera.zoom > 0 ? camera.width / camera.zoom : 0;
+    const worldViewHeight = camera.zoom > 0 ? camera.height / camera.zoom : 0;
 
     const viewX = offsetX + camera.scrollX * scaleX;
     const viewY = offsetY + camera.scrollY * scaleY;

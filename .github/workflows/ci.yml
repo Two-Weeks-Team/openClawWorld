@@ -52,6 +52,9 @@ jobs:
       - name: Run command generator
         run: pnpm generate:commands
 
+      - name: Format generated files
+        run: pnpm format
+
       - name: Check for uncommitted changes
         run: |
           CHANGED_FILES=$(git status --porcelain packages/plugin/src/generated/ .claude/commands/ocw-tools.md .opencode/command/ .gemini/commands/ .codex/)

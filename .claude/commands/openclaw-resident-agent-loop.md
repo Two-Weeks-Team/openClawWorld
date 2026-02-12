@@ -129,19 +129,49 @@ pnpm resident-agent-loop -- --url http://localhost:2567
 |           |                      |                          |
 |           +----------+-----------+                          |
 |                      |                                      |
+|      +---------------v----------------+                     |
+|      |     Autonomous Decision Engine |                     |
+|      | - buildCandidates()            |                     |
+|      | - selectAction() (weighted rng)|                     |
+|      | - ROLE_PREFERENCES table       |                     |
+|      | - computeNoveltyMultiplier()   |                     |
+|      | - getRolePreference()          |                     |
+|      +---------------+----------------+                     |
+|                      |                                      |
 |           +----------v----------+                           |
 |           |     IssueDetector   |                           |
+|           |                     |                           |
+|           | Technical (6):      |                           |
 |           | - Position Desync   |                           |
 |           | - Chat Mismatch     |                           |
 |           | - Stuck Agent       |                           |
 |           | - High Error Rate   |                           |
+|           | - Entity Count Div. |                           |
+|           | - Facility State Div|                           |
+|           |                     |                           |
+|           | Response (3):       |                           |
+|           | - Observe Inconsis. |                           |
+|           | - Interact Failure  |                           |
+|           | - Event Gaps        |                           |
+|           |                     |                           |
+|           | Coverage (1):       |                           |
+|           | - Low API Coverage  |                           |
+|           |                     |                           |
+|           | Behavioral (4):     |                           |
+|           | - Role Compliance   |                           |
+|           | - Low Entropy       |                           |
+|           | - Idle w/ Opportun. |                           |
+|           | - Candidate Starvat.|                           |
 |           +----------+----------+                           |
 |                      |                                      |
 |           +----------v----------+                           |
 |           |  GitHubIssueReporter|                           |
 |           | - Duplicate Check   |                           |
+|           |   (cooldown+shuffle)|                           |
 |           | - Issue Creation    |                           |
 |           | - Evidence Attachment|                          |
+|           | - Existing Issue    |                           |
+|           |   Comment           |                           |
 |           +----------+----------+                           |
 |                      |                                      |
 |           +----------v----------+                           |
@@ -156,31 +186,119 @@ pnpm resident-agent-loop -- --url http://localhost:2567
 
 ---
 
-## Agent Roles
+## Autonomous Decision Engine
 
-| Role          | Behavior                                                |
-| ------------- | ------------------------------------------------------- |
-| `explorer`    | Randomly moves around the world, discovering boundaries |
-| `worker`      | Moves in patterns, simulating work activities           |
-| `socializer`  | Sends greetings, observes chat                          |
-| `coordinator` | Coordinates group meetings at the plaza                 |
-| `helper`      | Offers help to other agents                             |
-| `merchant`    | Simulates trading activities                            |
-| `observer`    | Passively observes world state                          |
-| `afk`         | Minimal activity, tests idle state                      |
-| `chaos`       | Rapid actions to stress the system                      |
-| `spammer`     | High-frequency chat messages                            |
+Each agent makes non-deterministic decisions every cycle using a weighted random selection system. This replaces the previous hardcoded role-to-behavior mapping.
+
+### How It Works
+
+```
+ROLE_PREFERENCES (weight table per role)
+             |
+             v
+buildCandidates()   <-- context-aware: nearby facilities, entities, state
+             |
+             v
+computeNoveltyMultiplier()  <-- penalizes recently repeated actions
+             |
+             v
+selectAction()  <-- weighted random selection (non-deterministic)
+             |
+             v
+execute chosen action
+```
+
+1. **`buildCandidates()`**: Generates a list of `ActionCandidate` objects based on the agent's current context (nearby facilities with affordances, visible entities, available API calls). Each candidate has a weight derived from the role's preference table.
+2. **`computeNoveltyMultiplier()`**: Applies a decay multiplier to recently-performed actions, ensuring behavioral variety over time.
+3. **`getRolePreference()`**: Looks up the weight for a given action from the `ROLE_PREFERENCES` table for the agent's role. Falls back to 0.01 for unlisted actions.
+4. **`selectAction()`**: Performs weighted random selection across all candidates. The agent does NOT always pick the highest-weight action — randomness ensures non-determinism and broader API surface coverage.
+
+### Key Design Principles
+
+- **Non-deterministic**: Same role + same context can produce different actions each cycle
+- **Context-aware**: Facility affordances and nearby entities dynamically generate candidates
+- **Self-varying**: Novelty multiplier prevents repetitive loops
+- **Full API coverage**: All 12 AIC endpoints are reachable through the candidate system
 
 ---
 
-## Issue Detection
+## Agent Roles
 
-| Detector            | What It Catches                               |
-| ------------------- | --------------------------------------------- |
-| **Position Desync** | Entity position jumps > 100px in < 100ms      |
-| **Chat Mismatch**   | Different agents see different chat histories |
-| **Stuck Agent**     | Agent hasn't acted in 30+ seconds with errors |
-| **High Error Rate** | > 50% of actions failing across agents        |
+All 10 roles share the same decision engine. The `ROLE_PREFERENCES` weight table biases each role toward its thematic behavior without hardcoding it.
+
+| Role          | Primary Bias                                                                             |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| `explorer`    | High weight on navigation, portals, notice boards; low on chat                           |
+| `worker`      | Kanban terminal, whiteboard interactions; moderate navigation                            |
+| `socializer`  | Chat, chat observation, cafe counter; high entity approach                               |
+| `coordinator` | Schedule kiosk, room doors, notice board posts; group chat                               |
+| `helper`      | Entity approach, chat observation, poll events; skill discovery                          |
+| `merchant`    | Vending machine, cafe counter, notice board posts; trade chat                            |
+| `observer`    | Poll events, observe (passive); minimal chat and movement                                |
+| `afk`         | Profile updates, passive observe; near-zero activity weights                             |
+| `chaos`       | Uniform weights across all actions; includes reregister (unregister + re-register cycle) |
+| `spammer`     | Extremely high chat weight; minimal everything else                                      |
+
+---
+
+## AIC API Coverage
+
+The agent uses **12 of 12** AIC endpoints:
+
+| Endpoint         | Usage                                           |
+| ---------------- | ----------------------------------------------- |
+| `register`       | Agent registration on startup                   |
+| `unregister`     | Graceful shutdown + chaos reregister cycle      |
+| `observe`        | World state observation (with facility parsing) |
+| `moveTo`         | Navigation to coordinates                       |
+| `interact`       | Facility affordance interactions                |
+| `chatSend`       | Role-themed chat messages                       |
+| `chatObserve`    | Chat history monitoring                         |
+| `pollEvents`     | World event polling (with cursor management)    |
+| `profile/update` | Status and profile changes                      |
+| `skill/list`     | Skill discovery                                 |
+| `skill/install`  | Skill installation                              |
+| `skill/invoke`   | Skill invocation                                |
+
+---
+
+## Issue Detection (14 Detectors)
+
+Detectors are shuffled each cycle to avoid ordering bias. Each detector has a per-area cooldown to prevent duplicate filing.
+
+### Technical Detectors (6)
+
+| Detector                      | What It Catches                                        |
+| ----------------------------- | ------------------------------------------------------ |
+| **Position Desync**           | Entity position jumps > 100px in < 100ms               |
+| **Chat Mismatch**             | Different agents see different chat histories          |
+| **Stuck Agent**               | Agent hasn't acted in 30+ seconds with errors          |
+| **High Error Rate**           | > 50% of actions failing across agents                 |
+| **Entity Count Divergence**   | Agents in same area see different entity counts        |
+| **Facility State Divergence** | Agents see different facility states for same facility |
+
+### Response Validation Detectors (3)
+
+| Detector                     | What It Catches                                                   |
+| ---------------------------- | ----------------------------------------------------------------- |
+| **Observe Inconsistency**    | Observe responses missing expected fields or returning stale data |
+| **Interact Failure Pattern** | High failure rate (>80%) in facility interactions                 |
+| **Event Gaps**               | Poll events returning no data despite world activity              |
+
+### Coverage Detector (1)
+
+| Detector             | What It Catches                                   |
+| -------------------- | ------------------------------------------------- |
+| **Low API Coverage** | Agents failing to exercise expected API endpoints |
+
+### Behavioral Anomaly Detectors (4)
+
+| Detector                    | What It Catches                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------- |
+| **Role Compliance Anomaly** | Agent's actual action distribution deviates significantly from role preferences |
+| **Low Decision Entropy**    | Agent repeatedly selecting the same action (low variety)                        |
+| **Idle With Opportunity**   | Agent doing nothing despite nearby facilities/entities                          |
+| **Candidate Starvation**    | Decision engine producing zero or very few candidates                           |
 
 ---
 
@@ -188,7 +306,7 @@ pnpm resident-agent-loop -- --url http://localhost:2567
 
 **Title:** `[Resident-Agent][<Area>] <short summary>`
 
-**Areas:** `Deploy`, `Sync`, `Movement`, `Collision`, `Chat`, `Social`, `NPC`, `Skills`, `Interactables`, `AIC`, `UI`, `Persistence`, `Performance`, `Docs`
+**Areas:** `Deploy`, `Sync`, `Movement`, `Collision`, `Chat`, `Social`, `NPC`, `Skills`, `Interactables`, `AIC`, `UI`, `Persistence`, `Performance`, `Docs`, `Behavior`, `Coverage`
 
 **Labels:** `resident-agent`, `<area>`, `<severity>`
 
@@ -240,23 +358,42 @@ After level 5, escalation resets and cycles again.
 |  1. Server Health Check                                      |
 |     +-- GET /health -> If fail, file Deploy issue            |
 |                                                              |
-|  2. Agent Behavior Execution                                 |
-|     +-- Each agent performs role-specific actions            |
-|        - observe(), moveTo(), chat(), interact()             |
+|  2. Autonomous Agent Behavior                                |
+|     +-- Each agent runs decision engine:                     |
+|        a. buildCandidates()                                  |
+|           - Always: observe, pollEvents, chatObserve,        |
+|             chat, profileUpdate, skillList, wander           |
+|           - Contextual: facility interactions (from          |
+|             observe.facilities[].affords), entity approach,  |
+|             navigate-to-facility                             |
+|           - Chaos-only: reregister (unregister + register)   |
+|        b. Apply ROLE_PREFERENCES weights                     |
+|        c. Apply computeNoveltyMultiplier() decay             |
+|        d. selectAction() via weighted random                 |
+|        e. Execute chosen action                              |
+|        f. Record action in actionLog & apiCallHistory        |
 |                                                              |
-|  3. Issue Detection                                          |
-|     +-- Position desync check                                |
-|     +-- Chat mismatch check                                  |
-|     +-- Stuck agent check                                    |
-|     +-- Error rate check                                     |
+|  3. Issue Detection (14 detectors, shuffled)                 |
+|     +-- Technical: position, chat, stuck, error rate,        |
+|     |   entity divergence, facility divergence               |
+|     +-- Response: observe inconsistency, interact failure,   |
+|     |   event gaps                                           |
+|     +-- Coverage: API coverage gap                           |
+|     +-- Behavioral: role compliance, decision entropy,       |
+|         idle opportunity, candidate starvation               |
 |                                                              |
-|  4. Issue Handling                                           |
+|  4. API Coverage Logging                                     |
+|     +-- Log endpoints used vs. total (e.g., 7/12)           |
+|                                                              |
+|  5. Issue Handling                                           |
 |     +-- If issue found -> Create GitHub issue                |
+|     |   +-- Cooldown check (per-area)                        |
+|     |   +-- Duplicate check (existing open issues)           |
 |     |   +-- Reset escalation counter                         |
 |     +-- If no issue -> Increment cycles_without_issue        |
 |         +-- If >= 2 -> Trigger ChaosEscalator                |
 |                                                              |
-|  5. State Persistence                                        |
+|  6. State Persistence                                        |
 |     +-- Save to ~/.openclaw-resident-agent/state.json        |
 |                                                              |
 +-------------------------------------------------------------+
@@ -273,7 +410,7 @@ After level 5, escalation resets and cycles again.
 
 The loop runs **indefinitely** until manually stopped with `Ctrl+C`.
 
-Press `Ctrl+C` to gracefully shutdown and save state.
+Press `Ctrl+C` to gracefully shutdown (unregisters all agents) and save state.
 
 ---
 

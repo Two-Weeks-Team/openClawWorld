@@ -83,39 +83,39 @@ export class Minimap {
     for (let y = 0; y < 3; y++) {
       this.zoneGraphics.fillRect(
         offsetX,
-        offsetY + y * 32 * scaleY,
+        offsetY + y * 16 * scaleY,
         this.config.width - 8,
-        32 * scaleY
+        16 * scaleY
       );
     }
     for (let y = 3; y < 20; y++) {
-      this.zoneGraphics.fillRect(offsetX, offsetY + y * 32 * scaleY, 5 * 32 * scaleX, 32 * scaleY);
+      this.zoneGraphics.fillRect(offsetX, offsetY + y * 16 * scaleY, 5 * 16 * scaleX, 16 * scaleY);
     }
 
     this.zoneGraphics.fillStyle(EXTRA_COLORS.road, 0.6);
     this.zoneGraphics.fillRect(
-      offsetX + 17 * 32 * scaleX,
-      offsetY + 12 * 32 * scaleY,
-      23 * 32 * scaleX,
-      4 * 32 * scaleY
+      offsetX + 17 * 16 * scaleX,
+      offsetY + 12 * 16 * scaleY,
+      23 * 16 * scaleX,
+      4 * 16 * scaleY
     );
     this.zoneGraphics.fillRect(
-      offsetX + 17 * 32 * scaleX,
-      offsetY + 16 * 32 * scaleY,
-      4 * 32 * scaleX,
-      22 * 32 * scaleY
+      offsetX + 17 * 16 * scaleX,
+      offsetY + 16 * 16 * scaleY,
+      4 * 16 * scaleX,
+      22 * 16 * scaleY
     );
     this.zoneGraphics.fillRect(
-      offsetX + 37 * 32 * scaleX,
-      offsetY + 18 * 32 * scaleY,
-      3 * 32 * scaleX,
-      15 * 32 * scaleY
+      offsetX + 37 * 16 * scaleX,
+      offsetY + 18 * 16 * scaleY,
+      3 * 16 * scaleX,
+      15 * 16 * scaleY
     );
     this.zoneGraphics.fillRect(
-      offsetX + 17 * 32 * scaleX,
-      offsetY + 36 * 32 * scaleY,
-      41 * 32 * scaleX,
-      14 * 32 * scaleY
+      offsetX + 17 * 16 * scaleX,
+      offsetY + 36 * 16 * scaleY,
+      41 * 16 * scaleX,
+      14 * 16 * scaleY
     );
 
     for (const zoneId of ZONE_IDS) {

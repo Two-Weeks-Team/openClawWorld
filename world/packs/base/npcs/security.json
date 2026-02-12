@@ -3,9 +3,9 @@
   "name": "Max the Guard",
   "sprite": "npc-security",
   "zone": "lobby",
-  "defaultPosition": { "x": 384, "y": 192 },
+  "defaultPosition": { "x": 192, "y": 96 },
   "schedule": [
-    { "startHour": 0, "endHour": 24, "state": "working", "position": { "x": 384, "y": 192 } }
+    { "startHour": 0, "endHour": 24, "state": "working", "position": { "x": 192, "y": 96 } }
   ],
   "dialogue": {
     "greeting": {

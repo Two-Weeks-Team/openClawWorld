@@ -3,11 +3,11 @@
   "name": "Jordan the PM",
   "sprite": "npc-pm",
   "zone": "office",
-  "defaultPosition": { "x": 1600, "y": 320 },
+  "defaultPosition": { "x": 800, "y": 160 },
   "schedule": [
-    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 1600, "y": 320 } },
-    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 800, "y": 1440 } },
-    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 1600, "y": 320 } }
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 800, "y": 160 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 400, "y": 720 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 800, "y": 160 } }
   ],
   "dialogue": {
     "greeting": {

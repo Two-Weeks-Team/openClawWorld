@@ -318,8 +318,8 @@ export class WorldPackLoader {
         spawnPoints: zoneSpawns.map(sp => ({ x: sp.x, y: sp.y })),
         width: raw.width ?? 64,
         height: raw.height ?? 52,
-        tileWidth: raw.tilewidth ?? 32,
-        tileHeight: raw.tileheight ?? 32,
+        tileWidth: raw.tilewidth ?? 16,
+        tileHeight: raw.tileheight ?? 16,
         layers: raw.layers ?? [],
         objects: zoneObjects,
         npcs: (raw.npcs ?? []).filter(npc => this.getNpcZone(npc, zoneId)),
@@ -534,8 +534,8 @@ export class WorldPackLoader {
     }
 
     if (spawnPoints.length === 0) {
-      const tileWidth = raw.tilewidth ?? 32;
-      const tileHeight = raw.tileheight ?? 32;
+      const tileWidth = raw.tilewidth ?? 16;
+      const tileHeight = raw.tileheight ?? 16;
       const mapWidth = raw.width ?? 10;
       const mapHeight = raw.height ?? 10;
 
@@ -593,7 +593,7 @@ export class WorldPackLoader {
   }
 
   private getDefaultZoneBounds(zoneId: ZoneId): ZoneBounds {
-    return ZONE_BOUNDS[zoneId] ?? { x: 0, y: 0, width: 320, height: 320 };
+    return ZONE_BOUNDS[zoneId] ?? { x: 0, y: 0, width: 160, height: 160 };
   }
 
   private formatZoneName(zoneId: ZoneId): string {

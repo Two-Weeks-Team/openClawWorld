@@ -44,14 +44,14 @@ export const MAX_MOVE_SPEED = 200;
 /**
  * Default tile size in pixels.
  */
-export const DEFAULT_TILE_SIZE = 32;
+export const DEFAULT_TILE_SIZE = 16;
 
 /**
  * Default spawn position (plaza center) for entities when no spawn point is configured.
  */
 export const DEFAULT_SPAWN_POSITION = {
-  x: 1024,
-  y: 1024,
+  x: 512,
+  y: 512,
 } as const;
 
 function parseEnvInt(envVar: string | undefined, defaultValue: number): number {

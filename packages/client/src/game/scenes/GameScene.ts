@@ -108,7 +108,7 @@ export class GameScene extends Phaser.Scene {
     this.skillBar = new SkillBar(this);
     this.castBar = new CastBar(this);
 
-    this.tileInterpreter = new TileInterpreter(32);
+    this.tileInterpreter = new TileInterpreter(16);
     this.clientCollision = new ClientCollisionSystem();
     this.initializeWorldGrid();
 
@@ -144,7 +144,7 @@ export class GameScene extends Phaser.Scene {
         collisionData
       );
 
-      this.clientCollision.setWorldGrid(worldGrid, 32);
+      this.clientCollision.setWorldGrid(worldGrid, 16);
     }
   }
 
@@ -305,7 +305,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private findEntityAtPosition(x: number, y: number): string | undefined {
-    const clickRadius = 32;
+    const clickRadius = 16;
     let closestId: string | undefined;
     let closestDist = Infinity;
 
@@ -335,7 +335,7 @@ export class GameScene extends Phaser.Scene {
 
     this.marker = this.add.graphics();
     this.marker.lineStyle(2, 0xffff00, 1);
-    this.marker.strokeRect(0, 0, 32, 32);
+    this.marker.strokeRect(0, 0, 16, 16);
     this.marker.setVisible(false);
     this.marker.setDepth(100);
 
@@ -425,7 +425,7 @@ export class GameScene extends Phaser.Scene {
           break;
       }
 
-      const sprite = this.add.sprite(obj.x + 16, obj.y + 16, texture);
+      const sprite = this.add.sprite(obj.x + 8, obj.y + 8, texture);
       sprite.setDepth(obj.y);
 
       if (objType === 'portal') {
@@ -460,7 +460,7 @@ export class GameScene extends Phaser.Scene {
       const pointerTileY = this.map.worldToTileY(worldPoint.y);
 
       if (pointerTileX !== null && pointerTileY !== null) {
-        this.marker?.setPosition(pointerTileX * 32, pointerTileY * 32);
+        this.marker?.setPosition(pointerTileX * 16, pointerTileY * 16);
         this.marker?.setVisible(true);
 
         gameClient.moveTo(pointerTileX, pointerTileY);
@@ -629,8 +629,8 @@ export class GameScene extends Phaser.Scene {
 
   private drawDebugMapBoundary(): void {
     if (!this.map || !this.zoneDebug) return;
-    const mapWidth = this.map.width * 32;
-    const mapHeight = this.map.height * 32;
+    const mapWidth = this.map.width * 16;
+    const mapHeight = this.map.height * 16;
 
     this.zoneDebug.lineStyle(3, DEBUG_COLORS.mapBorder, 0.8);
     this.zoneDebug.strokeRect(0, 0, mapWidth, mapHeight);
@@ -685,9 +685,9 @@ export class GameScene extends Phaser.Scene {
         if (tile.index > 0) {
           blockedCount++;
           this.collisionDebug?.fillStyle(DEBUG_COLORS.collision, 0.4);
-          this.collisionDebug?.fillRect(x * 32, y * 32, 32, 32);
+          this.collisionDebug?.fillRect(x * 16, y * 16, 16, 16);
           this.collisionDebug?.lineStyle(1, DEBUG_COLORS.collision, 0.6);
-          this.collisionDebug?.strokeRect(x * 32, y * 32, 32, 32);
+          this.collisionDebug?.strokeRect(x * 16, y * 16, 16, 16);
         }
       });
     });
@@ -1230,8 +1230,8 @@ export class GameScene extends Phaser.Scene {
       const objType = this.getObjectProperty(obj, 'type') as string;
       if (!objType || objType === 'spawn' || objType === 'decoration') return;
 
-      const objCenterX = obj.x + 16;
-      const objCenterY = obj.y + 16;
+      const objCenterX = obj.x + 8;
+      const objCenterY = obj.y + 8;
       const distance = Phaser.Math.Distance.Between(playerX, playerY, objCenterX, objCenterY);
 
       if (distance < interactionRadius && distance < closestDistance) {

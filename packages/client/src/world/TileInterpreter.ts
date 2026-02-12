@@ -39,7 +39,7 @@ export class TileInterpreter {
   private tileSize: number;
   private worldGrid: WorldGrid | null = null;
 
-  constructor(tileSize: number = 32) {
+  constructor(tileSize: number = 16) {
     this.tileSize = tileSize;
   }
 

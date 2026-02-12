@@ -17,25 +17,25 @@ export type SpawnPoint = {
 export const MAP_CONFIG = {
   width: 64,
   height: 64,
-  tileSize: 32,
-  pixelWidth: 2048,
-  pixelHeight: 2048,
+  tileSize: 16,
+  pixelWidth: 1024,
+  pixelHeight: 1024,
 } as const;
 
 export const ZONE_BOUNDS: Record<ZoneId, ZoneBounds> = {
-  lobby: { x: 192, y: 64, width: 384, height: 384 },
-  office: { x: 1344, y: 64, width: 640, height: 448 },
-  'central-park': { x: 640, y: 512, width: 768, height: 640 },
-  arcade: { x: 1408, y: 512, width: 576, height: 512 },
-  meeting: { x: 64, y: 896, width: 512, height: 576 },
-  'lounge-cafe': { x: 576, y: 1216, width: 640, height: 448 },
-  plaza: { x: 1216, y: 1216, width: 512, height: 512 },
-  lake: { x: 64, y: 64, width: 128, height: 448 },
+  lobby: { x: 96, y: 32, width: 192, height: 192 },
+  office: { x: 672, y: 32, width: 320, height: 224 },
+  'central-park': { x: 320, y: 256, width: 384, height: 320 },
+  arcade: { x: 704, y: 256, width: 288, height: 256 },
+  meeting: { x: 32, y: 448, width: 256, height: 288 },
+  'lounge-cafe': { x: 288, y: 608, width: 320, height: 224 },
+  plaza: { x: 608, y: 608, width: 256, height: 256 },
+  lake: { x: 32, y: 32, width: 64, height: 224 },
 };
 
 export const DEFAULT_SPAWN_POINT: SpawnPoint = {
-  x: 1024,
-  y: 1024,
+  x: 512,
+  y: 512,
   tx: 32,
   ty: 32,
 };

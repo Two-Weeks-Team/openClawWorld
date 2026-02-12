@@ -714,23 +714,26 @@ class ResidentAgent {
           agentId: this.state.agentId,
           roomId: 'default',
           radius: 200,
+          detail: 'full',
         }),
       });
 
       if (!response.ok) throw new Error(`Observe failed: ${response.status}`);
 
       const result = await response.json();
-      if (result.status === 'ok' && result.data.entities) {
-        for (const entity of result.data.entities) {
-          this.state.observedEntities.set(entity.entityId, {
-            entityId: entity.entityId,
-            position: { x: entity.x, y: entity.y },
-            timestamp: Date.now(),
-          });
+      if (result.status === 'ok') {
+        if (result.data.nearby) {
+          for (const entity of result.data.nearby) {
+            this.state.observedEntities.set(entity.id, {
+              entityId: entity.id,
+              position: { x: entity.pos?.x ?? 0, y: entity.pos?.y ?? 0 },
+              timestamp: Date.now(),
+            });
+          }
         }
         this.state.position = {
-          x: result.data.self?.x ?? this.state.position.x,
-          y: result.data.self?.y ?? this.state.position.y,
+          x: result.data.self?.pos?.x ?? this.state.position.x,
+          y: result.data.self?.pos?.y ?? this.state.position.y,
         };
       }
       this.state.lastAction = 'observe';
@@ -797,7 +800,7 @@ class ResidentAgent {
         body: JSON.stringify({
           agentId: this.state.agentId,
           roomId: 'default',
-          limit: 20,
+          windowSec: 60,
         }),
       });
 
@@ -806,10 +809,10 @@ class ResidentAgent {
       const result = await response.json();
       if (result.status === 'ok' && result.data.messages) {
         this.state.chatHistory = result.data.messages.map(
-          (m: { from: string; text: string; channel: string; serverTsMs: number }) => ({
-            from: m.from,
-            message: m.text,
-            timestamp: m.serverTsMs,
+          (m: { fromEntityId: string; fromName: string; message: string; channel: string; tsMs: number }) => ({
+            from: m.fromEntityId,
+            message: m.message,
+            timestamp: m.tsMs,
             channel: m.channel,
           })
         );

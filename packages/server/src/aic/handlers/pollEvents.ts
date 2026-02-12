@@ -79,25 +79,11 @@ function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/**
- * Validate cursor format (base64url pattern).
- * Format: ^[A-Za-z0-9=_-]{1,256}$
- */
-function isValidCursorFormat(cursor: string): boolean {
-  return /^[A-Za-z0-9=_-]{1,256}$/.test(cursor);
-}
-
 export async function handlePollEvents(req: Request, res: Response): Promise<void> {
   const body = req.validatedBody as PollEventsRequest;
   const { agentId, roomId, sinceCursor, limit = 50, waitMs = 0 } = body;
 
   try {
-    // Validate cursor format
-    if (!isValidCursorFormat(sinceCursor)) {
-      res.status(400).json(createErrorResponse('bad_request', 'Invalid cursor format', false));
-      return;
-    }
-
     const colyseusRoomId = getColyseusRoomId(roomId);
 
     if (!colyseusRoomId) {
@@ -134,9 +120,12 @@ export async function handlePollEvents(req: Request, res: Response): Promise<voi
 
     const eventLog = gameRoom.getEventLog();
 
+    // Use provided cursor or get current cursor from event log
+    const effectiveCursor = sinceCursor ?? eventLog.getCurrentCursor();
+
     // If waitMs is 0 or not provided, return immediately with current events
     if (waitMs <= 0) {
-      const result = eventLog.getSince(sinceCursor, limit);
+      const result = eventLog.getSince(effectiveCursor, limit);
 
       const responseData: PollEventsResponseData = {
         events: result.events,
@@ -152,7 +141,7 @@ export async function handlePollEvents(req: Request, res: Response): Promise<voi
     }
 
     // Long-polling: wait for events or timeout
-    const result = await waitForEvents(gameRoom, sinceCursor, limit, waitMs);
+    const result = await waitForEvents(gameRoom, effectiveCursor, limit, waitMs);
 
     const responseData: PollEventsResponseData = {
       events: result.events,

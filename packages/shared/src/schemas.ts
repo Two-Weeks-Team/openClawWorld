@@ -24,7 +24,10 @@ export const IdMessageSchema = z
   .string()
   .regex(/^msg_[A-Za-z0-9._-]{8,128}$/, 'Invalid messageId format');
 
-export const CursorSchema = z.string().regex(/^[A-Za-z0-9=_-]{1,256}$/, 'Invalid cursor format');
+export const CursorSchema = z.union([
+  z.string().regex(/^[A-Za-z0-9=_-]{1,256}$/, 'Invalid cursor format'),
+  z.string().regex(/^\d+$/, 'Invalid numeric cursor format'),
+]);
 
 export const TsMsSchema = z.int().min(0);
 
@@ -177,7 +180,7 @@ export const ChatObserveRequestSchema = z.object({
 export const PollEventsRequestSchema = z.object({
   agentId: IdAgentSchema,
   roomId: IdRoomSchema,
-  sinceCursor: CursorSchema,
+  sinceCursor: CursorSchema.optional(),
   limit: z.int().min(1).max(200).optional(),
   waitMs: z.int().min(0).max(25000).optional(),
 });

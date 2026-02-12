@@ -635,6 +635,29 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.skillService.registerSkill(slowAuraSkill);
     console.log('[GameRoom] Registered builtin skill: slow_aura');
+
+    const defaultSkill: SkillDefinition = {
+      id: 'default',
+      name: 'Basic Agent Skill',
+      version: '1.0.0',
+      description: 'A basic skill for all agents',
+      category: 'utility',
+      emoji: '🤖',
+      source: { type: 'builtin' },
+      actions: [
+        {
+          id: 'use',
+          name: 'Use',
+          description: 'Perform a basic action',
+          params: [],
+          cooldownMs: 1000,
+        },
+      ],
+      triggers: ['basic', 'utility'],
+    };
+
+    this.skillService.registerSkill(defaultSkill);
+    console.log('[GameRoom] Registered builtin skill: default');
   }
 
   private loadFacilitiesFromWorldPack(): void {

@@ -136,7 +136,7 @@ export type ChatObserveRequest = {
 export type PollEventsRequest = {
   agentId: string;
   roomId: string;
-  sinceCursor: string;
+  sinceCursor?: string;
   limit?: number;
   waitMs?: number;
 };

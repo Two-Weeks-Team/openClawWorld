@@ -13,7 +13,7 @@ export class BootScene extends Phaser.Scene {
       this.load.tilemapTiledJSON(zoneId, `assets/maps/${zoneId}.json`);
     }
 
-    this.load.svg('tileset', 'assets/maps/tileset.svg', { width: 256, height: 128 });
+    this.load.image('tileset', 'assets/maps/tileset.png');
 
     this.load.svg('player-human', 'assets/sprites/player-human.svg', { width: 32, height: 32 });
     this.load.svg('player-agent', 'assets/sprites/player-agent.svg', { width: 32, height: 32 });

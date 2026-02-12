@@ -129,7 +129,7 @@ export class TileInterpreter {
     }
 
     const isDoor = tileDef.isDoor ?? false;
-    const collision = hasCollision && !isDoor;
+    const collision = (tileDef.collision || hasCollision) && !isDoor;
     const zoneId = ZONE_FLOOR_TYPES.get(tileDef.type);
 
     return { type: tileDef.type, collision, isDoor, zoneId };

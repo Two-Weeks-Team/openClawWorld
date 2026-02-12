@@ -46,14 +46,14 @@ export class SkillBar {
       bg.strokeRoundedRect(x, 0, SLOT_SIZE, SLOT_SIZE, 6);
 
       const icon = this.scene.add.text(x + SLOT_SIZE / 2, SLOT_SIZE / 2, '', {
-        fontSize: '28px',
+        fontSize: `${SLOT_SIZE / 2}px`,
       });
       icon.setOrigin(0.5);
 
       const cooldownOverlay = this.scene.add.graphics();
       cooldownOverlay.setVisible(false);
 
-      const keyLabel = this.scene.add.text(x + 4, 4, `${i + 1}`, {
+      const keyLabel = this.scene.add.text(x + SLOT_PADDING, SLOT_PADDING, `${i + 1}`, {
         fontSize: '12px',
         color: '#aaaaaa',
       });

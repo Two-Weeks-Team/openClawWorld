@@ -282,6 +282,8 @@ export type PresenceJoinPayload = {
 
 export type PresenceLeavePayload = {
   entityId: string;
+  name?: string;
+  kind?: EntityKind;
   reason: 'disconnect' | 'kicked' | 'room_closed' | 'unregister' | 'timeout';
 };
 

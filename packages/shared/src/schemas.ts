@@ -312,6 +312,8 @@ export const PresenceJoinPayloadSchema = z.object({
 
 export const PresenceLeavePayloadSchema = z.object({
   entityId: IdEntitySchema,
+  name: z.string().min(1).max(64).optional(),
+  kind: EntityKindSchema.optional(),
   reason: z.enum(['disconnect', 'kicked', 'room_closed', 'unregister', 'timeout']),
 });
 

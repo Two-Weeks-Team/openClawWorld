@@ -6,6 +6,7 @@ import type { RegisterRequest, RegisterResponseData, AicErrorObject } from '@ope
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { EntitySchema } from '../../schemas/EntitySchema.js';
 import { registerRoom, getColyseusRoomId } from '../roomRegistry.js';
+import { registerToken } from '../tokenRegistry.js';
 import { DEFAULT_SPAWN_POSITION, DEFAULT_TILE_SIZE } from '../../constants.js';
 
 function generateAgentId(): string {
@@ -87,6 +88,7 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
     });
 
     const sessionToken = generateSessionToken();
+    registerToken(sessionToken, agentId, roomId);
 
     const responseData: RegisterResponseData = {
       agentId,

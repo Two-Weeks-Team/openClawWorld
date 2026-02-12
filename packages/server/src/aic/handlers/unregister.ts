@@ -7,6 +7,7 @@ import type {
 } from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { getColyseusRoomId } from '../roomRegistry.js';
+import { invalidateAgentToken } from '../tokenRegistry.js';
 
 function createErrorResponse(
   code: AicErrorObject['code'],
@@ -26,6 +27,13 @@ function createErrorResponse(
 export async function handleUnregister(req: Request, res: Response): Promise<void> {
   const body = req.validatedBody as UnregisterRequest;
   const { agentId, roomId } = body;
+
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Cannot unregister another agent', false));
+    return;
+  }
 
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);
@@ -69,6 +77,8 @@ export async function handleUnregister(req: Request, res: Response): Promise<voi
       kind: 'agent',
       reason: 'unregister',
     });
+
+    invalidateAgentToken(agentId);
 
     const responseData: UnregisterResponseData = {
       agentId,

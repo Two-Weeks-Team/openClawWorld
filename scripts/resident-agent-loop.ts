@@ -787,6 +787,10 @@ class IssueDetector {
   private fingerprintCooldowns: Map<string, number> = new Map();
   private lastObserveTimes: Map<string, number> = new Map();
 
+  private behaviorComplianceFailures: Map<string, number> = new Map();
+  private behaviorComplianceCooldowns: Map<string, number> = new Map();
+  private agentOpportunityHistory: Map<string, Map<string, number>> = new Map();
+
   private generateFingerprint(area: string, detector: string, keyEvidence: string): string {
     return `${area}:${detector}:${keyEvidence}`;
   }
@@ -829,6 +833,40 @@ class IssueDetector {
     this.currentCycle++;
   }
 
+
+  recordOpportunity(agentId: string, facilityType: string): void {
+    if (!this.agentOpportunityHistory.has(agentId)) {
+      this.agentOpportunityHistory.set(agentId, new Map());
+    }
+    const opportunities = this.agentOpportunityHistory.get(agentId)!;
+    opportunities.set(facilityType, (opportunities.get(facilityType) ?? 0) + 1);
+  }
+
+  getOpportunityCount(agentId: string, category: string): number {
+    const opportunities = this.agentOpportunityHistory.get(agentId);
+    if (!opportunities) return 0;
+    let count = 0;
+    for (const [key, value] of opportunities) {
+      if (key === category || key.startsWith(`${category}:`) || category.startsWith(`${key}:`)) {
+        count += value;
+      }
+    }
+    return count;
+  }
+
+  private normalizeActionLabel(label: string): string {
+    const parts = label.split(':');
+    if (parts[0] === 'interact' && parts.length >= 2) {
+      return `interact:${parts[1]}`;
+    }
+    if (parts[0] === 'navigate' && parts[1] === 'entity') {
+      return 'navigate:entity';
+    }
+    if (parts[0] === 'navigate' && parts.length >= 2) {
+      return `navigate:${parts[1]}`;
+    }
+    return parts[0];
+  }
   private buildAgentStates(agents: ResidentAgent[]): AgentStateSnapshot[] {
     return agents.map(agent => {
       const state = agent.getState();
@@ -1409,58 +1447,120 @@ class IssueDetector {
   }
 
   detectRoleComplianceAnomaly(agents: ResidentAgent[]): Issue | null {
+    const now = Date.now();
+
     for (const agent of agents) {
       const state = agent.getState();
-      if (state.actionLog.length < 10) continue;
 
-      const baseCategoryCount: Record<string, number> = {};
-      for (const label of state.actionLog) {
-        const base = label.split(':')[0];
-        baseCategoryCount[base] = (baseCategoryCount[base] ?? 0) + 1;
+      if (state.actionLog.length < BEHAVIOR_COMPLIANCE_MIN_ACTIONS) continue;
+
+      const cooldownExpiry = this.behaviorComplianceCooldowns.get(state.agentId) ?? 0;
+      if (now < cooldownExpiry) continue;
+
+      const recentHistory = state.apiCallHistory.slice(-20);
+      const recentFailures = recentHistory.filter(h => !h.success).length;
+      if (
+        recentHistory.length >= 10 &&
+        recentFailures / recentHistory.length > BEHAVIOR_COMPLIANCE_MAX_RECENT_FAIL_RATE
+      ) {
+        this.behaviorComplianceFailures.set(state.agentId, 0);
+        continue;
+      }
+
+      for (const facility of state.observedFacilities.values()) {
+        this.recordOpportunity(state.agentId, facility.type);
+      }
+
+      const scoringActions = state.actionLog.slice(-BEHAVIOR_COMPLIANCE_SCORING_WINDOW);
+      const normalizedCounts: Record<string, number> = {};
+      for (const label of scoringActions) {
+        const normalized = this.normalizeActionLabel(label);
+        normalizedCounts[normalized] = (normalizedCounts[normalized] ?? 0) + 1;
       }
 
       const prefs = ROLE_PREFERENCES[state.role];
+      const totalPrefWeight = Object.values(prefs).reduce((sum, w) => sum + w, 0);
+
+      let overlapScore = 0;
+      const opportunityAwarePrefKeys: string[] = [];
+
+      for (const [prefKey, prefWeight] of Object.entries(prefs)) {
+        const normalizedPref = this.normalizeActionLabel(prefKey);
+        const opportunityCount = this.getOpportunityCount(state.agentId, normalizedPref);
+
+        if (opportunityCount < BEHAVIOR_COMPLIANCE_MIN_OPPORTUNITY_COUNT) continue;
+        opportunityAwarePrefKeys.push(prefKey);
+
+        const actionCount = normalizedCounts[normalizedPref] ?? 0;
+        const actionRatio = actionCount / scoringActions.length;
+        const prefRatio = prefWeight / totalPrefWeight;
+
+        const matchScore = Math.min(actionRatio / Math.max(prefRatio, 0.01), 1.0) * prefWeight;
+        overlapScore += matchScore;
+      }
+
+      if (opportunityAwarePrefKeys.length === 0) {
+        this.behaviorComplianceFailures.set(state.agentId, 0);
+        continue;
+      }
+
+      const maxPossibleScore = opportunityAwarePrefKeys.reduce(
+        (sum, k) => sum + (prefs[k] ?? 0),
+        0
+      );
+      const normalizedOverlap = maxPossibleScore > 0 ? overlapScore / maxPossibleScore : 0;
+
+      if (normalizedOverlap >= BEHAVIOR_COMPLIANCE_OVERLAP_THRESHOLD) {
+        this.behaviorComplianceFailures.set(state.agentId, 0);
+        continue;
+      }
+
+      const failures = (this.behaviorComplianceFailures.get(state.agentId) ?? 0) + 1;
+      this.behaviorComplianceFailures.set(state.agentId, failures);
+
+      if (failures < BEHAVIOR_COMPLIANCE_CONSECUTIVE_REQUIRED) continue;
+
+      this.behaviorComplianceCooldowns.set(state.agentId, now + BEHAVIOR_COMPLIANCE_COOLDOWN_MS);
+      this.behaviorComplianceFailures.set(state.agentId, 0);
+
       const topPrefKeys = Object.entries(prefs)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
+        .slice(0, 5)
         .map(([k]) => k);
 
-      const topActionCats = Object.entries(baseCategoryCount)
+      const topActionCats = Object.entries(normalizedCounts)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
+        .slice(0, 5)
         .map(([k]) => k);
 
-      const topPrefBases = topPrefKeys.map(k => k.split(':')[0]);
-      const overlap = topPrefKeys.filter((k, i) =>
-        topActionCats.some(
-          ac => ac === k || ac === topPrefBases[i] || k.includes(ac) || ac.includes(k)
-        )
-      );
-
-      if (overlap.length === 0) {
-        return {
-          area: 'Behavior',
-          title: `Role compliance anomaly for ${state.role} agent ${state.agentId}`,
-          description: 'Agent actions do not match expected role preferences',
-          expectedBehavior: `${state.role} should prefer: ${topPrefKeys.join(', ')}`,
-          observedBehavior: `Actual top actions: ${topActionCats.join(', ')}`,
-          reproductionSteps: [
-            'Run agent for 10+ cycles',
-            'Compare action distribution to role preferences',
+      return {
+        area: 'Behavior',
+        title: `Role compliance anomaly for ${state.role} agent ${state.agentId}`,
+        description:
+          'Agent actions do not match expected role preferences despite available opportunities',
+        expectedBehavior: `${state.role} should prefer: ${topPrefKeys.join(', ')}`,
+        observedBehavior: `Actual actions: ${topActionCats.join(', ')} (overlap score: ${Math.round(normalizedOverlap * 100)}%)`,
+        reproductionSteps: [
+          `Run agent for ${BEHAVIOR_COMPLIANCE_MIN_ACTIONS}+ cycles`,
+          `Verify ${BEHAVIOR_COMPLIANCE_CONSECUTIVE_REQUIRED} consecutive compliance failures`,
+          'Check opportunity-aware preference matching',
+        ],
+        severity: 'Minor',
+        frequency: 'sometimes',
+        evidence: {
+          agentIds: [state.agentId],
+          timestamps: [now],
+          logs: [
+            `Overlap score: ${Math.round(normalizedOverlap * 100)}%`,
+            `Consecutive failures: ${failures}`,
+            `Evaluated preferences: ${opportunityAwarePrefKeys.join(', ')}`,
+            ...Object.entries(normalizedCounts).map(([k, v]) => `${k}: ${v}`),
           ],
-          severity: 'Minor',
-          frequency: 'sometimes',
-          evidence: {
-            agentIds: [state.agentId],
-            timestamps: [Date.now()],
-            logs: Object.entries(baseCategoryCount).map(([k, v]) => `${k}: ${v}`),
-          },
-        };
-      }
+        },
+      };
     }
     return null;
   }
-
   detectLowDecisionEntropy(agents: ResidentAgent[]): Issue | null {
     for (const agent of agents) {
       const state = agent.getState();

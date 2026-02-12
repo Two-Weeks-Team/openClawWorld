@@ -166,6 +166,7 @@ export type ObserveResponseData = {
   facilities: ObservedFacility[];
   serverTsMs: number;
   room: RoomInfo;
+  mapMetadata?: MapMetadata;
 };
 
 export type MoveToResult = 'accepted' | 'rejected' | 'no_op';
@@ -644,7 +645,15 @@ export type TeamMember = {
 };
 
 // Zones
-export type ZoneId = 'plaza' | 'north-block' | 'west-block' | 'east-block' | 'south-block' | 'lake';
+export type ZoneId =
+  | 'lobby'
+  | 'office'
+  | 'central-park'
+  | 'arcade'
+  | 'meeting'
+  | 'lounge-cafe'
+  | 'plaza'
+  | 'lake';
 
 export type Zone = {
   id: ZoneId;
@@ -652,6 +661,30 @@ export type Zone = {
   description?: string;
   bounds: { x: number; y: number; width: number; height: number };
   allowedRoles?: OrgRole[]; // If set, only these roles can enter
+};
+
+export type EntranceDirection = 'north' | 'south' | 'east' | 'west';
+
+export type BuildingEntrance = {
+  id: string;
+  name: string;
+  position: { x: number; y: number };
+  size: { width: number; height: number };
+  zone: ZoneId;
+  direction: EntranceDirection;
+  connectsTo: ZoneId;
+};
+
+export type ZoneInfo = {
+  id: ZoneId;
+  bounds: { x: number; y: number; width: number; height: number };
+  entrances: BuildingEntrance[];
+};
+
+export type MapMetadata = {
+  currentZone: ZoneId | null;
+  zones: ZoneInfo[];
+  mapSize: { width: number; height: number; tileSize: number };
 };
 
 // Meetings

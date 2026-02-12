@@ -23,12 +23,14 @@ export const MAP_CONFIG = {
 } as const;
 
 export const ZONE_BOUNDS: Record<ZoneId, ZoneBounds> = {
-  plaza: { x: 768, y: 768, width: 512, height: 512 },
-  'north-block': { x: 576, y: 64, width: 768, height: 384 },
-  'west-block': { x: 64, y: 704, width: 640, height: 640 },
-  'east-block': { x: 1472, y: 704, width: 576, height: 640 },
-  'south-block': { x: 576, y: 1472, width: 768, height: 384 },
-  lake: { x: 1408, y: 1408, width: 640, height: 640 },
+  lobby: { x: 192, y: 64, width: 384, height: 384 },
+  office: { x: 1344, y: 64, width: 640, height: 448 },
+  'central-park': { x: 640, y: 512, width: 768, height: 640 },
+  arcade: { x: 1408, y: 512, width: 576, height: 512 },
+  meeting: { x: 64, y: 896, width: 512, height: 576 },
+  'lounge-cafe': { x: 576, y: 1216, width: 640, height: 448 },
+  plaza: { x: 1216, y: 1216, width: 512, height: 512 },
+  lake: { x: 64, y: 64, width: 128, height: 448 },
 };
 
 export const DEFAULT_SPAWN_POINT: SpawnPoint = {
@@ -39,11 +41,13 @@ export const DEFAULT_SPAWN_POINT: SpawnPoint = {
 };
 
 export const ZONE_COLORS: Record<ZoneId, number> = {
+  lobby: 0x4a90d9,
+  office: 0x4682b4,
+  'central-park': 0x228b22,
+  arcade: 0x9932cc,
+  meeting: 0x8b4513,
+  'lounge-cafe': 0xdaa520,
   plaza: 0x808080,
-  'north-block': 0x4a90d9,
-  'west-block': 0xdaa520,
-  'east-block': 0x8b4513,
-  'south-block': 0x9932cc,
   lake: 0x4169e1,
 };
 
@@ -55,11 +59,13 @@ export const DEBUG_COLORS = {
 } as const;
 
 export const ZONE_IDS: readonly ZoneId[] = [
+  'lobby',
+  'office',
+  'central-park',
+  'arcade',
+  'meeting',
+  'lounge-cafe',
   'plaza',
-  'north-block',
-  'west-block',
-  'east-block',
-  'south-block',
   'lake',
 ] as const;
 

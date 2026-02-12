@@ -23,12 +23,15 @@ const COLOR_RANGES: ColorRange[] = [
   { r: [100, 130], g: [140, 170], b: [200, 230], type: 'floor_lake', collision: false },
 ];
 
+// Legacy floor-to-zone mapping for backward compatibility
+// New zone system uses bounds-based detection (see ZONE_BOUNDS in world.ts)
+// Floor types that map to zones still in the new 8-zone system are preserved
 const ZONE_FLOOR_TYPES: Map<TileType, ZoneId> = new Map([
   ['floor_plaza', 'plaza'],
-  ['floor_north', 'north-block'],
-  ['floor_west', 'west-block'],
-  ['floor_east', 'east-block'],
-  ['floor_south', 'south-block'],
+  ['floor_north', 'lobby'], // north area -> lobby in new system
+  ['floor_west', 'meeting'], // west area -> meeting room in new system
+  ['floor_east', 'arcade'], // east area -> arcade in new system
+  ['floor_south', 'lounge-cafe'], // south area -> lounge-cafe in new system
   ['floor_lake', 'lake'],
 ]);
 

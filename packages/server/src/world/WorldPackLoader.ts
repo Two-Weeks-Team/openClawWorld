@@ -411,6 +411,7 @@ export class WorldPackLoader {
       'arcade-cabinet-2': 'arcade',
       'arcade-cabinet-3': 'arcade',
       'prize-counter': 'arcade',
+      'game-table': 'arcade',
       'meeting-room-a': 'meeting',
       'meeting-room-c': 'meeting',
       'schedule-board': 'meeting',
@@ -422,7 +423,8 @@ export class WorldPackLoader {
       'bench-2': 'plaza',
       'pond-edge': 'lake',
     };
-    return facilityZoneMap[facilityId] === zoneId;
+    const normalizedId = facilityId.replace(/_/g, '-');
+    return facilityZoneMap[normalizedId] === zoneId;
   }
 
   private loadZoneMap(zoneId: ZoneId): ZoneMapData {

@@ -5,8 +5,9 @@
   "zone": "office",
   "defaultPosition": { "x": 1728, "y": 256 },
   "schedule": [
-    { "startHour": 9, "endHour": 18, "state": "working", "position": { "x": 1728, "y": 256 } },
-    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 800, "y": 1440 } }
+    { "startHour": 9, "endHour": 12, "state": "working", "position": { "x": 1728, "y": 256 } },
+    { "startHour": 12, "endHour": 13, "state": "break", "position": { "x": 800, "y": 1440 } },
+    { "startHour": 13, "endHour": 18, "state": "working", "position": { "x": 1728, "y": 256 } }
   ],
   "dialogue": {
     "greeting": {

@@ -871,6 +871,10 @@ export class GameScene extends Phaser.Scene {
       clearInterval(this.roomCheckInterval);
       this.roomCheckInterval = undefined;
     }
+    this.zoneNameLabels.forEach(label => label.destroy());
+    this.zoneNameLabels = [];
+    this.zoneNameBackgrounds.forEach(bg => bg.destroy());
+    this.zoneNameBackgrounds = [];
     this.notificationPanel?.destroy();
     this.minimap?.destroy();
     this.zoneBanner?.destroy();

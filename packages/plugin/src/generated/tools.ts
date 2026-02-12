@@ -3,7 +3,21 @@
  * AUTO-GENERATED from OpenAPI spec - DO NOT EDIT
  */
 
-import type { AicResult, ObserveRequest, MoveToRequest, InteractRequest, ChatSendRequest, ChatObserveRequest, PollEventsRequest, ObserveResponseData, MoveToResponseData, InteractResponseData, ChatSendResponseData, ChatObserveResponseData, PollEventsResponseData } from '@openclawworld/shared';
+import type {
+  AicResult,
+  ObserveRequest,
+  MoveToRequest,
+  InteractRequest,
+  ChatSendRequest,
+  ChatObserveRequest,
+  PollEventsRequest,
+  ObserveResponseData,
+  MoveToResponseData,
+  InteractResponseData,
+  ChatSendResponseData,
+  ChatObserveResponseData,
+  PollEventsResponseData,
+} from '@openclawworld/shared';
 import {
   ObserveRequestSchema,
   MoveToRequestSchema,
@@ -35,7 +49,7 @@ export interface ObserveToolOptions {
 export async function executeObserveTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: ObserveToolOptions,
+  options: ObserveToolOptions
 ): Promise<ObserveToolOutput> {
   const parseResult = ObserveToolInputSchema.safeParse(input);
   if (!parseResult.success) {
@@ -98,7 +112,7 @@ const MOVETO_TOOL_NAME = 'ocw.move_to';
 export async function executeMoveToTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: MoveToToolOptions,
+  options: MoveToToolOptions
 ): Promise<MoveToToolOutput> {
   if (!isToolEnabled(MOVETO_TOOL_NAME, options.config)) {
     return createForbiddenError(MOVETO_TOOL_NAME);
@@ -165,7 +179,7 @@ const INTERACT_TOOL_NAME = 'ocw.interact';
 export async function executeInteractTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: InteractToolOptions,
+  options: InteractToolOptions
 ): Promise<InteractToolOutput> {
   if (!isToolEnabled(INTERACT_TOOL_NAME, options.config)) {
     return createForbiddenError(INTERACT_TOOL_NAME);
@@ -233,7 +247,7 @@ const CHATSEND_TOOL_NAME = 'ocw.chat_send';
 export async function executeChatSendTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: ChatSendToolOptions,
+  options: ChatSendToolOptions
 ): Promise<ChatSendToolOutput> {
   if (!isToolEnabled(CHATSEND_TOOL_NAME, options.config)) {
     return createForbiddenError(CHATSEND_TOOL_NAME);
@@ -300,7 +314,7 @@ const CHATOBSERVE_TOOL_NAME = 'ocw.chat_observe';
 export async function executeChatObserveTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: ChatObserveToolOptions,
+  options: ChatObserveToolOptions
 ): Promise<ChatObserveToolOutput> {
   if (!isToolEnabled(CHATOBSERVE_TOOL_NAME, options.config)) {
     return createForbiddenError(CHATOBSERVE_TOOL_NAME);
@@ -363,7 +377,7 @@ export interface PollEventsToolOptions {
 export async function executePollEventsTool(
   client: OpenClawWorldClient,
   input: unknown,
-  options: PollEventsToolOptions,
+  options: PollEventsToolOptions
 ): Promise<PollEventsToolOutput> {
   const parseResult = PollEventsToolInputSchema.safeParse(input);
   if (!parseResult.success) {

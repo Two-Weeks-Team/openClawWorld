@@ -175,7 +175,7 @@ This project includes custom commands for multiple AI coding assistants, auto-ge
 | CLI                                                           | Config Location      | Status    |
 | ------------------------------------------------------------- | -------------------- | --------- |
 | [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `.claude/commands/`  | Supported |
-| [OpenCode](https://github.com/code-yeongyu/oh-my-opencode)    | `.opencode/command/` | Supported |
+| [OpenCode](https://github.com/anomalyco/opencode)             | `.opencode/command/` | Supported |
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli)     | `.gemini/commands/`  | Supported |
 | [Codex CLI](https://github.com/openai/codex)                  | `.codex/`            | Supported |
 

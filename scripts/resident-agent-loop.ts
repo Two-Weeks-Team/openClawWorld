@@ -228,6 +228,14 @@ const CHAT_MISMATCH_CONSECUTIVE_REQUIRED = 2;
 
 const FINGERPRINT_COOLDOWN_TTL_MS = 20 * 60 * 1000;
 
+const BEHAVIOR_COMPLIANCE_MIN_ACTIONS = 30;
+const BEHAVIOR_COMPLIANCE_SCORING_WINDOW = 25;
+const BEHAVIOR_COMPLIANCE_OVERLAP_THRESHOLD = 0.2;
+const BEHAVIOR_COMPLIANCE_MIN_OPPORTUNITY_COUNT = 8;
+const BEHAVIOR_COMPLIANCE_CONSECUTIVE_REQUIRED = 3;
+const BEHAVIOR_COMPLIANCE_MAX_RECENT_FAIL_RATE = 0.6;
+const BEHAVIOR_COMPLIANCE_COOLDOWN_MS = 45 * 60 * 1000;
+
 const ENDPOINT_TO_CATEGORY: Record<string, string> = {
   observe: 'observe',
   moveTo: 'navigate',
@@ -887,7 +895,6 @@ class IssueDetector {
   incrementCycle(): void {
     this.currentCycle++;
   }
-
 
   recordOpportunity(agentId: string, facilityType: string): void {
     if (!this.agentOpportunityHistory.has(agentId)) {

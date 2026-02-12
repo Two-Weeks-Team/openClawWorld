@@ -308,11 +308,12 @@ async function runLifeLoop() {
   };
 
   const allowedStepKeys = [
-    'matchmake',
     'register',
     'observe',
-    'moveTo',
-    'interact',
+    'moveTo_lobby',
+    'moveTo_office',
+    'interact_reception_desk',
+    'interact_desk',
     'chatSend',
     'pollEvents',
   ];

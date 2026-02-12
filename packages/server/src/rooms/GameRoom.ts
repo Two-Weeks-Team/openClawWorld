@@ -26,6 +26,7 @@ import { PermissionService } from '../services/PermissionService.js';
 import { SafetyService } from '../services/SafetyService.js';
 import { AuditLog } from '../audit/AuditLog.js';
 import type { EntityKind, UserStatus, ZoneId, SkillDefinition } from '@openclawworld/shared';
+import { DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 import { WorldPackLoader, WorldPackError, type WorldPack } from '../world/WorldPackLoader.js';
 import { SkillService } from '../services/SkillService.js';
@@ -60,12 +61,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private eventLog: EventLog;
   private cleanupInterval: NodeJS.Timeout | null = null;
   private skillService: SkillService | null = null;
-  private spawnPoint: { x: number; y: number; tx: number; ty: number } = {
-    x: 0,
-    y: 0,
-    tx: 0,
-    ty: 0,
-  };
+  private spawnPoint: { x: number; y: number; tx: number; ty: number } = { ...DEFAULT_SPAWN_POINT };
 
   constructor() {
     super();

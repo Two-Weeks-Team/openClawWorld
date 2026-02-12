@@ -1,13 +1,14 @@
-import type { ZoneId, ZoneEnterPayload, ZoneExitPayload } from '@openclawworld/shared';
+import {
+  type ZoneId,
+  type ZoneEnterPayload,
+  type ZoneExitPayload,
+  type ZoneBounds,
+  getZoneBoundsMap,
+} from '@openclawworld/shared';
 import type { EntitySchema } from '../schemas/EntitySchema.js';
 import type { EventLog } from '../events/EventLog.js';
 
-export type ZoneBounds = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+export type { ZoneBounds };
 
 export type ZoneEvent =
   | { type: 'zone.enter'; payload: ZoneEnterPayload }
@@ -19,36 +20,7 @@ export type ZoneTransitionResult = {
   changed: boolean;
 };
 
-// Map layout: 64x64 tiles (2048x2048 pixels @ 32px)
-// Based on Grid-Town reference image
-// ┌─────────────────────────────────────────────────────────────────────┐
-// │                                                                     │
-// │    North Block (576,64)       Central cross-roads                   │
-// │    24x12 tiles                                                      │
-// │    768x384 px                                                       │
-// │                                                                     │
-// ├─────────────────────────────────────────────────────────────────────┤
-// │                                                                     │
-// │  West Block        Plaza (768,768)        East Block                │
-// │  (64,704)          16x16 tiles            (1472,704)                │
-// │  20x20 tiles       512x512 px             18x20 tiles               │
-// │  640x640 px                               576x640 px                │
-// │                                                                     │
-// ├─────────────────────────────────────────────────────────────────────┤
-// │                                                                     │
-// │    South Block (576,1472)                 Lake (1408,1408)          │
-// │    24x12 tiles                            20x20 tiles               │
-// │    768x384 px                             640x640 px (BLOCKED)      │
-// │                                                                     │
-// └─────────────────────────────────────────────────────────────────────┘
-export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = new Map([
-  ['plaza', { x: 768, y: 768, width: 512, height: 512 }],
-  ['north-block', { x: 576, y: 64, width: 768, height: 384 }],
-  ['west-block', { x: 64, y: 704, width: 640, height: 640 }],
-  ['east-block', { x: 1472, y: 704, width: 576, height: 640 }],
-  ['south-block', { x: 576, y: 1472, width: 768, height: 384 }],
-  ['lake', { x: 1408, y: 1408, width: 640, height: 640 }],
-]);
+export const DEFAULT_ZONE_BOUNDS: Map<ZoneId, ZoneBounds> = getZoneBoundsMap();
 
 export class ZoneSystem {
   private zones: Map<ZoneId, ZoneBounds>;

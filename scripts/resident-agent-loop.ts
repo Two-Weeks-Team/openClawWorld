@@ -408,15 +408,24 @@ class IssueDetector {
       agentChatData.set(state.agentId, { messages: state.chatHistory, latestTs });
     }
 
-    const agentIds = Array.from(agentChatData.keys());
-    if (agentIds.length < 2) return null;
+    // Filter out agents that haven't observed chat yet (latestTs === 0)
+    // These agents haven't called chatObserve() yet, so comparing them would
+    // produce false positives (empty set vs populated set = "mismatch")
+    const agentsWithHistory = Array.from(agentChatData.entries()).filter(
+      ([, data]) => data.latestTs > 0
+    );
 
-    const latestTimestamps = Array.from(agentChatData.values()).map(d => d.latestTs);
-    const commonCutoff = Math.min(...latestTimestamps.filter(ts => ts > 0));
+    // Need at least 2 agents with chat history to compare
+    if (agentsWithHistory.length < 2) return null;
+
+    const agentIds = agentsWithHistory.map(([id]) => id);
+    const latestTimestamps = agentsWithHistory.map(([, data]) => data.latestTs);
+    const commonCutoff = Math.min(...latestTimestamps);
     if (commonCutoff === 0 || commonCutoff === Infinity) return null;
 
     const filteredSets: Map<string, Set<string>> = new Map();
-    for (const [agentId, data] of Array.from(agentChatData.entries())) {
+    for (const [agentId] of agentsWithHistory) {
+      const data = agentChatData.get(agentId)!;
       const filtered = data.messages
         .filter(m => m.timestamp <= commonCutoff)
         .map(m => `${m.from}:${m.message}`);

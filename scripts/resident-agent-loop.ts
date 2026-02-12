@@ -724,11 +724,13 @@ class ResidentAgent {
       if (result.status === 'ok') {
         if (result.data.nearby) {
           for (const entity of result.data.nearby) {
-            this.state.observedEntities.set(entity.id, {
-              entityId: entity.id,
-              position: { x: entity.pos?.x ?? 0, y: entity.pos?.y ?? 0 },
-              timestamp: Date.now(),
-            });
+            if (entity.pos?.x != null && entity.pos?.y != null) {
+              this.state.observedEntities.set(entity.id, {
+                entityId: entity.id,
+                position: { x: entity.pos.x, y: entity.pos.y },
+                timestamp: Date.now(),
+              });
+            }
           }
         }
         this.state.position = {
@@ -809,7 +811,13 @@ class ResidentAgent {
       const result = await response.json();
       if (result.status === 'ok' && result.data.messages) {
         this.state.chatHistory = result.data.messages.map(
-          (m: { fromEntityId: string; fromName: string; message: string; channel: string; tsMs: number }) => ({
+          (m: {
+            fromEntityId: string;
+            fromName: string;
+            message: string;
+            channel: string;
+            tsMs: number;
+          }) => ({
             from: m.fromEntityId,
             message: m.message,
             timestamp: m.tsMs,

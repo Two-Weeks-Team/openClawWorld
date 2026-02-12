@@ -102,6 +102,9 @@ export class ZoneSystem {
           entity.setZone(currentZone);
         }
       } else {
+        if (entity) {
+          entity.clearZone();
+        }
         this.entityZones.delete(entityId);
       }
     }

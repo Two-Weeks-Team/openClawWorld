@@ -58,7 +58,7 @@ export class GameScene extends Phaser.Scene {
   private zoneBanner?: ZoneBanner;
   private tileInterpreter?: TileInterpreter;
   private clientCollision?: ClientCollisionSystem;
-  private previousZone?: ZoneId;
+  private previousZone: ZoneId | null = null;
   private chatInputFocused = false;
   private skillBar?: SkillBar;
   private castBar?: CastBar;
@@ -981,7 +981,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private checkZoneChange(entity: Entity): void {
-    const currentZone = entity.currentZone ?? null;
+    const rawZone = entity.currentZone;
+    const currentZone: ZoneId | null = rawZone ? (rawZone as ZoneId) : null;
 
     if (currentZone === this.previousZone) return;
 

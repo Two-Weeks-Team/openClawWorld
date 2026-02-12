@@ -30,8 +30,8 @@ export function activityTrackerMiddleware(req: Request, _res: Response, next: Ne
     if (entity && entity.kind === 'agent') {
       entity.updateActivity();
     }
-  } catch {
-    // Non-critical: continue even if activity tracking fails
+  } catch (error) {
+    console.warn('[activityTracker] Failed to update agent activity:', error);
   }
 
   next();

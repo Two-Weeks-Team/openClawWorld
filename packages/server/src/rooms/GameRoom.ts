@@ -390,7 +390,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   private cleanupStaleAgents(): void {
-    const staleAgents: Array<{ id: string; name: string }> = [];
+    const staleAgents: { id: string; name: string }[] = [];
 
     this.state.agents.forEach((entity, agentId) => {
       if (entity.kind === 'agent' && entity.isStale(AGENT_TIMEOUT_MS)) {

@@ -54,16 +54,22 @@ export const DEFAULT_SPAWN_POSITION = {
   y: 1024,
 } as const;
 
+function parseEnvInt(envVar: string | undefined, defaultValue: number): number {
+  if (envVar === undefined) return defaultValue;
+  const parsed = parseInt(envVar, 10);
+  return Number.isNaN(parsed) ? defaultValue : parsed;
+}
+
 /**
  * Agent timeout in milliseconds (5 minutes).
  * Agents with no activity for longer than this are considered stale and will be removed.
  * Override with AGENT_TIMEOUT_MS environment variable.
  */
-export const AGENT_TIMEOUT_MS = Number(process.env.AGENT_TIMEOUT_MS) || 300000;
+export const AGENT_TIMEOUT_MS = parseEnvInt(process.env.AGENT_TIMEOUT_MS, 300000);
 
 /**
  * Interval for cleanup job in milliseconds (1 minute).
  * How often the server checks for and removes stale agents.
  * Override with AGENT_CLEANUP_INTERVAL_MS environment variable.
  */
-export const AGENT_CLEANUP_INTERVAL_MS = Number(process.env.AGENT_CLEANUP_INTERVAL_MS) || 60000;
+export const AGENT_CLEANUP_INTERVAL_MS = parseEnvInt(process.env.AGENT_CLEANUP_INTERVAL_MS, 60000);

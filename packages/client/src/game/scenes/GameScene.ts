@@ -33,6 +33,17 @@ interface TiledObjectLayer {
   objects?: MapObject[];
 }
 
+// Zone label positioning constants (production)
+const ZONE_LABEL_OFFSET_Y_FACTOR = 0.08;
+const ZONE_LABEL_MIN_OFFSET_Y = 8;
+const ZONE_LABEL_MAX_OFFSET_Y = 24;
+const ZONE_LABEL_BG_Y_ADJUST = 4;
+
+// Zone label positioning constants (debug)
+const DEBUG_LABEL_OFFSET_Y_FACTOR = 0.05;
+const DEBUG_LABEL_MIN_OFFSET_Y = 6;
+const DEBUG_LABEL_MAX_OFFSET_Y = 16;
+
 export class GameScene extends Phaser.Scene {
   private entities: Map<string, Phaser.GameObjects.Container> = new Map();
   private entityData: Map<string, Entity> = new Map();
@@ -354,7 +365,10 @@ export class GameScene extends Phaser.Scene {
       const displayName = ZONE_DISPLAY_NAMES[zoneId];
       const color = ZONE_COLORS[zoneId];
 
-      const labelOffsetY = Math.max(8, Math.min(24, bounds.height * 0.08));
+      const labelOffsetY = Math.max(
+        ZONE_LABEL_MIN_OFFSET_Y,
+        Math.min(ZONE_LABEL_MAX_OFFSET_Y, bounds.height * ZONE_LABEL_OFFSET_Y_FACTOR)
+      );
       const label = this.add.text(
         bounds.x + bounds.width / 2,
         bounds.y + labelOffsetY,
@@ -385,7 +399,7 @@ export class GameScene extends Phaser.Scene {
       bg.fillStyle(color, 0.3);
       bg.fillRoundedRect(
         bounds.x + bounds.width / 2 - bgWidth / 2,
-        bounds.y + labelOffsetY - 4,
+        bounds.y + labelOffsetY - ZONE_LABEL_BG_Y_ADJUST,
         bgWidth,
         bgHeight,
         4
@@ -666,7 +680,10 @@ export class GameScene extends Phaser.Scene {
         this.zoneDebug.strokeRect(bounds.x - 2, bounds.y - 2, bounds.width + 4, bounds.height + 4);
       }
 
-      const debugLabelOffsetY = Math.max(6, Math.min(16, bounds.height * 0.05));
+      const debugLabelOffsetY = Math.max(
+        DEBUG_LABEL_MIN_OFFSET_Y,
+        Math.min(DEBUG_LABEL_MAX_OFFSET_Y, bounds.height * DEBUG_LABEL_OFFSET_Y_FACTOR)
+      );
       const label = this.add.text(
         bounds.x + bounds.width / 2,
         bounds.y + debugLabelOffsetY,

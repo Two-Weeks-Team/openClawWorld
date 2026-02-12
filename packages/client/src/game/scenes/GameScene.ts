@@ -424,7 +424,8 @@ export class GameScene extends Phaser.Scene {
       const objType = this.getObjectProperty(obj, 'type') as string;
       if (!objType || objType === 'spawn') continue;
 
-      let texture = 'player-object';
+      let texture = '';
+      let usePlayersAtlas = false;
       switch (objType) {
         case 'chest':
           texture = 'chest';
@@ -445,6 +446,7 @@ export class GameScene extends Phaser.Scene {
             continue;
           }
           texture = 'player-object';
+          usePlayersAtlas = true;
           break;
         }
         case 'decoration':
@@ -452,9 +454,16 @@ export class GameScene extends Phaser.Scene {
           else if (obj.name.includes('lamp')) texture = 'lamp';
           else if (obj.name.includes('bench')) texture = 'bench';
           break;
+        default:
+          texture = 'player-object';
+          usePlayersAtlas = true;
       }
 
-      const sprite = this.add.sprite(obj.x + 8, obj.y + 8, texture);
+      if (!texture) continue;
+
+      const sprite = usePlayersAtlas
+        ? this.add.sprite(obj.x + 8, obj.y + 8, 'players', texture)
+        : this.add.sprite(obj.x + 8, obj.y + 8, texture);
       sprite.setDepth(obj.y);
 
       if (objType === 'portal') {
@@ -1158,11 +1167,11 @@ export class GameScene extends Phaser.Scene {
     const container = this.add.container(entity.pos.x, entity.pos.y);
     container.setDepth(entity.pos.y);
 
-    let texture = 'player-human';
-    if (type === 'agent') texture = 'player-agent';
-    if (type === 'object') texture = 'player-object';
+    let frame = 'player-human';
+    if (type === 'agent') frame = 'player-agent';
+    if (type === 'object') frame = 'player-object';
 
-    const sprite = this.add.sprite(0, 0, texture);
+    const sprite = this.add.sprite(0, 0, 'players', frame);
     sprite.setOrigin(0.5, 0.5);
 
     const text = this.add.text(0, -20, entity.name, {

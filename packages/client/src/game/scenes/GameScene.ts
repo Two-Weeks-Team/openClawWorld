@@ -751,13 +751,20 @@ export class GameScene extends Phaser.Scene {
   }
 
   private checkZoneChange(entity: Entity): void {
-    const currentZone = (entity as unknown as { currentZone?: ZoneId }).currentZone;
-    if (!currentZone) return;
+    const currentZone = (entity as unknown as { currentZone?: ZoneId }).currentZone ?? null;
 
-    if (this.previousZone && this.previousZone !== currentZone) {
+    if (currentZone === this.previousZone) return;
+
+    if (this.previousZone && !currentZone) {
+      this.zoneBanner?.showLeave(this.previousZone);
+      this.notificationPanel?.addEvent(
+        'zone.exit',
+        `Left zone: ${this.previousZone}`,
+        EVENT_COLORS['zone.exit']
+      );
+    } else if (this.previousZone && currentZone) {
       this.zoneBanner?.showLeave(this.previousZone);
       this.zoneBanner?.showEnter(currentZone);
-
       this.notificationPanel?.addEvent(
         'zone.exit',
         `Left zone: ${this.previousZone}`,
@@ -770,6 +777,11 @@ export class GameScene extends Phaser.Scene {
       );
     } else if (!this.previousZone && currentZone) {
       this.zoneBanner?.showEnter(currentZone);
+      this.notificationPanel?.addEvent(
+        'zone.enter',
+        `Entered zone: ${currentZone}`,
+        EVENT_COLORS['zone.enter']
+      );
     }
 
     this.previousZone = currentZone;

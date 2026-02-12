@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "image": "interior_tilemap.png",
+    "size": { "w": 458, "h": 305 },
+    "scale": 1,
+    "format": "RGBA8888",
+    "app": "kenney-roguelike-interior",
+    "tileSize": 16,
+    "spacing": 1
+  },
+  "frames": {}
+}

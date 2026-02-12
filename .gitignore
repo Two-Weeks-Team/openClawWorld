@@ -56,3 +56,4 @@ packages/client/public/assets/extracted/
 !/packages/client/public/**/*.png
 !/world/**/*.png
 docs/reference/Kenney Game Assets All-in-1 3.3.0/
+docs/reference/Kenney*

@@ -14,6 +14,58 @@ env:
   NODE_VERSION: '22'
 
 jobs:
+  codegen-check:
+    name: Codegen Freshness
+    runs-on: [self-hosted, macOS, ARM64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared package
+        run: pnpm --filter @openclawworld/shared build
+
+      - name: Run code generator
+        run: pnpm generate:tools
+
+      - name: Run command generator
+        run: pnpm generate:commands
+
+      - name: Check for uncommitted changes
+        run: |
+          CHANGED_FILES=$(git status --porcelain packages/plugin/src/generated/ .claude/commands/ocw-tools.md .opencode/command/ .gemini/commands/ .codex/)
+          if [[ -n "$CHANGED_FILES" ]]; then
+            echo "❌ Generated code is out of sync!"
+            echo ""
+            echo "The following files have changed:"
+            echo "$CHANGED_FILES"
+            echo ""
+            echo "Please run 'pnpm generate' and commit the changes."
+            exit 1
+          fi
+          echo "✅ Generated code is up to date"
+
   lint:
     name: Lint & Format
     runs-on: [self-hosted, Linux, X64]
@@ -183,12 +235,13 @@ jobs:
   all-checks:
     name: All Checks Passed
     runs-on: [self-hosted, macOS, ARM64]
-    needs: [typecheck, lint, build, test]
+    needs: [codegen-check, typecheck, lint, build, test]
     if: always()
     steps:
       - name: Check all jobs
         run: |
-          if [[ "${{ needs.typecheck.result }}" != "success" ]] || \
+          if [[ "${{ needs.codegen-check.result }}" != "success" ]] || \
+             [[ "${{ needs.typecheck.result }}" != "success" ]] || \
              [[ "${{ needs.lint.result }}" != "success" ]] || \
              [[ "${{ needs.build.result }}" != "success" ]] || \
              [[ "${{ needs.test.result }}" != "success" ]]; then

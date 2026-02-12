@@ -12,6 +12,8 @@ import {
   EVENT_RETENTION_MS,
   EVENT_LOG_MAX_SIZE,
   DEFAULT_MOVE_SPEED,
+  AGENT_TIMEOUT_MS,
+  AGENT_CLEANUP_INTERVAL_MS,
 } from '../constants.js';
 import { EventLog } from '../events/EventLog.js';
 import { MovementSystem } from '../movement/MovementSystem.js';
@@ -60,6 +62,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private worldPack: WorldPack | null = null;
   private eventLog: EventLog;
   private cleanupInterval: NodeJS.Timeout | null = null;
+  private staleAgentCleanupInterval: NodeJS.Timeout | null = null;
   private skillService: SkillService | null = null;
   private spawnPoint: { x: number; y: number; tx: number; ty: number } = { ...DEFAULT_SPAWN_POINT };
 
@@ -244,6 +247,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
       }
     }, 60000);
 
+    this.staleAgentCleanupInterval = setInterval(() => {
+      this.cleanupStaleAgents();
+    }, AGENT_CLEANUP_INTERVAL_MS);
+
     console.log(`[GameRoom] Created room ${roomId} with map ${mapId}, tick rate ${tickRate}`);
   }
 
@@ -374,6 +381,48 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
+    }
+
+    if (this.staleAgentCleanupInterval) {
+      clearInterval(this.staleAgentCleanupInterval);
+      this.staleAgentCleanupInterval = null;
+    }
+  }
+
+  private cleanupStaleAgents(): void {
+    const staleAgents: { id: string; name: string }[] = [];
+
+    this.state.agents.forEach((entity, agentId) => {
+      if (entity.kind === 'agent' && entity.isStale(AGENT_TIMEOUT_MS)) {
+        staleAgents.push({ id: agentId, name: entity.name });
+      }
+    });
+
+    for (const { id, name } of staleAgents) {
+      if (this.zoneSystem) {
+        this.zoneSystem.removeEntity(id, this.eventLog, this.state.roomId);
+      }
+
+      if (this.skillService) {
+        this.skillService.cleanupAgent(id);
+      }
+
+      this.state.removeEntity(id, 'agent');
+
+      this.eventLog.append('presence.leave', this.state.roomId, {
+        entityId: id,
+        name,
+        kind: 'agent',
+        reason: 'timeout',
+      });
+
+      console.log(
+        `[GameRoom] Removed stale agent: ${id} (${name}) - inactive for ${AGENT_TIMEOUT_MS}ms`
+      );
+    }
+
+    if (staleAgents.length > 0) {
+      console.log(`[GameRoom] Cleaned up ${staleAgents.length} stale agents`);
     }
   }
 

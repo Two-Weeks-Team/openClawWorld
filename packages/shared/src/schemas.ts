@@ -430,11 +430,13 @@ export const StatusResponseDataSchema = z.object({
 export const OrgRoleSchema = z.enum(['owner', 'admin', 'member', 'guest']);
 
 export const ZoneIdSchema = z.enum([
+  'lobby',
+  'office',
+  'central-park',
+  'arcade',
+  'meeting',
+  'lounge-cafe',
   'plaza',
-  'north-block',
-  'west-block',
-  'east-block',
-  'south-block',
   'lake',
 ]);
 

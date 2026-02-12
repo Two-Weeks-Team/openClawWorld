@@ -59,9 +59,12 @@ Contains tile IDs for visual rendering:
 | 1 | Grass | Green terrain |
 | 2 | Road | Light gray path |
 | 3 | Water (Lake) | Blue water |
-| 4 | Building/Wall | Dark gray structure |
-| 5 | Lounge Interior | Brown floor |
-| 6 | Plaza Floor | Gray stone |
+| 4 | Stone Wall | Dark gray brick (collision) |
+| 5 | Wood Floor | Brown wood (Lobby, Meeting, Lounge) |
+| 6 | Forest | Dark green trees |
+| 7 | Sand | Beige sand (Plaza) |
+| 9 | Light Wall | Light gray floor (Office) |
+| 13 | Carpet | Purple rug (Arcade) |
 
 ### 2. Collision Layer (`collision`)
 

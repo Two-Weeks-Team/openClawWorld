@@ -10,22 +10,22 @@
   "dialogue": {
     "greeting": {
       "id": "greeting",
-      "text": "Ahoy! I'm River, the lake ranger. Beautiful day for a stroll by the water, isn't it?",
+      "text": "Hello there! I'm River, the park ranger. Beautiful day for a stroll through Central Park, isn't it?",
       "options": [
-        { "text": "Can I swim here?", "next": "swimming" },
-        { "text": "Any fish in the lake?", "next": "fishing" },
-        { "text": "Just enjoying the view!", "next": null }
+        { "text": "What can I do here?", "next": "activities" },
+        { "text": "Any wildlife around?", "next": "wildlife" },
+        { "text": "Just enjoying the scenery!", "next": null }
       ]
     },
-    "swimming": {
-      "id": "swimming",
-      "text": "Afraid not - the lake is for viewing only! But feel free to toss a coin and make a wish at the viewpoint. Who knows, it might come true!",
-      "options": [{ "text": "I'll try my luck!", "next": null }]
+    "activities": {
+      "id": "activities",
+      "text": "Plenty! Take a seat on one of the benches, check the signpost for directions, or just wander the paths. It's all connected to the other zones from here!",
+      "options": [{ "text": "Thanks for the tips!", "next": null }]
     },
-    "fishing": {
-      "id": "fishing",
-      "text": "Oh yes! We've got some digital fish swimming around. They're shy though - you'll need to wait patiently at the pond edge to spot them!",
-      "options": [{ "text": "I'll keep an eye out!", "next": null }]
+    "wildlife": {
+      "id": "wildlife",
+      "text": "Keep your eyes peeled! We've got squirrels, birds, and even some butterflies fluttering about. The trees here are home to all sorts of critters.",
+      "options": [{ "text": "I'll look around!", "next": null }]
     }
   }
 }

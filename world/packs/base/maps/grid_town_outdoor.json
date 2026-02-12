@@ -5,8 +5,8 @@
   "renderorder": "right-down",
   "width": 64,
   "height": 64,
-  "tilewidth": 32,
-  "tileheight": 32,
+  "tilewidth": 16,
+  "tileheight": 16,
   "nextlayerid": 4,
   "nextobjectid": 25,
   "properties": [
@@ -787,13 +787,13 @@
     {
       "firstgid": 1,
       "name": "tileset",
-      "tilewidth": 32,
-      "tileheight": 32,
+      "tilewidth": 16,
+      "tileheight": 16,
       "tilecount": 32,
       "columns": 8,
-      "image": "tileset.svg",
-      "imagewidth": 256,
-      "imageheight": 128
+      "image": "tileset.png",
+      "imagewidth": 128,
+      "imageheight": 64
     }
   ]
 }

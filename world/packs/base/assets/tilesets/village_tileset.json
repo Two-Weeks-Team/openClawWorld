@@ -1,7 +1,7 @@
 {
   "name": "village_tileset",
-  "tilewidth": 32,
-  "tileheight": 32,
+  "tilewidth": 16,
+  "tileheight": 16,
   "tilecount": 14,
   "columns": 14,
   "license": "CC0",

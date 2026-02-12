@@ -10,7 +10,7 @@ import os
 
 MAP_WIDTH = 64
 MAP_HEIGHT = 52
-TILE_SIZE = 32
+TILE_SIZE = 16
 
 ZONE_COLORS = {
     "lobby": (144, 238, 144, 180),

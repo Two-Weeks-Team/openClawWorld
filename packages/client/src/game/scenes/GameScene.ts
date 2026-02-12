@@ -415,8 +415,7 @@ export class GameScene extends Phaser.Scene {
         case 'portal':
           texture = 'portal';
           break;
-        case 'npc':
-          // NPC uses atlas with frame based on npcId
+        case 'npc': {
           const npcId = this.getObjectProperty(obj, 'npcId') as string;
           if (npcId) {
             const npcSprite = this.add.sprite(obj.x + 8, obj.y + 8, 'npcs', npcId);
@@ -427,6 +426,7 @@ export class GameScene extends Phaser.Scene {
           }
           texture = 'player-object';
           break;
+        }
         case 'decoration':
           if (obj.name.includes('fountain')) texture = 'fountain';
           else if (obj.name.includes('lamp')) texture = 'lamp';

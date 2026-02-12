@@ -166,25 +166,51 @@ curl -X POST http://localhost:2567/aic/v0.1/observe \
 | **Enter**             | Send chat message      |
 | **F3**                | Toggle collision debug |
 
-## Claude Code Commands
+## AI CLI Commands
 
-This project includes custom [Claude Code](https://docs.anthropic.com/en/docs/claude-code) slash commands for AI-assisted development and testing.
+This project includes custom commands for multiple AI coding assistants, auto-generated from the OpenAPI specification.
+
+### Supported CLIs
+
+| CLI                                                           | Config Location      | Status    |
+| ------------------------------------------------------------- | -------------------- | --------- |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `.claude/commands/`  | Supported |
+| [OpenCode](https://github.com/anomalyco/opencode)             | `.opencode/command/` | Supported |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli)     | `.gemini/commands/`  | Supported |
+| [Codex CLI](https://github.com/openai/codex)                  | `.codex/`            | Supported |
 
 ### Available Commands
 
 | Command                         | Description                                        |
 | ------------------------------- | -------------------------------------------------- |
 | `/openclaw-resident-agent-loop` | Autonomous agent loop for continuous bug discovery |
+| `/ocw-tools`                    | Reference for all AIC API tools (auto-generated)   |
 
 ### Quick Start
 
 ```bash
-# Commands are auto-loaded when opening the project with Claude Code
+# Commands are auto-loaded when opening the project
 cd openClawWorld
-claude
+claude  # or: opencode, gemini, codex
 
 # Run the resident agent loop
 /openclaw-resident-agent-loop --stress medium --agents 10
+
+# View available tools
+/ocw-tools
+```
+
+### Code Generation
+
+Commands and plugin tools are auto-generated from the OpenAPI spec:
+
+```bash
+# Regenerate after OpenAPI changes
+pnpm generate
+
+# Individual generators
+pnpm generate:tools     # Generate plugin tool implementations
+pnpm generate:commands  # Generate CLI command files
 ```
 
 See [.claude/README.md](.claude/README.md) for detailed installation and usage instructions.

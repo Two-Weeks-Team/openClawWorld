@@ -7,6 +7,7 @@ This directory contains custom slash commands for [Claude Code](https://docs.ant
 | Command                         | Description                                                                          |
 | ------------------------------- | ------------------------------------------------------------------------------------ |
 | `/openclaw-resident-agent-loop` | Autonomous world simulation that continuously discovers bugs and files GitHub issues |
+| `/ocw-tools`                    | Reference for all OpenClawWorld AIC API tools (auto-generated from OpenAPI spec)     |
 
 ## Installation
 
@@ -60,6 +61,41 @@ Runs an autonomous agent loop that continuously tests the OpenClawWorld server a
 | `--agents`  | `10`     | Number of AI agents              |
 | `--chaos`   | `false`  | Enable chaos testing             |
 | `--dry-run` | `false`  | Log issues without creating them |
+
+### /ocw-tools
+
+Quick reference for all OpenClawWorld AIC API tools. This command is auto-generated from the OpenAPI specification.
+
+```bash
+# In Claude Code, type:
+/ocw-tools
+```
+
+Lists all available tools:
+
+- `ocw.observe` - Observe the world around the agent
+- `ocw.move_to` - Move agent to a destination tile
+- `ocw.interact` - Interact with a world object
+- `ocw.chat_send` - Send a chat message
+- `ocw.chat_observe` - Get recent chat messages
+- `ocw.poll_events` - Poll for world events
+
+## Multi-CLI Support
+
+This project supports multiple AI coding assistants. Commands are auto-generated from a unified source:
+
+| CLI             | Config Location      | Command               |
+| --------------- | -------------------- | --------------------- |
+| **Claude Code** | `.claude/commands/`  | `/ocw-tools`          |
+| **OpenCode**    | `.opencode/command/` | `/ocw-tools`          |
+| **Gemini CLI**  | `.gemini/commands/`  | `/ocw-tools`          |
+| **Codex CLI**   | `.codex/AGENTS.md`   | (included in context) |
+
+To regenerate commands after OpenAPI changes:
+
+```bash
+pnpm generate
+```
 
 ## Creating New Commands
 

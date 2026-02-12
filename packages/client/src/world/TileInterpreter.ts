@@ -1,12 +1,12 @@
 import type {
   TileInfo,
   TileType,
-  TilesetDefinition,
   TilesetTileDefinition,
   WorldGrid,
   ZoneId,
 } from '@openclawworld/shared';
-import villageTileset from '../../../../world/packs/base/assets/tilesets/village_tileset.json';
+import { TilesetDefinitionSchema } from '@openclawworld/shared';
+import villageTilesetJson from '@world/packs/base/assets/tilesets/village_tileset.json';
 
 type ColorRange = {
   r: [number, number];
@@ -42,7 +42,7 @@ const ZONE_FLOOR_TYPES: Map<TileType, ZoneId> = new Map([
   ['floor_lake', 'lake'],
 ]);
 
-const tileset: TilesetDefinition = villageTileset as TilesetDefinition;
+const tileset = TilesetDefinitionSchema.parse(villageTilesetJson);
 const tileDefById: Map<number, TilesetTileDefinition> = new Map(tileset.tiles.map(t => [t.id, t]));
 
 export class TileInterpreter {

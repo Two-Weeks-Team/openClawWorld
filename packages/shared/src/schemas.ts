@@ -680,3 +680,41 @@ export const WorkLifeEventTypeSchema = z.enum([
   'npc.dialogue',
   'facility.interact',
 ]);
+
+// ============================================================================
+// Tileset Schemas
+// ============================================================================
+
+export const TileTypeSchema = z.enum([
+  'empty',
+  'grass',
+  'road',
+  'floor_lobby',
+  'floor_office',
+  'floor_meeting',
+  'floor_lounge',
+  'floor_arcade',
+  'floor_plaza',
+  'floor_lake',
+  'door',
+  'wall',
+  'water',
+  'decoration',
+]);
+
+export const TilesetTileDefinitionSchema = z.object({
+  id: z.number().int().min(0),
+  type: TileTypeSchema,
+  collision: z.boolean(),
+  isDoor: z.boolean().optional(),
+});
+
+export const TilesetDefinitionSchema = z.object({
+  name: z.string().min(1).max(64),
+  tilewidth: z.number().int().min(1),
+  tileheight: z.number().int().min(1),
+  tilecount: z.number().int().min(1),
+  columns: z.number().int().min(1),
+  license: z.string().optional(),
+  tiles: z.array(TilesetTileDefinitionSchema).min(1),
+});

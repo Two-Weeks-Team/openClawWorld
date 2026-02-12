@@ -11,7 +11,12 @@
     "useDefineForClassFields": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noEmit": true
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@world/*": ["../../world/*"]
+    }
   },
   "include": ["src/**/*", "../server/src/**/*"],
   "exclude": ["dist", "node_modules", "**/*.test.ts"]

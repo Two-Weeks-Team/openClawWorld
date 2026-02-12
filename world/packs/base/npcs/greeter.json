@@ -19,12 +19,12 @@
     },
     "about-town": {
       "id": "about-town",
-      "text": "Grid-Town is a vibrant community hub! We have offices to the north, a cozy cafe to the west, meeting rooms to the east, an arcade to the south, and a beautiful lake in the corner!",
+      "text": "Grid-Town is a vibrant community hub! Central Park is our heart, surrounded by the office and arcade to the east, meeting rooms to the left, the lounge cafe below, and the plaza for gatherings!",
       "options": [{ "text": "Sounds great!", "next": null }]
     },
     "directions": {
       "id": "directions",
-      "text": "North has the office block with workstations. West has the cafe - Jamie makes great coffee! East has meeting rooms. South has the arcade for fun. And the lake is perfect for a peaceful walk!",
+      "text": "Head through Central Park to reach everywhere! The office and arcade are to the east. Meeting rooms are on the left side. The lounge cafe is down south - Jamie makes great coffee! And don't miss the plaza fountain!",
       "options": [{ "text": "Thanks for the info!", "next": null }]
     }
   }

@@ -49,6 +49,7 @@ export class GameScene extends Phaser.Scene {
   private debugLegend?: Phaser.GameObjects.Container;
   private debugZoneLabels: Phaser.GameObjects.Text[] = [];
   private zoneNameLabels: Phaser.GameObjects.Text[] = [];
+  private zoneNameBackgrounds: Phaser.GameObjects.Graphics[] = [];
   private interactionPrompt?: Phaser.GameObjects.Container;
   private nearbyObject?: MapObject;
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -386,6 +387,7 @@ export class GameScene extends Phaser.Scene {
       bg.setDepth(49);
 
       this.zoneNameLabels.push(label);
+      this.zoneNameBackgrounds.push(bg);
     }
   }
 

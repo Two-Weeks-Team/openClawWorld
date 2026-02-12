@@ -63,6 +63,16 @@ interface AgentState {
   interactionHistory: InteractionRecord[];
   actionLog: string[];
   cycleCount: number;
+  // Detailed error tracking for issue reporting
+  lastError?: {
+    endpoint: string;
+    httpStatusCode: number;
+    errorCode?: string;
+    errorMessage?: string;
+    requestBody?: string;
+    responseBody?: string;
+    timestamp: number;
+  };
 }
 
 interface EntitySnapshot {
@@ -95,6 +105,33 @@ interface IssueEvidence {
   timestamps: number[];
   logs: string[];
   positions?: { x: number; y: number }[];
+  screenshots?: string[];
+  httpStatusCode?: number;
+  requestBody?: string;
+  responseBody?: string;
+  errorCode?: string;
+  errorMessage?: string;
+  endpoint?: string;
+  actionLog?: string[];
+  agentStates?: AgentStateSnapshot[];
+  apiCoverage?: { used: number; total: number; percentage: number };
+  serverInfo?: {
+    version: string;
+    env: string;
+    timestamp: number;
+  };
+}
+
+interface AgentStateSnapshot {
+  agentId: string;
+  role: string;
+  position: { x: number; y: number };
+  lastAction: string;
+  errorCount: number;
+  cycleCount: number;
+  eventCursor?: string | null;
+  observedEntities: number;
+  observedFacilities: number;
 }
 
 interface FacilitySnapshot {
@@ -528,12 +565,46 @@ class GitHubIssueReporter {
 
     try {
       const labels = ['resident-agent', issue.area.toLowerCase(), issue.severity.toLowerCase()];
+
+      // Create issue body file if needed
+      const bodyFile = `/tmp/issue-body-${Date.now()}.md`;
+      writeFileSync(bodyFile, body);
+
       const result = execFileSync(
         'gh',
-        ['issue', 'create', '--title', title, '--body', body, '--label', labels.join(',')],
+        ['issue', 'create', '--title', title, '--body-file', bodyFile, '--label', labels.join(',')],
         { encoding: 'utf-8' }
       );
+
+      // Clean up temp file
+      try {
+        require('fs').unlinkSync(bodyFile);
+      } catch {}
+
       const issueUrl = result.trim();
+      const issueNumber = issueUrl.split('/').pop();
+
+      if (!issueNumber) {
+        console.error('[Issue] Could not extract issue number from URL:', issueUrl);
+        return issueUrl;
+      }
+
+      // Upload screenshots if present
+      if (issue.evidence.screenshots && issue.evidence.screenshots.length > 0) {
+        console.log(`[Issue] Uploading ${issue.evidence.screenshots.length} screenshot(s)...`);
+        for (const screenshotPath of issue.evidence.screenshots) {
+          try {
+            execFileSync(
+              'gh',
+              ['issue', 'comment', issueNumber, '--body', `Screenshot: ${screenshotPath}`],
+              { encoding: 'utf-8' }
+            );
+          } catch (e) {
+            console.error(`[Issue] Failed to attach screenshot ${screenshotPath}:`, e);
+          }
+        }
+      }
+
       console.log(`✅ Created issue: ${issueUrl}`);
       return issueUrl;
     } catch (error) {
@@ -560,13 +631,78 @@ class GitHubIssueReporter {
   private formatIssueBody(issue: Issue): string {
     const commitSha = getCommitSha();
     const timestamp = formatTimestamp();
+    const evidence = issue.evidence;
+
+    // Build screenshots section
+    let screenshotsSection = '';
+    if (evidence.screenshots && evidence.screenshots.length > 0) {
+      screenshotsSection = evidence.screenshots
+        .map(path => {
+          const filename = path.split('/').pop();
+          return `### Screenshot: ${filename}
+![${filename}](${path})`;
+        })
+        .join('\n\n');
+    }
+
+    // Build request/response section
+    let requestResponseSection = '';
+    if (evidence.endpoint) {
+      requestResponseSection = `## HTTP Request Details
+- **Endpoint:** ${evidence.endpoint}`;
+      if (evidence.httpStatusCode) {
+        requestResponseSection += `\n- **Status Code:** ${evidence.httpStatusCode}`;
+      }
+      if (evidence.errorCode) {
+        requestResponseSection += `\n- **Error Code:** ${evidence.errorCode}`;
+      }
+      if (evidence.errorMessage) {
+        requestResponseSection += `\n- **Error Message:** ${evidence.errorMessage}`;
+      }
+      if (evidence.requestBody) {
+        requestResponseSection += `\n\n### Request Body\n\`\`\`json\n${evidence.requestBody}\n\`\`\``;
+      }
+      if (evidence.responseBody) {
+        requestResponseSection += `\n\n### Response Body\n\`\`\`json\n${evidence.responseBody}\n\`\`\``;
+      }
+    }
+
+    // Build agent states section
+    let agentStatesSection = '';
+    if (evidence.agentStates && evidence.agentStates.length > 0) {
+      agentStatesSection = `## Agent States at Time of Incident\n\n| Agent ID | Role | Position | Last Action | Errors | Cycles | Entities | Facilities |\n|----------|------|----------|-------------|--------|--------|----------|------------|\n${evidence.agentStates
+        .map(
+          s =>
+            `| ${s.agentId} | ${s.role} | (${s.position.x.toFixed(0)}, ${s.position.y.toFixed(0)}) | ${s.lastAction} | ${s.errorCount} | ${s.cycleCount} | ${s.observedEntities} | ${s.observedFacilities} |`
+        )
+        .join('\n')}`;
+    }
+
+    // Build API coverage section
+    let apiCoverageSection = '';
+    if (evidence.apiCoverage) {
+      apiCoverageSection = `## API Coverage at Time of Incident\n- **Used:** ${evidence.apiCoverage.used}/${evidence.apiCoverage.total}\n- **Coverage:** ${evidence.apiCoverage.percentage}%`;
+    }
+
+    // Build server info section
+    let serverInfoSection = '';
+    if (evidence.serverInfo) {
+      serverInfoSection = `## Server Information\n- **Version:** ${evidence.serverInfo.version}\n- **Environment:** ${evidence.serverInfo.env}\n- **Server Timestamp:** ${new Date(evidence.serverInfo.timestamp).toISOString()}`;
+    }
+
+    // Build action log section
+    let actionLogSection = '';
+    if (evidence.actionLog && evidence.actionLog.length > 0) {
+      actionLogSection = `## Recent Actions (Last ${evidence.actionLog.length})\n\`\`\`\n${evidence.actionLog.join('\n')}\n\`\`\``;
+    }
 
     return `## Build Info
 - Commit SHA: ${commitSha}
 - Timestamp: ${timestamp}
 
 ## Environment
-- Agents involved: ${issue.evidence.agentIds.join(', ')}
+- Agents involved: ${evidence.agentIds.join(', ')}
+- Labels: \`label:resident-agent\`
 
 ## Bug Description
 
@@ -582,14 +718,28 @@ ${issue.reproductionSteps.map((step, i) => `${i + 1}. ${step}`).join('\n')}
 ## Metadata
 - Frequency: ${issue.frequency}
 - Severity: ${issue.severity}
+- Area: ${issue.area}
 
-## Evidence
+${serverInfoSection}
+
+${apiCoverageSection}
+
+${agentStatesSection}
+
+${requestResponseSection}
+
+${actionLogSection}
+
+## Logs
 \`\`\`
-${issue.evidence.logs.slice(0, 20).join('\n')}
+${evidence.logs.slice(0, 30).join('\n')}
 \`\`\`
+
+${screenshotsSection}
 
 ---
-*Automatically generated by Resident Agent Loop*`;
+*Automatically generated by Resident Agent Loop*
+*Ensure \`label:resident-agent\` is maintained*`;
   }
 }
 
@@ -618,6 +768,40 @@ class IssueDetector {
     this.currentCycle++;
   }
 
+  private buildAgentStates(agents: ResidentAgent[]): AgentStateSnapshot[] {
+    return agents.map(agent => {
+      const state = agent.getState();
+      return {
+        agentId: state.agentId,
+        role: state.role,
+        position: state.position,
+        lastAction: state.lastAction,
+        errorCount: state.errorCount,
+        cycleCount: state.cycleCount,
+        eventCursor: state.eventCursor,
+        observedEntities: state.observedEntities.size,
+        observedFacilities: state.observedFacilities.size,
+      };
+    });
+  }
+
+  private getApiCoverage(agents: ResidentAgent[]): {
+    used: number;
+    total: number;
+    percentage: number;
+  } {
+    const usedEndpoints = new Set<string>();
+    for (const agent of agents) {
+      const state = agent.getState();
+      for (const record of state.apiCallHistory) {
+        usedEndpoints.add(record.endpoint);
+      }
+    }
+    const total = 12;
+    const used = usedEndpoints.size;
+    return { used, total, percentage: Math.round((used / total) * 100) };
+  }
+
   detectPositionDesync(agents: ResidentAgent[]): Issue | null {
     for (const agent of agents) {
       const state = agent.getState();
@@ -629,6 +813,12 @@ class IssueDetector {
             Math.abs(snapshot.position.x - known.x) + Math.abs(snapshot.position.y - known.y);
 
           if (posDiff > 100 && timeDiff < 100) {
+            const affectedAgent = agents.find(a => {
+              const s = a.getState();
+              return Array.from(s.observedEntities.keys()).includes(entityId);
+            });
+            const lastError = affectedAgent?.getState().lastError;
+
             return {
               area: 'Sync',
               title: `Position desync detected for entity ${entityId}`,
@@ -644,13 +834,31 @@ class IssueDetector {
               severity: 'Major',
               frequency: 'sometimes',
               evidence: {
-                agentIds: [state.agentId],
-                timestamps: [snapshot.timestamp, known.timestamp],
+                agentIds: agents.map(a => a.getState().agentId),
+                timestamps: [snapshot.timestamp, known.timestamp, Date.now()],
                 logs: [
                   `Previous: (${known.x}, ${known.y}) at ${known.timestamp}`,
                   `Current: (${snapshot.position.x}, ${snapshot.position.y}) at ${snapshot.timestamp}`,
+                  `Affected entity: ${entityId}`,
+                  `Position delta: ${posDiff}px`,
+                  `Time delta: ${timeDiff}ms`,
+                  ...(lastError
+                    ? [`Last error: ${lastError.endpoint} ${lastError.httpStatusCode}`]
+                    : []),
                 ],
                 positions: [known, snapshot.position],
+                agentStates: this.buildAgentStates(agents),
+                apiCoverage: this.getApiCoverage(agents),
+                ...(lastError
+                  ? {
+                      endpoint: lastError.endpoint,
+                      httpStatusCode: lastError.httpStatusCode,
+                      errorCode: lastError.errorCode,
+                      errorMessage: lastError.errorMessage,
+                      requestBody: lastError.requestBody,
+                      responseBody: lastError.responseBody,
+                    }
+                  : {}),
               },
             };
           }
@@ -1794,22 +2002,47 @@ class ResidentAgent {
   private async pollEvents(waitMs = 0): Promise<void> {
     const startMs = Date.now();
     try {
+      const requestBody: Record<string, unknown> = {
+        agentId: this.state.agentId,
+        roomId: 'default',
+        limit: 50,
+      };
+      if (this.state.eventCursor) {
+        requestBody.sinceCursor = this.state.eventCursor;
+      }
+      if (waitMs > 0) {
+        requestBody.waitMs = Math.min(waitMs, 1000);
+      }
+      console.error(
+        `[${this.state.agentId}] eventCursor value: ${JSON.stringify(this.state.eventCursor)}, type: ${typeof this.state.eventCursor}`
+      );
+
       const response = await fetch(`${this.serverUrl}/aic/v0.1/pollEvents`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.state.sessionToken}`,
         },
-        body: JSON.stringify({
-          agentId: this.state.agentId,
-          roomId: 'default',
-          ...(this.state.eventCursor && { sinceCursor: this.state.eventCursor }),
-          limit: 50,
-          ...(waitMs > 0 && { waitMs: Math.min(waitMs, 1000) }),
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) throw new Error(`PollEvents failed: ${response.status}`);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        const errorDetail = {
+          endpoint: 'pollEvents',
+          httpStatusCode: response.status,
+          errorCode:
+            response.status >= 400 && response.status < 500 ? 'client_error' : 'server_error',
+          errorMessage: errorBody,
+          requestBody: JSON.stringify(requestBody),
+          responseBody: errorBody,
+          timestamp: Date.now(),
+        };
+        this.state.lastError = errorDetail;
+        console.error(`[${this.state.agentId}] PollEvents error body: ${errorBody}`);
+        console.error(`[${this.state.agentId}] Request body sent: ${JSON.stringify(requestBody)}`);
+        throw new Error(`PollEvents failed: ${response.status}`);
+      }
 
       const result = await response.json();
       if (result.status === 'ok') {

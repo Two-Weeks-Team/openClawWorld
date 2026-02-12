@@ -9,7 +9,13 @@ import { ClientCollisionSystem } from '../../systems/CollisionSystem';
 import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
 import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
-import { ZONE_BOUNDS, ZONE_COLORS, DEBUG_COLORS, DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
+import {
+  ZONE_BOUNDS,
+  ZONE_COLORS,
+  ZONE_DISPLAY_NAMES,
+  DEBUG_COLORS,
+  DEFAULT_SPAWN_POINT,
+} from '@openclawworld/shared';
 
 interface MapObject {
   id: number;
@@ -340,17 +346,6 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createZoneNameLabels(): void {
-    const ZONE_DISPLAY_NAMES: Record<ZoneId, string> = {
-      lobby: 'LOBBY',
-      office: 'OFFICE',
-      'central-park': 'CENTRAL PARK',
-      arcade: 'ARCADE',
-      meeting: 'MEETING',
-      'lounge-cafe': 'LOUNGE CAFÉ',
-      plaza: 'PLAZA',
-      lake: 'LAKE',
-    };
-
     for (const [zoneId, bounds] of Object.entries(ZONE_BOUNDS) as [
       ZoneId,
       (typeof ZONE_BOUNDS)[ZoneId],

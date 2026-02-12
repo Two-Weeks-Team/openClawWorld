@@ -74,7 +74,7 @@ Binary collision data:
 
 ### 3. Objects Layer (`objects`)
 
-Spawn points and markers (currently unused, reserved for future use).
+Contains spawn points, building entrances, and facility markers for navigation and gameplay.
 
 ## Map Data Array Structure
 
@@ -489,6 +489,5 @@ for (let i = 0; i < 4096; i++) {
 
 ## Related Documentation
 
-- [Grid-Town Map Spec](./map_spec_grid_town.md) - Zone layout and facilities
-- [Map Spec](./map_spec.md) - General map format
+- [Grid-Town Map Spec](./map_spec_grid_town.md) - Zone layout, facilities, and current map specification
 - [Demo Runbook](../demo-runbook.md) - Testing procedures

@@ -51,6 +51,17 @@ export const ZONE_COLORS: Record<ZoneId, number> = {
   lake: 0x4169e1,
 };
 
+export const ZONE_DISPLAY_NAMES: Record<ZoneId, string> = {
+  lobby: 'LOBBY',
+  office: 'OFFICE',
+  'central-park': 'CENTRAL PARK',
+  arcade: 'ARCADE',
+  meeting: 'MEETING',
+  'lounge-cafe': 'LOUNGE CAFÉ',
+  plaza: 'PLAZA',
+  lake: 'LAKE',
+};
+
 export const DEBUG_COLORS = {
   collision: 0xff0000,
   mapBorder: 0xffffff,

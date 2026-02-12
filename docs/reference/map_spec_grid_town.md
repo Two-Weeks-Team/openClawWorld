@@ -179,7 +179,7 @@ Building entrances are defined in the map's objects layer with `type: "building_
 Required layers for map JSON:
 
 1. **ground** - Base terrain (grass tiles, ID 1)
-2. **collision** - Collision grid (0=passable, 2=blocked)
+2. **collision** - Collision grid (0=passable, 1=blocked)
 3. **objects** - Spawn points, facility markers
 
 ## Zone Colors (for debug display)

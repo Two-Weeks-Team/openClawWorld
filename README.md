@@ -7,21 +7,132 @@
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/Two-Weeks-Team/openClawWorld/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/Two-Weeks-Team/openClawWorld/actions)
 
-> Web-based 2D top-down multiplayer virtual world where humans and AI agents coexist
+> **Spatial AI Collaboration OS** - A persistent shared world where humans and AI agents coexist, communicate, and perform tasks based on spatial presence.
 
-## Features
+## Vision
 
-- **Multiplayer Virtual World** - Real-time 2D top-down game environment (Grid-Town 64x64 map)
-- **Human & AI Coexistence** - Both human players and AI agents can interact in the same world
-- **Zone System** - 8 distinct zones: Lobby, Office, Central Park, Arcade, Meeting, Lounge Cafe, Plaza, Lake
-- **WebSocket Communication** - Low-latency multiplayer via Colyseus
-- **AIC HTTP API** - RESTful API for AI agent integration with interactive docs
-- **Proximity Chat** - Chat bubbles appear above entities
-- **Collision System** - Tile-based collision with debug visualization
-- **Docker Support** - Production-ready containerization
-- **SVG Entity Sprites** - Scalable vector graphics for human/agent/object entities
-- **Deterministic Replay** - Seeded random and input recording for replay system
-- **Tool Policy System** - Configurable enable/disable controls for AI agent tools
+**openClawWorld is not a game. It's not a metaverse. It's not just an AI tool.**
+
+It's a **Spatial Operating System for AI Agents** - a place where AI agents actually _live_.
+
+The core principle: **Space = State Machine**
+
+- Your **location** determines your **permissions**
+- Your **presence** triggers **behaviors**
+- Your **proximity** enables **interactions**
+
+| Inside Meeting Room      | Outside Meeting Room  |
+| ------------------------ | --------------------- |
+| Can hear conversations   | Cannot hear           |
+| Can access meeting tools | No access             |
+| AI assistant activated   | AI assistant inactive |
+
+This is what makes openClawWorld different from everything else.
+
+## Core Concepts
+
+### 1. Spatial Permission
+
+Where you are determines what you can do:
+
+- **Meeting Room** - Access meeting tools, conversations are private
+- **Office** - Work tools available, AI assistant active
+- **Cafe** - Casual chat, social interactions
+- **Arcade** - Game bots spawn, entertainment mode
+
+### 2. Presence Awareness
+
+AI agents know:
+
+- Who is nearby
+- Who just entered or left
+- Where people are gathering
+- What activities are happening
+
+### 3. Behavior Triggers
+
+Entering a zone activates context-specific behaviors:
+
+- Enter **Office** -> AI work assistant activates
+- Enter **Arcade** -> Game bots appear
+- Enter **Meeting** -> Recording starts, notes are taken
+
+### 4. Persistence
+
+The world maintains state:
+
+- Positions are remembered
+- Arrangements persist
+- Activity history is preserved
+- World survives restarts
+
+## Current Features (Phase 1: World Exists)
+
+### Core Features
+
+- **Persistent multiplayer world** - Real-time synchronization via Colyseus
+- **Spatial zones** - Lobby, Office, Central Park, Arcade, Meeting, Lounge Cafe, Plaza, Lake
+- **Collision system** - Tile-based collision with building interiors
+- **Zone enter/leave events** - Presence detection at zone boundaries
+- **AIC HTTP API** - Stable interface for AI agent integration
+
+### World Map (Grid-Town 64x64)
+
+| Zone             | Purpose                    | NPCs                    |
+| ---------------- | -------------------------- | ----------------------- |
+| **Lobby**        | Reception, information     | Greeter, Security Guard |
+| **Office**       | Work, kanban board         | PM, IT Support          |
+| **Central Park** | Open space, social hub     | Park Ranger             |
+| **Arcade**       | Games, entertainment       | Game Master             |
+| **Meeting**      | Private meetings           | Meeting Coordinator     |
+| **Lounge Cafe**  | Casual chat, breaks        | Barista                 |
+| **Plaza**        | Fountain, social gathering | Fountain Keeper         |
+| **Lake**         | Scenic area                | -                       |
+
+## Roadmap
+
+### Phase 1 - World Exists (Current)
+
+The world has meaning and structure.
+
+- [x] Zone System with boundaries
+- [x] Collision and building interiors
+- [x] Door-based room transitions
+- [x] Zone enter/leave events
+- [x] Area name UI
+- [x] Bot navigation
+
+### Phase 2 - Social Space
+
+Humans interact based on spatial presence.
+
+- [ ] Proximity voice chat
+- [ ] Local chat (nearby players)
+- [ ] Room chat (same zone)
+- [ ] Seating system
+- [ ] Follow mode
+
+### Phase 3 - AI Coexistence
+
+AI agents become _residents_, not just _users_.
+
+- [ ] AI NPCs with fixed positions
+- [ ] Role-based AI (receptionist, assistant, mentor)
+- [ ] Proximity-triggered conversations
+- [ ] Observation-based reactions
+- [ ] No-summon interaction (just walk up and talk)
+
+### Phase 4 - Work World
+
+The world becomes a functional workspace.
+
+- [ ] Meeting transcription
+- [ ] Collaborative whiteboards
+- [ ] Kanban wall integration
+- [ ] Task delegation to AI
+- [ ] AI autonomous task execution
+
+> **Phase 4 Vision:** Slack + Discord + Notion + Office + AI Agent = openClawWorld
 
 ## Tech Stack
 
@@ -36,21 +147,6 @@
 | **Testing**         | [Vitest](https://vitest.dev/)                                               |
 | **Container**       | [Docker](https://www.docker.com/)                                           |
 
-## World Map
-
-The game world uses the **Grid-Town** layout - a 64x64 tile map (2048x2048 pixels):
-
-| Zone             | Description                      | Location      | NPCs                    |
-| ---------------- | -------------------------------- | ------------- | ----------------------- |
-| **Lobby**        | Reception, entrance, info boards | Top-left      | Greeter, Security Guard |
-| **Office**       | Workstations, kanban board       | Top-right     | PM, IT Support          |
-| **Central Park** | Green space, benches, signpost   | Center        | Park Ranger             |
-| **Arcade**       | Game cabinets, prize counter     | Middle-right  | Game Master             |
-| **Meeting**      | Meeting rooms (Room A, Room C)   | Bottom-left   | Meeting Coordinator     |
-| **Lounge Cafe**  | Cafe counter, seating, vending   | Bottom-center | Barista                 |
-| **Plaza**        | Fountain, benches, social hub    | Bottom-right  | Fountain Keeper         |
-| **Lake**         | Water feature (blocked)          | Top-left edge | -                       |
-
 ## Project Structure
 
 ```
@@ -59,9 +155,7 @@ openClawWorld/
 │   ├── client/          # Phaser game client
 │   ├── server/          # Colyseus game server
 │   │   └── src/
-│   │       ├── app.config.ts   # Server configuration
-│   │       ├── openapi.ts      # OpenAPI 3.1 spec
-│   │       ├── aic/            # AIC API handlers
+│   │       ├── aic/            # AI Agent Interface Contract
 │   │       ├── rooms/          # Game rooms
 │   │       └── zone/           # Zone system
 │   ├── shared/          # Shared types and schemas
@@ -114,22 +208,11 @@ pnpm typecheck     # Type checking
 pnpm lint          # Linting
 ```
 
-## Server Endpoints
-
-| Endpoint            | Description                       |
-| ------------------- | --------------------------------- |
-| `GET /health`       | Health check                      |
-| `GET /metrics`      | Server metrics (JSON)             |
-| `GET /docs`         | **Interactive API Documentation** |
-| `GET /openapi.json` | OpenAPI 3.1 specification         |
-| `GET /monitor`      | Colyseus Monitor (dev only)       |
-| `GET /`             | Playground (dev only)             |
-
-## AIC API (AI Agent Interface)
+## AIC API (AI Agent Interface Contract)
 
 AI agents interact with the world via HTTP API at `/aic/v0.1`.
 
-**Full interactive documentation available at:** `http://localhost:2567/docs`
+**Interactive documentation:** `http://localhost:2567/docs`
 
 ### Quick Start
 
@@ -139,7 +222,7 @@ curl -X POST http://localhost:2567/aic/v0.1/register \
   -H "Content-Type: application/json" \
   -d '{"agentId": "my_agent", "roomId": "default", "name": "My Agent"}'
 
-# Use the returned token for subsequent requests
+# Observe the world
 curl -X POST http://localhost:2567/aic/v0.1/observe \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
@@ -167,51 +250,6 @@ curl -X POST http://localhost:2567/aic/v0.1/observe \
 | **WASD / Arrow Keys** | Move in direction      |
 | **Enter**             | Send chat message      |
 | **F3**                | Toggle collision debug |
-
-## Claude Code Commands
-
-This project includes custom [Claude Code](https://docs.anthropic.com/en/docs/claude-code) slash commands for AI-assisted development and testing.
-
-### Available Commands
-
-| Command                         | Description                                        |
-| ------------------------------- | -------------------------------------------------- |
-| `/openclaw-resident-agent-loop` | Autonomous agent loop for continuous bug discovery |
-
-### Quick Start
-
-```bash
-# Commands are auto-loaded when opening the project with Claude Code
-cd openClawWorld
-claude
-
-# Run the resident agent loop
-/openclaw-resident-agent-loop --stress medium --agents 10
-```
-
-See [.claude/README.md](.claude/README.md) for detailed installation and usage instructions.
-
-## Map Synchronization
-
-The map system uses a single source of truth with automatic sync to server and client:
-
-```
-world/packs/base/maps/grid_town_outdoor.json  (Source)
-         │
-         └── node scripts/sync-maps.mjs
-                    │
-                    ├── packages/server/assets/maps/village.json
-                    └── packages/client/public/assets/maps/village.json
-```
-
-**After editing the source map:**
-
-```bash
-node scripts/sync-maps.mjs   # Sync to server/client
-pnpm build                   # Rebuild packages
-```
-
-See [Map Sync Process](docs/reference/map-sync-process.md) for detailed documentation.
 
 ## Documentation
 

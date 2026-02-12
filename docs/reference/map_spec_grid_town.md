@@ -1,5 +1,7 @@
 # Grid-Town Map Specification
 
+The Grid-Town map defines the spatial structure of openClawWorld. Each zone represents a distinct context where different permissions and behaviors apply - the foundation of the **Space = State Machine** principle.
+
 Based on reference image: `grid_town_layout.png`
 
 ## Map Dimensions

@@ -129,6 +129,38 @@ Based on reference image: `grid_town_layout.png`
 | barista | Jamie the Barista | lounge-cafe | (800, 1440) | Cafe service |
 | fountain-keeper | Quinn the Keeper | plaza | (1440, 1344) | Plaza maintenance |
 
+## Building Entrances
+
+Building entrances are defined in the map's objects layer with `type: "building_entrance"`.
+
+| Zone | Direction | Pixel Position | Connects To | Tile Position |
+|------|-----------|----------------|-------------|---------------|
+| lobby | south | (352, 416) | central-park | (11, 13) |
+| office | west | (1344, 256) | lobby/road | (42, 8) |
+| arcade | west | (1408, 736) | central-park | (44, 23) |
+| meeting | east | (544, 1152) | central-park | (17, 36) |
+| meeting | south | (320, 1440) | lounge-cafe | (10, 45) |
+| lounge-cafe | north | (864, 1216) | central-park | (27, 38) |
+| lounge-cafe | west | (576, 1472) | meeting | (18, 46) |
+| plaza | north | (1440, 1216) | central-park | (45, 38) |
+
+### Zone Connectivity Diagram
+
+```
+         LOBBY ──→ road ←── OFFICE
+           ↓                
+           ↓                
+    MEETING ←─→ CENTRAL-PARK ←─→ ARCADE
+       ↓              ↓
+       ↓              ↓
+       └──→ LOUNGE-CAFE ←── road ←── PLAZA
+```
+
+**Door Summary:**
+- All zones connect to central-park/road network (hub model)
+- Meeting ↔ Lounge-cafe: Direct connection via south/west doors
+- Plaza: Connects via north door to road (then to central-park)
+
 ## Spawn Points
 
 | Zone | Spawn Position (px) | Notes |

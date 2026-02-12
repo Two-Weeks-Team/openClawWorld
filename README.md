@@ -191,11 +191,34 @@ claude
 
 See [.claude/README.md](.claude/README.md) for detailed installation and usage instructions.
 
+## Map Synchronization
+
+The map system uses a single source of truth with automatic sync to server and client:
+
+```
+world/packs/base/maps/grid_town_outdoor.json  (Source)
+         │
+         └── node scripts/sync-maps.mjs
+                    │
+                    ├── packages/server/assets/maps/village.json
+                    └── packages/client/public/assets/maps/village.json
+```
+
+**After editing the source map:**
+
+```bash
+node scripts/sync-maps.mjs   # Sync to server/client
+pnpm build                   # Rebuild packages
+```
+
+See [Map Sync Process](docs/reference/map-sync-process.md) for detailed documentation.
+
 ## Documentation
 
 - [PRD Index](docs/PRD-INDEX.md) - Product Requirements Document
 - [Demo Runbook](docs/demo-runbook.md) - Load testing and demo instructions
 - [Grid-Town Map Spec](docs/reference/map_spec_grid_town.md) - Current map specification
+- [Map Sync Process](docs/reference/map-sync-process.md) - Map synchronization guide
 - [AIC Schema](docs/aic/v0.1/aic-schema.json) - JSON Schema for AIC API
 - [Claude Commands](.claude/README.md) - Claude Code slash commands guide
 

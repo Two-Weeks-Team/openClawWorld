@@ -467,44 +467,46 @@ export type StatusResponseData = {
 // Map Types
 // ============================================================================
 
-/**
- * Tile types for the world map
- * Based on the color interpretation system:
- * - Green = outdoor grass (walkable)
- * - Light Gray = road/plaza (walkable)
- * - Brown = indoor floor (walkable)
- * - Yellow = door (walkable, triggers zone transition)
- * - Dark Gray = wall (collision)
- * - Blue = water (collision)
- */
 export type TileType =
   | 'empty'
   | 'grass'
   | 'road'
+  | 'floor_lobby'
+  | 'floor_office'
+  | 'floor_meeting'
+  | 'floor_lounge'
+  | 'floor_arcade'
   | 'floor_plaza'
-  | 'floor_north'
-  | 'floor_west'
-  | 'floor_east'
-  | 'floor_south'
   | 'floor_lake'
   | 'door'
   | 'wall'
   | 'water'
   | 'decoration';
 
-/**
- * Color to tile type mapping for TileInterpreter
- */
 export type TileColorMapping = {
-  color: string; // Hex color like '#00FF00'
+  color: string;
   type: TileType;
   collision: boolean;
   isDoor?: boolean;
 };
 
-/**
- * Parsed tile information
- */
+export type TilesetTileDefinition = {
+  id: number;
+  type: TileType;
+  collision: boolean;
+  isDoor?: boolean;
+};
+
+export type TilesetDefinition = {
+  name: string;
+  tilewidth: number;
+  tileheight: number;
+  tilecount: number;
+  columns: number;
+  license?: string;
+  tiles: TilesetTileDefinition[];
+};
+
 export type TileInfo = {
   type: TileType;
   collision: boolean;

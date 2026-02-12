@@ -1,4 +1,12 @@
-import type { TileInfo, TileType, WorldGrid, ZoneId } from '@openclawworld/shared';
+import type {
+  TileInfo,
+  TileType,
+  TilesetDefinition,
+  TilesetTileDefinition,
+  WorldGrid,
+  ZoneId,
+} from '@openclawworld/shared';
+import villageTileset from '../../../../world/packs/base/assets/tilesets/village_tileset.json';
 
 type ColorRange = {
   r: [number, number];
@@ -16,24 +24,26 @@ const COLOR_RANGES: ColorRange[] = [
   { r: [60, 100], g: [50, 80], b: [40, 70], type: 'wall', collision: true },
   { r: [180, 220], g: [180, 220], b: [180, 220], type: 'road', collision: false },
   { r: [150, 180], g: [150, 180], b: [150, 180], type: 'floor_plaza', collision: false },
-  { r: [170, 200], g: [200, 230], b: [210, 240], type: 'floor_north', collision: false },
-  { r: [190, 220], g: [200, 230], b: [190, 220], type: 'floor_west', collision: false },
-  { r: [200, 230], g: [180, 210], b: [150, 180], type: 'floor_east', collision: false },
-  { r: [140, 170], g: [140, 170], b: [140, 170], type: 'floor_south', collision: false },
+  { r: [170, 200], g: [200, 230], b: [210, 240], type: 'floor_office', collision: false },
+  { r: [190, 220], g: [200, 230], b: [190, 220], type: 'floor_meeting', collision: false },
+  { r: [200, 230], g: [180, 210], b: [150, 180], type: 'floor_arcade', collision: false },
+  { r: [140, 170], g: [140, 170], b: [140, 170], type: 'floor_lounge', collision: false },
   { r: [100, 130], g: [140, 170], b: [200, 230], type: 'floor_lake', collision: false },
+  { r: [160, 190], g: [180, 210], b: [200, 230], type: 'floor_lobby', collision: false },
 ];
 
-// Legacy floor-to-zone mapping for backward compatibility
-// New zone system uses bounds-based detection (see ZONE_BOUNDS in world.ts)
-// Floor types that map to zones still in the new 8-zone system are preserved
 const ZONE_FLOOR_TYPES: Map<TileType, ZoneId> = new Map([
+  ['floor_lobby', 'lobby'],
+  ['floor_office', 'office'],
+  ['floor_meeting', 'meeting'],
+  ['floor_lounge', 'lounge-cafe'],
+  ['floor_arcade', 'arcade'],
   ['floor_plaza', 'plaza'],
-  ['floor_north', 'office'],
-  ['floor_west', 'meeting'],
-  ['floor_east', 'arcade'],
-  ['floor_south', 'lounge-cafe'],
   ['floor_lake', 'lake'],
 ]);
+
+const tileset: TilesetDefinition = villageTileset as TilesetDefinition;
+const tileDefById: Map<number, TilesetTileDefinition> = new Map(tileset.tiles.map(t => [t.id, t]));
 
 export class TileInterpreter {
   private tileSize: number;
@@ -113,28 +123,16 @@ export class TileInterpreter {
   }
 
   private interpretTileId(tileId: number, hasCollision: boolean): TileInfo {
-    const tileTypes: TileType[] = [
-      'empty',
-      'grass',
-      'road',
-      'floor_plaza',
-      'floor_north',
-      'floor_west',
-      'floor_east',
-      'floor_south',
-      'floor_lake',
-      'door',
-      'wall',
-      'water',
-      'decoration',
-    ];
+    const tileDef = tileDefById.get(tileId);
+    if (!tileDef) {
+      return { type: 'empty', collision: false, isDoor: false };
+    }
 
-    const type = tileTypes[tileId] || 'empty';
-    const isDoor = type === 'door';
+    const isDoor = tileDef.isDoor ?? false;
     const collision = hasCollision && !isDoor;
-    const zoneId = ZONE_FLOOR_TYPES.get(type);
+    const zoneId = ZONE_FLOOR_TYPES.get(tileDef.type);
 
-    return { type, collision, isDoor, zoneId };
+    return { type: tileDef.type, collision, isDoor, zoneId };
   }
 
   private interpretColor(r: number, g: number, b: number): TileInfo {

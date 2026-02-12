@@ -196,6 +196,35 @@ const API_HISTORY_MAX_LENGTH = 100;
 const INTERACTION_HISTORY_MAX_LENGTH = 50;
 const ACTION_LOG_MAX_LENGTH = 20;
 
+const HIGH_ERROR_RATE_ROLLING_WINDOW = 50;
+const HIGH_ERROR_RATE_MIN_CALLS = 20;
+const HIGH_ERROR_RATE_THRESHOLD = 0.35;
+const HIGH_ERROR_RATE_CONSECUTIVE_REQUIRED = 2;
+
+const STUCK_AGENT_IDLE_THRESHOLD_MS = 60000;
+const STUCK_AGENT_RECENT_FAIL_RATE_THRESHOLD = 0.5;
+const STUCK_AGENT_MIN_API_CALLS = 10;
+const STUCK_AGENT_CONSECUTIVE_REQUIRED = 2;
+
+const ENTITY_DIVERGENCE_BUCKET_SIZE_PX = 256;
+const ENTITY_DIVERGENCE_MIN_AGENTS_IN_COHORT = 3;
+const ENTITY_DIVERGENCE_MAX_TIME_SKEW_MS = 1500;
+const ENTITY_DIVERGENCE_MIN_ENTITY_COUNT = 4;
+const ENTITY_DIVERGENCE_RATIO_THRESHOLD = 0.65;
+const ENTITY_DIVERGENCE_CONSECUTIVE_REQUIRED = 2;
+
+const POSITION_DESYNC_MIN_JUMP_PX = 160;
+const POSITION_DESYNC_MAX_TIME_DELTA_MS = 500;
+const POSITION_DESYNC_SPEED_THRESHOLD_PX_PER_MS = 1.2;
+const POSITION_DESYNC_VIOLATIONS_OUT_OF_THREE = 2;
+
+const CHAT_MISMATCH_RECENT_OBSERVE_WINDOW_MS = 20000;
+const CHAT_MISMATCH_OVERLAP_WINDOW_MS = 30000;
+const CHAT_MISMATCH_JACCARD_DIFF_THRESHOLD = 0.4;
+const CHAT_MISMATCH_CONSECUTIVE_REQUIRED = 2;
+
+const FINGERPRINT_COOLDOWN_TTL_MS = 20 * 60 * 1000;
+
 const ENDPOINT_TO_CATEGORY: Record<string, string> = {
   observe: 'observe',
   moveTo: 'navigate',
@@ -751,17 +780,49 @@ class IssueDetector {
   private knownPositions: Map<string, { x: number; y: number; timestamp: number }> = new Map();
   private chatMessages: Map<string, ChatMessage[]> = new Map();
   private detectedIssues: Issue[] = [];
-  private recentlyReportedAreas: Map<string, number> = new Map();
   private currentCycle = 0;
 
-  private isOnCooldown(area: string): boolean {
-    const lastReported = this.recentlyReportedAreas.get(area);
-    if (lastReported === undefined) return false;
-    return this.currentCycle - lastReported < 3;
+  private consecutiveViolations: Map<string, number> = new Map();
+  private positionDesyncHistory: Map<string, boolean[]> = new Map();
+  private fingerprintCooldowns: Map<string, number> = new Map();
+  private lastObserveTimes: Map<string, number> = new Map();
+
+  private generateFingerprint(area: string, detector: string, keyEvidence: string): string {
+    return `${area}:${detector}:${keyEvidence}`;
   }
 
-  markReported(area: string): void {
-    this.recentlyReportedAreas.set(area, this.currentCycle);
+  private isOnCooldown(fingerprint: string): boolean {
+    const cooldownExpiry = this.fingerprintCooldowns.get(fingerprint);
+    if (cooldownExpiry === undefined) return false;
+    return Date.now() < cooldownExpiry;
+  }
+
+  markReported(fingerprint: string): void {
+    this.fingerprintCooldowns.set(fingerprint, Date.now() + FINGERPRINT_COOLDOWN_TTL_MS);
+  }
+
+  private incrementConsecutive(key: string): number {
+    const current = this.consecutiveViolations.get(key) ?? 0;
+    const next = current + 1;
+    this.consecutiveViolations.set(key, next);
+    return next;
+  }
+
+  private resetConsecutive(key: string): void {
+    this.consecutiveViolations.set(key, 0);
+  }
+
+  private recordPositionDesyncViolation(entityId: string, isViolation: boolean): boolean {
+    const history = this.positionDesyncHistory.get(entityId) ?? [];
+    history.push(isViolation);
+    if (history.length > 3) history.shift();
+    this.positionDesyncHistory.set(entityId, history);
+    const violationCount = history.filter(v => v).length;
+    return violationCount >= POSITION_DESYNC_VIOLATIONS_OUT_OF_THREE;
+  }
+
+  updateLastObserveTime(agentId: string): void {
+    this.lastObserveTimes.set(agentId, Date.now());
   }
 
   incrementCycle(): void {
@@ -809,58 +870,79 @@ class IssueDetector {
         const known = this.knownPositions.get(entityId);
         if (known) {
           const timeDiff = snapshot.timestamp - known.timestamp;
-          const posDiff =
-            Math.abs(snapshot.position.x - known.x) + Math.abs(snapshot.position.y - known.y);
 
-          if (posDiff > 100 && timeDiff < 100) {
-            const affectedAgent = agents.find(a => {
-              const s = a.getState();
-              return Array.from(s.observedEntities.keys()).includes(entityId);
+          // Skip invalid time deltas (clock skew or stale data)
+          if (timeDiff <= 0 || timeDiff > POSITION_DESYNC_MAX_TIME_DELTA_MS) {
+            this.recordPositionDesyncViolation(entityId, false);
+            this.knownPositions.set(entityId, {
+              x: snapshot.position.x,
+              y: snapshot.position.y,
+              timestamp: snapshot.timestamp,
             });
-            const lastError = affectedAgent?.getState().lastError;
+            continue;
+          }
 
-            return {
-              area: 'Sync',
-              title: `Position desync detected for entity ${entityId}`,
-              description:
-                'Entity position jumped unexpectedly, indicating a synchronization issue',
-              expectedBehavior: 'Entity positions should update smoothly without sudden jumps',
-              observedBehavior: `Entity ${entityId} jumped ${posDiff} pixels in ${timeDiff}ms`,
-              reproductionSteps: [
-                'Run multiple agents in the world',
-                'Monitor entity positions',
-                'Wait for desync event',
-              ],
-              severity: 'Major',
-              frequency: 'sometimes',
-              evidence: {
-                agentIds: agents.map(a => a.getState().agentId),
-                timestamps: [snapshot.timestamp, known.timestamp, Date.now()],
-                logs: [
-                  `Previous: (${known.x}, ${known.y}) at ${known.timestamp}`,
-                  `Current: (${snapshot.position.x}, ${snapshot.position.y}) at ${snapshot.timestamp}`,
-                  `Affected entity: ${entityId}`,
-                  `Position delta: ${posDiff}px`,
-                  `Time delta: ${timeDiff}ms`,
-                  ...(lastError
-                    ? [`Last error: ${lastError.endpoint} ${lastError.httpStatusCode}`]
-                    : []),
+          const posDiff = Math.hypot(snapshot.position.x - known.x, snapshot.position.y - known.y);
+          const impliedSpeed = posDiff / timeDiff;
+
+          const isViolation =
+            posDiff > POSITION_DESYNC_MIN_JUMP_PX &&
+            impliedSpeed > POSITION_DESYNC_SPEED_THRESHOLD_PX_PER_MS;
+
+          const shouldTrigger = this.recordPositionDesyncViolation(entityId, isViolation);
+
+          if (shouldTrigger) {
+            const fingerprint = this.generateFingerprint('Sync', 'positionDesync', entityId);
+            if (!this.isOnCooldown(fingerprint)) {
+              const affectedAgent = agents.find(a => {
+                const s = a.getState();
+                return Array.from(s.observedEntities.keys()).includes(entityId);
+              });
+              const lastError = affectedAgent?.getState().lastError;
+
+              return {
+                area: 'Sync',
+                title: `Position desync detected for entity ${entityId}`,
+                description:
+                  'Entity position jumped unexpectedly, indicating a synchronization issue',
+                expectedBehavior: 'Entity positions should update smoothly without sudden jumps',
+                observedBehavior: `Entity ${entityId} jumped ${Math.round(posDiff)} pixels in ${timeDiff}ms (speed: ${impliedSpeed.toFixed(2)} px/ms)`,
+                reproductionSteps: [
+                  'Run multiple agents in the world',
+                  'Monitor entity positions',
+                  'Wait for desync event',
                 ],
-                positions: [known, snapshot.position],
-                agentStates: this.buildAgentStates(agents),
-                apiCoverage: this.getApiCoverage(agents),
-                ...(lastError
-                  ? {
-                      endpoint: lastError.endpoint,
-                      httpStatusCode: lastError.httpStatusCode,
-                      errorCode: lastError.errorCode,
-                      errorMessage: lastError.errorMessage,
-                      requestBody: lastError.requestBody,
-                      responseBody: lastError.responseBody,
-                    }
-                  : {}),
-              },
-            };
+                severity: 'Major',
+                frequency: 'sometimes',
+                evidence: {
+                  agentIds: agents.map(a => a.getState().agentId),
+                  timestamps: [snapshot.timestamp, known.timestamp, Date.now()],
+                  logs: [
+                    `Previous: (${known.x}, ${known.y}) at ${known.timestamp}`,
+                    `Current: (${snapshot.position.x}, ${snapshot.position.y}) at ${snapshot.timestamp}`,
+                    `Affected entity: ${entityId}`,
+                    `Jump: ${Math.round(posDiff)}px, Speed: ${impliedSpeed.toFixed(2)} px/ms`,
+                    `Time delta: ${timeDiff}ms`,
+                    ...(lastError
+                      ? [`Last error: ${lastError.endpoint} ${lastError.httpStatusCode}`]
+                      : []),
+                  ],
+                  positions: [known, snapshot.position],
+                  agentStates: this.buildAgentStates(agents),
+                  apiCoverage: this.getApiCoverage(agents),
+                  ...(lastError
+                    ? {
+                        endpoint: lastError.endpoint,
+                        httpStatusCode: lastError.httpStatusCode,
+                        errorCode: lastError.errorCode,
+                        errorMessage: lastError.errorMessage,
+                        requestBody: lastError.requestBody,
+                        responseBody: lastError.responseBody,
+                      }
+                    : {}),
+                },
+              };
+            }
           }
         }
         this.knownPositions.set(entityId, {
@@ -874,56 +956,89 @@ class IssueDetector {
   }
 
   detectChatMismatch(agents: ResidentAgent[]): Issue | null {
-    const agentChatData: Map<string, { messages: ChatMessage[]; latestTs: number }> = new Map();
+    const now = Date.now();
+    interface AgentChatInfo {
+      agentId: string;
+      messages: ChatMessage[];
+      latestTs: number;
+      lastChatObserve: number;
+    }
+    const agentChatData: Map<string, AgentChatInfo> = new Map();
 
     for (const agent of agents) {
       const state = agent.getState();
       const latestTs =
         state.chatHistory.length > 0 ? Math.max(...state.chatHistory.map(m => m.timestamp)) : 0;
-      agentChatData.set(state.agentId, { messages: state.chatHistory, latestTs });
+      const lastChatObserve =
+        state.apiCallHistory.filter(h => h.endpoint === 'chatObserve' && h.success).slice(-1)[0]
+          ?.timestamp ?? 0;
+      agentChatData.set(state.agentId, {
+        agentId: state.agentId,
+        messages: state.chatHistory,
+        latestTs,
+        lastChatObserve,
+      });
     }
 
-    // Filter out agents that haven't observed chat yet (latestTs === 0)
-    // These agents haven't called chatObserve() yet, so comparing them would
-    // produce false positives (empty set vs populated set = "mismatch")
-    const agentsWithHistory = Array.from(agentChatData.entries()).filter(
-      ([, data]) => data.latestTs > 0
+    const recentAgents = Array.from(agentChatData.values()).filter(
+      data =>
+        data.latestTs > 0 && now - data.lastChatObserve <= CHAT_MISMATCH_RECENT_OBSERVE_WINDOW_MS
     );
 
-    // Need at least 2 agents with chat history to compare
-    if (agentsWithHistory.length < 2) return null;
+    if (recentAgents.length < 2) return null;
 
-    const agentIds = agentsWithHistory.map(([id]) => id);
-    const latestTimestamps = agentsWithHistory.map(([, data]) => data.latestTs);
-    const commonCutoff = Math.min(...latestTimestamps);
-    if (commonCutoff === 0 || commonCutoff === Infinity) return null;
-
-    const filteredSets: Map<string, Set<string>> = new Map();
-    for (const [agentId] of agentsWithHistory) {
-      const data = agentChatData.get(agentId)!;
-      const filtered = data.messages
-        .filter(m => m.timestamp <= commonCutoff)
-        .map(m => `${m.from}:${m.message}`);
-      filteredSets.set(agentId, new Set(filtered));
+    const overlapStart = now - CHAT_MISMATCH_OVERLAP_WINDOW_MS;
+    const channelGroups: Map<string, AgentChatInfo[]> = new Map();
+    for (const agent of recentAgents) {
+      const channels = new Set(agent.messages.map(m => m.channel));
+      for (const channel of channels) {
+        if (!channelGroups.has(channel)) channelGroups.set(channel, []);
+        channelGroups.get(channel)!.push(agent);
+      }
     }
 
-    for (let i = 0; i < agentIds.length; i++) {
-      for (let j = i + 1; j < agentIds.length; j++) {
-        const set1 = filteredSets.get(agentIds[i])!;
-        const set2 = filteredSets.get(agentIds[j])!;
+    for (const [channel, channelAgents] of Array.from(channelGroups.entries())) {
+      if (channelAgents.length < 2) continue;
 
-        const diff1 = Array.from(set1).filter(m => !set2.has(m));
-        const diff2 = Array.from(set2).filter(m => !set1.has(m));
+      const filteredSets: Map<string, Set<string>> = new Map();
+      for (const agent of channelAgents) {
+        const filtered = agent.messages
+          .filter(m => m.channel === channel && m.timestamp >= overlapStart)
+          .map(m => `${m.from}:${m.message}`);
+        filteredSets.set(agent.agentId, new Set(filtered));
+      }
 
-        if (diff1.length > 0 || diff2.length > 0) {
-          const data1 = agentChatData.get(agentIds[i])!;
-          const data2 = agentChatData.get(agentIds[j])!;
+      for (let i = 0; i < channelAgents.length; i++) {
+        for (let j = i + 1; j < channelAgents.length; j++) {
+          const a1 = channelAgents[i];
+          const a2 = channelAgents[j];
+          const set1 = filteredSets.get(a1.agentId)!;
+          const set2 = filteredSets.get(a2.agentId)!;
+
+          const union = new Set([...set1, ...set2]);
+          const intersection = new Set([...set1].filter(x => set2.has(x)));
+
+          if (union.size === 0) continue;
+
+          const jaccardDiff = 1 - intersection.size / union.size;
+          if (jaccardDiff <= CHAT_MISMATCH_JACCARD_DIFF_THRESHOLD) {
+            this.resetConsecutive(`chatMismatch:${channel}`);
+            continue;
+          }
+
+          const detectorKey = `chatMismatch:${channel}`;
+          const consecutive = this.incrementConsecutive(detectorKey);
+          if (consecutive < CHAT_MISMATCH_CONSECUTIVE_REQUIRED) continue;
+
+          const fingerprint = this.generateFingerprint('Chat', 'chatMismatch', channel);
+          if (this.isOnCooldown(fingerprint)) continue;
+
           return {
             area: 'Chat',
             title: 'Chat message mismatch between agents',
-            description: 'Different agents see different chat messages',
+            description: `Different agents see different chat messages in channel ${channel}`,
             expectedBehavior: 'All agents should see the same chat messages',
-            observedBehavior: `Agent ${agentIds[i]} and ${agentIds[j]} have different message histories`,
+            observedBehavior: `Agent ${a1.agentId} and ${a2.agentId} have ${Math.round(jaccardDiff * 100)}% message difference`,
             reproductionSteps: [
               'Spawn multiple agents',
               'Have agents send chat messages',
@@ -932,12 +1047,13 @@ class IssueDetector {
             severity: 'Major',
             frequency: 'sometimes',
             evidence: {
-              agentIds: [agentIds[i], agentIds[j]],
-              timestamps: [commonCutoff, data1.latestTs, data2.latestTs],
+              agentIds: [a1.agentId, a2.agentId],
+              timestamps: [now, a1.latestTs, a2.latestTs],
               logs: [
-                `Common cutoff: ${commonCutoff}`,
-                `Agent ${agentIds[i]} latest: ${data1.latestTs}, unique: ${diff1.join(', ')}`,
-                `Agent ${agentIds[j]} latest: ${data2.latestTs}, unique: ${diff2.join(', ')}`,
+                `Channel: ${channel}`,
+                `Jaccard diff: ${Math.round(jaccardDiff * 100)}%`,
+                `Agent ${a1.agentId}: ${set1.size} messages`,
+                `Agent ${a2.agentId}: ${set2.size} messages`,
               ],
             },
           };
@@ -950,96 +1066,163 @@ class IssueDetector {
   detectStuckAgent(agents: ResidentAgent[]): Issue | null {
     for (const agent of agents) {
       const state = agent.getState();
+
+      if (state.role === 'afk') continue;
+
       const timeSinceLastAction = Date.now() - state.lastActionTime;
+      if (timeSinceLastAction <= STUCK_AGENT_IDLE_THRESHOLD_MS) continue;
 
-      if (timeSinceLastAction > 30000 && state.errorCount > 3) {
-        return {
-          area: 'Performance',
-          title: `Agent ${state.agentId} appears stuck`,
-          description: 'Agent has not performed any successful action for an extended period',
-          expectedBehavior: 'Agents should be able to perform actions continuously',
-          observedBehavior: `Agent stuck for ${Math.floor(timeSinceLastAction / 1000)} seconds with ${state.errorCount} errors`,
-          reproductionSteps: [
-            'Spawn agent in the world',
-            'Monitor agent activity',
-            'Wait for stuck condition',
-          ],
-          severity: 'Minor',
-          frequency: 'rare',
-          evidence: {
-            agentIds: [state.agentId],
-            timestamps: [state.lastActionTime, Date.now()],
-            logs: [`Last action: ${state.lastAction}`, `Error count: ${state.errorCount}`],
-          },
-        };
-      }
-    }
-    return null;
-  }
+      const recentHistory = state.apiCallHistory.slice(-STUCK_AGENT_MIN_API_CALLS * 2);
+      if (recentHistory.length < STUCK_AGENT_MIN_API_CALLS) continue;
 
-  detectHighErrorRate(agents: ResidentAgent[]): Issue | null {
-    const totalErrors = agents.reduce((sum, a) => sum + a.getState().errorCount, 0);
-    const totalActions = agents.length * 10;
+      const recentFailures = recentHistory.filter(h => !h.success).length;
+      const recentFailRate = recentFailures / recentHistory.length;
 
-    const errorRate = totalErrors / totalActions;
+      if (recentFailRate < STUCK_AGENT_RECENT_FAIL_RATE_THRESHOLD) continue;
 
-    if (errorRate > 0.5) {
+      const detectorKey = `stuckAgent:${state.agentId}`;
+      const consecutive = this.incrementConsecutive(detectorKey);
+      if (consecutive < STUCK_AGENT_CONSECUTIVE_REQUIRED) continue;
+
+      const fingerprint = this.generateFingerprint('Performance', 'stuckAgent', state.agentId);
+      if (this.isOnCooldown(fingerprint)) continue;
+
       return {
         area: 'Performance',
-        title: 'High error rate detected across agents',
-        description: 'More than 50% of actions are failing',
-        expectedBehavior: 'Actions should succeed most of the time',
-        observedBehavior: `${Math.round(errorRate * 100)}% error rate across ${agents.length} agents`,
-        reproductionSteps: ['Run load test with multiple agents', 'Monitor error rates'],
-        severity: 'Critical',
-        frequency: 'always',
+        title: `Agent ${state.agentId} appears stuck`,
+        description: 'Agent has not performed any successful action for an extended period',
+        expectedBehavior: 'Agents should be able to perform actions continuously',
+        observedBehavior: `Agent stuck for ${Math.floor(timeSinceLastAction / 1000)} seconds with ${Math.round(recentFailRate * 100)}% recent fail rate`,
+        reproductionSteps: [
+          'Spawn agent in the world',
+          'Monitor agent activity',
+          'Wait for stuck condition',
+        ],
+        severity: 'Minor',
+        frequency: 'rare',
         evidence: {
-          agentIds: agents.map(a => a.getState().agentId),
-          timestamps: [Date.now()],
-          logs: agents.map(a => `${a.getState().agentId}: ${a.getState().errorCount} errors`),
+          agentIds: [state.agentId],
+          timestamps: [state.lastActionTime, Date.now()],
+          logs: [
+            `Last action: ${state.lastAction}`,
+            `Recent fail rate: ${recentFailures}/${recentHistory.length}`,
+          ],
         },
       };
     }
     return null;
   }
 
+  detectHighErrorRate(agents: ResidentAgent[]): Issue | null {
+    let totalCalls = 0;
+    let totalFailures = 0;
+
+    for (const agent of agents) {
+      const history = agent.getState().apiCallHistory.slice(-HIGH_ERROR_RATE_ROLLING_WINDOW);
+      totalCalls += history.length;
+      totalFailures += history.filter(h => !h.success).length;
+    }
+
+    if (totalCalls < HIGH_ERROR_RATE_MIN_CALLS) return null;
+
+    const errorRate = totalFailures / totalCalls;
+    const detectorKey = 'highErrorRate';
+
+    if (errorRate > HIGH_ERROR_RATE_THRESHOLD) {
+      const consecutive = this.incrementConsecutive(detectorKey);
+      if (consecutive < HIGH_ERROR_RATE_CONSECUTIVE_REQUIRED) return null;
+
+      const fingerprint = this.generateFingerprint('Performance', 'highErrorRate', 'global');
+      if (this.isOnCooldown(fingerprint)) return null;
+
+      return {
+        area: 'Performance',
+        title: 'High error rate detected across agents',
+        description: `More than ${HIGH_ERROR_RATE_THRESHOLD * 100}% of recent actions are failing`,
+        expectedBehavior: 'Actions should succeed most of the time',
+        observedBehavior: `${Math.round(errorRate * 100)}% error rate across ${agents.length} agents (${totalFailures}/${totalCalls} calls)`,
+        reproductionSteps: ['Run load test with multiple agents', 'Monitor error rates'],
+        severity: 'Critical',
+        frequency: 'always',
+        evidence: {
+          agentIds: agents.map(a => a.getState().agentId),
+          timestamps: [Date.now()],
+          logs: agents.map(a => {
+            const h = a.getState().apiCallHistory.slice(-HIGH_ERROR_RATE_ROLLING_WINDOW);
+            const fails = h.filter(x => !x.success).length;
+            return `${a.getState().agentId}: ${fails}/${h.length} recent failures`;
+          }),
+        },
+      };
+    } else {
+      this.resetConsecutive(detectorKey);
+    }
+    return null;
+  }
+
   detectEntityCountDivergence(agents: ResidentAgent[]): Issue | null {
-    const zoneAgents: Map<string, { agentId: string; entityCount: number }[]> = new Map();
+    const now = Date.now();
+    interface ZoneEntry {
+      agentId: string;
+      entityCount: number;
+      lastObserveTime: number;
+    }
+    const zoneAgents: Map<string, ZoneEntry[]> = new Map();
+
     for (const agent of agents) {
       const state = agent.getState();
-      const zone = `${Math.floor(state.position.x / 512)}_${Math.floor(state.position.y / 512)}`;
+      const lastObserve = this.lastObserveTimes.get(state.agentId) ?? 0;
+      const zone = `${Math.floor(state.position.x / ENTITY_DIVERGENCE_BUCKET_SIZE_PX)}_${Math.floor(state.position.y / ENTITY_DIVERGENCE_BUCKET_SIZE_PX)}`;
       if (!zoneAgents.has(zone)) zoneAgents.set(zone, []);
       zoneAgents.get(zone)!.push({
         agentId: state.agentId,
         entityCount: state.observedEntities.size,
+        lastObserveTime: lastObserve,
       });
     }
 
     for (const [zone, entries] of Array.from(zoneAgents.entries())) {
-      if (entries.length < 2) continue;
-      const counts = entries.map(e => e.entityCount);
+      if (entries.length < ENTITY_DIVERGENCE_MIN_AGENTS_IN_COHORT) continue;
+
+      const recentEntries = entries.filter(
+        e => now - e.lastObserveTime <= ENTITY_DIVERGENCE_MAX_TIME_SKEW_MS
+      );
+      if (recentEntries.length < ENTITY_DIVERGENCE_MIN_AGENTS_IN_COHORT) continue;
+
+      const counts = recentEntries.map(e => e.entityCount);
       const max = Math.max(...counts);
       const min = Math.min(...counts);
-      if (max > 0 && min >= 0 && (max - min) / Math.max(max, 1) > 0.5) {
-        return {
-          area: 'Sync',
-          title: `Entity count divergence in zone ${zone}`,
-          description: 'Agents in the same zone see significantly different entity counts',
-          expectedBehavior: 'Agents in the same zone should see similar entity counts',
-          observedBehavior: `Entity counts range from ${min} to ${max} in zone ${zone}`,
-          reproductionSteps: [
-            'Spawn multiple agents in same zone',
-            'Compare observed entity counts',
-          ],
-          severity: 'Major',
-          frequency: 'sometimes',
-          evidence: {
-            agentIds: entries.map(e => e.agentId),
-            timestamps: [Date.now()],
-            logs: entries.map(e => `${e.agentId}: ${e.entityCount} entities`),
-          },
-        };
+
+      if (max < ENTITY_DIVERGENCE_MIN_ENTITY_COUNT) continue;
+
+      const divergenceRatio = (max - min) / Math.max(max, 1);
+      if (divergenceRatio <= ENTITY_DIVERGENCE_RATIO_THRESHOLD) {
+        this.resetConsecutive(`entityDivergence:${zone}`);
+        continue;
       }
+
+      const detectorKey = `entityDivergence:${zone}`;
+      const consecutive = this.incrementConsecutive(detectorKey);
+      if (consecutive < ENTITY_DIVERGENCE_CONSECUTIVE_REQUIRED) continue;
+
+      const fingerprint = this.generateFingerprint('Sync', 'entityCountDivergence', zone);
+      if (this.isOnCooldown(fingerprint)) continue;
+
+      return {
+        area: 'Sync',
+        title: `Entity count divergence in zone ${zone}`,
+        description: 'Agents in the same zone see significantly different entity counts',
+        expectedBehavior: 'Agents in the same zone should see similar entity counts',
+        observedBehavior: `Entity counts range from ${min} to ${max} in zone ${zone} (${Math.round(divergenceRatio * 100)}% divergence)`,
+        reproductionSteps: ['Spawn multiple agents in same zone', 'Compare observed entity counts'],
+        severity: 'Major',
+        frequency: 'sometimes',
+        evidence: {
+          agentIds: recentEntries.map(e => e.agentId),
+          timestamps: [now],
+          logs: recentEntries.map(e => `${e.agentId}: ${e.entityCount} entities`),
+        },
+      };
     }
     return null;
   }
@@ -1382,6 +1565,16 @@ class IssueDetector {
   runAllDetections(agents: ResidentAgent[]): Issue | null {
     this.incrementCycle();
 
+    for (const agent of agents) {
+      const state = agent.getState();
+      const lastObserve = state.apiCallHistory
+        .filter(h => h.endpoint === 'observe' && h.success)
+        .slice(-1)[0]?.timestamp;
+      if (lastObserve) {
+        this.updateLastObserveTime(state.agentId);
+      }
+    }
+
     const detectors = [
       () => this.detectPositionDesync(agents),
       () => this.detectChatMismatch(agents),
@@ -1406,7 +1599,7 @@ class IssueDetector {
 
     for (const detect of detectors) {
       const issue = detect();
-      if (issue && !this.isOnCooldown(issue.area)) {
+      if (issue) {
         return issue;
       }
     }
@@ -2330,7 +2523,9 @@ class ResidentAgentLoop {
     const issue = this.issueDetector.runAllDetections(this.agents);
 
     if (issue) {
-      this.issueDetector.markReported(issue.area);
+      const evidenceKey = issue.evidence.agentIds[0] ?? issue.title.slice(0, 30);
+      const fingerprint = `${issue.area}:${issue.title.split(' ')[0]}:${evidenceKey}`;
+      this.issueDetector.markReported(fingerprint);
       const issueUrl = await this.issueReporter.createIssue(issue);
       if (issueUrl) {
         this.state.totalIssuesCreated++;

@@ -67,8 +67,10 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
     const agentId = generateAgentId();
     const entity = new EntitySchema(agentId, 'agent', name, roomId);
 
-    entity.setPosition(0, 0);
-    entity.setTile(0, 0);
+    const PLAZA_CENTER_PIXEL = { x: 1024, y: 1024 };
+    const PLAZA_CENTER_TILE = { tx: 32, ty: 32 };
+    entity.setPosition(PLAZA_CENTER_PIXEL.x, PLAZA_CENTER_PIXEL.y);
+    entity.setTile(PLAZA_CENTER_TILE.tx, PLAZA_CENTER_TILE.ty);
 
     gameRoom.state.addEntity(entity);
 

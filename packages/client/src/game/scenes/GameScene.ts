@@ -424,46 +424,18 @@ export class GameScene extends Phaser.Scene {
       const objType = this.getObjectProperty(obj, 'type') as string;
       if (!objType || objType === 'spawn') continue;
 
-      let atlasKey = '';
-      let frameKey = '';
-
-      switch (objType) {
-        case 'chest':
-          atlasKey = 'objects';
-          frameKey = 'chest';
-          break;
-        case 'sign':
-          atlasKey = 'objects';
-          frameKey = 'sign';
-          break;
-        case 'portal':
-          atlasKey = 'objects';
-          frameKey = 'portal';
-          break;
-        case 'npc': {
-          const npcId = this.getObjectProperty(obj, 'npcId') as string;
-          if (npcId) {
-            const npcSprite = this.add.sprite(obj.x + 8, obj.y + 8, 'npcs', npcId);
-            npcSprite.setDepth(obj.y);
-            this.mapObjects.set(obj.name, npcSprite);
-            this.mapObjectData.set(obj.name, obj);
-            continue;
-          }
-          atlasKey = 'players';
-          frameKey = 'player-object';
-          break;
+      if (objType === 'npc') {
+        const npcId = this.getObjectProperty(obj, 'npcId') as string;
+        if (npcId) {
+          const npcSprite = this.add.sprite(obj.x + 8, obj.y + 8, 'npcs', npcId);
+          npcSprite.setDepth(obj.y);
+          this.mapObjects.set(obj.name, npcSprite);
+          this.mapObjectData.set(obj.name, obj);
+          continue;
         }
-        case 'decoration':
-          atlasKey = 'objects';
-          if (obj.name.includes('fountain')) frameKey = 'fountain';
-          else if (obj.name.includes('lamp')) frameKey = 'lamp';
-          else if (obj.name.includes('bench')) frameKey = 'bench';
-          break;
-        default:
-          atlasKey = 'players';
-          frameKey = 'player-object';
       }
 
+      const { atlasKey, frameKey } = this.getObjectAtlasInfo(objType, obj);
       if (!frameKey) continue;
 
       const sprite = this.add.sprite(obj.x + 8, obj.y + 8, atlasKey, frameKey);
@@ -490,6 +462,31 @@ export class GameScene extends Phaser.Scene {
     if (!obj.properties) return obj.type || null;
     const prop = obj.properties.find(p => p.name === propName);
     return prop ? prop.value : null;
+  }
+
+  private getObjectAtlasInfo(
+    objType: string,
+    obj: MapObject
+  ): { atlasKey: string; frameKey: string } {
+    switch (objType) {
+      case 'chest':
+        return { atlasKey: 'objects', frameKey: 'chest' };
+      case 'sign':
+        return { atlasKey: 'objects', frameKey: 'sign' };
+      case 'portal':
+        return { atlasKey: 'objects', frameKey: 'portal' };
+      case 'npc':
+        return { atlasKey: 'players', frameKey: 'player-object' };
+      case 'decoration': {
+        let frameKey = '';
+        if (obj.name.includes('fountain')) frameKey = 'fountain';
+        else if (obj.name.includes('lamp')) frameKey = 'lamp';
+        else if (obj.name.includes('bench')) frameKey = 'bench';
+        return { atlasKey: 'objects', frameKey };
+      }
+      default:
+        return { atlasKey: 'players', frameKey: 'player-object' };
+    }
   }
 
   private setupInput() {

@@ -4,7 +4,7 @@ import type appConfig from '../../../server/src/app.config.js';
 import type { GameRoom } from '../../../server/src/rooms/GameRoom.js';
 import type { EntitySchema } from '../../../server/src/schemas/EntitySchema.js';
 import type { RoomState } from '../../../server/src/schemas/RoomState.js';
-import type { SkillDefinition, SkillInvokeOutcome } from '@openclawworld/shared';
+import type { SkillDefinition, SkillInvokeOutcome, InteractOutcome } from '@openclawworld/shared';
 
 export type Entity = EntitySchema;
 export type { RoomState, GameRoom };
@@ -12,6 +12,11 @@ export type { RoomState, GameRoom };
 export type SkillInvokeResult = {
   txId: string;
   outcome: SkillInvokeOutcome;
+};
+
+export type InteractResult = {
+  txId: string;
+  outcome: InteractOutcome;
 };
 
 export type InstalledSkill = {
@@ -116,6 +121,17 @@ export class ColyseusClient {
     if (this.room) {
       this.room.send('skill_cancel', {});
     }
+  }
+
+  interact(targetId: string, action: string, params?: Record<string, unknown>): void {
+    if (this.room) {
+      this.room.send('interact', { targetId, action, params: params ?? {} });
+    }
+  }
+
+  onInteractResult(callback: (result: InteractResult) => void): () => void {
+    if (!this.room) return () => {};
+    return this.room.onMessage('interact.result', callback);
   }
 
   onSkillEvent(

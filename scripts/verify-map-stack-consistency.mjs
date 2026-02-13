@@ -32,6 +32,25 @@ const CONTRACT_PATHS = {
   tileIdContract: join(ROOT_DIR, 'world/packs/base/assets/tilesets/village_tileset.json'),
 };
 
+const DEFAULT_SPAWN_POINT = {
+  x: 512,
+  y: 512,
+  tx: 32,
+  ty: 32,
+};
+
+const VALID_ZONES = [
+  'lobby',
+  'office',
+  'central-park',
+  'arcade',
+  'meeting',
+  'lounge-cafe',
+  'plaza',
+  'lake',
+];
+const VALID_DIRECTIONS = ['north', 'south', 'east', 'west'];
+
 function md5(content) {
   return createHash('md5').update(content).digest('hex');
 }
@@ -128,6 +147,108 @@ function collectUsedTileIds(mapJson) {
   return used;
 }
 
+function validateCollisionLayer(mapJson) {
+  const errors = [];
+  const collisionLayer = (mapJson.layers || []).find(l => l.name === 'collision');
+
+  if (!collisionLayer) {
+    errors.push('collision layer not found');
+    return { errors };
+  }
+
+  if (!Array.isArray(collisionLayer.data)) {
+    errors.push('collision layer data is not an array');
+    return { errors };
+  }
+
+  const invalidValues = [];
+  for (let i = 0; i < collisionLayer.data.length; i++) {
+    const value = collisionLayer.data[i];
+    if (value !== 0 && value !== 1) {
+      invalidValues.push({ index: i, value });
+    }
+  }
+
+  if (invalidValues.length > 0) {
+    const sample = invalidValues
+      .slice(0, 5)
+      .map(v => `[${v.index}]=${v.value}`)
+      .join(', ');
+    errors.push(
+      `collision layer contains non-binary values: ${sample}${invalidValues.length > 5 ? ` (+${invalidValues.length - 5} more)` : ''}`
+    );
+  }
+
+  return { errors, collisionData: collisionLayer.data };
+}
+
+function validateSpawnPoint(mapJson, collisionData) {
+  const errors = [];
+  const { tx, ty } = DEFAULT_SPAWN_POINT;
+  const width = mapJson.width || 0;
+  const height = mapJson.height || 0;
+
+  if (tx < 0 || tx >= width || ty < 0 || ty >= height) {
+    errors.push(`spawn point (${tx}, ${ty}) is outside map bounds (${width}x${height})`);
+    return { errors };
+  }
+
+  if (collisionData) {
+    const index = ty * width + tx;
+    const collisionValue = collisionData[index];
+    if (collisionValue === 1) {
+      errors.push(`spawn point (${tx}, ${ty}) is blocked by collision`);
+    }
+  }
+
+  return { errors };
+}
+
+function validateEntrances(mapJson) {
+  const errors = [];
+  const objectsLayer = (mapJson.layers || []).find(l => l.name === 'objects');
+
+  if (!objectsLayer || !Array.isArray(objectsLayer.objects)) {
+    return { errors };
+  }
+
+  const entrances = objectsLayer.objects.filter(obj => obj.type === 'building_entrance');
+
+  for (const entrance of entrances) {
+    const name = entrance.name || 'unnamed';
+    const props = entrance.properties || [];
+    const getProp = key => props.find(p => p.name === key)?.value;
+
+    const zone = getProp('zone');
+    const direction = getProp('direction');
+    const connectsTo = getProp('connectsTo');
+
+    if (!zone) {
+      errors.push(`entrance "${name}": missing zone property`);
+    } else if (!VALID_ZONES.includes(zone)) {
+      errors.push(`entrance "${name}": invalid zone "${zone}"`);
+    }
+
+    if (!direction) {
+      errors.push(`entrance "${name}": missing direction property`);
+    } else if (!VALID_DIRECTIONS.includes(direction)) {
+      errors.push(`entrance "${name}": invalid direction "${direction}"`);
+    }
+
+    if (!connectsTo) {
+      errors.push(`entrance "${name}": missing connectsTo property`);
+    } else if (!VALID_ZONES.includes(connectsTo)) {
+      errors.push(`entrance "${name}": invalid connectsTo "${connectsTo}"`);
+    }
+
+    if (zone && connectsTo && zone === connectsTo) {
+      errors.push(`entrance "${name}": zone and connectsTo are the same ("${zone}")`);
+    }
+  }
+
+  return { errors, entranceCount: entrances.length };
+}
+
 function validateCurationStructure(curation) {
   const errors = [];
 
@@ -185,7 +306,9 @@ function validateSources(sources) {
         errors.push(`${base}.path not found: ${absolutePath}`);
       }
       if (source.path.includes('docs/reference')) {
-        errors.push(`${base}.path must use repo-tracked assets, not docs/reference: ${source.path}`);
+        errors.push(
+          `${base}.path must use repo-tracked assets, not docs/reference: ${source.path}`
+        );
       }
     }
 
@@ -211,7 +334,9 @@ function validateTilesetOutput(tilesetOutput) {
   const requiredIntFields = ['width', 'height', 'tileSize', 'columns', 'rows'];
   for (const field of requiredIntFields) {
     if (!isPositiveInt(tilesetOutput[field])) {
-      errors.push(`curation.outputs.tileset.${field} must be a positive integer, got ${tilesetOutput[field]}`);
+      errors.push(
+        `curation.outputs.tileset.${field} must be a positive integer, got ${tilesetOutput[field]}`
+      );
     }
   }
 
@@ -255,9 +380,7 @@ function validateTilesetTiles(tiles, sources, tilesetOutput) {
       : null;
 
   if (expectedSlots !== null && tiles.length !== expectedSlots) {
-    errors.push(
-      `curation.tileset.tiles expected=${expectedSlots}, actual=${tiles.length}`
-    );
+    errors.push(`curation.tileset.tiles expected=${expectedSlots}, actual=${tiles.length}`);
   }
 
   for (const [index, tile] of tiles.entries()) {
@@ -303,7 +426,9 @@ function validateTilesetTiles(tiles, sources, tilesetOutput) {
   }
 
   if (expectedSlots !== null && tileIndices.size !== expectedSlots) {
-    errors.push(`curation.tileset.tiles defines ${tileIndices.size}/${expectedSlots} unique indices`);
+    errors.push(
+      `curation.tileset.tiles defines ${tileIndices.size}/${expectedSlots} unique indices`
+    );
   }
 
   return { errors, tileIndices };
@@ -318,17 +443,23 @@ function validateTilesetMetaConsistency(tilesetMeta, tilesetOutput) {
 
   if (isPositiveInt(tilesetOutput?.tileSize)) {
     if (tilesetMeta.tilewidth !== tilesetOutput.tileSize) {
-      errors.push(`tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tilesetOutput.tileSize}`);
+      errors.push(
+        `tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tilesetOutput.tileSize}`
+      );
     }
     if (tilesetMeta.tileheight !== tilesetOutput.tileSize) {
-      errors.push(`tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tilesetOutput.tileSize}`);
+      errors.push(
+        `tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tilesetOutput.tileSize}`
+      );
     }
   }
 
   if (isPositiveInt(tilesetOutput?.columns) && isPositiveInt(tilesetOutput?.rows)) {
     const tileCount = tilesetOutput.columns * tilesetOutput.rows;
     if (tilesetMeta.columns !== tilesetOutput.columns) {
-      errors.push(`tileset.json: columns=${tilesetMeta.columns}, expected=${tilesetOutput.columns}`);
+      errors.push(
+        `tileset.json: columns=${tilesetMeta.columns}, expected=${tilesetOutput.columns}`
+      );
     }
     if (tilesetMeta.tilecount !== tileCount) {
       errors.push(`tileset.json: tilecount=${tilesetMeta.tilecount}, expected=${tileCount}`);
@@ -336,11 +467,15 @@ function validateTilesetMetaConsistency(tilesetMeta, tilesetOutput) {
   }
 
   if (isPositiveInt(tilesetOutput?.width) && tilesetMeta.imagewidth !== tilesetOutput.width) {
-    errors.push(`tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${tilesetOutput.width}`);
+    errors.push(
+      `tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${tilesetOutput.width}`
+    );
   }
 
   if (isPositiveInt(tilesetOutput?.height) && tilesetMeta.imageheight !== tilesetOutput.height) {
-    errors.push(`tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${tilesetOutput.height}`);
+    errors.push(
+      `tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${tilesetOutput.height}`
+    );
   }
 
   if (typeof tilesetOutput?.path === 'string' && tilesetOutput.path.length > 0) {
@@ -413,7 +548,11 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
   const metaValidation = validateTilesetMetaConsistency(tilesetMeta, structure.tilesetOutput);
   errors.push(...metaValidation.errors);
 
-  const usageValidation = validateMapTileUsage(map.json, tilesValidation.tileIndices, tileIdContract);
+  const usageValidation = validateMapTileUsage(
+    map.json,
+    tilesValidation.tileIndices,
+    tileIdContract
+  );
   errors.push(...usageValidation.errors);
 
   return { errors, usedTileIds: [...usageValidation.usedTileIds].sort((a, b) => a - b) };
@@ -494,6 +633,37 @@ function main() {
 
   console.log('✅ Curation manifest and tileset metadata contract are valid');
   console.log(`✅ Map tile IDs are within contract: ${usedTileIds.join(', ')}\n`);
+
+  console.log('Validating collision layer...');
+  const collisionValidation = validateCollisionLayer(sourceMap.json);
+  if (collisionValidation.errors.length > 0) {
+    console.log('❌ COLLISION LAYER VALIDATION FAILED\n');
+    collisionValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  console.log('✅ Collision layer contains only valid values (0/1)\n');
+
+  console.log('Validating spawn point...');
+  const spawnValidation = validateSpawnPoint(sourceMap.json, collisionValidation.collisionData);
+  if (spawnValidation.errors.length > 0) {
+    console.log('❌ SPAWN POINT VALIDATION FAILED\n');
+    spawnValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  console.log(
+    `✅ Spawn point (${DEFAULT_SPAWN_POINT.tx}, ${DEFAULT_SPAWN_POINT.ty}) is valid and unblocked\n`
+  );
+
+  console.log('Validating building entrances...');
+  const entranceValidation = validateEntrances(sourceMap.json);
+  if (entranceValidation.errors.length > 0) {
+    console.log('❌ ENTRANCE VALIDATION FAILED\n');
+    entranceValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  console.log(
+    `✅ ${entranceValidation.entranceCount} building entrances have valid zone/direction/connectsTo\n`
+  );
 
   console.log('══════════════════════════════════════════════════════════════');
   console.log('✅ MAP STACK CONSISTENCY VERIFIED');

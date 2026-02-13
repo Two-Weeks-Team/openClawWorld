@@ -212,14 +212,19 @@ pnpm lint          # Linting
 
 Map expansion or tile changes must follow the same issue-first routine to prevent client/server drift and review omissions.
 
-1. Issue registry (task -> issue mapping): [`docs/task-issue-registry-2026-02-13.md`](docs/task-issue-registry-2026-02-13.md)
-2. Mandatory recurring routine: [`docs/reference/map-change-routine.md`](docs/reference/map-change-routine.md)
-3. Map sync details: [`docs/reference/map-sync-process.md`](docs/reference/map-sync-process.md)
+**Key Documents:**
 
-Core verification command:
+1. [Issue Registry](docs/task-issue-registry-2026-02-13.md) - Task to issue mapping
+2. [Map Change Routine](docs/reference/map-change-routine.md) - Mandatory workflow (Issue First -> Implement -> Verify -> Evidence -> PR)
+3. [Map Sync Process](docs/reference/map-sync-process.md) - Technical sync details (tile size: 16x16)
+4. [Evidence Template](docs/templates/map-change-evidence.md) - PR evidence format
+
+**Core verification commands:**
 
 ```bash
-node scripts/verify-map-stack-consistency.mjs
+pnpm sync-maps                              # Sync source to server/client
+node scripts/verify-map-stack-consistency.mjs  # Validate consistency
+pnpm test                                   # Run tests
 ```
 
 ## AIC API (AI Agent Interface Contract)

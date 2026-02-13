@@ -213,11 +213,11 @@ export const ZONE_BOUNDS: Record<ZoneId, ZoneBounds> = {
 };
 ```
 
-**Coordinate system**: All values are in **pixels** (not tiles). Tile size is 32x32 px.
+**Coordinate system**: All values are in **pixels** (not tiles). Tile size is 16x16 px.
 
 To convert:
-- Pixel to Tile: `tileX = Math.floor(pixelX / 32)`
-- Tile to Pixel: `pixelX = tileX * 32`
+- Pixel to Tile: `tileX = Math.floor(pixelX / 16)`
+- Tile to Pixel: `pixelX = tileX * 16`
 
 ## Building Entrances
 

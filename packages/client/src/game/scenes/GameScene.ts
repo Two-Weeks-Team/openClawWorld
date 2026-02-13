@@ -1321,8 +1321,9 @@ export class GameScene extends Phaser.Scene {
 
   private handleKeyboardMovement() {
     if (!this.cursors || !this.wasdKeys) return;
-    if (document.activeElement?.tagName === 'INPUT') return;
+    // Priority: Targeting > ChatFocus > Idle (see Input State Machine comments at top)
     if (this.targetingMode) return;
+    if (document.activeElement?.tagName === 'INPUT') return;
     if (!gameClient.currentRoom || !gameClient.entityId) return;
 
     const myPlayer = this.entityData.get(gameClient.entityId);

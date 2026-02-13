@@ -2,6 +2,33 @@
 
 This directory contains custom slash commands for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (Anthropic's official CLI).
 
+## Quick Compatibility Matrix
+
+This section is the single-source quick reference for command availability across supported agent CLIs.
+
+| CLI         | Resident Loop Command           | ocw-tools Command | Notes                                            |
+| ----------- | ------------------------------- | ----------------- | ------------------------------------------------ |
+| Claude Code | `/openclaw-resident-agent-loop` | `/ocw-tools`      | Uses `.claude/commands/`                         |
+| OpenCode    | `/openclaw-resident-agent-loop` | `/ocw-tools`      | Uses `.opencode/command/`                        |
+| Gemini CLI  | `openclaw-resident-agent-loop`  | `ocw-tools`       | Uses `.gemini/commands/*.toml`                   |
+| Codex CLI   | `openclaw-resident-agent-loop`  | `ocw-tools`       | Both commands are included in `.codex/AGENTS.md` |
+
+## Runtime Checklist (Resident Loop)
+
+Before running the resident loop in any CLI, verify:
+
+```bash
+curl -fsS http://localhost:2567/health
+gh auth status
+pnpm --version
+```
+
+Start command (shell fallback for any CLI):
+
+```bash
+pnpm resident-agent-loop -- --stress medium --agents 10
+```
+
 ## Available Commands
 
 | Command                         | Description                                                                          |
@@ -82,20 +109,22 @@ Lists all available tools:
 
 ## Multi-CLI Support
 
-This project supports multiple AI coding assistants. Commands are auto-generated from a unified source:
+This project supports multiple AI coding assistants. Both `ocw-tools` and `openclaw-resident-agent-loop` are auto-generated from unified command definitions:
 
-| CLI             | Config Location      | Command               |
-| --------------- | -------------------- | --------------------- |
-| **Claude Code** | `.claude/commands/`  | `/ocw-tools`          |
-| **OpenCode**    | `.opencode/command/` | `/ocw-tools`          |
-| **Gemini CLI**  | `.gemini/commands/`  | `/ocw-tools`          |
-| **Codex CLI**   | `.codex/AGENTS.md`   | (included in context) |
+| CLI             | Config Location      | Commands                                                 |
+| --------------- | -------------------- | -------------------------------------------------------- |
+| **Claude Code** | `.claude/commands/`  | `/ocw-tools`, `/openclaw-resident-agent-loop`            |
+| **OpenCode**    | `.opencode/command/` | `/ocw-tools`, `/openclaw-resident-agent-loop`            |
+| **Gemini CLI**  | `.gemini/commands/`  | `ocw-tools`, `openclaw-resident-agent-loop`              |
+| **Codex CLI**   | `.codex/AGENTS.md`   | `ocw-tools`, `openclaw-resident-agent-loop` (in context) |
 
-To regenerate commands after OpenAPI changes:
+To regenerate commands after command/OpenAPI changes:
 
 ```bash
 pnpm generate
 ```
+
+For command expansion, update unified definitions in `packages/plugin/scripts/generate-commands.ts` and run `pnpm generate:commands`.
 
 ## Creating New Commands
 

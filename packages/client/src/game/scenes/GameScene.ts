@@ -424,8 +424,8 @@ export class GameScene extends Phaser.Scene {
       const objType = this.getObjectProperty(obj, 'type') as string;
       if (!objType || objType === 'spawn') continue;
 
-      let atlasKey = '';
-      let frameKey = '';
+      let atlasKey: string;
+      let frameKey: string;
 
       switch (objType) {
         case 'chest':

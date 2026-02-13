@@ -11,8 +11,6 @@ const MAP_CONFIG = {
   width: 64,
   height: 64,
   tileSize: 16,
-  pixelWidth: 1024,
-  pixelHeight: 1024,
 };
 
 const MAP_PATHS = {
@@ -37,7 +35,12 @@ function loadMap(path) {
     return null;
   }
   const content = readFileSync(path, 'utf-8');
-  return { content, json: JSON.parse(content), hash: md5(content) };
+  try {
+    return { content, json: JSON.parse(content), hash: md5(content) };
+  } catch (e) {
+    console.error(`❌ Failed to parse JSON: ${path}\n  ${e.message}`);
+    process.exit(1);
+  }
 }
 
 function validateMapDimensions(map, name) {
@@ -66,6 +69,10 @@ function validateTileset(map, name) {
   if (tilesets.length === 0) {
     errors.push(`${name}: no tilesets found`);
     return errors;
+  }
+
+  if (tilesets.length > 1) {
+    errors.push(`${name}: expected 1 tileset, found ${tilesets.length}`);
   }
 
   const tileset = tilesets[0];

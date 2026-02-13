@@ -186,5 +186,25 @@
         "source": { "pack": "city", "col": 4, "row": 15 }
       }
     ]
+  },
+
+  "customSprites": {
+    "description": "Custom pixel art sprites for assets not available in Kenney packs",
+    "manifest": "tools/sprites/custom-sprites.json",
+    "generator": "tools/generate_custom_sprites.py",
+    "sprites": [
+      {
+        "id": "arcade_cabinet",
+        "output": "packages/client/public/assets/sprites/arcade_cabinet.png"
+      },
+      {
+        "id": "coffee_machine",
+        "output": "packages/client/public/assets/sprites/coffee_machine.png"
+      },
+      { "id": "server_rack", "output": "packages/client/public/assets/sprites/server_rack.png" },
+      { "id": "monitor", "output": "packages/client/public/assets/sprites/monitor.png" },
+      { "id": "jukebox", "output": "packages/client/public/assets/sprites/jukebox.png" },
+      { "id": "atm", "output": "packages/client/public/assets/sprites/atm.png" }
+    ]
   }
 }

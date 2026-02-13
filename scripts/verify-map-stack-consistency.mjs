@@ -362,10 +362,17 @@ function validateMapTileUsage({ mapJson, slotSet, tileIdContract }) {
   const usedTileIds = collectUsedTileIds(mapJson);
 
   const tileContractIds = new Set();
+  const tileCount = tileIdContract?.tilecount;
+  if (isPositiveInt(tileCount)) {
+    for (let id = 0; id < tileCount; id += 1) {
+      tileContractIds.add(id);
+    }
+  }
+
   const contractTiles = tileIdContract?.tiles;
-  if (!Array.isArray(contractTiles)) {
+  if (!Array.isArray(contractTiles) && !isPositiveInt(tileCount)) {
     errors.push('village_tileset.json: tiles must be an array');
-  } else {
+  } else if (Array.isArray(contractTiles)) {
     for (const tile of contractTiles) {
       if (tile && typeof tile === 'object' && isNonNegativeInt(tile.id)) {
         tileContractIds.add(tile.id);

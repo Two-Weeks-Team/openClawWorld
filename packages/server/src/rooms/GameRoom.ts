@@ -27,7 +27,13 @@ import { FacilitySchema } from '../schemas/FacilitySchema.js';
 import { PermissionService } from '../services/PermissionService.js';
 import { SafetyService } from '../services/SafetyService.js';
 import { AuditLog } from '../audit/AuditLog.js';
-import type { EntityKind, UserStatus, ZoneId, SkillDefinition } from '@openclawworld/shared';
+import type {
+  EntityKind,
+  UserStatus,
+  ZoneId,
+  SkillDefinition,
+  InteractOutcome,
+} from '@openclawworld/shared';
 import { DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 import { WorldPackLoader, WorldPackError, type WorldPack } from '../world/WorldPackLoader.js';
@@ -239,6 +245,34 @@ export class GameRoom extends Room<{ state: RoomState }> {
       }
     });
 
+    this.onMessage(
+      'interact',
+      (
+        client,
+        data: {
+          targetId: string;
+          action: string;
+          params?: Record<string, unknown>;
+        }
+      ) => {
+        const entityId = this.clientEntities.get(client.sessionId);
+        if (!entityId) return;
+
+        const entity = this.state.getEntity(entityId);
+        if (!entity) return;
+
+        const txId = `ws_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const outcome = this.handleInteraction(
+          entityId,
+          data.targetId,
+          data.action,
+          data.params ?? {}
+        );
+
+        client.send('interact.result', { txId, outcome });
+      }
+    );
+
     // Set up periodic cleanup of expired events (every minute)
     this.cleanupInterval = setInterval(() => {
       const removed = this.eventLog.cleanup();
@@ -304,6 +338,188 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   getSkillService(): SkillService | null {
     return this.skillService;
+  }
+
+  handleInteraction(
+    agentId: string,
+    targetId: string,
+    action: string,
+    params: Record<string, unknown>
+  ): InteractOutcome {
+    const agentEntity = this.state.getEntity(agentId);
+    if (!agentEntity) {
+      return { type: 'invalid_action', message: 'Agent not found' };
+    }
+
+    const targetFacility = this.facilityService.getFacility(targetId);
+
+    if (targetFacility) {
+      const distance = this.calculateDistance(
+        agentEntity.pos.x,
+        agentEntity.pos.y,
+        targetFacility.position.x,
+        targetFacility.position.y
+      );
+
+      if (distance > DEFAULT_PROXIMITY_RADIUS) {
+        return {
+          type: 'too_far',
+          message: `Facility '${targetId}' is too far away`,
+        };
+      }
+
+      const outcome = this.facilityService.interact(targetId, agentId, action, params);
+
+      if (outcome.type === 'ok') {
+        this.eventLog.append('facility.interacted', this.state.roomId, {
+          facilityId: targetId,
+          facilityType: targetFacility.type,
+          action,
+          entityId: agentId,
+        });
+      }
+
+      return outcome;
+    }
+
+    const targetEntity = this.state.getEntity(targetId);
+
+    if (!targetEntity) {
+      return { type: 'invalid_action', message: `Target '${targetId}' not found` };
+    }
+
+    if (targetEntity.kind !== 'object') {
+      return {
+        type: 'invalid_action',
+        message: `Target '${targetId}' is not an interactable object`,
+      };
+    }
+
+    const distance = this.calculateDistance(
+      agentEntity.pos.x,
+      agentEntity.pos.y,
+      targetEntity.pos.x,
+      targetEntity.pos.y
+    );
+
+    if (distance > DEFAULT_PROXIMITY_RADIUS) {
+      return { type: 'too_far', message: `Target '${targetId}' is too far away` };
+    }
+
+    const objectType = targetEntity.meta.get('objectType') || 'unknown';
+    const outcome = this.handleObjectInteraction(
+      objectType,
+      action,
+      agentEntity,
+      targetEntity,
+      params
+    );
+
+    if (outcome.type === 'ok' && ['open', 'close', 'use', 'read'].includes(action)) {
+      this.eventLog.append('object.state_changed', this.state.roomId, {
+        objectId: targetId,
+        objectType,
+        action,
+        agentId,
+      });
+    }
+
+    return outcome;
+  }
+
+  private handleObjectInteraction(
+    objectType: string,
+    action: string,
+    agent: EntitySchema,
+    target: EntitySchema,
+    _params: Record<string, unknown>
+  ): InteractOutcome {
+    switch (objectType) {
+      case 'sign':
+        if (action === 'read') {
+          const text = target.meta.get('text') || 'Empty sign';
+          return { type: 'ok', message: text };
+        }
+        break;
+
+      case 'door':
+        if (action === 'open') {
+          const isOpen = target.meta.get('isOpen');
+          if (isOpen === 'true') {
+            return { type: 'no_effect', message: 'Door is already open' };
+          }
+          target.meta.set('isOpen', 'true');
+          return { type: 'ok', message: 'Door opened' };
+        }
+        if (action === 'close') {
+          const isOpen = target.meta.get('isOpen');
+          if (isOpen !== 'true') {
+            return { type: 'no_effect', message: 'Door is already closed' };
+          }
+          target.meta.set('isOpen', 'false');
+          return { type: 'ok', message: 'Door closed' };
+        }
+        break;
+
+      case 'chest':
+        if (action === 'open') {
+          const isOpen = target.meta.get('isOpen');
+          if (isOpen === 'true') {
+            return { type: 'no_effect', message: 'Chest is already open' };
+          }
+          const loot = target.meta.get('loot') || 'nothing';
+          target.meta.set('isOpen', 'true');
+          return { type: 'ok', message: `You found: ${loot}!` };
+        }
+        break;
+
+      case 'portal':
+        if (action === 'use') {
+          const destXRaw = target.meta.get('destX');
+          const destYRaw = target.meta.get('destY');
+          if (destXRaw === undefined || destYRaw === undefined) {
+            return { type: 'invalid_action', message: 'Portal destination is not configured' };
+          }
+
+          const destX = parseInt(destXRaw, 10);
+          const destY = parseInt(destYRaw, 10);
+          if (Number.isNaN(destX) || Number.isNaN(destY)) {
+            return { type: 'invalid_action', message: 'Portal destination is invalid' };
+          }
+
+          if (!this.collisionSystem) {
+            return { type: 'invalid_action', message: 'Collision system is not initialized' };
+          }
+
+          if (!this.collisionSystem.isInBounds(destX, destY)) {
+            return { type: 'invalid_action', message: 'Portal destination is out of bounds' };
+          }
+
+          if (this.collisionSystem.isBlocked(destX, destY)) {
+            return { type: 'invalid_action', message: 'Portal destination is blocked' };
+          }
+
+          const worldPos = this.collisionSystem.tileToWorld(destX, destY);
+          agent.setTile(destX, destY);
+          agent.setPosition(worldPos.x, worldPos.y);
+          return { type: 'ok', message: 'Teleported' };
+        }
+        break;
+
+      case 'npc':
+        if (action === 'talk') {
+          const npcName = target.meta.get('name') || 'Stranger';
+          const dialogue = target.meta.get('dialogue') || 'Hello there!';
+          return { type: 'ok', message: `${npcName}: "${dialogue}"` };
+        }
+        break;
+    }
+
+    return { type: 'invalid_action', message: `No handler for ${action} on ${objectType}` };
+  }
+
+  private calculateDistance(x1: number, y1: number, x2: number, y2: number): number {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
   }
 
   getRecentProximityEvents(): ProximityEvent[] {

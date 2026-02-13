@@ -181,6 +181,95 @@ jobs:
             packages/client/dist
           retention-days: 1
 
+  map-consistency:
+    name: Map Consistency
+    runs-on: [self-hosted, macOS, ARM64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for map-impacting changes
+        id: check-map
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            BASE_SHA="${{ github.event.before }}"
+          else
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          fi
+
+          MAP_PATTERNS=(
+            'world/packs/base/maps/**'
+            'packages/server/assets/maps/**'
+            'packages/client/public/assets/maps/**'
+            'tools/kenney-curation.json'
+            'world/packs/base/assets/tilesets/**'
+            'scripts/sync-maps.mjs'
+            'scripts/verify-map-stack-consistency.mjs'
+          )
+
+          CHANGED_FILES=$(git diff --name-only "$BASE_SHA"...HEAD 2>/dev/null || git diff --name-only HEAD~1...HEAD)
+          MAP_CHANGED=false
+
+          for pattern in "${MAP_PATTERNS[@]}"; do
+            if echo "$CHANGED_FILES" | grep -q "^${pattern/\*\*/.*}"; then
+              MAP_CHANGED=true
+              break
+            fi
+          done
+
+          echo "map_changed=$MAP_CHANGED" >> $GITHUB_OUTPUT
+          if [[ "$MAP_CHANGED" == "true" ]]; then
+            echo "📍 Map-impacting files detected:"
+            echo "$CHANGED_FILES" | grep -E "(world/|maps/|tileset|sync-maps|verify-map)" || true
+          else
+            echo "✅ No map-impacting files changed"
+          fi
+
+      - name: Setup pnpm
+        if: steps.check-map.outputs.map_changed == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        if: steps.check-map.outputs.map_changed == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        if: steps.check-map.outputs.map_changed == 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        if: steps.check-map.outputs.map_changed == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify map sync
+        if: steps.check-map.outputs.map_changed == 'true'
+        run: |
+          pnpm sync-maps
+          SYNC_DIFF=$(git status --porcelain packages/server/assets/maps/ packages/client/public/assets/maps/)
+          if [[ -n "$SYNC_DIFF" ]]; then
+            echo "❌ Map files are out of sync!"
+            echo "$SYNC_DIFF"
+            echo "Run 'pnpm sync-maps' and commit the changes."
+            exit 1
+          fi
+          echo "✅ Map files are in sync"
+
+      - name: Run map stack consistency check
+        if: steps.check-map.outputs.map_changed == 'true'
+        run: node scripts/verify-map-stack-consistency.mjs
+
   test:
     name: Unit Tests
     runs-on: [self-hosted, macOS, ARM64]
@@ -238,7 +327,7 @@ jobs:
   all-checks:
     name: All Checks Passed
     runs-on: [self-hosted, macOS, ARM64]
-    needs: [codegen-check, typecheck, lint, build, test]
+    needs: [codegen-check, typecheck, lint, build, test, map-consistency]
     if: always()
     steps:
       - name: Check all jobs
@@ -247,7 +336,8 @@ jobs:
              [[ "${{ needs.typecheck.result }}" != "success" ]] || \
              [[ "${{ needs.lint.result }}" != "success" ]] || \
              [[ "${{ needs.build.result }}" != "success" ]] || \
-             [[ "${{ needs.test.result }}" != "success" ]]; then
+             [[ "${{ needs.test.result }}" != "success" ]] || \
+             [[ "${{ needs.map-consistency.result }}" != "success" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi

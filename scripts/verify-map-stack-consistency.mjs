@@ -33,6 +33,25 @@ const CONTRACT_PATHS = {
   manifest: join(ROOT_DIR, 'world/packs/base/manifest.json'),
 };
 
+const DEFAULT_SPAWN_POINT = {
+  x: 512,
+  y: 512,
+  tx: 32,
+  ty: 32,
+};
+
+const VALID_ZONES = [
+  'lobby',
+  'office',
+  'central-park',
+  'arcade',
+  'meeting',
+  'lounge-cafe',
+  'plaza',
+  'lake',
+];
+const VALID_DIRECTIONS = ['north', 'south', 'east', 'west'];
+
 function md5(content) {
   return createHash('md5').update(content).digest('hex');
 }
@@ -262,6 +281,108 @@ function validateFacilityZoneContracts(mapJson, validZones) {
   }
 
   return { errors, count: validFacilityObjects, aliasCount: mappedFacilityIds.size };
+}
+
+function validateCollisionLayer(mapJson) {
+  const errors = [];
+  const collisionLayer = (mapJson.layers || []).find(l => l.name === 'collision');
+
+  if (!collisionLayer) {
+    errors.push('collision layer not found');
+    return { errors };
+  }
+
+  if (!Array.isArray(collisionLayer.data)) {
+    errors.push('collision layer data is not an array');
+    return { errors };
+  }
+
+  const invalidValues = [];
+  for (let i = 0; i < collisionLayer.data.length; i++) {
+    const value = collisionLayer.data[i];
+    if (value !== 0 && value !== 1) {
+      invalidValues.push({ index: i, value });
+    }
+  }
+
+  if (invalidValues.length > 0) {
+    const sample = invalidValues
+      .slice(0, 5)
+      .map(v => `[${v.index}]=${v.value}`)
+      .join(', ');
+    errors.push(
+      `collision layer contains non-binary values: ${sample}${invalidValues.length > 5 ? ` (+${invalidValues.length - 5} more)` : ''}`
+    );
+  }
+
+  return { errors, collisionData: collisionLayer.data };
+}
+
+function validateSpawnPoint(mapJson, collisionData) {
+  const errors = [];
+  const { tx, ty } = DEFAULT_SPAWN_POINT;
+  const width = mapJson.width || 0;
+  const height = mapJson.height || 0;
+
+  if (tx < 0 || tx >= width || ty < 0 || ty >= height) {
+    errors.push(`spawn point (${tx}, ${ty}) is outside map bounds (${width}x${height})`);
+    return { errors };
+  }
+
+  if (collisionData) {
+    const index = ty * width + tx;
+    const collisionValue = collisionData[index];
+    if (collisionValue === 1) {
+      errors.push(`spawn point (${tx}, ${ty}) is blocked by collision`);
+    }
+  }
+
+  return { errors };
+}
+
+function validateEntrances(mapJson) {
+  const errors = [];
+  const objectsLayer = (mapJson.layers || []).find(l => l.name === 'objects');
+
+  if (!objectsLayer || !Array.isArray(objectsLayer.objects)) {
+    return { errors };
+  }
+
+  const entrances = objectsLayer.objects.filter(obj => obj.type === 'building_entrance');
+
+  for (const entrance of entrances) {
+    const name = entrance.name || 'unnamed';
+    const props = entrance.properties || [];
+    const getProp = key => props.find(p => p.name === key)?.value;
+
+    const zone = getProp('zone');
+    const direction = getProp('direction');
+    const connectsTo = getProp('connectsTo');
+
+    if (!zone) {
+      errors.push(`entrance "${name}": missing zone property`);
+    } else if (!VALID_ZONES.includes(zone)) {
+      errors.push(`entrance "${name}": invalid zone "${zone}"`);
+    }
+
+    if (!direction) {
+      errors.push(`entrance "${name}": missing direction property`);
+    } else if (!VALID_DIRECTIONS.includes(direction)) {
+      errors.push(`entrance "${name}": invalid direction "${direction}"`);
+    }
+
+    if (!connectsTo) {
+      errors.push(`entrance "${name}": missing connectsTo property`);
+    } else if (!VALID_ZONES.includes(connectsTo)) {
+      errors.push(`entrance "${name}": invalid connectsTo "${connectsTo}"`);
+    }
+
+    if (zone && connectsTo && zone === connectsTo) {
+      errors.push(`entrance "${name}": zone and connectsTo are the same ("${zone}")`);
+    }
+  }
+
+  return { errors, entranceCount: entrances.length };
 }
 
 function validateCurationStructure(curation) {
@@ -666,6 +787,37 @@ function main() {
 
   console.log(
     `✅ Facility zone contracts are valid (${facilityCount} mapped facilities, ${aliasCount} resolvable IDs)\n`
+  );
+
+  console.log('Validating collision layer...');
+  const collisionValidation = validateCollisionLayer(sourceMap.json);
+  if (collisionValidation.errors.length > 0) {
+    console.log('❌ COLLISION LAYER VALIDATION FAILED\n');
+    collisionValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  console.log('✅ Collision layer contains only valid values (0/1)\n');
+
+  console.log('Validating spawn point...');
+  const spawnValidation = validateSpawnPoint(sourceMap.json, collisionValidation.collisionData);
+  if (spawnValidation.errors.length > 0) {
+    console.log('❌ SPAWN POINT VALIDATION FAILED\n');
+    spawnValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  console.log(
+    `✅ Spawn point (${DEFAULT_SPAWN_POINT.tx}, ${DEFAULT_SPAWN_POINT.ty}) is valid and unblocked\n`
+  );
+
+  console.log('Validating building entrances...');
+  const entranceValidation = validateEntrances(sourceMap.json);
+  if (entranceValidation.errors.length > 0) {
+    console.log('❌ ENTRANCE VALIDATION FAILED\n');
+    entranceValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  console.log(
+    `✅ ${entranceValidation.entranceCount} building entrances have valid zone/direction/connectsTo\n`
   );
 
   console.log('══════════════════════════════════════════════════════════════');

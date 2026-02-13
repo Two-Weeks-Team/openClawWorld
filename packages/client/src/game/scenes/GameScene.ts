@@ -490,6 +490,7 @@ export class GameScene extends Phaser.Scene {
 
   private setupInput() {
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.targetingMode) return;
       if (!this.map) return;
 
       const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;

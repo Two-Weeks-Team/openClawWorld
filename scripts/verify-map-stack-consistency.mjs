@@ -45,18 +45,17 @@ function loadMap(path) {
 
 function validateMapDimensions(map, name) {
   const errors = [];
+  const dimensions = {
+    width: MAP_CONFIG.width,
+    height: MAP_CONFIG.height,
+    tilewidth: MAP_CONFIG.tileSize,
+    tileheight: MAP_CONFIG.tileSize,
+  };
 
-  if (map.json.width !== MAP_CONFIG.width) {
-    errors.push(`${name}: width=${map.json.width}, expected=${MAP_CONFIG.width}`);
-  }
-  if (map.json.height !== MAP_CONFIG.height) {
-    errors.push(`${name}: height=${map.json.height}, expected=${MAP_CONFIG.height}`);
-  }
-  if (map.json.tilewidth !== MAP_CONFIG.tileSize) {
-    errors.push(`${name}: tilewidth=${map.json.tilewidth}, expected=${MAP_CONFIG.tileSize}`);
-  }
-  if (map.json.tileheight !== MAP_CONFIG.tileSize) {
-    errors.push(`${name}: tileheight=${map.json.tileheight}, expected=${MAP_CONFIG.tileSize}`);
+  for (const [key, expected] of Object.entries(dimensions)) {
+    if (map.json[key] !== expected) {
+      errors.push(`${name}: ${key}=${map.json[key]}, expected=${expected}`);
+    }
   }
 
   return errors;
@@ -76,22 +75,10 @@ function validateTileset(map, name) {
   }
 
   const tileset = tilesets[0];
-
-  if (tileset.name !== EXPECTED_TILESET.name) {
-    errors.push(`${name}: tileset.name=${tileset.name}, expected=${EXPECTED_TILESET.name}`);
-  }
-  if (tileset.tilewidth !== EXPECTED_TILESET.tilewidth) {
-    errors.push(
-      `${name}: tileset.tilewidth=${tileset.tilewidth}, expected=${EXPECTED_TILESET.tilewidth}`
-    );
-  }
-  if (tileset.tileheight !== EXPECTED_TILESET.tileheight) {
-    errors.push(
-      `${name}: tileset.tileheight=${tileset.tileheight}, expected=${EXPECTED_TILESET.tileheight}`
-    );
-  }
-  if (tileset.image !== EXPECTED_TILESET.image) {
-    errors.push(`${name}: tileset.image=${tileset.image}, expected=${EXPECTED_TILESET.image}`);
+  for (const [key, expected] of Object.entries(EXPECTED_TILESET)) {
+    if (tileset[key] !== expected) {
+      errors.push(`${name}: tileset.${key}=${tileset[key]}, expected=${expected}`);
+    }
   }
 
   return errors;
@@ -102,24 +89,18 @@ function main() {
   console.log('║     Map Stack Consistency Verification                       ║');
   console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
-  const results = {
-    passed: [],
-    failed: [],
-  };
-
   const maps = {};
+  const missingFiles = [];
   for (const [name, path] of Object.entries(MAP_PATHS)) {
     maps[name] = loadMap(path);
     if (!maps[name]) {
-      results.failed.push(`[MISSING] ${name}: ${path}`);
-    } else {
-      results.passed.push(`[EXISTS] ${name}: ${path}`);
+      missingFiles.push(`[MISSING] ${name}: ${path}`);
     }
   }
 
-  if (results.failed.length > 0) {
+  if (missingFiles.length > 0) {
     console.log('❌ FILE EXISTENCE CHECK FAILED\n');
-    results.failed.forEach(msg => console.log(`  ${msg}`));
+    missingFiles.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
 
@@ -141,31 +122,16 @@ function main() {
 
   console.log(`✅ All maps have same hash: ${hashes[0].hash}\n`);
 
-  console.log('Validating map dimensions...');
-  const dimensionErrors = [];
-  for (const [name, map] of Object.entries(maps)) {
-    dimensionErrors.push(...validateMapDimensions(map, name));
-  }
+  console.log('Validating map properties...');
+  const sourceMap = maps.source;
+  const validationErrors = [
+    ...validateMapDimensions(sourceMap, 'source'),
+    ...validateTileset(sourceMap, 'source'),
+  ];
 
-  if (dimensionErrors.length > 0) {
-    console.log('❌ DIMENSION VALIDATION FAILED\n');
-    dimensionErrors.forEach(msg => console.log(`  ${msg}`));
-    process.exit(1);
-  }
-
-  console.log(
-    `✅ All maps: ${MAP_CONFIG.width}x${MAP_CONFIG.height} tiles @ ${MAP_CONFIG.tileSize}px\n`
-  );
-
-  console.log('Validating tileset configuration...');
-  const tilesetErrors = [];
-  for (const [name, map] of Object.entries(maps)) {
-    tilesetErrors.push(...validateTileset(map, name));
-  }
-
-  if (tilesetErrors.length > 0) {
-    console.log('❌ TILESET VALIDATION FAILED\n');
-    tilesetErrors.forEach(msg => console.log(`  ${msg}`));
+  if (validationErrors.length > 0) {
+    console.log('❌ MAP PROPERTY VALIDATION FAILED\n');
+    validationErrors.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
 

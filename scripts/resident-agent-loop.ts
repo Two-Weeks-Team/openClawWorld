@@ -1089,6 +1089,19 @@ class IssueDetector {
 
     const overlapStart = now - CHAT_MISMATCH_OVERLAP_WINDOW_MS;
     const messageKey = (m: ChatMessage): string => `${m.timestamp}:${m.from}:${m.message}`;
+    const getAgentMessageSet = (
+      messages: ChatMessage[],
+      channel: string,
+      cutoff: number
+    ): Set<string> =>
+      new Set(
+        messages
+          .filter(
+            m => m.channel === channel && m.timestamp >= overlapStart && m.timestamp <= cutoff
+          )
+          .map(messageKey)
+      );
+
     const channelGroups: Map<string, AgentChatInfo[]> = new Map();
     for (const agent of recentAgents) {
       const channels = new Set(agent.messages.map(m => m.channel));
@@ -1111,26 +1124,8 @@ class IssueDetector {
 
           // Compare only the stable horizon both agents could have observed.
           // This avoids transient false positives from chatObserve polling skew.
-          const set1 = new Set(
-            a1.messages
-              .filter(
-                m =>
-                  m.channel === channel &&
-                  m.timestamp >= overlapStart &&
-                  m.timestamp <= commonCutoff
-              )
-              .map(messageKey)
-          );
-          const set2 = new Set(
-            a2.messages
-              .filter(
-                m =>
-                  m.channel === channel &&
-                  m.timestamp >= overlapStart &&
-                  m.timestamp <= commonCutoff
-              )
-              .map(messageKey)
-          );
+          const set1 = getAgentMessageSet(a1.messages, channel, commonCutoff);
+          const set2 = getAgentMessageSet(a2.messages, channel, commonCutoff);
 
           const union = new Set([...set1, ...set2]);
           const intersection = new Set([...set1].filter(x => set2.has(x)));

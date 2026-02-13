@@ -11,12 +11,14 @@ SCRIPT_DIR = Path(__file__).parent
 MANIFEST_PATH = SCRIPT_DIR / "sprites" / "custom-sprites.json"
 
 
-def load_manifest():
+def load_manifest() -> dict:
+    """Load custom-sprites.json manifest file."""
     with open(MANIFEST_PATH) as f:
         return json.load(f)
 
 
-def generate_sprite(sprite_def, palette, charmap):
+def generate_sprite(sprite_def: dict, palette: dict, charmap: dict) -> Image.Image:
+    """Render a sprite from ASCII pixel art definition using palette colors."""
     width = sprite_def["width"]
     height = sprite_def["height"]
     pixels_data = sprite_def["pixels"]
@@ -34,7 +36,8 @@ def generate_sprite(sprite_def, palette, charmap):
     return img
 
 
-def main():
+def main() -> None:
+    """Generate custom pixel art sprites from JSON manifest definitions."""
     manifest = load_manifest()
     palette = manifest["palette"]
     charmap = manifest["charmap"]

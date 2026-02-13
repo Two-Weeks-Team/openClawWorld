@@ -15,18 +15,23 @@ SCRIPT_DIR = Path(__file__).parent
 MANIFEST_PATH = SCRIPT_DIR / "kenney-curation.json"
 
 
-def load_manifest():
+def load_manifest() -> dict:
+    """Load kenney-curation.json manifest file."""
     with open(MANIFEST_PATH) as f:
         return json.load(f)
 
 
-def get_tile(img, col, row, tile_size=16, spacing=0):
+def get_tile(
+    img: Image.Image, col: int, row: int, tile_size: int = 16, spacing: int = 0
+) -> Image.Image:
+    """Extract a single tile from a spritesheet at the given grid position."""
     x = col * (tile_size + spacing)
     y = row * (tile_size + spacing)
     return img.crop((x, y, x + tile_size, y + tile_size))
 
 
-def main():
+def main() -> None:
+    """Extract tiles from Kenney packs based on manifest and save as tileset PNG."""
     manifest = load_manifest()
     sources_config = manifest["sources"]
     output_config = manifest["outputs"]["tileset"]
@@ -82,7 +87,9 @@ def main():
             except Exception as e:
                 raise RuntimeError(f"Tile extraction failed for {tile_id}: {e}") from e
         else:
-            raise RuntimeError(f"Source '{source_name}' not loaded for tile '{tile_id}'")
+            raise RuntimeError(
+                f"Source '{source_name}' not loaded for tile '{tile_id}'"
+            )
 
     output_path = output_config["path"]
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

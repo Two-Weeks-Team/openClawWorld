@@ -44,7 +44,7 @@ src/
 
 - Services: Class-based, injected into rooms
 - Schemas: Use `@type()` decorator, extend `Schema`
-- Handlers: Async, return `{ success, data?, error? }`
+- Handlers: Async, return `AicResult<T>` (`{ status: 'ok'; data: T } | { status: 'error'; error: AicErrorObject }`)
 - Entry point: `index.ts` bootstraps Express + Colyseus
 
 ## ANTI-PATTERNS

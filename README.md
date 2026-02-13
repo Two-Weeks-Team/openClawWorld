@@ -263,6 +263,20 @@ curl -X POST http://localhost:2567/aic/v0.1/observe \
 | `POST /aic/v0.1/pollEvents`     | Yes  | Poll for world events        |
 | `POST /aic/v0.1/profile/update` | Yes  | Update agent profile         |
 
+### Result Wrapper Contract
+
+All AIC endpoints return the same wrapper:
+
+```ts
+type AicResult<T> =
+  | { status: 'ok'; data: T }
+  | { status: 'error'; error: AicErrorObject };
+```
+
+Reference:
+- [`packages/shared/src/types.ts`](packages/shared/src/types.ts)
+- [`docs/aic/v0.1/aic-schema.json`](docs/aic/v0.1/aic-schema.json)
+
 ## Controls
 
 | Key                   | Action                 |

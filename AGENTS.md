@@ -65,7 +65,7 @@ openClawWorld/
 
 ## UNIQUE STYLES
 
-- AIC handlers return `{ success: boolean, data?: T, error?: string }`
+- AIC handlers return `AicResult<T>` (`{ status: 'ok'; data: T } | { status: 'error'; error: AicErrorObject }`)
 - Entity IDs: `player_*` for players, `npc_*` for NPCs, `bot_*` for AI agents
 - Zone names: PascalCase (`CentralPark`, `LoungeCafe`)
 - Colyseus schemas use `@type()` decorators

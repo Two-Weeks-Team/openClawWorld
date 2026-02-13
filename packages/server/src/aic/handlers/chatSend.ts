@@ -130,6 +130,13 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
 
     const { messageId, tsMs } = result;
 
+    // Broadcast to WebSocket clients so human players see AI agent messages in real-time
+    gameRoom.broadcast('chat', {
+      from: agentEntity.name,
+      message,
+      entityId: agentId,
+    });
+
     const eventLog = gameRoom.getEventLog();
     eventLog.append('chat.message', roomId, {
       messageId,

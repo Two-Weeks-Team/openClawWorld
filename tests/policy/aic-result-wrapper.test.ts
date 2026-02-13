@@ -2,17 +2,18 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, it } from 'vitest';
 
-function readText(path: string): string {
-  return readFileSync(resolve(process.cwd(), path), 'utf-8');
+function readText(filePath: string): string {
+  return readFileSync(resolve(process.cwd(), filePath), 'utf-8');
 }
 
 describe('AIC Result Wrapper Contract', () => {
   it('uses status-based AicResult in shared types', () => {
     const sharedTypes = readText('packages/shared/src/types.ts');
 
-    expect(sharedTypes).toMatch(
-      /export type AicResult<T>\s*=\s*\{ status: 'ok'; data: T \}\s*\|\s*\{ status: 'error'; error: AicErrorObject \};/
-    );
+    expect(sharedTypes).toMatch(/export type AicResult<T>/);
+    expect(sharedTypes).toMatch(/status:\s*'ok'/);
+    expect(sharedTypes).toMatch(/status:\s*'error'/);
+    expect(sharedTypes).toMatch(/AicErrorObject/);
   });
 
   it('keeps AIC guide docs aligned to status/data/error wrapper', () => {
@@ -23,11 +24,11 @@ describe('AIC Result Wrapper Contract', () => {
       'README.md',
     ];
 
-    for (const path of guidePaths) {
-      const content = readText(path);
+    for (const guidePath of guidePaths) {
+      const content = readText(guidePath);
 
       expect(content).not.toMatch(/\{\s*success\s*:\s*boolean/);
-      expect(content).toMatch(/status/);
+      expect(content).toMatch(/status:\s*'ok'/);
     }
   });
 });

@@ -424,20 +424,17 @@ export class GameScene extends Phaser.Scene {
       const objType = this.getObjectProperty(obj, 'type') as string;
       if (!objType || objType === 'spawn') continue;
 
-      let atlasKey = '';
+      let atlasKey: 'objects' | 'players' = 'objects';
       let frameKey = '';
 
       switch (objType) {
         case 'chest':
-          atlasKey = 'objects';
           frameKey = 'chest';
           break;
         case 'sign':
-          atlasKey = 'objects';
           frameKey = 'sign';
           break;
         case 'portal':
-          atlasKey = 'objects';
           frameKey = 'portal';
           break;
         case 'npc': {
@@ -454,7 +451,6 @@ export class GameScene extends Phaser.Scene {
           break;
         }
         case 'decoration':
-          atlasKey = 'objects';
           if (obj.name.includes('fountain')) frameKey = 'fountain';
           else if (obj.name.includes('lamp')) frameKey = 'lamp';
           else if (obj.name.includes('bench')) frameKey = 'bench';

@@ -304,10 +304,8 @@ export class WorldPackLoader {
     const maps = new Map<ZoneId, ZoneMapData>();
     const spawnPoints = this.extractSpawnPointsFromUnified(raw);
     const objects = this.extractObjects(raw.layers ?? []);
-    const mapWidth = raw.width ?? MAP_CONFIG.width;
-    const mapHeight = raw.height ?? MAP_CONFIG.height;
-    const mapTileWidth = raw.tilewidth ?? MAP_CONFIG.tileSize;
-    const mapTileHeight = raw.tileheight ?? MAP_CONFIG.tileSize;
+    const { mapWidth, mapHeight, mapTileWidth, mapTileHeight } =
+      this.resolveUnifiedMapDimensions(raw);
 
     const allEntrances = this.extractBuildingEntrances(objects);
 
@@ -337,6 +335,33 @@ export class WorldPackLoader {
       `[WorldPackLoader] Loaded unified map (${mapWidth}x${mapHeight}) for ${zones.length} zones`
     );
     return maps;
+  }
+
+  private resolveUnifiedMapDimensions(raw: RawUnifiedMap): {
+    mapWidth: number;
+    mapHeight: number;
+    mapTileWidth: number;
+    mapTileHeight: number;
+  } {
+    const mapWidth = raw.width ?? MAP_CONFIG.width;
+    const mapHeight = raw.height ?? MAP_CONFIG.height;
+    const mapTileWidth = raw.tilewidth ?? MAP_CONFIG.tileSize;
+    const mapTileHeight = raw.tileheight ?? MAP_CONFIG.tileSize;
+
+    const dimensions = {
+      mapWidth,
+      mapHeight,
+      mapTileWidth,
+      mapTileHeight,
+    };
+
+    for (const [label, value] of Object.entries(dimensions)) {
+      if (!Number.isInteger(value) || value <= 0) {
+        throw new WorldPackError(`Invalid unified map ${label}: ${value}`, this.packPath);
+      }
+    }
+
+    return dimensions;
   }
 
   private extractSpawnPointsFromUnified(

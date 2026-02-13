@@ -30,6 +30,7 @@ const CONTRACT_PATHS = {
   curation: join(ROOT_DIR, 'tools/kenney-curation.json'),
   tilesetMeta: join(ROOT_DIR, 'packages/client/public/assets/maps/tileset.json'),
   tileIdContract: join(ROOT_DIR, 'world/packs/base/assets/tilesets/village_tileset.json'),
+  manifest: join(ROOT_DIR, 'world/packs/base/manifest.json'),
 };
 
 function md5(content) {
@@ -128,6 +129,127 @@ function collectUsedTileIds(mapJson) {
   return used;
 }
 
+function getObjectStringProperty(obj, name) {
+  const prop = (obj.properties || []).find(p => p.name === name);
+  return typeof prop?.value === 'string' ? prop.value : undefined;
+}
+
+function normalizeFacilityId(value) {
+  return value.trim().replace(/_/g, '-');
+}
+
+function resolveFacilityObjectId(obj) {
+  const explicitId = getObjectStringProperty(obj, 'facilityId');
+  if (explicitId && explicitId.length > 0) {
+    return normalizeFacilityId(explicitId);
+  }
+
+  const explicitType = getObjectStringProperty(obj, 'facilityType');
+  if (explicitType && explicitType.length > 0) {
+    return normalizeFacilityId(explicitType);
+  }
+
+  if (typeof obj.type === 'string' && obj.type.length > 0 && obj.type !== 'facility') {
+    return normalizeFacilityId(obj.type);
+  }
+
+  if (typeof obj.name === 'string' && obj.name.includes('.')) {
+    const suffix = obj.name.split('.').pop();
+    if (suffix && suffix.length > 0) {
+      return normalizeFacilityId(suffix);
+    }
+  }
+
+  if (typeof obj.name === 'string' && obj.name.length > 0) {
+    return normalizeFacilityId(obj.name);
+  }
+
+  return undefined;
+}
+
+function extractFacilityObjects(mapJson) {
+  const facilities = [];
+
+  for (const layer of mapJson.layers || []) {
+    if (layer.type !== 'objectgroup' || !Array.isArray(layer.objects)) {
+      continue;
+    }
+
+    for (const obj of layer.objects) {
+      if (getObjectStringProperty(obj, 'type') !== 'facility') {
+        continue;
+      }
+
+      facilities.push({
+        id: resolveFacilityObjectId(obj),
+        name: obj.name,
+        zone: getObjectStringProperty(obj, 'zone'),
+      });
+    }
+  }
+
+  return facilities;
+}
+
+function validateFacilityZoneContracts(mapJson, validZones) {
+  const errors = [];
+  const facilities = extractFacilityObjects(mapJson);
+  const mappedFacilityIds = new Map();
+
+  for (const facility of facilities) {
+    if (!facility.id) {
+      errors.push(`facility object "${facility.name}" missing facility identifier`);
+      continue;
+    }
+
+    if (!facility.zone) {
+      errors.push(`facility object "${facility.name}" (${facility.id}) missing zone property`);
+      continue;
+    }
+
+    if (!validZones.has(facility.zone)) {
+      errors.push(
+        `facility object "${facility.name}" (${facility.id}) has invalid zone "${facility.zone}"`
+      );
+      continue;
+    }
+
+    const zoneFromNamePrefix = facility.name.includes('.') ? facility.name.split('.')[0] : null;
+    if (zoneFromNamePrefix && zoneFromNamePrefix !== facility.zone) {
+      errors.push(
+        `facility object "${facility.name}" has zone prefix "${zoneFromNamePrefix}" but zone property "${facility.zone}"`
+      );
+    }
+
+    const existing = mappedFacilityIds.get(facility.id);
+    if (existing && existing !== facility.zone) {
+      errors.push(
+        `facility id "${facility.id}" has conflicting zones ("${existing}" vs "${facility.zone}")`
+      );
+      continue;
+    }
+
+    mappedFacilityIds.set(facility.id, facility.zone);
+  }
+
+  const listedFacilities = Array.isArray(mapJson.facilities) ? mapJson.facilities : [];
+  for (const listedFacility of listedFacilities) {
+    if (typeof listedFacility !== 'string') {
+      errors.push(`map facilities entry must be a string, got ${typeof listedFacility}`);
+      continue;
+    }
+
+    const normalized = normalizeFacilityId(listedFacility);
+    if (!mappedFacilityIds.has(normalized)) {
+      errors.push(
+        `map facilities entry "${listedFacility}" has no matching facility object mapping`
+      );
+    }
+  }
+
+  return { errors, count: mappedFacilityIds.size };
+}
+
 function validateCurationStructure(curation) {
   const errors = [];
 
@@ -185,7 +307,9 @@ function validateSources(sources) {
         errors.push(`${base}.path not found: ${absolutePath}`);
       }
       if (source.path.includes('docs/reference')) {
-        errors.push(`${base}.path must use repo-tracked assets, not docs/reference: ${source.path}`);
+        errors.push(
+          `${base}.path must use repo-tracked assets, not docs/reference: ${source.path}`
+        );
       }
     }
 
@@ -211,7 +335,9 @@ function validateTilesetOutput(tilesetOutput) {
   const requiredIntFields = ['width', 'height', 'tileSize', 'columns', 'rows'];
   for (const field of requiredIntFields) {
     if (!isPositiveInt(tilesetOutput[field])) {
-      errors.push(`curation.outputs.tileset.${field} must be a positive integer, got ${tilesetOutput[field]}`);
+      errors.push(
+        `curation.outputs.tileset.${field} must be a positive integer, got ${tilesetOutput[field]}`
+      );
     }
   }
 
@@ -255,9 +381,7 @@ function validateTilesetTiles(tiles, sources, tilesetOutput) {
       : null;
 
   if (expectedSlots !== null && tiles.length !== expectedSlots) {
-    errors.push(
-      `curation.tileset.tiles expected=${expectedSlots}, actual=${tiles.length}`
-    );
+    errors.push(`curation.tileset.tiles expected=${expectedSlots}, actual=${tiles.length}`);
   }
 
   for (const [index, tile] of tiles.entries()) {
@@ -303,7 +427,9 @@ function validateTilesetTiles(tiles, sources, tilesetOutput) {
   }
 
   if (expectedSlots !== null && tileIndices.size !== expectedSlots) {
-    errors.push(`curation.tileset.tiles defines ${tileIndices.size}/${expectedSlots} unique indices`);
+    errors.push(
+      `curation.tileset.tiles defines ${tileIndices.size}/${expectedSlots} unique indices`
+    );
   }
 
   return { errors, tileIndices };
@@ -318,17 +444,23 @@ function validateTilesetMetaConsistency(tilesetMeta, tilesetOutput) {
 
   if (isPositiveInt(tilesetOutput?.tileSize)) {
     if (tilesetMeta.tilewidth !== tilesetOutput.tileSize) {
-      errors.push(`tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tilesetOutput.tileSize}`);
+      errors.push(
+        `tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tilesetOutput.tileSize}`
+      );
     }
     if (tilesetMeta.tileheight !== tilesetOutput.tileSize) {
-      errors.push(`tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tilesetOutput.tileSize}`);
+      errors.push(
+        `tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tilesetOutput.tileSize}`
+      );
     }
   }
 
   if (isPositiveInt(tilesetOutput?.columns) && isPositiveInt(tilesetOutput?.rows)) {
     const tileCount = tilesetOutput.columns * tilesetOutput.rows;
     if (tilesetMeta.columns !== tilesetOutput.columns) {
-      errors.push(`tileset.json: columns=${tilesetMeta.columns}, expected=${tilesetOutput.columns}`);
+      errors.push(
+        `tileset.json: columns=${tilesetMeta.columns}, expected=${tilesetOutput.columns}`
+      );
     }
     if (tilesetMeta.tilecount !== tileCount) {
       errors.push(`tileset.json: tilecount=${tilesetMeta.tilecount}, expected=${tileCount}`);
@@ -336,11 +468,15 @@ function validateTilesetMetaConsistency(tilesetMeta, tilesetOutput) {
   }
 
   if (isPositiveInt(tilesetOutput?.width) && tilesetMeta.imagewidth !== tilesetOutput.width) {
-    errors.push(`tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${tilesetOutput.width}`);
+    errors.push(
+      `tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${tilesetOutput.width}`
+    );
   }
 
   if (isPositiveInt(tilesetOutput?.height) && tilesetMeta.imageheight !== tilesetOutput.height) {
-    errors.push(`tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${tilesetOutput.height}`);
+    errors.push(
+      `tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${tilesetOutput.height}`
+    );
   }
 
   if (typeof tilesetOutput?.path === 'string' && tilesetOutput.path.length > 0) {
@@ -413,7 +549,11 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
   const metaValidation = validateTilesetMetaConsistency(tilesetMeta, structure.tilesetOutput);
   errors.push(...metaValidation.errors);
 
-  const usageValidation = validateMapTileUsage(map.json, tilesValidation.tileIndices, tileIdContract);
+  const usageValidation = validateMapTileUsage(
+    map.json,
+    tilesValidation.tileIndices,
+    tileIdContract
+  );
   errors.push(...usageValidation.errors);
 
   return { errors, usedTileIds: [...usageValidation.usedTileIds].sort((a, b) => a - b) };
@@ -478,6 +618,8 @@ function main() {
   const curation = loadRequiredJson(CONTRACT_PATHS.curation, 'kenney-curation');
   const tilesetMeta = loadRequiredJson(CONTRACT_PATHS.tilesetMeta, 'tileset-meta');
   const tileIdContract = loadRequiredJson(CONTRACT_PATHS.tileIdContract, 'tile-id-contract');
+  const manifest = loadRequiredJson(CONTRACT_PATHS.manifest, 'world-manifest');
+  const validZones = new Set(Array.isArray(manifest.zones) ? manifest.zones : []);
 
   const { errors: curationErrors, usedTileIds } = validateCurationContract({
     map: sourceMap,
@@ -494,6 +636,20 @@ function main() {
 
   console.log('✅ Curation manifest and tileset metadata contract are valid');
   console.log(`✅ Map tile IDs are within contract: ${usedTileIds.join(', ')}\n`);
+
+  console.log('Validating facility zone contracts...');
+  const { errors: facilityErrors, count: facilityCount } = validateFacilityZoneContracts(
+    sourceMap.json,
+    validZones
+  );
+
+  if (facilityErrors.length > 0) {
+    console.log('❌ FACILITY CONTRACT VALIDATION FAILED\n');
+    facilityErrors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+
+  console.log(`✅ Facility zone contracts are valid (${facilityCount} mapped facilities)\n`);
 
   console.log('══════════════════════════════════════════════════════════════');
   console.log('✅ MAP STACK CONSISTENCY VERIFIED');

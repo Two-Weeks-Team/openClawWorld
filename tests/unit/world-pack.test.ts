@@ -291,6 +291,56 @@ describe('WorldPackLoader', () => {
   });
 
   describe('unified map fallback', () => {
+    it('uses facility object zone mapping instead of hardcoded facility zone map', () => {
+      createTestPack({
+        zones: ['lobby', 'office'],
+        manifest: { entryZone: 'lobby' as ZoneId },
+        skipMaps: true,
+        unifiedMap: {
+          width: 64,
+          height: 64,
+          tilewidth: 16,
+          tileheight: 16,
+          facilities: ['reception_desk'],
+          layers: [
+            {
+              id: 1,
+              name: 'objects',
+              type: 'objectgroup',
+              x: 0,
+              y: 0,
+              visible: true,
+              opacity: 1,
+              objects: [
+                {
+                  id: 1,
+                  name: 'office.reception_desk',
+                  type: 'reception_desk',
+                  x: 700,
+                  y: 120,
+                  width: 32,
+                  height: 32,
+                  properties: [
+                    { name: 'type', type: 'string', value: 'facility' },
+                    { name: 'zone', type: 'string', value: 'office' },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      });
+
+      const loader = new WorldPackLoader(TEST_PACK_PATH);
+      loader.loadPack();
+
+      const office = loader.getZoneMap('office');
+      const lobby = loader.getZoneMap('lobby');
+
+      expect(office?.facilities).toContain('reception_desk');
+      expect(lobby?.facilities).not.toContain('reception_desk');
+    });
+
     it('uses MAP_CONFIG defaults for unified map dimensions when metadata is missing', () => {
       createTestPack({
         zones: ['plaza'],

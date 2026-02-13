@@ -137,6 +137,7 @@ export class WorldPackLoader {
   private npcZoneCache: Map<string, ZoneId> = new Map();
   private warnedMissingNpcZones: Set<string> = new Set();
   private warnedUnknownNpcZoneRefs: Set<string> = new Set();
+  private warnedUnknownFacilityZoneRefs: Set<string> = new Set();
 
   constructor(packPath: string) {
     this.packPath = resolve(packPath);
@@ -151,6 +152,7 @@ export class WorldPackLoader {
     this.loadNpcZoneMapping();
     const maps = this.loadAllZoneMaps(manifest.zones);
     this.validateNpcObjectConsistency(maps);
+    this.validateFacilityObjectConsistency(maps);
     const npcs = this.loadNpcs();
     const facilities = this.loadFacilities(maps);
 
@@ -313,6 +315,7 @@ export class WorldPackLoader {
       this.resolveUnifiedMapDimensions(raw);
 
     const allEntrances = this.extractBuildingEntrances(objects);
+    const facilityZoneAssignments = this.extractFacilityZoneAssignments(objects, zones);
 
     for (const zoneId of zones) {
       const zoneSpawns = spawnPoints.filter(sp => sp.zone === zoneId);
@@ -343,7 +346,11 @@ export class WorldPackLoader {
           }
           return npcZone === zoneId;
         }),
-        facilities: (raw.facilities ?? []).filter(f => this.getFacilityZone(f, zoneId)),
+        facilities: this.resolveFacilitiesForZone(
+          raw.facilities ?? [],
+          zoneId,
+          facilityZoneAssignments
+        ),
         entrances: zoneEntrances,
       });
     }
@@ -615,34 +622,168 @@ export class WorldPackLoader {
     return this.npcZoneCache.get(npcId);
   }
 
-  private getFacilityZone(facilityId: string, zoneId: ZoneId): boolean {
-    const facilityZoneMap: Record<string, ZoneId> = {
-      'reception-desk': 'lobby',
-      'info-board': 'lobby',
-      'desk-cluster': 'office',
-      'kanban-board': 'office',
-      whiteboard: 'office',
-      signpost: 'central-park',
-      'bench-park-1': 'central-park',
-      'bench-park-2': 'central-park',
-      'arcade-cabinet-1': 'arcade',
-      'arcade-cabinet-2': 'arcade',
-      'arcade-cabinet-3': 'arcade',
-      'prize-counter': 'arcade',
-      'game-table': 'arcade',
-      'meeting-room-a': 'meeting',
-      'meeting-room-c': 'meeting',
-      'schedule-board': 'meeting',
-      'cafe-counter': 'lounge-cafe',
-      'vending-machine': 'lounge-cafe',
-      'seating-area': 'lounge-cafe',
-      fountain: 'plaza',
-      'bench-1': 'plaza',
-      'bench-2': 'plaza',
-      'pond-edge': 'lake',
-    };
-    const normalizedId = facilityId.replace(/_/g, '-');
-    return facilityZoneMap[normalizedId] === zoneId;
+  private normalizeFacilityId(facilityId: string): string {
+    return facilityId.trim().replace(/_/g, '-');
+  }
+
+  private getFacilityObjectId(obj: TiledObject): string | undefined {
+    const facilityIdProp = obj.properties?.find(
+      p => p.name === 'facilityId' || p.name === 'facilityType'
+    );
+    if (typeof facilityIdProp?.value === 'string' && facilityIdProp.value.trim().length > 0) {
+      return this.normalizeFacilityId(facilityIdProp.value);
+    }
+
+    if (obj.type && obj.type !== 'facility') {
+      return this.normalizeFacilityId(obj.type);
+    }
+
+    if (obj.name.includes('.')) {
+      const suffix = obj.name.split('.').pop();
+      if (suffix && suffix.trim().length > 0) {
+        return this.normalizeFacilityId(suffix);
+      }
+    }
+
+    if (obj.name.trim().length > 0) {
+      return this.normalizeFacilityId(obj.name);
+    }
+
+    return undefined;
+  }
+
+  private getFacilityObjectZone(obj: TiledObject): ZoneId | undefined {
+    const zoneProp = obj.properties?.find(p => p.name === 'zone');
+    if (typeof zoneProp?.value === 'string') {
+      const zoneResult = ZoneIdSchema.safeParse(zoneProp.value);
+      if (zoneResult.success) {
+        return zoneResult.data;
+      }
+    }
+
+    const centerX = obj.x + (obj.width ?? 0) / 2;
+    const centerY = obj.y + (obj.height ?? 0) / 2;
+
+    for (const [zoneId, bounds] of Object.entries(ZONE_BOUNDS) as [ZoneId, ZoneBounds][]) {
+      const inZone =
+        centerX >= bounds.x &&
+        centerX < bounds.x + bounds.width &&
+        centerY >= bounds.y &&
+        centerY < bounds.y + bounds.height;
+      if (inZone) {
+        return zoneId;
+      }
+    }
+
+    return undefined;
+  }
+
+  private extractFacilityZoneAssignments(
+    objects: TiledObject[],
+    zones: ZoneId[]
+  ): Map<string, ZoneId> {
+    const assignments = new Map<string, ZoneId>();
+    const zoneSet = new Set(zones);
+
+    for (const obj of objects) {
+      const typeProp = obj.properties?.find(p => p.name === 'type');
+      if (typeProp?.value !== 'facility') {
+        continue;
+      }
+
+      const facilityId = this.getFacilityObjectId(obj);
+      if (!facilityId) {
+        console.warn(
+          `[WorldPackLoader] Facility object "${obj.name}" is missing a resolvable facility ID`
+        );
+        continue;
+      }
+
+      const zoneId = this.getFacilityObjectZone(obj);
+      if (!zoneId) {
+        console.warn(
+          `[WorldPackLoader] Facility object "${obj.name}" has no valid zone and is outside known zone bounds`
+        );
+        continue;
+      }
+
+      if (!zoneSet.has(zoneId)) {
+        console.warn(
+          `[WorldPackLoader] Facility object "${obj.name}" mapped to zone "${zoneId}" not present in manifest.zones`
+        );
+        continue;
+      }
+
+      const existing = assignments.get(facilityId);
+      if (existing && existing !== zoneId) {
+        console.warn(
+          `[WorldPackLoader] Facility "${facilityId}" zone conflict detected (${existing} vs ${zoneId}). Using latest value.`
+        );
+      }
+
+      assignments.set(facilityId, zoneId);
+    }
+
+    return assignments;
+  }
+
+  private resolveFacilitiesForZone(
+    facilityIds: string[],
+    zoneId: ZoneId,
+    assignments: Map<string, ZoneId>
+  ): string[] {
+    const filtered: string[] = [];
+    const seen = new Set<string>();
+
+    for (const facilityId of facilityIds) {
+      const normalizedId = this.normalizeFacilityId(facilityId);
+      const mappedZone = assignments.get(normalizedId);
+      if (!mappedZone) {
+        if (!this.warnedUnknownFacilityZoneRefs.has(normalizedId)) {
+          this.warnedUnknownFacilityZoneRefs.add(normalizedId);
+          console.warn(
+            `[WorldPackLoader] Unified map references unknown facilityId "${facilityId}" (zone mapping not found)`
+          );
+        }
+        continue;
+      }
+
+      if (mappedZone !== zoneId) {
+        continue;
+      }
+
+      if (seen.has(facilityId)) {
+        continue;
+      }
+
+      seen.add(facilityId);
+      filtered.push(facilityId);
+    }
+
+    return filtered;
+  }
+
+  private validateFacilityObjectConsistency(maps: Map<ZoneId, ZoneMapData>): void {
+    for (const [zoneId, zoneMap] of maps) {
+      const assignments = this.extractFacilityZoneAssignments(zoneMap.objects, [zoneId]);
+
+      for (const facilityId of zoneMap.facilities) {
+        const normalizedId = this.normalizeFacilityId(facilityId);
+        const mappedZone = assignments.get(normalizedId);
+        if (!mappedZone) {
+          console.warn(
+            `[WorldPackLoader] Zone "${zoneId}" references facilityId "${facilityId}" but no matching facility object mapping was found`
+          );
+          continue;
+        }
+
+        if (mappedZone !== zoneId) {
+          console.warn(
+            `[WorldPackLoader] Facility "${facilityId}" zone mismatch: mapped zone="${mappedZone}" but zone map assignment is "${zoneId}"`
+          );
+        }
+      }
+    }
   }
 
   private loadZoneMap(zoneId: ZoneId): ZoneMapData {
@@ -906,15 +1047,22 @@ export class WorldPackLoader {
     const facilities: FacilityDefinition[] = [];
 
     for (const [zoneId, zoneMap] of maps) {
-      for (const facilityId of zoneMap.facilities) {
-        facilities.push({
-          id: `${zoneId}-${facilityId}`,
-          type: facilityId,
-          name: this.formatZoneName(facilityId as ZoneId),
-          zone: zoneId,
-          position: { x: 0, y: 0 },
-          interactionRadius: 64,
-        });
+      const hasFacilityObjects = zoneMap.objects.some(obj => {
+        const typeProp = obj.properties?.find(p => p.name === 'type');
+        return typeProp?.value === 'facility';
+      });
+
+      if (!hasFacilityObjects) {
+        for (const facilityId of zoneMap.facilities) {
+          facilities.push({
+            id: `${zoneId}-${facilityId}`,
+            type: facilityId,
+            name: facilityId,
+            zone: zoneId,
+            position: { x: 0, y: 0 },
+            interactionRadius: 64,
+          });
+        }
       }
 
       for (const obj of zoneMap.objects) {

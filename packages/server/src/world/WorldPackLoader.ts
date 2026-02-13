@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve, join } from 'path';
 import {
+  MAP_CONFIG,
   ZoneIdSchema,
   EntranceDirectionSchema,
   ZONE_BOUNDS,
@@ -303,6 +304,10 @@ export class WorldPackLoader {
     const maps = new Map<ZoneId, ZoneMapData>();
     const spawnPoints = this.extractSpawnPointsFromUnified(raw);
     const objects = this.extractObjects(raw.layers ?? []);
+    const mapWidth = raw.width ?? MAP_CONFIG.width;
+    const mapHeight = raw.height ?? MAP_CONFIG.height;
+    const mapTileWidth = raw.tilewidth ?? MAP_CONFIG.tileSize;
+    const mapTileHeight = raw.tileheight ?? MAP_CONFIG.tileSize;
 
     const allEntrances = this.extractBuildingEntrances(objects);
 
@@ -316,10 +321,10 @@ export class WorldPackLoader {
         name: this.formatZoneName(zoneId),
         bounds: this.getDefaultZoneBounds(zoneId),
         spawnPoints: zoneSpawns.map(sp => ({ x: sp.x, y: sp.y })),
-        width: raw.width ?? 64,
-        height: raw.height ?? 52,
-        tileWidth: raw.tilewidth ?? 16,
-        tileHeight: raw.tileheight ?? 16,
+        width: mapWidth,
+        height: mapHeight,
+        tileWidth: mapTileWidth,
+        tileHeight: mapTileHeight,
         layers: raw.layers ?? [],
         objects: zoneObjects,
         npcs: (raw.npcs ?? []).filter(npc => this.getNpcZone(npc, zoneId)),
@@ -329,7 +334,7 @@ export class WorldPackLoader {
     }
 
     console.log(
-      `[WorldPackLoader] Loaded unified map (${raw.width}x${raw.height}) for ${zones.length} zones`
+      `[WorldPackLoader] Loaded unified map (${mapWidth}x${mapHeight}) for ${zones.length} zones`
     );
     return maps;
   }

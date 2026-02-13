@@ -20,6 +20,7 @@ function createTestPack(
     skipManifest?: boolean;
     skipMaps?: boolean;
     invalidMapJson?: boolean;
+    unifiedMap?: Record<string, unknown>;
   } = {}
 ) {
   if (existsSync(TEST_PACK_PATH)) {
@@ -92,6 +93,13 @@ function createTestPack(
         );
       }
     }
+  }
+
+  if (overrides.unifiedMap) {
+    writeFileSync(
+      resolve(TEST_PACK_PATH, 'maps', 'grid_town_outdoor.json'),
+      JSON.stringify(overrides.unifiedMap, null, 2)
+    );
   }
 
   writeFileSync(resolve(TEST_PACK_PATH, 'npcs', 'index.json'), JSON.stringify({ npcs: [] }));
@@ -279,6 +287,26 @@ describe('WorldPackLoader', () => {
       const plaza = loader.getZoneMap('plaza');
       expect(plaza).toBeDefined();
       expect(plaza?.name).toBe('Plaza');
+    });
+
+    it('uses MAP_CONFIG defaults for unified map dimensions when metadata is missing', () => {
+      createTestPack({
+        zones: ['plaza'],
+        skipMaps: true,
+        unifiedMap: {
+          layers: [],
+        },
+      });
+
+      const loader = new WorldPackLoader(TEST_PACK_PATH);
+      loader.loadPack();
+
+      const plaza = loader.getZoneMap('plaza');
+      expect(plaza).toBeDefined();
+      expect(plaza?.width).toBe(64);
+      expect(plaza?.height).toBe(64);
+      expect(plaza?.tileWidth).toBe(16);
+      expect(plaza?.tileHeight).toBe(16);
     });
   });
 });

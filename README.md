@@ -222,6 +222,8 @@ Map expansion or tile changes must follow the same issue-first routine to preven
 **Core verification commands:**
 
 ```bash
+pnpm verify:map-change                      # Unified map-change verification (recommended)
+# Expanded form (same pipeline):
 pnpm sync-maps                              # Sync source to server/client
 node scripts/verify-map-stack-consistency.mjs  # Validate consistency
 pnpm test                                   # Run tests

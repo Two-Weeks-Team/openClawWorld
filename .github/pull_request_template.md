@@ -37,6 +37,7 @@
 
 #### Verification Commands
 
+- [ ] `pnpm verify:map-change` executed (recommended unified command)
 - [ ] `pnpm sync-maps` executed
 - [ ] `node scripts/verify-map-stack-consistency.mjs` passes
 - [ ] `pnpm build` succeeds
@@ -49,6 +50,7 @@
 - [ ] Spawn coordinates within valid bounds
 - [ ] Collision layer values are 0 or 1 only
 - [ ] NPC IDs match atlas frame keys
+- [ ] Minimap regression checked (zone/road/water + viewport alignment)
 - [ ] No hardcoded zone/coordinate values added
 
 #### Documentation

@@ -104,6 +104,13 @@ export class GameScene extends Phaser.Scene {
   private skillKeys?: Phaser.Input.Keyboard.Key[];
   private targetingMode = false;
   private selectedSkillSlot: number | null = null;
+
+  // Input State Machine:
+  // Idle -> ChatFocus: Enter key pressed
+  // Idle -> Targeting: Skill activation
+  // Targeting -> Idle: Target selected or cancelled
+  // ChatFocus -> Idle: Chat submitted or ESC
+  // Priority: Targeting > ChatFocus > Idle
   private entityEffects: Map<string, Set<string>> = new Map();
   private builtinSkills: SkillDefinition[] = [];
   private _debugBlockedCount = 0;
@@ -1315,6 +1322,7 @@ export class GameScene extends Phaser.Scene {
   private handleKeyboardMovement() {
     if (!this.cursors || !this.wasdKeys) return;
     if (document.activeElement?.tagName === 'INPUT') return;
+    if (this.targetingMode) return;
     if (!gameClient.currentRoom || !gameClient.entityId) return;
 
     const myPlayer = this.entityData.get(gameClient.entityId);

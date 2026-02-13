@@ -8,7 +8,7 @@ import {
   type PackManifest,
 } from '../../packages/server/src/world/WorldPackLoader.js';
 import { MapLoader } from '../../packages/server/src/map/MapLoader.js';
-import type { ZoneId } from '@openclawworld/shared';
+import { MAP_CONFIG, type ZoneId } from '@openclawworld/shared';
 
 const TEST_PACK_PATH = resolve(process.cwd(), 'tests/fixtures/test-pack');
 const REAL_PACK_PATH = resolve(process.cwd(), 'world/packs/base');
@@ -20,6 +20,7 @@ function createTestPack(
     skipManifest?: boolean;
     skipMaps?: boolean;
     invalidMapJson?: boolean;
+    unifiedMap?: Record<string, unknown>;
   } = {}
 ) {
   if (existsSync(TEST_PACK_PATH)) {
@@ -92,6 +93,13 @@ function createTestPack(
         );
       }
     }
+  }
+
+  if (overrides.unifiedMap) {
+    writeFileSync(
+      resolve(TEST_PACK_PATH, 'maps', 'grid_town_outdoor.json'),
+      JSON.stringify(overrides.unifiedMap, null, 2)
+    );
   }
 
   writeFileSync(resolve(TEST_PACK_PATH, 'npcs', 'index.json'), JSON.stringify({ npcs: [] }));
@@ -279,6 +287,45 @@ describe('WorldPackLoader', () => {
       const plaza = loader.getZoneMap('plaza');
       expect(plaza).toBeDefined();
       expect(plaza?.name).toBe('Plaza');
+    });
+  });
+
+  describe('unified map fallback', () => {
+    it('uses MAP_CONFIG defaults for unified map dimensions when metadata is missing', () => {
+      createTestPack({
+        zones: ['plaza'],
+        skipMaps: true,
+        unifiedMap: {
+          layers: [],
+        },
+      });
+
+      const loader = new WorldPackLoader(TEST_PACK_PATH);
+      loader.loadPack();
+
+      const plaza = loader.getZoneMap('plaza');
+      expect(plaza).toBeDefined();
+      expect(plaza?.width).toBe(MAP_CONFIG.width);
+      expect(plaza?.height).toBe(MAP_CONFIG.height);
+      expect(plaza?.tileWidth).toBe(MAP_CONFIG.tileSize);
+      expect(plaza?.tileHeight).toBe(MAP_CONFIG.tileSize);
+    });
+
+    it('throws WorldPackError for invalid unified map dimensions', () => {
+      createTestPack({
+        zones: ['plaza'],
+        skipMaps: true,
+        unifiedMap: {
+          width: -1,
+          height: 64,
+          tilewidth: 16,
+          tileheight: 16,
+          layers: [],
+        },
+      });
+
+      const loader = new WorldPackLoader(TEST_PACK_PATH);
+      expect(() => loader.loadPack()).toThrow(WorldPackError);
     });
   });
 });

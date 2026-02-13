@@ -26,7 +26,13 @@ export async function handleSkillInvoke(req: Request, res: Response): Promise<vo
   const body = req.validatedBody as SkillInvokeRequest;
   const { agentId, roomId, skillId, actionId, params } = body;
 
-  // TODO(security): Validate req.authToken maps to agentId (requires token registry)
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   const txId = (body as { txId?: string }).txId ?? `tx_${uuidv4()}`;
 
   try {

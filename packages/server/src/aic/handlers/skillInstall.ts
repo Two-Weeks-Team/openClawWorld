@@ -23,7 +23,13 @@ export async function handleSkillInstall(req: Request, res: Response): Promise<v
   const body = req.validatedBody as SkillInstallRequest;
   const { agentId, roomId, skillId, credentials } = body;
 
-  // TODO(security): Validate req.authToken maps to agentId (requires token registry)
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);
 

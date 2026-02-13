@@ -61,6 +61,104 @@ export type WorldPack = {
   facilities: FacilityDefinition[];
 };
 
+/**
+ * Validation severity levels
+ * ERROR: Blocks CI - critical consistency violations
+ * WARN: Allowed but reported - non-critical issues
+ */
+export enum ValidationSeverity {
+  ERROR = 'ERROR',
+  WARN = 'WARN',
+}
+
+/**
+ * Validation error codes with severity classification
+ */
+export enum ValidationErrorCode {
+  // ERROR codes (CI blocking)
+  ZONE_MISMATCH = 'ZONE_MISMATCH',
+  UNKNOWN_NPC_REFERENCE = 'UNKNOWN_NPC_REF',
+  UNKNOWN_FACILITY_REFERENCE = 'UNKNOWN_FACILITY_REF',
+  INVALID_ZONE_ID = 'INVALID_ZONE_ID',
+  INVALID_ENTRANCE_CONTRACT = 'INVALID_ENTRANCE_CONTRACT',
+  FACILITY_ZONE_CONFLICT = 'FACILITY_ZONE_CONFLICT',
+
+  // WARN codes (allowed but reported)
+  HIGH_BLOCK_PERCENTAGE = 'HIGH_BLOCK_PCT',
+  MIXED_ENTRANCE_TILES = 'MIXED_ENTRANCE_TILES',
+  MISSING_OPTIONAL_FIELD = 'MISSING_OPTIONAL',
+  NPC_ZONE_NOT_MAPPED = 'NPC_ZONE_NOT_MAPPED',
+}
+
+/**
+ * Validation issue with severity and code
+ */
+export interface ValidationIssue {
+  severity: ValidationSeverity;
+  code: ValidationErrorCode;
+  message: string;
+  detail: string;
+  context?: Record<string, unknown>;
+}
+
+/**
+ * Validation result collector
+ */
+export class ValidationResult {
+  private errors: ValidationIssue[] = [];
+  private warnings: ValidationIssue[] = [];
+
+  addError(
+    code: ValidationErrorCode,
+    message: string,
+    detail: string,
+    context?: Record<string, unknown>
+  ): void {
+    this.errors.push({
+      severity: ValidationSeverity.ERROR,
+      code,
+      message,
+      detail,
+      context,
+    });
+  }
+
+  addWarning(
+    code: ValidationErrorCode,
+    message: string,
+    detail: string,
+    context?: Record<string, unknown>
+  ): void {
+    this.warnings.push({
+      severity: ValidationSeverity.WARN,
+      code,
+      message,
+      detail,
+      context,
+    });
+  }
+
+  hasErrors(): boolean {
+    return this.errors.length > 0;
+  }
+
+  hasWarnings(): boolean {
+    return this.warnings.length > 0;
+  }
+
+  getErrors(): ValidationIssue[] {
+    return this.errors;
+  }
+
+  getWarnings(): ValidationIssue[] {
+    return this.warnings;
+  }
+
+  getAllIssues(): ValidationIssue[] {
+    return [...this.errors, ...this.warnings];
+  }
+}
+
 export class WorldPackError extends Error {
   constructor(
     message: string,
@@ -138,6 +236,7 @@ export class WorldPackLoader {
   private warnedMissingNpcZones: Set<string> = new Set();
   private warnedUnknownNpcZoneRefs: Set<string> = new Set();
   private warnedUnknownFacilityZoneRefs: Set<string> = new Set();
+  private validationResult: ValidationResult = new ValidationResult();
 
   constructor(packPath: string) {
     this.packPath = resolve(packPath);
@@ -147,6 +246,8 @@ export class WorldPackLoader {
     if (!existsSync(this.packPath)) {
       throw new WorldPackError('Pack directory not found', this.packPath);
     }
+
+    this.validationResult = new ValidationResult();
 
     const manifest = this.loadManifest();
     this.loadNpcZoneMapping();
@@ -168,6 +269,10 @@ export class WorldPackLoader {
     );
 
     return this.pack;
+  }
+
+  getValidationResult(): ValidationResult {
+    return this.validationResult;
   }
 
   getPack(): WorldPack {
@@ -578,6 +683,12 @@ export class WorldPackLoader {
         const mappedZone = this.npcZoneCache.get(npcId);
 
         if (!mappedZone) {
+          this.validationResult.addError(
+            ValidationErrorCode.UNKNOWN_NPC_REFERENCE,
+            'NPC zone mapping not found',
+            `Zone "${zoneId}" references unknown npcId "${npcId}" (zone mapping not found)`,
+            { zoneId, npcId }
+          );
           console.warn(
             `[WorldPackLoader] Zone "${zoneId}" references unknown npcId "${npcId}" (zone mapping not found)`
           );
@@ -585,6 +696,12 @@ export class WorldPackLoader {
         }
 
         if (mappedZone !== zoneId) {
+          this.validationResult.addError(
+            ValidationErrorCode.ZONE_MISMATCH,
+            'NPC zone mismatch',
+            `NPC "${npcId}" zone mismatch: npc json zone="${mappedZone}" but zone map assignment is "${zoneId}"`,
+            { npcId, npcZone: mappedZone, assignedZone: zoneId }
+          );
           console.warn(
             `[WorldPackLoader] NPC "${npcId}" zone mismatch: npc json zone="${mappedZone}" but zone map assignment is "${zoneId}"`
           );
@@ -599,6 +716,12 @@ export class WorldPackLoader {
         const npcId = typeof npcIdProp?.value === 'string' ? npcIdProp.value : '';
 
         if (!npcId) {
+          this.validationResult.addWarning(
+            ValidationErrorCode.MISSING_OPTIONAL_FIELD,
+            'NPC ID property missing',
+            `NPC object "${obj.name}" in zone "${zoneId}" is missing npcId property`,
+            { objectName: obj.name, zoneId }
+          );
           console.warn(
             `[WorldPackLoader] NPC object "${obj.name}" in zone "${zoneId}" is missing npcId property`
           );
@@ -609,6 +732,12 @@ export class WorldPackLoader {
 
         const mappedZone = this.npcZoneCache.get(npcId);
         if (!mappedZone) {
+          this.validationResult.addError(
+            ValidationErrorCode.UNKNOWN_NPC_REFERENCE,
+            'NPC zone mapping not found',
+            `NPC object "${obj.name}" references unknown npcId "${npcId}" (zone mapping not found)`,
+            { objectName: obj.name, npcId }
+          );
           console.warn(
             `[WorldPackLoader] NPC object "${obj.name}" references unknown npcId "${npcId}" (zone mapping not found)`
           );
@@ -616,6 +745,12 @@ export class WorldPackLoader {
         }
 
         if (mappedZone !== zoneId) {
+          this.validationResult.addError(
+            ValidationErrorCode.ZONE_MISMATCH,
+            'NPC zone mismatch',
+            `NPC "${npcId}" zone mismatch: npc json zone="${mappedZone}" but map object "${obj.name}" is in zone "${zoneId}"`,
+            { npcId, npcZone: mappedZone, objectName: obj.name, mapZone: zoneId }
+          );
           console.warn(
             `[WorldPackLoader] NPC "${npcId}" zone mismatch: npc json zone="${mappedZone}" but map object "${obj.name}" is in zone "${zoneId}"`
           );
@@ -712,6 +847,12 @@ export class WorldPackLoader {
 
       const facilityIds = this.getFacilityObjectIdCandidates(obj);
       if (facilityIds.length === 0) {
+        this.validationResult.addWarning(
+          ValidationErrorCode.MISSING_OPTIONAL_FIELD,
+          'Facility ID missing',
+          `Facility object "${obj.name}" is missing a resolvable facility ID`,
+          { objectName: obj.name }
+        );
         console.warn(
           `[WorldPackLoader] Facility object "${obj.name}" is missing a resolvable facility ID`
         );
@@ -720,6 +861,12 @@ export class WorldPackLoader {
 
       const zoneId = this.getFacilityObjectZone(obj);
       if (!zoneId) {
+        this.validationResult.addError(
+          ValidationErrorCode.INVALID_ZONE_ID,
+          'Facility has no valid zone',
+          `Facility object "${obj.name}" has no valid zone and is outside known zone bounds`,
+          { objectName: obj.name }
+        );
         console.warn(
           `[WorldPackLoader] Facility object "${obj.name}" has no valid zone and is outside known zone bounds`
         );
@@ -727,6 +874,12 @@ export class WorldPackLoader {
       }
 
       if (!zoneSet.has(zoneId)) {
+        this.validationResult.addError(
+          ValidationErrorCode.INVALID_ZONE_ID,
+          'Facility zone not in manifest',
+          `Facility object "${obj.name}" mapped to zone "${zoneId}" not present in manifest.zones`,
+          { objectName: obj.name, zoneId }
+        );
         console.warn(
           `[WorldPackLoader] Facility object "${obj.name}" mapped to zone "${zoneId}" not present in manifest.zones`
         );
@@ -736,6 +889,12 @@ export class WorldPackLoader {
       for (const facilityId of facilityIds) {
         const existing = assignments.get(facilityId);
         if (existing && existing !== zoneId) {
+          this.validationResult.addError(
+            ValidationErrorCode.FACILITY_ZONE_CONFLICT,
+            'Facility zone conflict',
+            `Facility "${facilityId}" zone conflict detected (${existing} vs ${zoneId}). Using latest value.`,
+            { facilityId, existingZone: existing, newZone: zoneId }
+          );
           console.warn(
             `[WorldPackLoader] Facility "${facilityId}" zone conflict detected (${existing} vs ${zoneId}). Using latest value.`
           );
@@ -762,6 +921,12 @@ export class WorldPackLoader {
       if (!mappedZone) {
         if (!this.warnedUnknownFacilityZoneRefs.has(normalizedId)) {
           this.warnedUnknownFacilityZoneRefs.add(normalizedId);
+          this.validationResult.addWarning(
+            ValidationErrorCode.UNKNOWN_FACILITY_REFERENCE,
+            'Facility zone mapping not found',
+            `Unified map references unknown facilityId "${facilityId}" (zone mapping not found)`,
+            { facilityId }
+          );
           console.warn(
             `[WorldPackLoader] Unified map references unknown facilityId "${facilityId}" (zone mapping not found)`
           );
@@ -792,6 +957,12 @@ export class WorldPackLoader {
         const normalizedId = this.normalizeFacilityId(facilityId);
         const mappedZone = assignments.get(normalizedId);
         if (!mappedZone) {
+          this.validationResult.addError(
+            ValidationErrorCode.UNKNOWN_FACILITY_REFERENCE,
+            'Facility zone mapping not found',
+            `Zone "${zoneId}" references facilityId "${facilityId}" but no matching facility object mapping was found`,
+            { zoneId, facilityId }
+          );
           console.warn(
             `[WorldPackLoader] Zone "${zoneId}" references facilityId "${facilityId}" but no matching facility object mapping was found`
           );
@@ -799,6 +970,12 @@ export class WorldPackLoader {
         }
 
         if (mappedZone !== zoneId) {
+          this.validationResult.addError(
+            ValidationErrorCode.ZONE_MISMATCH,
+            'Facility zone mismatch',
+            `Facility "${facilityId}" zone mismatch: mapped zone="${mappedZone}" but zone map assignment is "${zoneId}"`,
+            { facilityId, mappedZone, assignedZone: zoneId }
+          );
           console.warn(
             `[WorldPackLoader] Facility "${facilityId}" zone mismatch: mapped zone="${mappedZone}" but zone map assignment is "${zoneId}"`
           );

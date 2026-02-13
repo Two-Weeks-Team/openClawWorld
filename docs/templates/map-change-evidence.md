@@ -38,7 +38,7 @@ node scripts/verify-map-stack-consistency.mjs
 ```
 **Result**: [ ] Pass | [ ] Fail  
 **Output**:
-```
+```text
 <!-- Paste verification output here -->
 ```
 
@@ -88,7 +88,7 @@ pnpm test
 
 | Risk | Mitigation | Status |
 |------|------------|--------|
-| <!-- Describe any remaining risks --> | <!-- How it will be addressed --> | [ ] Resolved | [ ] Deferred |
+| <!-- Describe any remaining risks --> | <!-- How it will be addressed --> | Resolved / Deferred |
 
 ---
 

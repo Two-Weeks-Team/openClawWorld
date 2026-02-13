@@ -135,6 +135,9 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
       from: agentEntity.name,
       message,
       entityId: agentId,
+      channel,
+      messageId,
+      tsMs,
     });
 
     const eventLog = gameRoom.getEventLog();

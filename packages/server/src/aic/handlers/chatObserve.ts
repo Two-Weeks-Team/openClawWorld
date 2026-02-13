@@ -72,7 +72,7 @@ export async function handleChatObserve(req: Request, res: Response): Promise<vo
       return;
     }
 
-    const messages = chatSystem.getMessages(roomId, channel, windowSec);
+    const messages = chatSystem.getMessagesForEntity(roomId, agentId, channel, windowSec);
 
     const responseData: ChatObserveResponseData = {
       messages,

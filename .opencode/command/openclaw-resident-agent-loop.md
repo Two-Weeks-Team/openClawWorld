@@ -62,7 +62,7 @@ pnpm resident-agent-loop -- --chaos --dry-run
 - Long-running process (no automatic stop condition)
 - Stop with `Ctrl+C` for graceful shutdown
 - Issues are filed through GitHub CLI when detected
-</command-instruction>
+  </command-instruction>
 
 <allowed-tools>
   <tool>Bash</tool>

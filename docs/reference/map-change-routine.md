@@ -30,6 +30,8 @@
    - 타일/NPC/플레이어 에셋은 `tools/kenney-curation.json` 계약을 우선 반영한다.
 
 3. 정합성 검증
+   - `pnpm verify:map-change` (권장 단일 명령)
+   - 필요 시 상세 확인:
    - `pnpm sync-maps`
    - `node scripts/verify-map-stack-consistency.mjs`
    - `pnpm test`

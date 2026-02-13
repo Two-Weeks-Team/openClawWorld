@@ -267,23 +267,25 @@ curl -X POST http://localhost:2567/aic/v0.1/observe \
 
 ## AI CLI Commands
 
-This project includes custom commands for multiple AI coding assistants, auto-generated from the OpenAPI specification.
+This project includes custom commands for multiple AI coding assistants.
+
+- `ocw-tools` and `openclaw-resident-agent-loop` are generated from unified command definitions.
 
 ### Supported CLIs
 
-| CLI                                                           | Config Location      | Status    |
-| ------------------------------------------------------------- | -------------------- | --------- |
-| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `.claude/commands/`  | Supported |
-| [OpenCode](https://github.com/anomalyco/opencode)             | `.opencode/command/` | Supported |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli)     | `.gemini/commands/`  | Supported |
-| [Codex CLI](https://github.com/openai/codex)                  | `.codex/`            | Supported |
+| CLI                                                           | Config Location      | Available Commands                            |
+| ------------------------------------------------------------- | -------------------- | --------------------------------------------- |
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | `.claude/commands/`  | `/openclaw-resident-agent-loop`, `/ocw-tools` |
+| [OpenCode](https://github.com/anomalyco/opencode)             | `.opencode/command/` | `/openclaw-resident-agent-loop`, `/ocw-tools` |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli)     | `.gemini/commands/`  | `openclaw-resident-agent-loop`, `ocw-tools`   |
+| [Codex CLI](https://github.com/openai/codex)                  | `.codex/AGENTS.md`   | `openclaw-resident-agent-loop`, `ocw-tools`   |
 
 ### Available Commands
 
-| Command                         | Description                                        |
-| ------------------------------- | -------------------------------------------------- |
-| `/openclaw-resident-agent-loop` | Autonomous agent loop for continuous bug discovery |
-| `/ocw-tools`                    | Reference for all AIC API tools (auto-generated)   |
+| Command                         | Description                                        | Availability                    |
+| ------------------------------- | -------------------------------------------------- | ------------------------------- |
+| `/openclaw-resident-agent-loop` | Autonomous agent loop for continuous bug discovery | Claude, OpenCode, Gemini, Codex |
+| `/ocw-tools`                    | Reference for all AIC API tools (auto-generated)   | Claude, OpenCode, Gemini, Codex |
 
 ### Quick Start
 
@@ -301,7 +303,7 @@ claude  # or: opencode, gemini, codex
 
 ### Code Generation
 
-Commands and plugin tools are auto-generated from the OpenAPI spec:
+CLI commands and plugin tools are auto-generated from unified definitions and OpenAPI-derived tool metadata:
 
 ```bash
 # Regenerate after OpenAPI changes
@@ -309,8 +311,18 @@ pnpm generate
 
 # Individual generators
 pnpm generate:tools     # Generate plugin tool implementations
-pnpm generate:commands  # Generate CLI command files
+pnpm generate:commands  # Generate command files for all CLIs
 ```
+
+Generated outputs:
+
+- `.claude/commands/ocw-tools.md`
+- `.claude/commands/openclaw-resident-agent-loop.md`
+- `.opencode/command/ocw-tools.md`
+- `.opencode/command/openclaw-resident-agent-loop.md`
+- `.gemini/commands/ocw-tools.toml`
+- `.gemini/commands/openclaw-resident-agent-loop.toml`
+- `.codex/AGENTS.md`
 
 See [.claude/README.md](.claude/README.md) for detailed installation and usage instructions.
 

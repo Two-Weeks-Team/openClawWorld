@@ -135,6 +135,7 @@ export class WorldPackLoader {
   private packPath: string;
   private pack: WorldPack | null = null;
   private npcZoneCache: Map<string, ZoneId> = new Map();
+  private warnedMissingNpcZones: Set<string> = new Set();
 
   constructor(packPath: string) {
     this.packPath = resolve(packPath);
@@ -148,6 +149,7 @@ export class WorldPackLoader {
     const manifest = this.loadManifest();
     this.loadNpcZoneMapping();
     const maps = this.loadAllZoneMaps(manifest.zones);
+    this.validateNpcObjectConsistency(maps);
     const npcs = this.loadNpcs();
     const facilities = this.loadFacilities(maps);
 
@@ -415,6 +417,9 @@ export class WorldPackLoader {
   }
 
   private loadNpcZoneMapping(): void {
+    this.npcZoneCache.clear();
+    this.warnedMissingNpcZones.clear();
+
     const npcsDir = join(this.packPath, 'npcs');
     if (!existsSync(npcsDir)) {
       return;
@@ -446,13 +451,94 @@ export class WorldPackLoader {
       try {
         const npcContent = readFileSync(npcPath, 'utf-8');
         const raw = JSON.parse(npcContent) as { zone?: string };
-        if (raw.zone) {
-          this.npcZoneCache.set(npcId, raw.zone as ZoneId);
+        if (!raw.zone) {
+          if (!this.warnedMissingNpcZones.has(npcId)) {
+            this.warnedMissingNpcZones.add(npcId);
+            console.warn(
+              `[WorldPackLoader] NPC "${npcId}" has no zone. It will be excluded from zone NPC lists.`
+            );
+          }
+          continue;
         }
+
+        const zoneResult = ZoneIdSchema.safeParse(raw.zone);
+        if (!zoneResult.success) {
+          console.warn(
+            `[WorldPackLoader] NPC "${npcId}" has invalid zone "${raw.zone}". It will be excluded from zone NPC lists.`
+          );
+          continue;
+        }
+
+        const existing = this.npcZoneCache.get(npcId);
+        if (existing && existing !== zoneResult.data) {
+          console.warn(
+            `[WorldPackLoader] NPC "${npcId}" zone conflict detected (${existing} vs ${zoneResult.data}). Using latest value.`
+          );
+        }
+
+        this.npcZoneCache.set(npcId, zoneResult.data);
       } catch {
         continue;
       }
     }
+  }
+
+  private validateNpcObjectConsistency(maps: Map<ZoneId, ZoneMapData>): void {
+    const referencedNpcIds = new Set<string>();
+
+    for (const [zoneId, zoneMap] of maps) {
+      for (const npcId of zoneMap.npcs) {
+        referencedNpcIds.add(npcId);
+        const mappedZone = this.npcZoneCache.get(npcId);
+
+        if (!mappedZone) {
+          console.warn(
+            `[WorldPackLoader] Zone "${zoneId}" references unknown npcId "${npcId}" (zone mapping not found)`
+          );
+          continue;
+        }
+
+        if (mappedZone !== zoneId) {
+          console.warn(
+            `[WorldPackLoader] NPC "${npcId}" zone mismatch: npc json zone="${mappedZone}" but zone map assignment is "${zoneId}"`
+          );
+        }
+      }
+
+      for (const obj of zoneMap.objects) {
+        const typeProp = obj.properties?.find(p => p.name === 'type');
+        if (typeProp?.value !== 'npc') continue;
+
+        const npcIdProp = obj.properties?.find(p => p.name === 'npcId');
+        const npcId = typeof npcIdProp?.value === 'string' ? npcIdProp.value : '';
+
+        if (!npcId) {
+          console.warn(
+            `[WorldPackLoader] NPC object "${obj.name}" in zone "${zoneId}" is missing npcId property`
+          );
+          continue;
+        }
+
+        referencedNpcIds.add(npcId);
+
+        const mappedZone = this.npcZoneCache.get(npcId);
+        if (!mappedZone) {
+          console.warn(
+            `[WorldPackLoader] NPC object "${obj.name}" references unknown npcId "${npcId}" (zone mapping not found)`
+          );
+          continue;
+        }
+
+        if (mappedZone !== zoneId) {
+          console.warn(
+            `[WorldPackLoader] NPC "${npcId}" zone mismatch: npc json zone="${mappedZone}" but map object "${obj.name}" is in zone "${zoneId}"`
+          );
+        }
+      }
+    }
+
+    // Unreferenced NPCs are allowed (e.g., dynamically spawned or future content),
+    // so we only validate explicit references from maps/object layers.
   }
 
   private getNpcZone(npcId: string, zoneId: ZoneId): boolean {

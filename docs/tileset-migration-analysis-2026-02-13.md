@@ -188,7 +188,7 @@ ground 레이어 유니크 ID: `1,2,3,4,5,7,9,13`
 아래 항목을 사전 검증 완료:
 
 1. 소스 자산 접근성: 통과  
-   - `docs/reference/Kenney Game Assets All-in-1 3.3.0/...` 파일 존재 확인.
+   - `packages/client/public/assets/kenney/...` 리포 내 추적 자산 존재 확인.
 2. 추출 재현성: 통과  
    - `extract_tileset.py` 실행 전후 `tileset.png` MD5 동일.
 3. 맵 동기화 일관성: 통과  
@@ -203,4 +203,3 @@ ground 레이어 유니크 ID: `1,2,3,4,5,7,9,13`
 1. 단계 A 문서 계약 먼저 확정.
 2. 단계 B에서 `extract_tileset.py` ID 8개 슬롯 재매핑 적용.
 3. 시각 점검 후 단계 C를 별도 PR로 분리 진행.
-

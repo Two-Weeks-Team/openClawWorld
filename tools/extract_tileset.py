@@ -1,138 +1,255 @@
 #!/usr/bin/env python3
-"""
-Extract tiles from Kenney Roguelike City Pack to create a game tileset.
+"""Extract map tileset using the Kenney curation manifest contract."""
 
-The city_tilemap.png is 592x448 pixels with 37x28 tiles at 16x16 each.
-No spacing between tiles (packed format).
+from __future__ import annotations
 
-Output: 128x64 tileset (8x4 tiles at 16x16)
-"""
-
-from PIL import Image
+import json
 import os
+from pathlib import Path
+from typing import Any
 
-# Source tilemap
-KENNEY_PATH = "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets"
-CITY_TILEMAP = f"{KENNEY_PATH}/Roguelike City Pack/Tilemap/tilemap_packed.png"
-INTERIOR_TILEMAP = (
-    f"{KENNEY_PATH}/Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png"
-)
-
-# Output
-OUTPUT_PATH = "packages/client/public/assets/maps/tileset.png"
-
-# Tile size
-TILE_SIZE = 16
-
-# City tilemap: 37 columns, 28 rows (no spacing in packed version)
-CITY_COLS = 37
-CITY_ROWS = 28
+try:
+    from PIL import Image
+except ModuleNotFoundError:
+    Image = None
 
 
-def get_tile_from_city(img, col, row):
-    """Extract a tile from city tilemap (0-indexed)."""
-    x = col * TILE_SIZE
-    y = row * TILE_SIZE
-    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MANIFEST_PATH = Path(__file__).resolve().with_name("kenney-curation.json")
 
 
-def get_tile_from_interior(img, col, row, spacing=1):
-    """Extract a tile from interior tilemap (0-indexed, with 1px spacing)."""
-    x = col * (TILE_SIZE + spacing)
-    y = row * (TILE_SIZE + spacing)
-    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+class CurationError(RuntimeError):
+    """Raised when kenney-curation.json contract is invalid."""
 
 
-def main():
-    # Load source tilemaps
-    city_img = Image.open(CITY_TILEMAP)
-    interior_img = Image.open(INTERIOR_TILEMAP)
+def _require_int(value: Any, field: str, *, minimum: int = 0) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise CurationError(f"{field} must be an integer, got {value!r}")
+    if value < minimum:
+        raise CurationError(f"{field} must be >= {minimum}, got {value}")
+    return value
 
-    print(f"City tilemap size: {city_img.size}")
-    print(f"Interior tilemap size: {interior_img.size}")
 
-    # Create output tileset (8x4 = 32 tiles)
-    # 128x64 pixels (8 columns, 4 rows)
-    tileset = Image.new("RGBA", (128, 64), (0, 0, 0, 0))
+def _require_str(value: Any, field: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise CurationError(f"{field} must be a non-empty string")
+    return value
 
-    # Tile mapping based on current game requirements:
-    # Row 0: Basic terrain (grass, road variants)
-    # Row 1: Floor types for different zones
-    # Row 2: Walls, doors, water
-    # Row 3: Decorations, special tiles
 
-    # Selected tiles from city_tilemap (by visual inspection of common roguelike layouts):
-    # Grass: typically around row 0-2, col 0-5
-    # Road: typically middle rows
-    # Water: typically bottom rows or edges
-    # Buildings: various
+def _resolve_repo_path(relative_path: str, field: str) -> Path:
+    path = REPO_ROOT / relative_path
+    if not path.exists():
+        raise CurationError(f"{field} does not exist: {path}")
+    return path
 
-    tile_mapping = [
-        # Row 0: Basic terrain
-        (0, 0, "city"),  # 0: empty/void
-        (1, 0, "city"),  # 1: grass light
-        (2, 0, "city"),  # 2: grass dark
-        (0, 1, "city"),  # 3: road horizontal
-        (1, 1, "city"),  # 4: road vertical
-        (2, 1, "city"),  # 5: road corner
-        (3, 1, "city"),  # 6: road intersection
-        (4, 1, "city"),  # 7: path/sidewalk
-        # Row 1: Zone floors
-        (0, 2, "city"),  # 8: floor_lobby (tile)
-        (1, 2, "city"),  # 9: floor_office
-        (2, 2, "city"),  # 10: floor_meeting
-        (3, 2, "city"),  # 11: floor_lounge
-        (4, 2, "city"),  # 12: floor_arcade
-        (5, 2, "city"),  # 13: floor_plaza
-        (6, 2, "city"),  # 14: floor_park
-        (7, 2, "city"),  # 15: floor_lake (water edge)
-        # Row 2: Walls and barriers
-        (0, 5, "city"),  # 16: wall solid
-        (1, 5, "city"),  # 17: wall_top
-        (2, 5, "city"),  # 18: wall_left
-        (3, 5, "city"),  # 19: wall_right
-        (4, 5, "city"),  # 20: wall_bottom
-        (0, 8, "city"),  # 21: door closed
-        (1, 8, "city"),  # 22: door open
-        (0, 10, "city"),  # 23: water
-        # Row 3: Decorations and special
-        (0, 12, "city"),  # 24: tree
-        (1, 12, "city"),  # 25: bush
-        (2, 12, "city"),  # 26: flower
-        (0, 15, "city"),  # 27: fountain
-        (1, 15, "city"),  # 28: bench
-        (2, 15, "city"),  # 29: lamp
-        (3, 15, "city"),  # 30: sign
-        (4, 15, "city"),  # 31: chest
-    ]
 
-    # Place tiles into output tileset
-    for idx, (col, row, source) in enumerate(tile_mapping):
-        out_col = idx % 8
-        out_row = idx // 8
-        out_x = out_col * TILE_SIZE
-        out_y = out_row * TILE_SIZE
+def _load_manifest() -> dict[str, Any]:
+    if not MANIFEST_PATH.exists():
+        raise CurationError(f"Manifest not found: {MANIFEST_PATH}")
 
+    with MANIFEST_PATH.open("r", encoding="utf-8") as f:
         try:
-            if source == "city":
-                tile = get_tile_from_city(city_img, col, row)
-            else:
-                tile = get_tile_from_interior(interior_img, col, row)
+            manifest = json.load(f)
+        except json.JSONDecodeError as exc:
+            raise CurationError(f"Failed to parse {MANIFEST_PATH}: {exc}") from exc
 
-            tileset.paste(tile, (out_x, out_y))
-            print(f"Tile {idx}: ({col}, {row}) from {source} -> ({out_col}, {out_row})")
-        except Exception as e:
-            print(f"Error extracting tile {idx}: {e}")
-            # Fill with placeholder color
-            placeholder = Image.new("RGBA", (TILE_SIZE, TILE_SIZE), (255, 0, 255, 255))
-            tileset.paste(placeholder, (out_x, out_y))
+    if not isinstance(manifest, dict):
+        raise CurationError("Manifest root must be an object")
+    return manifest
 
-    # Save output
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    tileset.save(OUTPUT_PATH)
-    print(f"\nSaved tileset to {OUTPUT_PATH}")
-    print(f"Output size: {tileset.size}")
+
+def _load_pack_images(manifest: dict[str, Any], tile_size: int) -> dict[str, dict[str, Any]]:
+    source_root_rel = _require_str(manifest.get("sourceRoot"), "sourceRoot")
+    source_root = _resolve_repo_path(source_root_rel, "sourceRoot")
+    if not source_root.is_dir():
+        raise CurationError(f"sourceRoot must be a directory: {source_root}")
+
+    packs = manifest.get("packs")
+    if not isinstance(packs, dict) or not packs:
+        raise CurationError("packs must be a non-empty object")
+
+    pack_images: dict[str, dict[str, Any]] = {}
+    for pack_name, pack in packs.items():
+        if not isinstance(pack, dict):
+            raise CurationError(f"packs.{pack_name} must be an object")
+
+        pack_path_rel = _require_str(pack.get("path"), f"packs.{pack_name}.path")
+        pack_path = source_root / pack_path_rel
+        if not pack_path.exists():
+            raise CurationError(f"packs.{pack_name}.path does not exist: {pack_path}")
+
+        pack_tile_size = _require_int(pack.get("tileSize", tile_size), f"packs.{pack_name}.tileSize", minimum=1)
+        if pack_tile_size != tile_size:
+            raise CurationError(
+                f"packs.{pack_name}.tileSize={pack_tile_size} must match tileset.tileSize={tile_size}"
+            )
+        spacing = _require_int(pack.get("spacing", 0), f"packs.{pack_name}.spacing", minimum=0)
+
+        pack_images[pack_name] = {
+            "image": Image.open(pack_path),
+            "spacing": spacing,
+            "path": pack_path,
+        }
+
+    return pack_images
+
+
+def _extract_tile(pack_img: Image.Image, tile_size: int, spacing: int, col: int, row: int) -> Image.Image:
+    x = col * (tile_size + spacing)
+    y = row * (tile_size + spacing)
+    if x + tile_size > pack_img.width or y + tile_size > pack_img.height:
+        raise CurationError(
+            f"Tile out of bounds: col={col}, row={row}, tile_size={tile_size}, spacing={spacing}, "
+            f"image_size={pack_img.width}x{pack_img.height}"
+        )
+    return pack_img.crop((x, y, x + tile_size, y + tile_size))
+
+
+def _build_output_meta(
+    *,
+    tile_size: int,
+    columns: int,
+    rows: int,
+    image_name: str,
+) -> dict[str, Any]:
+    return {
+        "name": "tileset",
+        "tilewidth": tile_size,
+        "tileheight": tile_size,
+        "tilecount": columns * rows,
+        "columns": columns,
+        "image": image_name,
+        "imagewidth": columns * tile_size,
+        "imageheight": rows * tile_size,
+    }
+
+
+def main() -> int:
+    if Image is None:
+        raise CurationError("Pillow is required. Install it with: python3 -m pip install pillow")
+
+    manifest = _load_manifest()
+
+    tileset = manifest.get("tileset")
+    if not isinstance(tileset, dict):
+        raise CurationError("tileset must be an object")
+
+    tile_size = _require_int(tileset.get("tileSize"), "tileset.tileSize", minimum=1)
+    columns = _require_int(tileset.get("columns"), "tileset.columns", minimum=1)
+    rows = _require_int(tileset.get("rows"), "tileset.rows", minimum=1)
+    expected_slots = columns * rows
+
+    output_png_rel = _require_str(tileset.get("outputPng"), "tileset.outputPng")
+    output_meta_rel = _require_str(tileset.get("outputMeta"), "tileset.outputMeta")
+    output_png = REPO_ROOT / output_png_rel
+    output_meta = REPO_ROOT / output_meta_rel
+
+    slots = tileset.get("slots")
+    if not isinstance(slots, list):
+        raise CurationError("tileset.slots must be an array")
+    if len(slots) != expected_slots:
+        raise CurationError(
+            f"tileset.slots must contain exactly {expected_slots} entries, got {len(slots)}"
+        )
+
+    pack_images = _load_pack_images(manifest, tile_size)
+
+    sorted_slots: list[dict[str, Any]] = []
+    seen_slots: set[int] = set()
+    for index, slot in enumerate(slots):
+        slot_field = f"tileset.slots[{index}]"
+        if not isinstance(slot, dict):
+            raise CurationError(f"{slot_field} must be an object")
+
+        slot_index = _require_int(slot.get("slot"), f"{slot_field}.slot", minimum=0)
+        if slot_index >= expected_slots:
+            raise CurationError(
+                f"{slot_field}.slot={slot_index} is out of range (0..{expected_slots - 1})"
+            )
+        if slot_index in seen_slots:
+            raise CurationError(f"Duplicate slot index: {slot_index}")
+        seen_slots.add(slot_index)
+
+        source = slot.get("source")
+        if not isinstance(source, dict):
+            raise CurationError(f"{slot_field}.source must be an object")
+
+        pack_name = _require_str(source.get("pack"), f"{slot_field}.source.pack")
+        if pack_name not in pack_images:
+            raise CurationError(f"{slot_field}.source.pack references unknown pack: {pack_name}")
+
+        col = _require_int(source.get("col"), f"{slot_field}.source.col", minimum=0)
+        row = _require_int(source.get("row"), f"{slot_field}.source.row", minimum=0)
+        semantic = _require_str(slot.get("semantic"), f"{slot_field}.semantic")
+
+        sorted_slots.append(
+            {
+                "slot": slot_index,
+                "semantic": semantic,
+                "pack": pack_name,
+                "col": col,
+                "row": row,
+            }
+        )
+
+    if len(seen_slots) != expected_slots:
+        missing = sorted(set(range(expected_slots)) - seen_slots)
+        raise CurationError(f"Missing slot definitions: {missing}")
+
+    sorted_slots.sort(key=lambda item: item["slot"])
+
+    output_width = columns * tile_size
+    output_height = rows * tile_size
+    tileset_img = Image.new("RGBA", (output_width, output_height), (0, 0, 0, 0))
+
+    for slot in sorted_slots:
+        slot_index = slot["slot"]
+        pack_cfg = pack_images[slot["pack"]]
+        tile = _extract_tile(
+            pack_img=pack_cfg["image"],
+            tile_size=tile_size,
+            spacing=pack_cfg["spacing"],
+            col=slot["col"],
+            row=slot["row"],
+        )
+
+        out_col = slot_index % columns
+        out_row = slot_index // columns
+        out_x = out_col * tile_size
+        out_y = out_row * tile_size
+        tileset_img.paste(tile, (out_x, out_y))
+
+        print(
+            f"slot={slot_index:02d} semantic={slot['semantic']} "
+            f"source={slot['pack']}({slot['col']},{slot['row']}) output=({out_col},{out_row})"
+        )
+
+    os.makedirs(output_png.parent, exist_ok=True)
+    tileset_img.save(output_png)
+
+    output_meta_json = _build_output_meta(
+        tile_size=tile_size,
+        columns=columns,
+        rows=rows,
+        image_name=output_png.name,
+    )
+
+    os.makedirs(output_meta.parent, exist_ok=True)
+    with output_meta.open("w", encoding="utf-8") as f:
+        json.dump(output_meta_json, f, indent=2)
+        f.write("\n")
+
+    print(f"\nSaved tileset image: {output_png}")
+    print(f"Saved tileset metadata: {output_meta}")
+    print(f"Output size: {output_width}x{output_height}")
+    print("Manifest contract applied successfully.")
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        raise SystemExit(main())
+    except CurationError as exc:
+        print(f"[ERROR] {exc}")
+        raise SystemExit(1)

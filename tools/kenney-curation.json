@@ -1,0 +1,190 @@
+{
+  "version": "2026-02-13",
+  "sourceRoot": "packages/client/public/assets/kenney",
+  "packs": {
+    "city": {
+      "path": "tiles/city_tilemap.png",
+      "tileSize": 16,
+      "spacing": 0
+    },
+    "interior": {
+      "path": "interior/interior_tilemap.png",
+      "tileSize": 16,
+      "spacing": 1
+    },
+    "characters": {
+      "path": "characters/characters_spritesheet.png",
+      "tileSize": 16,
+      "spacing": 1
+    }
+  },
+  "tileset": {
+    "tileSize": 16,
+    "columns": 8,
+    "rows": 4,
+    "outputPng": "packages/client/public/assets/maps/tileset.png",
+    "outputMeta": "packages/client/public/assets/maps/tileset.json",
+    "slots": [
+      {
+        "slot": 0,
+        "semantic": "empty",
+        "source": { "pack": "city", "col": 0, "row": 0 }
+      },
+      {
+        "slot": 1,
+        "semantic": "grass_light",
+        "source": { "pack": "city", "col": 0, "row": 25 }
+      },
+      {
+        "slot": 2,
+        "semantic": "grass_dark",
+        "source": { "pack": "city", "col": 1, "row": 25 }
+      },
+      {
+        "slot": 3,
+        "semantic": "road_horizontal",
+        "source": { "pack": "city", "col": 10, "row": 21 }
+      },
+      {
+        "slot": 4,
+        "semantic": "road_vertical",
+        "source": { "pack": "city", "col": 11, "row": 21 }
+      },
+      {
+        "slot": 5,
+        "semantic": "road_corner",
+        "source": { "pack": "city", "col": 12, "row": 21 }
+      },
+      {
+        "slot": 6,
+        "semantic": "road_intersection",
+        "source": { "pack": "city", "col": 3, "row": 1 }
+      },
+      {
+        "slot": 7,
+        "semantic": "path_sidewalk",
+        "source": { "pack": "city", "col": 4, "row": 1 }
+      },
+      {
+        "slot": 8,
+        "semantic": "floor_lobby",
+        "source": { "pack": "city", "col": 0, "row": 2 }
+      },
+      {
+        "slot": 9,
+        "semantic": "floor_office",
+        "source": { "pack": "city", "col": 1, "row": 2 }
+      },
+      {
+        "slot": 10,
+        "semantic": "floor_meeting",
+        "source": { "pack": "city", "col": 2, "row": 2 }
+      },
+      {
+        "slot": 11,
+        "semantic": "floor_lounge",
+        "source": { "pack": "city", "col": 3, "row": 2 }
+      },
+      {
+        "slot": 12,
+        "semantic": "floor_arcade",
+        "source": { "pack": "city", "col": 4, "row": 2 }
+      },
+      {
+        "slot": 13,
+        "semantic": "floor_plaza",
+        "source": { "pack": "city", "col": 5, "row": 2 }
+      },
+      {
+        "slot": 14,
+        "semantic": "floor_park",
+        "source": { "pack": "city", "col": 6, "row": 2 }
+      },
+      {
+        "slot": 15,
+        "semantic": "floor_lake",
+        "source": { "pack": "city", "col": 7, "row": 2 }
+      },
+      {
+        "slot": 16,
+        "semantic": "wall_solid",
+        "source": { "pack": "city", "col": 1, "row": 5 }
+      },
+      {
+        "slot": 17,
+        "semantic": "wall_top",
+        "source": { "pack": "city", "col": 0, "row": 5 }
+      },
+      {
+        "slot": 18,
+        "semantic": "wall_left",
+        "source": { "pack": "city", "col": 2, "row": 5 }
+      },
+      {
+        "slot": 19,
+        "semantic": "wall_right",
+        "source": { "pack": "city", "col": 3, "row": 5 }
+      },
+      {
+        "slot": 20,
+        "semantic": "wall_bottom",
+        "source": { "pack": "city", "col": 4, "row": 5 }
+      },
+      {
+        "slot": 21,
+        "semantic": "door_closed",
+        "source": { "pack": "city", "col": 20, "row": 27 }
+      },
+      {
+        "slot": 22,
+        "semantic": "door_open",
+        "source": { "pack": "city", "col": 1, "row": 8 }
+      },
+      {
+        "slot": 23,
+        "semantic": "water",
+        "source": { "pack": "city", "col": 27, "row": 5 }
+      },
+      {
+        "slot": 24,
+        "semantic": "tree",
+        "source": { "pack": "city", "col": 0, "row": 12 }
+      },
+      {
+        "slot": 25,
+        "semantic": "bush",
+        "source": { "pack": "city", "col": 1, "row": 12 }
+      },
+      {
+        "slot": 26,
+        "semantic": "flower",
+        "source": { "pack": "city", "col": 2, "row": 12 }
+      },
+      {
+        "slot": 27,
+        "semantic": "fountain",
+        "source": { "pack": "city", "col": 0, "row": 15 }
+      },
+      {
+        "slot": 28,
+        "semantic": "bench",
+        "source": { "pack": "city", "col": 1, "row": 15 }
+      },
+      {
+        "slot": 29,
+        "semantic": "lamp",
+        "source": { "pack": "city", "col": 2, "row": 15 }
+      },
+      {
+        "slot": 30,
+        "semantic": "sign",
+        "source": { "pack": "city", "col": 3, "row": 15 }
+      },
+      {
+        "slot": 31,
+        "semantic": "chest",
+        "source": { "pack": "city", "col": 4, "row": 15 }
+      }
+    ]
+  }
+}

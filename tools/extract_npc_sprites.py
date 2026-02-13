@@ -5,10 +5,8 @@ from PIL import Image
 import json
 import os
 
-KENNEY_PATH = "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets"
-CHAR_SPRITESHEET = (
-    f"{KENNEY_PATH}/Roguelike Characters Pack/Spritesheet/roguelikeChar_transparent.png"
-)
+KENNEY_PATH = "packages/client/public/assets/kenney"
+CHAR_SPRITESHEET = f"{KENNEY_PATH}/characters/characters_spritesheet.png"
 
 OUTPUT_PNG = "packages/client/public/assets/sprites/npcs.png"
 OUTPUT_JSON = "packages/client/public/assets/sprites/npcs.json"

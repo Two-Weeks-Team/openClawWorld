@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from 'fs';
-import { dirname, join, resolve } from 'path';
+import { basename, dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { createHash } from 'crypto';
 
@@ -26,6 +26,12 @@ const EXPECTED_TILESET = {
   image: 'tileset.png',
 };
 
+const CONTRACT_PATHS = {
+  curation: join(ROOT_DIR, 'tools/kenney-curation.json'),
+  tilesetMeta: join(ROOT_DIR, 'packages/client/public/assets/maps/tileset.json'),
+  tileIdContract: join(ROOT_DIR, 'world/packs/base/assets/tilesets/village_tileset.json'),
+};
+
 function md5(content) {
   return createHash('md5').update(content).digest('hex');
 }
@@ -39,6 +45,21 @@ function loadMap(path) {
     return { content, json: JSON.parse(content), hash: md5(content) };
   } catch (e) {
     console.error(`❌ Failed to parse JSON: ${path}\n  ${e.message}`);
+    process.exit(1);
+  }
+}
+
+function loadRequiredJson(path, label) {
+  if (!existsSync(path)) {
+    console.error(`❌ Missing required file (${label}): ${path}`);
+    process.exit(1);
+  }
+
+  const content = readFileSync(path, 'utf-8');
+  try {
+    return JSON.parse(content);
+  } catch (e) {
+    console.error(`❌ Failed to parse JSON (${label}): ${path}\n  ${e.message}`);
     process.exit(1);
   }
 }
@@ -82,6 +103,256 @@ function validateTileset(map, name) {
   }
 
   return errors;
+}
+
+function isNonNegativeInt(value) {
+  return Number.isInteger(value) && value >= 0;
+}
+
+function isPositiveInt(value) {
+  return Number.isInteger(value) && value > 0;
+}
+
+function collectUsedTileIds(mapJson) {
+  const used = new Set();
+  for (const layer of mapJson.layers || []) {
+    if (!Array.isArray(layer.data)) {
+      continue;
+    }
+    for (const tileId of layer.data) {
+      if (Number.isInteger(tileId)) {
+        used.add(tileId);
+      }
+    }
+  }
+  return used;
+}
+
+function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }) {
+  const errors = [];
+  const warnings = [];
+
+  if (!curation || typeof curation !== 'object') {
+    return { errors: ['curation: manifest root must be an object'], warnings };
+  }
+
+  const sourceRootRel = curation.sourceRoot;
+  if (typeof sourceRootRel !== 'string' || sourceRootRel.length === 0) {
+    errors.push('curation: sourceRoot must be a non-empty string');
+  }
+
+  let sourceRootAbs = '';
+  if (typeof sourceRootRel === 'string' && sourceRootRel.length > 0) {
+    sourceRootAbs = join(ROOT_DIR, sourceRootRel);
+    if (!existsSync(sourceRootAbs)) {
+      warnings.push(`curation: sourceRoot not found (asset path check skipped): ${sourceRootAbs}`);
+    }
+  }
+
+  const packs = curation.packs;
+  if (!packs || typeof packs !== 'object' || Array.isArray(packs)) {
+    errors.push('curation: packs must be an object');
+  }
+
+  const tileset = curation.tileset;
+  if (!tileset || typeof tileset !== 'object' || Array.isArray(tileset)) {
+    return { errors: [...errors, 'curation: tileset must be an object'], warnings };
+  }
+
+  const tileSize = tileset.tileSize;
+  const columns = tileset.columns;
+  const rows = tileset.rows;
+
+  if (!isPositiveInt(tileSize)) {
+    errors.push(`curation.tileset.tileSize must be a positive integer, got ${tileSize}`);
+  } else if (tileSize !== MAP_CONFIG.tileSize) {
+    errors.push(
+      `curation.tileset.tileSize=${tileSize} must match MAP_CONFIG.tileSize=${MAP_CONFIG.tileSize}`
+    );
+  }
+
+  if (!isPositiveInt(columns)) {
+    errors.push(`curation.tileset.columns must be a positive integer, got ${columns}`);
+  }
+
+  if (!isPositiveInt(rows)) {
+    errors.push(`curation.tileset.rows must be a positive integer, got ${rows}`);
+  }
+
+  const outputPng = tileset.outputPng;
+  const outputMeta = tileset.outputMeta;
+  if (typeof outputPng !== 'string' || outputPng.length === 0) {
+    errors.push('curation.tileset.outputPng must be a non-empty string');
+  }
+  if (typeof outputMeta !== 'string' || outputMeta.length === 0) {
+    errors.push('curation.tileset.outputMeta must be a non-empty string');
+  }
+
+  const expectedSlots = isPositiveInt(columns) && isPositiveInt(rows) ? columns * rows : null;
+  const slots = tileset.slots;
+  if (!Array.isArray(slots)) {
+    errors.push('curation.tileset.slots must be an array');
+  } else if (expectedSlots !== null && slots.length !== expectedSlots) {
+    errors.push(
+      `curation.tileset.slots expected=${expectedSlots}, actual=${slots.length} (must define 32-slot contract)`
+    );
+  }
+
+  const seenSlots = new Set();
+  if (Array.isArray(slots) && expectedSlots !== null && packs && typeof packs === 'object') {
+    for (const [index, slot] of slots.entries()) {
+      const base = `curation.tileset.slots[${index}]`;
+      if (!slot || typeof slot !== 'object' || Array.isArray(slot)) {
+        errors.push(`${base} must be an object`);
+        continue;
+      }
+
+      if (!isNonNegativeInt(slot.slot)) {
+        errors.push(`${base}.slot must be a non-negative integer, got ${slot.slot}`);
+      } else {
+        if (slot.slot >= expectedSlots) {
+          errors.push(`${base}.slot=${slot.slot} out of range (0..${expectedSlots - 1})`);
+        }
+        if (seenSlots.has(slot.slot)) {
+          errors.push(`${base}.slot duplicate value: ${slot.slot}`);
+        }
+        seenSlots.add(slot.slot);
+      }
+
+      if (typeof slot.semantic !== 'string' || slot.semantic.length === 0) {
+        errors.push(`${base}.semantic must be a non-empty string`);
+      }
+
+      const source = slot.source;
+      if (!source || typeof source !== 'object' || Array.isArray(source)) {
+        errors.push(`${base}.source must be an object`);
+        continue;
+      }
+
+      if (typeof source.pack !== 'string' || source.pack.length === 0) {
+        errors.push(`${base}.source.pack must be a non-empty string`);
+      } else if (!(source.pack in packs)) {
+        errors.push(`${base}.source.pack references unknown pack: ${source.pack}`);
+      }
+
+      if (!isNonNegativeInt(source.col)) {
+        errors.push(`${base}.source.col must be a non-negative integer, got ${source.col}`);
+      }
+      if (!isNonNegativeInt(source.row)) {
+        errors.push(`${base}.source.row must be a non-negative integer, got ${source.row}`);
+      }
+    }
+
+    if (seenSlots.size !== expectedSlots) {
+      errors.push(`curation.tileset.slots defines ${seenSlots.size}/${expectedSlots} unique slot indexes`);
+    }
+
+    if (typeof sourceRootAbs === 'string' && sourceRootAbs.length > 0 && existsSync(sourceRootAbs)) {
+      for (const [packName, pack] of Object.entries(packs)) {
+        if (!pack || typeof pack !== 'object' || Array.isArray(pack)) {
+          errors.push(`curation.packs.${packName} must be an object`);
+          continue;
+        }
+
+        if (!isPositiveInt(pack.tileSize)) {
+          errors.push(`curation.packs.${packName}.tileSize must be a positive integer`);
+        } else if (isPositiveInt(tileSize) && pack.tileSize !== tileSize) {
+          errors.push(
+            `curation.packs.${packName}.tileSize=${pack.tileSize} must match curation.tileset.tileSize=${tileSize}`
+          );
+        }
+
+        const spacing = pack.spacing ?? 0;
+        if (!isNonNegativeInt(spacing)) {
+          errors.push(`curation.packs.${packName}.spacing must be a non-negative integer`);
+        }
+
+        if (typeof pack.path !== 'string' || pack.path.length === 0) {
+          errors.push(`curation.packs.${packName}.path must be a non-empty string`);
+        } else {
+          const absolutePackPath = join(sourceRootAbs, pack.path);
+          if (!existsSync(absolutePackPath)) {
+            errors.push(`curation.packs.${packName}.path not found: ${absolutePackPath}`);
+          }
+        }
+      }
+    } else {
+      warnings.push('curation: skipped pack path existence checks because sourceRoot is unavailable');
+    }
+  }
+
+  if (tilesetMeta && typeof tilesetMeta === 'object') {
+    if (isPositiveInt(tileSize)) {
+      if (tilesetMeta.tilewidth !== tileSize) {
+        errors.push(`tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tileSize}`);
+      }
+      if (tilesetMeta.tileheight !== tileSize) {
+        errors.push(`tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tileSize}`);
+      }
+    }
+
+    if (isPositiveInt(columns) && isPositiveInt(rows)) {
+      const tileCount = columns * rows;
+      if (tilesetMeta.columns !== columns) {
+        errors.push(`tileset.json: columns=${tilesetMeta.columns}, expected=${columns}`);
+      }
+      if (tilesetMeta.tilecount !== tileCount) {
+        errors.push(`tileset.json: tilecount=${tilesetMeta.tilecount}, expected=${tileCount}`);
+      }
+      if (isPositiveInt(tileSize)) {
+        const expectedWidth = columns * tileSize;
+        const expectedHeight = rows * tileSize;
+        if (tilesetMeta.imagewidth !== expectedWidth) {
+          errors.push(`tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${expectedWidth}`);
+        }
+        if (tilesetMeta.imageheight !== expectedHeight) {
+          errors.push(`tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${expectedHeight}`);
+        }
+      }
+    }
+
+    if (typeof outputPng === 'string' && outputPng.length > 0) {
+      const expectedImageName = basename(outputPng);
+      if (tilesetMeta.image !== expectedImageName) {
+        errors.push(`tileset.json: image=${tilesetMeta.image}, expected=${expectedImageName}`);
+      }
+    }
+  } else {
+    errors.push('tileset.json metadata must be a JSON object');
+  }
+
+  const usedTileIds = collectUsedTileIds(map.json);
+  const slotSet = new Set();
+  if (Array.isArray(slots)) {
+    for (const slot of slots) {
+      if (slot && typeof slot === 'object' && isNonNegativeInt(slot.slot)) {
+        slotSet.add(slot.slot);
+      }
+    }
+  }
+
+  const tileContractIds = new Set();
+  const contractTiles = tileIdContract?.tiles;
+  if (!Array.isArray(contractTiles)) {
+    errors.push('village_tileset.json: tiles must be an array');
+  } else {
+    for (const tile of contractTiles) {
+      if (tile && typeof tile === 'object' && isNonNegativeInt(tile.id)) {
+        tileContractIds.add(tile.id);
+      }
+    }
+  }
+
+  for (const id of usedTileIds) {
+    if (!slotSet.has(id)) {
+      errors.push(`map uses tile ID ${id} but curation.tileset.slots does not define it`);
+    }
+    if (!tileContractIds.has(id)) {
+      errors.push(`map uses tile ID ${id} but village_tileset.json contract does not define it`);
+    }
+  }
+
+  return { errors, warnings };
 }
 
 function main() {
@@ -138,6 +409,36 @@ function main() {
   console.log(
     `✅ All maps use tileset: ${EXPECTED_TILESET.name} (${EXPECTED_TILESET.tilewidth}x${EXPECTED_TILESET.tileheight}px)\n`
   );
+
+  console.log('Validating Kenney curation contract...');
+  const curation = loadRequiredJson(CONTRACT_PATHS.curation, 'kenney-curation');
+  const tilesetMeta = loadRequiredJson(CONTRACT_PATHS.tilesetMeta, 'tileset-meta');
+  const tileIdContract = loadRequiredJson(CONTRACT_PATHS.tileIdContract, 'tile-id-contract');
+
+  const { errors: curationErrors, warnings: curationWarnings } = validateCurationContract({
+    map: sourceMap,
+    curation,
+    tilesetMeta,
+    tileIdContract,
+  });
+
+  if (curationErrors.length > 0) {
+    console.log('❌ TILESET CONTRACT VALIDATION FAILED\n');
+    curationErrors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+
+  if (curationWarnings.length > 0) {
+    console.log('⚠️  Curation warnings');
+    curationWarnings.forEach(msg => console.log(`  ${msg}`));
+    console.log('');
+  }
+
+  const usedTileIds = [...collectUsedTileIds(sourceMap.json)].sort((a, b) => a - b);
+  console.log(
+    `✅ Curation manifest valid (${curation.tileset.columns}x${curation.tileset.rows}, ${curation.tileset.slots.length} slots)`
+  );
+  console.log(`✅ Map tile IDs are within contract: ${usedTileIds.join(', ')}\n`);
 
   console.log('══════════════════════════════════════════════════════════════');
   console.log('✅ MAP STACK CONSISTENCY VERIFIED');

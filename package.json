@@ -15,6 +15,7 @@
   "scripts": {
     "sync-maps": "node scripts/sync-maps.mjs",
     "verify:maps": "node scripts/verify-map-stack-consistency.mjs",
+    "verify:map-change": "pnpm sync-maps && pnpm verify:maps && pnpm test",
     "build": "pnpm run sync-maps && pnpm -r build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",

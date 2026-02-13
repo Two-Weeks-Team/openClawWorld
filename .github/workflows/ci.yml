@@ -207,6 +207,11 @@ jobs:
             'world/packs/base/assets/tilesets/**'
             'scripts/sync-maps.mjs'
             'scripts/verify-map-stack-consistency.mjs'
+            'world/packs/base/npcs/**'
+            'world/packs/base/facilities/**'
+            'world/packs/base/manifest.json'
+            'packages/server/src/world/**'
+            'packages/shared/src/world.ts'
           )
 
           CHANGED_FILES=$(git diff --name-only "$BASE_SHA"...HEAD 2>/dev/null || git diff --name-only HEAD~1...HEAD)
@@ -215,6 +220,7 @@ jobs:
           for pattern in "${MAP_PATTERNS[@]}"; do
             if echo "$CHANGED_FILES" | grep -q "^${pattern/\*\*/.*}"; then
               MAP_CHANGED=true
+              echo "📍 Matched pattern: $pattern"
               break
             fi
           done

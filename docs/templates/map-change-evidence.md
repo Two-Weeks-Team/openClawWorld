@@ -2,6 +2,8 @@
 
 Use this template when submitting PRs that affect map-related files.
 
+See a filled example: [`docs/templates/map-change-evidence.example.md`](./map-change-evidence.example.md)
+
 ---
 
 ## Change Summary

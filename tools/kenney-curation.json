@@ -535,18 +535,14 @@
   },
 
   "gaps": {
-    "description": "Assets not available in Kenney packs",
-    "critical": [
-      {
-        "asset": "arcade_cabinet",
-        "purpose": "Arcade zone game machines",
-        "recommendation": "Create custom 16x32 sprite"
-      },
-      {
-        "asset": "coffee_machine",
-        "purpose": "LoungeCafe beverage maker",
-        "recommendation": "Use vending machine as substitute"
-      }
+    "description": "Assets not available in Kenney packs - resolved via custom-sprites.json",
+    "resolved": [
+      { "asset": "arcade_cabinet", "solution": "tools/sprites/custom-sprites.json" },
+      { "asset": "coffee_machine", "solution": "tools/sprites/custom-sprites.json" },
+      { "asset": "server_rack", "solution": "tools/sprites/custom-sprites.json" },
+      { "asset": "monitor", "solution": "tools/sprites/custom-sprites.json" },
+      { "asset": "jukebox", "solution": "tools/sprites/custom-sprites.json" },
+      { "asset": "atm", "solution": "tools/sprites/custom-sprites.json" }
     ],
     "optional": [
       {
@@ -559,6 +555,26 @@
         "purpose": "Office task management",
         "recommendation": "Use whiteboard as substitute"
       }
+    ]
+  },
+
+  "customSprites": {
+    "description": "Custom pixel art sprites for assets not available in Kenney packs",
+    "manifest": "tools/sprites/custom-sprites.json",
+    "generator": "tools/generate_custom_sprites.py",
+    "sprites": [
+      {
+        "id": "arcade_cabinet",
+        "output": "packages/client/public/assets/sprites/arcade_cabinet.png"
+      },
+      {
+        "id": "coffee_machine",
+        "output": "packages/client/public/assets/sprites/coffee_machine.png"
+      },
+      { "id": "server_rack", "output": "packages/client/public/assets/sprites/server_rack.png" },
+      { "id": "monitor", "output": "packages/client/public/assets/sprites/monitor.png" },
+      { "id": "jukebox", "output": "packages/client/public/assets/sprites/jukebox.png" },
+      { "id": "atm", "output": "packages/client/public/assets/sprites/atm.png" }
     ]
   }
 }

@@ -1,0 +1,247 @@
+{
+  "version": "1.0.0",
+  "description": "Custom pixel art sprite definitions for assets not available in Kenney packs",
+
+  "palette": {
+    "transparent": [0, 0, 0, 0],
+    "black": [20, 20, 30, 255],
+    "white": [240, 240, 245, 255],
+
+    "purple_dark": [60, 40, 80, 255],
+    "purple": [100, 60, 140, 255],
+    "purple_light": [140, 100, 180, 255],
+
+    "blue_dark": [30, 60, 120, 255],
+    "blue": [60, 120, 220, 255],
+    "blue_light": [100, 160, 240, 255],
+
+    "cyan_dark": [20, 80, 100, 255],
+    "cyan": [60, 200, 220, 255],
+    "cyan_light": [120, 230, 240, 255],
+
+    "green_dark": [30, 100, 50, 255],
+    "green": [80, 220, 120, 255],
+    "green_light": [140, 240, 160, 255],
+
+    "yellow_dark": [160, 140, 30, 255],
+    "yellow": [220, 200, 60, 255],
+    "yellow_light": [240, 230, 120, 255],
+
+    "orange_dark": [160, 80, 30, 255],
+    "orange": [220, 140, 60, 255],
+    "orange_light": [240, 180, 100, 255],
+
+    "red_dark": [140, 30, 30, 255],
+    "red": [220, 60, 60, 255],
+    "red_light": [240, 120, 120, 255],
+
+    "brown_dark": [60, 40, 30, 255],
+    "brown": [120, 80, 50, 255],
+    "brown_light": [160, 120, 80, 255],
+
+    "gray_dark": [50, 50, 60, 255],
+    "gray": [80, 80, 90, 255],
+    "gray_light": [120, 120, 130, 255],
+
+    "steel": [100, 110, 130, 255],
+    "silver": [180, 185, 195, 255]
+  },
+
+  "charmap": {
+    ".": "transparent",
+    "#": "black",
+    "W": "white",
+
+    "P": "purple",
+    "p": "purple_dark",
+    "q": "purple_light",
+
+    "B": "blue",
+    "b": "blue_dark",
+    "c": "blue_light",
+
+    "C": "cyan",
+    "n": "cyan_dark",
+    "m": "cyan_light",
+
+    "G": "green",
+    "g": "green_dark",
+    "h": "green_light",
+
+    "Y": "yellow",
+    "y": "yellow_dark",
+    "z": "yellow_light",
+
+    "O": "orange",
+    "o": "orange_dark",
+    "w": "orange_light",
+
+    "R": "red",
+    "r": "red_dark",
+    "s": "red_light",
+
+    "T": "brown",
+    "t": "brown_dark",
+    "u": "brown_light",
+
+    "X": "gray",
+    "x": "gray_dark",
+    "v": "gray_light",
+
+    "S": "steel",
+    "I": "silver"
+  },
+
+  "sprites": [
+    {
+      "id": "arcade_cabinet",
+      "description": "Arcade game machine for Arcade zone",
+      "width": 16,
+      "height": 16,
+      "output": "packages/client/public/assets/sprites/arcade_cabinet.png",
+      "pixels": [
+        "....#PPPPPP#....",
+        "...#PPPPPPPP#...",
+        "..#PpnnnnnnpP#..",
+        "..#PnnCGCnnnP#..",
+        "..#PnnGCGnnnP#..",
+        "..#PnnCGCnnnP#..",
+        "..#PpnnnnnnpP#..",
+        "..#PPPPPPPPPp#..",
+        "..#PpRBYpppPP#..",
+        "..#PPppppppPP#..",
+        "..#PPPPPPPPPp#..",
+        "..#PXXXXXXXpP#..",
+        "..#PXXXXXXXpp#..",
+        "..#xxxxxxxxxx#..",
+        "..############..",
+        "................"
+      ]
+    },
+    {
+      "id": "coffee_machine",
+      "description": "Coffee/espresso machine for LoungeCafe zone",
+      "width": 16,
+      "height": 16,
+      "output": "packages/client/public/assets/sprites/coffee_machine.png",
+      "pixels": [
+        "................",
+        "....########....",
+        "...#XXXXXXXX#...",
+        "...#XvvvvvvX#...",
+        "...#XvIIIIvX#...",
+        "...#XvIttIvX#...",
+        "...#XvIttIvX#...",
+        "...#XvIIIIvX#...",
+        "...#XvvvvvvX#...",
+        "...#XXXXXXXX#...",
+        "...#XRgXXXXX#...",
+        "...#XXXXXXXX#...",
+        "...##......##...",
+        "....#ttttt#.....",
+        "....#######.....",
+        "................"
+      ]
+    },
+    {
+      "id": "server_rack",
+      "description": "Server/computer rack for Office zone",
+      "width": 16,
+      "height": 16,
+      "output": "packages/client/public/assets/sprites/server_rack.png",
+      "pixels": [
+        "..############..",
+        "..#xxxxxxxxxx#..",
+        "..#xGxCxGxCxx#..",
+        "..#xxxxxxxxxx#..",
+        "..#xCxGxCxGxx#..",
+        "..#xxxxxxxxxx#..",
+        "..#xGxCxGxCxx#..",
+        "..#xxxxxxxxxx#..",
+        "..#xCxGxCxGxx#..",
+        "..#xxxxxxxxxx#..",
+        "..#xGxCxGxCxx#..",
+        "..#xxxxxxxxxx#..",
+        "..#xvvvvvvvvx#..",
+        "..#xxxxxxxxxx#..",
+        "..############..",
+        "................"
+      ]
+    },
+    {
+      "id": "monitor",
+      "description": "Computer monitor for Office zone",
+      "width": 16,
+      "height": 16,
+      "output": "packages/client/public/assets/sprites/monitor.png",
+      "pixels": [
+        "................",
+        "..##########....",
+        "..#xxxxxxxx#....",
+        "..#xbbbbbbx#....",
+        "..#xbcccbbx#....",
+        "..#xbcccbbx#....",
+        "..#xbbbbbbx#....",
+        "..#xxxxxxxx#....",
+        "..##########....",
+        ".....#xx#.......",
+        "....#xxxx#......",
+        "...########.....",
+        "................",
+        "................",
+        "................",
+        "................"
+      ]
+    },
+    {
+      "id": "jukebox",
+      "description": "Music jukebox for Arcade/LoungeCafe zone",
+      "width": 16,
+      "height": 16,
+      "output": "packages/client/public/assets/sprites/jukebox.png",
+      "pixels": [
+        "....######......",
+        "...#OOOOOO#.....",
+        "..#OoYYYYoO#....",
+        "..#OYzzzzYO#....",
+        "..#OYzWWzYO#....",
+        "..#OYzWWzYO#....",
+        "..#OYzzzzYO#....",
+        "..#OoYYYYoO#....",
+        "..#OOOOOOOO#....",
+        "..#ORgBgRgO#....",
+        "..#OOOOOOOO#....",
+        "..#OxxxxxxO#....",
+        "..#OxxxxxxO#....",
+        "..#oooooooo#....",
+        "..##########....",
+        "................"
+      ]
+    },
+    {
+      "id": "atm",
+      "description": "ATM machine for Lobby zone",
+      "width": 16,
+      "height": 16,
+      "output": "packages/client/public/assets/sprites/atm.png",
+      "pixels": [
+        "..############..",
+        "..#BbbbbbbbbB#..",
+        "..#bBBBBBBBBb#..",
+        "..#bBccccccBb#..",
+        "..#bBcWWWWcBb#..",
+        "..#bBcWWWWcBb#..",
+        "..#bBccccccBb#..",
+        "..#bBBBBBBBBb#..",
+        "..#bXXXXXXXXb#..",
+        "..#bXGXGXGXGb#..",
+        "..#bXXXXXXXXb#..",
+        "..#bXGXGXGXGb#..",
+        "..#bXXXXXXXXb#..",
+        "..#xxxxxxxxxx#..",
+        "..############..",
+        "................"
+      ]
+    }
+  ]
+}

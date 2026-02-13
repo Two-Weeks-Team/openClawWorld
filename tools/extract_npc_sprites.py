@@ -10,18 +10,23 @@ SCRIPT_DIR = Path(__file__).parent
 MANIFEST_PATH = SCRIPT_DIR / "kenney-curation.json"
 
 
-def load_manifest():
+def load_manifest() -> dict:
+    """Load kenney-curation.json manifest file."""
     with open(MANIFEST_PATH) as f:
         return json.load(f)
 
 
-def get_tile(img, col, row, tile_size=16, spacing=1):
+def get_tile(
+    img: Image.Image, col: int, row: int, tile_size: int = 16, spacing: int = 1
+) -> Image.Image:
+    """Extract a single tile from a spritesheet at the given grid position."""
     x = col * (tile_size + spacing)
     y = row * (tile_size + spacing)
     return img.crop((x, y, x + tile_size, y + tile_size))
 
 
-def main():
+def main() -> None:
+    """Extract NPC sprites from manifest and save as spritesheet with atlas JSON."""
     manifest = load_manifest()
     char_source = manifest["sources"]["characters"]
     npcs_config = manifest["npcs"]["sprites"]

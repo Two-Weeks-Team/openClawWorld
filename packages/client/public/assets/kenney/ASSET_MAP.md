@@ -13,6 +13,7 @@
 | `tiles/city_tilemap.png`                | Roguelike City Pack       | 592x448 | 도시, 도로, 건물 타일 (1036 tiles) |
 | `tiles/city_tilemap_spacing.png`        | Roguelike City Pack       | -       | 1px spacing 버전                   |
 | `tiles/tinytown_tilemap.png`            | Tiny Town                 | -       | 추가 자연물, 건물                  |
+| `urban/urban_tilemap.png`               | RPG Urban Pack            | 432x288 | 도시 오브젝트 보강 타일            |
 | `interior/interior_tilemap.png`         | Roguelike Interior Pack   | 458x305 | 실내 가구, 장식                    |
 | `characters/characters_spritesheet.png` | Roguelike Characters Pack | 918x203 | NPC, 플레이어 캐릭터               |
 
@@ -21,7 +22,7 @@
 All tiles are:
 
 - **Size**: 16x16 pixels
-- **Spacing**: 1px margin between tiles
+- **Spacing**: city/urban `0`, interior/characters `1`
 - **Format**: PNG with transparency
 
 ## Zone Asset Mapping

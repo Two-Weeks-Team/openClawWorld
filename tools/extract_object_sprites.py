@@ -2,8 +2,8 @@
 """Extract object sprites from Kenney Roguelike packs.
 
 Extracts decorative objects and interactive items from:
-- Roguelike City Pack: fountain, bench, lamp, sign
-- Roguelike Interior Pack: chest, chest-open, portal
+- City tilemap subset in repository
+- Interior tilemap subset in repository
 
 Output: objects.png atlas + objects.json (Phaser atlas format)
 """
@@ -12,21 +12,16 @@ from PIL import Image
 import json
 import os
 
-KENNEY_PATH = "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets"
-
-# City Pack individual tiles (no spacing needed)
-CITY_TILES_DIR = f"{KENNEY_PATH}/Roguelike City Pack/Tiles"
-
-# Interior Pack tilesheet (has 1px spacing)
-INTERIOR_SPRITESHEET = (
-    f"{KENNEY_PATH}/Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png"
-)
+KENNEY_PATH = "packages/client/public/assets/kenney"
+CITY_TILEMAP = f"{KENNEY_PATH}/tiles/city_tilemap.png"
+INTERIOR_SPRITESHEET = f"{KENNEY_PATH}/interior/interior_tilemap.png"
 
 OUTPUT_PNG = "packages/client/public/assets/sprites/objects.png"
 OUTPUT_JSON = "packages/client/public/assets/sprites/objects.json"
 
 TILE_SIZE = 16
 SPACING = 1  # For spaced tilesheets
+CITY_COLS = 37  # city_tilemap.png columns at 16x16
 
 # Object mapping using individual tile files for City Pack
 # Tile numbers determined from Kenney Roguelike City Pack analysis
@@ -54,26 +49,43 @@ INTERIOR_OBJECTS = [
 ]
 
 
-def load_city_tile(tile_num: int) -> Image.Image:
-    """Load individual tile from City Pack Tiles folder."""
-    tile_path = f"{CITY_TILES_DIR}/tile_{tile_num:04d}.png"
-    if not os.path.exists(tile_path):
-        raise FileNotFoundError(f"City tile not found: {tile_path}")
-    return Image.open(tile_path).convert("RGBA")
+def get_city_tile(img: Image.Image, tile_num: int) -> Image.Image:
+    """Extract a city tile using 1-based tile index."""
+    if tile_num <= 0:
+        raise ValueError(f"tile_num must be >= 1, got {tile_num}")
+
+    tile_index = tile_num - 1
+    col = tile_index % CITY_COLS
+    row = tile_index // CITY_COLS
+    x = col * TILE_SIZE
+    y = row * TILE_SIZE
+
+    if x + TILE_SIZE > img.width or y + TILE_SIZE > img.height:
+        raise ValueError(
+            f"tile_{tile_num:04d} out of bounds (col={col}, row={row}) for image {img.size}"
+        )
+
+    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
 
 
 def get_interior_tile(img: Image.Image, col: int, row: int) -> Image.Image:
     """Extract tile from Interior spritesheet with 1px spacing."""
     x = col * (TILE_SIZE + SPACING)
     y = row * (TILE_SIZE + SPACING)
+    if x + TILE_SIZE > img.width or y + TILE_SIZE > img.height:
+        raise ValueError(
+            f"interior tile out of bounds (col={col}, row={row}) for image {img.size}"
+        )
     return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
 
 
 def main():
     print("=== Extracting Object Sprites from Kenney Packs ===\n")
 
-    # Load Interior spritesheet
+    # Load source tilemaps/spritesheets from tracked repo assets
+    city_img = Image.open(CITY_TILEMAP).convert("RGBA")
     interior_img = Image.open(INTERIOR_SPRITESHEET).convert("RGBA")
+    print(f"City tilemap size: {city_img.size}")
     print(f"Interior spritesheet size: {interior_img.size}")
 
     # Calculate output dimensions
@@ -88,11 +100,11 @@ def main():
 
     idx = 0
 
-    # Extract City Pack objects (individual tiles)
+    # Extract city objects from packed city tilemap
     print("\n--- City Pack Objects ---")
     for obj in CITY_OBJECTS:
         try:
-            tile = load_city_tile(obj["tile_num"])
+            tile = get_city_tile(city_img, obj["tile_num"])
             out_x = idx * TILE_SIZE
             output_img.paste(tile, (out_x, 0))
 
@@ -103,23 +115,26 @@ def main():
             }
             print(f"  {obj['id']}: tile_{obj['tile_num']:04d} -> x={out_x}")
             idx += 1
-        except FileNotFoundError as e:
+        except ValueError as e:
             print(f"  WARNING: {e}")
 
     # Extract Interior Pack objects (spritesheet)
     print("\n--- Interior Pack Objects ---")
     for obj in INTERIOR_OBJECTS:
-        tile = get_interior_tile(interior_img, obj["col"], obj["row"])
-        out_x = idx * TILE_SIZE
-        output_img.paste(tile, (out_x, 0))
+        try:
+            tile = get_interior_tile(interior_img, obj["col"], obj["row"])
+            out_x = idx * TILE_SIZE
+            output_img.paste(tile, (out_x, 0))
 
-        frames[obj["id"]] = {
-            "frame": {"x": out_x, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
-            "sourceSize": {"w": TILE_SIZE, "h": TILE_SIZE},
-            "spriteSourceSize": {"x": 0, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
-        }
-        print(f"  {obj['id']}: ({obj['col']}, {obj['row']}) -> x={out_x}")
-        idx += 1
+            frames[obj["id"]] = {
+                "frame": {"x": out_x, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+                "sourceSize": {"w": TILE_SIZE, "h": TILE_SIZE},
+                "spriteSourceSize": {"x": 0, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+            }
+            print(f"  {obj['id']}: ({obj['col']}, {obj['row']}) -> x={out_x}")
+            idx += 1
+        except ValueError as e:
+            print(f"  WARNING: {e}")
 
     # Save output PNG
     os.makedirs(os.path.dirname(OUTPUT_PNG), exist_ok=True)

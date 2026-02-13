@@ -287,19 +287,40 @@ This project includes custom commands for multiple AI coding assistants.
 | `/openclaw-resident-agent-loop` | Autonomous agent loop for continuous bug discovery | Claude, OpenCode, Gemini, Codex |
 | `/ocw-tools`                    | Reference for all AIC API tools (auto-generated)   | Claude, OpenCode, Gemini, Codex |
 
-### Quick Start
+### 3-Minute Quick Start (New Users)
+
+1. Install dependencies and verify runtime prerequisites:
 
 ```bash
-# Commands are auto-loaded when opening the project
+pnpm install
+pnpm dev:server  # or: docker compose up -d
+curl -fsS http://localhost:2567/health
+gh auth status
+```
+
+2. Open your preferred CLI from the repository root:
+
+```bash
 cd openClawWorld
 claude  # or: opencode, gemini, codex
-
-# Run the resident agent loop
-/openclaw-resident-agent-loop --stress medium --agents 10
-
-# View available tools
-/ocw-tools
 ```
+
+3. Run resident loop command with your CLI command format:
+
+- Claude Code: `/openclaw-resident-agent-loop --stress medium --agents 10`
+- OpenCode: `/openclaw-resident-agent-loop --stress medium --agents 10`
+- Gemini CLI: `openclaw-resident-agent-loop --stress medium --agents 10`
+- Codex CLI: `openclaw-resident-agent-loop --stress medium --agents 10`
+
+4. Optional universal shell fallback (works in any environment):
+
+```bash
+pnpm resident-agent-loop -- --stress medium --agents 10
+```
+
+5. Stop gracefully with `Ctrl+C`.
+
+You can inspect available AIC tools with `ocw-tools` (`/ocw-tools` in Claude/OpenCode).
 
 ### Code Generation
 
@@ -323,6 +344,17 @@ Generated outputs:
 - `.gemini/commands/ocw-tools.toml`
 - `.gemini/commands/openclaw-resident-agent-loop.toml`
 - `.codex/AGENTS.md`
+
+### Extending for Other Teams
+
+1. Update unified command definitions in `packages/plugin/scripts/generate-commands.ts`.
+2. Regenerate artifacts with `pnpm generate:commands`.
+3. Commit both source and generated outputs together.
+4. Validate your workflow with one CLI command path plus shell fallback:
+
+```bash
+pnpm resident-agent-loop -- --stress medium --agents 10
+```
 
 See [.claude/README.md](.claude/README.md) for detailed installation and usage instructions.
 

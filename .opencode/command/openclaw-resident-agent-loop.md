@@ -1,11 +1,11 @@
 ---
-description: "Execute autonomous resident loop for continuous bug discovery in OpenClawWorld"
-allowed-tools: Bash, Read
+description: Execute autonomous resident loop for continuous bug discovery in OpenClawWorld
 argument-hint: [--stress low|medium|high] [--agents N] [--chaos] [--dry-run] [--resume]
 ---
 
-# /openclaw-resident-agent-loop
+<command-name>openclaw-resident-agent-loop</command-name>
 
+<command-instruction>
 Execute the OpenClawWorld resident-agent loop immediately.
 
 ## Execution Contract
@@ -65,3 +65,9 @@ pnpm resident-agent-loop -- --chaos --dry-run
 - Long-running process (no automatic stop condition)
 - Stop with `Ctrl+C` for graceful shutdown
 - Issues are filed through GitHub CLI when detected
+</command-instruction>
+
+<allowed-tools>
+  <tool>Bash</tool>
+  <tool>Read</tool>
+</allowed-tools>

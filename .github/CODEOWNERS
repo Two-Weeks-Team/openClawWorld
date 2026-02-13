@@ -1,0 +1,101 @@
+# CODEOWNERS for openClawWorld
+# These owners will be requested for review when someone opens a PR
+# that modifies code they own.
+#
+# Documentation: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything
+* @Two-Weeks-Team/maintainers
+
+# =============================================================================
+# MAP STACK (Critical - requires careful review)
+# =============================================================================
+
+# Map source files (single source of truth)
+world/packs/base/maps/ @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+
+# Map sync targets (should only change via sync script)
+packages/server/assets/maps/ @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+packages/client/public/assets/maps/ @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+
+# Map sync and verification scripts
+scripts/sync-maps.mjs @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+scripts/sync-maps.sh @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+scripts/verify-map-stack-consistency.mjs @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+
+# =============================================================================
+# ASSET PIPELINE (Kenney assets, extraction tools)
+# =============================================================================
+
+# Kenney curation manifest
+tools/kenney-curation.json @Two-Weeks-Team/asset-reviewers @Two-Weeks-Team/maintainers
+
+# Asset extraction scripts
+tools/extract_*.py @Two-Weeks-Team/asset-reviewers @Two-Weeks-Team/maintainers
+tools/generate_*.py @Two-Weeks-Team/asset-reviewers @Two-Weeks-Team/maintainers
+tools/sprites/ @Two-Weeks-Team/asset-reviewers @Two-Weeks-Team/maintainers
+
+# =============================================================================
+# WORLD DATA (NPCs, Facilities, Zones)
+# =============================================================================
+
+# NPC definitions
+world/packs/base/npcs/ @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+
+# Facility definitions
+world/packs/base/facilities/ @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+
+# World type definitions
+packages/shared/src/world.ts @Two-Weeks-Team/map-reviewers @Two-Weeks-Team/maintainers
+
+# =============================================================================
+# SERVER CORE (Game logic, AIC handlers)
+# =============================================================================
+
+# World loading and zone management
+packages/server/src/world/ @Two-Weeks-Team/server-reviewers @Two-Weeks-Team/maintainers
+packages/server/src/zone/ @Two-Weeks-Team/server-reviewers @Two-Weeks-Team/maintainers
+
+# AIC API handlers
+packages/server/src/aic/ @Two-Weeks-Team/server-reviewers @Two-Weeks-Team/maintainers
+
+# Game rooms
+packages/server/src/rooms/ @Two-Weeks-Team/server-reviewers @Two-Weeks-Team/maintainers
+
+# =============================================================================
+# CLIENT CORE (Game scenes, UI)
+# =============================================================================
+
+# Game scenes
+packages/client/src/game/scenes/ @Two-Weeks-Team/client-reviewers @Two-Weeks-Team/maintainers
+
+# UI components
+packages/client/src/ui/ @Two-Weeks-Team/client-reviewers @Two-Weeks-Team/maintainers
+
+# =============================================================================
+# CI/CD AND CONFIGURATION
+# =============================================================================
+
+# GitHub workflows
+.github/workflows/ @Two-Weeks-Team/maintainers
+
+# GitHub templates and config
+.github/CODEOWNERS @Two-Weeks-Team/maintainers
+.github/pull_request_template.md @Two-Weeks-Team/maintainers
+
+# Package configuration
+package.json @Two-Weeks-Team/maintainers
+pnpm-workspace.yaml @Two-Weeks-Team/maintainers
+tsconfig*.json @Two-Weeks-Team/maintainers
+
+# =============================================================================
+# DOCUMENTATION
+# =============================================================================
+
+# Reference documentation
+docs/reference/ @Two-Weeks-Team/maintainers
+docs/templates/ @Two-Weeks-Team/maintainers
+
+# Main README
+README.md @Two-Weeks-Team/maintainers
+AGENTS.md @Two-Weeks-Team/maintainers

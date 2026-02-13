@@ -134,6 +134,7 @@ type RawUnifiedMap = {
 export class WorldPackLoader {
   private packPath: string;
   private pack: WorldPack | null = null;
+  private npcZoneCache: Map<string, ZoneId> = new Map();
 
   constructor(packPath: string) {
     this.packPath = resolve(packPath);
@@ -145,6 +146,7 @@ export class WorldPackLoader {
     }
 
     const manifest = this.loadManifest();
+    this.loadNpcZoneMapping();
     const maps = this.loadAllZoneMaps(manifest.zones);
     const npcs = this.loadNpcs();
     const facilities = this.loadFacilities(maps);
@@ -412,19 +414,50 @@ export class WorldPackLoader {
     });
   }
 
+  private loadNpcZoneMapping(): void {
+    const npcsDir = join(this.packPath, 'npcs');
+    if (!existsSync(npcsDir)) {
+      return;
+    }
+
+    const indexPath = join(npcsDir, 'index.json');
+    if (!existsSync(indexPath)) {
+      return;
+    }
+
+    let index: { npcs?: string[] };
+    try {
+      const indexContent = readFileSync(indexPath, 'utf-8');
+      index = JSON.parse(indexContent) as { npcs?: string[] };
+    } catch {
+      return;
+    }
+
+    if (!index.npcs || !Array.isArray(index.npcs)) {
+      return;
+    }
+
+    for (const npcId of index.npcs) {
+      const npcPath = join(npcsDir, `${npcId}.json`);
+      if (!existsSync(npcPath)) {
+        continue;
+      }
+
+      try {
+        const npcContent = readFileSync(npcPath, 'utf-8');
+        const raw = JSON.parse(npcContent) as { zone?: string };
+        if (raw.zone) {
+          this.npcZoneCache.set(npcId, raw.zone as ZoneId);
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+
   private getNpcZone(npcId: string, zoneId: ZoneId): boolean {
-    const npcZoneMap: Record<string, ZoneId> = {
-      greeter: 'lobby',
-      security: 'lobby',
-      'office-pm': 'office',
-      'it-help': 'office',
-      ranger: 'central-park',
-      'arcade-host': 'arcade',
-      'meeting-host': 'meeting',
-      barista: 'lounge-cafe',
-      'fountain-keeper': 'plaza',
-    };
-    return npcZoneMap[npcId] === zoneId;
+    const npcZone = this.npcZoneCache.get(npcId);
+    return npcZone === zoneId;
   }
 
   private getFacilityZone(facilityId: string, zoneId: ZoneId): boolean {

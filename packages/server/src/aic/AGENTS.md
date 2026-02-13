@@ -42,7 +42,7 @@ aic/
 - **URL pattern**: `/aic/v0.1/{action}`
 - **Auth**: Bearer token from `/register` response
 - **Request body**: Always JSON, validated with Zod
-- **Response**: `{ success: boolean, data?: T, error?: string }`
+- **Response**: `AicResult<T>` = `{ status: 'ok', data: T } | { status: 'error', error: AicErrorObject }`
 - **Idempotency**: Use `X-Idempotency-Key` header
 
 ## HANDLER TEMPLATE
@@ -51,12 +51,12 @@ aic/
 export async function handleXxx(
   body: XxxRequest,
   context: AICContext
-): Promise<AICResponse<XxxResponse>> {
+): Promise<AicResult<XxxResponse>> {
   // 1. Validate (already done by middleware)
   // 2. Get room/entity from context
   // 3. Delegate to service
   // 4. Return response
-  return { success: true, data: { ... } };
+  return { status: 'ok', data: { ... } };
 }
 ```
 

@@ -284,39 +284,107 @@ ocw.poll_events({ agentId: "my_agent", roomId: "default" })
   };
 }
 
+function createResidentAgentLoopCommand(): UnifiedCommand {
+  const instructions = `Execute the OpenClawWorld resident-agent loop immediately.
+
+## Execution Contract
+
+1. Use Bash to execute the workflow.
+2. Do not return a documentation-only summary instead of execution.
+3. Run prerequisite checks first and stop with a clear error if any check fails.
+4. If checks pass, execute the resident loop with provided arguments.
+
+## Prerequisite Checks
+
+Run these checks in order:
+
+\`\`\`bash
+pnpm --version
+curl -fsS http://localhost:2567/health
+gh auth status
+\`\`\`
+
+If the health check fails, start server first:
+
+\`\`\`bash
+pnpm dev:server
+# or
+docker compose up -d
+\`\`\`
+
+## Run Command
+
+From the repository root, start the loop:
+
+\`\`\`bash
+pnpm resident-agent-loop [options]
+\`\`\`
+
+## Options
+
+- \`--stress\` (\`low\` | \`medium\` | \`high\`, default: \`medium\`)
+- \`--agents\` (number, default: \`10\`)
+- \`--chaos\`
+- \`--dry-run\`
+- \`--resume\`
+
+## Examples
+
+\`\`\`bash
+pnpm resident-agent-loop
+pnpm resident-agent-loop -- --stress high --agents 20
+pnpm resident-agent-loop -- --chaos --dry-run
+\`\`\`
+
+## Runtime Behavior
+
+- Long-running process (no automatic stop condition)
+- Stop with \`Ctrl+C\` for graceful shutdown
+- Issues are filed through GitHub CLI when detected`;
+
+  return {
+    name: 'openclaw-resident-agent-loop',
+    description: 'Execute autonomous resident loop for continuous bug discovery in OpenClawWorld',
+    tools: ['Bash', 'Read'],
+    arguments: '[--stress low|medium|high] [--agents N] [--chaos] [--dry-run] [--resume]',
+    instructions,
+  };
+}
+
 // Generate commands for all CLI formats
 function generateCommands(): void {
-  const command = createOCWToolsCommand();
+  const commands = [createOCWToolsCommand(), createResidentAgentLoopCommand()];
 
-  // Claude Code (Markdown)
   const claudeAdapter = new ClaudeAdapter({ outputDir: '.claude/commands', extension: 'md' });
-  const claudeOutput = claudeAdapter.generate(command);
-  const claudeDir = path.join(PROJECT_ROOT, '.claude', 'commands');
-  fs.mkdirSync(claudeDir, { recursive: true });
-  fs.writeFileSync(path.join(claudeDir, 'ocw-tools.md'), claudeOutput);
-  console.log('✓ Generated: .claude/commands/ocw-tools.md');
-
-  // OpenCode (Markdown)
   const opencodeAdapter = new OpenCodeAdapter({ outputDir: '.opencode/command', extension: 'md' });
-  const opencodeOutput = opencodeAdapter.generate(command);
-  const opencodeDir = path.join(PROJECT_ROOT, '.opencode', 'command');
-  fs.mkdirSync(opencodeDir, { recursive: true });
-  fs.writeFileSync(path.join(opencodeDir, 'ocw-tools.md'), opencodeOutput);
-  console.log('✓ Generated: .opencode/command/ocw-tools.md');
-
-  // Gemini CLI (TOML)
   const geminiAdapter = new GeminiAdapter({ outputDir: '.gemini/commands', extension: 'toml' });
-  const geminiOutput = geminiAdapter.generate(command);
-  const geminiDir = path.join(PROJECT_ROOT, '.gemini', 'commands');
-  fs.mkdirSync(geminiDir, { recursive: true });
-  fs.writeFileSync(path.join(geminiDir, 'ocw-tools.toml'), geminiOutput);
-  console.log('✓ Generated: .gemini/commands/ocw-tools.toml');
-
-  // Codex CLI (AGENTS.md)
   const codexAdapter = new CodexAdapter({ outputDir: '.codex', extension: 'md' });
-  const codexOutput = codexAdapter.generate(command);
+
+  const claudeDir = path.join(PROJECT_ROOT, '.claude', 'commands');
+  const opencodeDir = path.join(PROJECT_ROOT, '.opencode', 'command');
+  const geminiDir = path.join(PROJECT_ROOT, '.gemini', 'commands');
   const codexDir = path.join(PROJECT_ROOT, '.codex');
+
+  fs.mkdirSync(claudeDir, { recursive: true });
+  fs.mkdirSync(opencodeDir, { recursive: true });
+  fs.mkdirSync(geminiDir, { recursive: true });
   fs.mkdirSync(codexDir, { recursive: true });
+
+  for (const command of commands) {
+    const claudeOutput = claudeAdapter.generate(command);
+    fs.writeFileSync(path.join(claudeDir, `${command.name}.md`), claudeOutput);
+    console.log(`✓ Generated: .claude/commands/${command.name}.md`);
+
+    const opencodeOutput = opencodeAdapter.generate(command);
+    fs.writeFileSync(path.join(opencodeDir, `${command.name}.md`), opencodeOutput);
+    console.log(`✓ Generated: .opencode/command/${command.name}.md`);
+
+    const geminiOutput = geminiAdapter.generate(command);
+    fs.writeFileSync(path.join(geminiDir, `${command.name}.toml`), geminiOutput);
+    console.log(`✓ Generated: .gemini/commands/${command.name}.toml`);
+  }
+
+  const codexOutput = commands.map(command => codexAdapter.generate(command)).join('\n\n---\n\n');
   fs.writeFileSync(path.join(codexDir, 'AGENTS.md'), codexOutput);
   console.log('✓ Generated: .codex/AGENTS.md');
 

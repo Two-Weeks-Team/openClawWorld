@@ -1,5 +1,12 @@
 import Phaser from 'phaser';
-import { ZONE_BOUNDS, ZONE_COLORS, MAP_CONFIG, ZONE_IDS } from '@openclawworld/shared';
+import {
+  ZONE_BOUNDS,
+  ZONE_COLORS,
+  MAP_CONFIG,
+  ZONE_IDS,
+  type WorldGrid,
+  type TileType,
+} from '@openclawworld/shared';
 
 interface MinimapConfig {
   width: number;
@@ -25,20 +32,35 @@ const DEFAULT_CONFIG: MinimapConfig = {
   agentColor: 0xff00ff,
 };
 
-const EXTRA_COLORS = {
+const TERRAIN_COLORS: Partial<Record<TileType, number>> = {
   water: 0x3a7ca5,
   road: 0xa88b5a,
+  grass: 0x4a8c4a,
+  wall: 0x5a5a5a,
+  floor_lobby: 0xa6bed0,
+  floor_office: 0xb4d2e1,
+  floor_meeting: 0xc8d2c8,
+  floor_lounge: 0x8c8c8c,
+  floor_arcade: 0xd2bea5,
+  floor_plaza: 0xa0a0a0,
+  floor_lake: 0x6ea0d7,
+  door: 0xe6d25a,
+  decoration: 0x7a6b52,
 };
 
 export class Minimap {
   private scene: Phaser.Scene;
   private container: Phaser.GameObjects.Container;
   private background: Phaser.GameObjects.Graphics;
+  private terrainGraphics: Phaser.GameObjects.Graphics;
   private zoneGraphics: Phaser.GameObjects.Graphics;
   private entityGraphics: Phaser.GameObjects.Graphics;
   private viewportGraphics: Phaser.GameObjects.Graphics;
   private config: MinimapConfig;
   private padding = 10;
+  private worldGrid: WorldGrid | null = null;
+  private tileSize = 16;
+  private warnedGridBoundsMismatch = false;
 
   constructor(scene: Phaser.Scene, config?: Partial<MinimapConfig>) {
     this.scene = scene;
@@ -57,71 +79,108 @@ export class Minimap {
     this.background.lineStyle(2, this.config.borderColor, 1);
     this.background.strokeRoundedRect(0, 0, this.config.width, this.config.height, 8);
 
+    this.terrainGraphics = scene.add.graphics();
     this.zoneGraphics = scene.add.graphics();
     this.entityGraphics = scene.add.graphics();
     this.viewportGraphics = scene.add.graphics();
 
     this.container.add([
       this.background,
+      this.terrainGraphics,
       this.zoneGraphics,
       this.entityGraphics,
       this.viewportGraphics,
     ]);
 
-    this.drawZones();
+    this.drawZoneBounds();
   }
 
-  private drawZones(): void {
-    this.zoneGraphics.clear();
+  private getRenderBounds(): { pixelWidth: number; pixelHeight: number } {
+    const defaultBounds = {
+      pixelWidth: this.config.mapWidth,
+      pixelHeight: this.config.mapHeight,
+    };
 
-    const scaleX = (this.config.width - 8) / this.config.mapWidth;
-    const scaleY = (this.config.height - 8) / this.config.mapHeight;
+    if (!this.worldGrid || this.worldGrid.length === 0 || this.worldGrid[0].length === 0) {
+      return defaultBounds;
+    }
+
+    const gridPixelWidth = this.worldGrid[0].length * this.tileSize;
+    const gridPixelHeight = this.worldGrid.length * this.tileSize;
+    if (gridPixelWidth !== this.config.mapWidth || gridPixelHeight !== this.config.mapHeight) {
+      if (!this.warnedGridBoundsMismatch) {
+        this.warnedGridBoundsMismatch = true;
+        console.warn(
+          `[Minimap] WorldGrid pixel bounds (${gridPixelWidth}x${gridPixelHeight}) do not match map bounds (${this.config.mapWidth}x${this.config.mapHeight}).`
+        );
+      }
+      return {
+        pixelWidth: gridPixelWidth,
+        pixelHeight: gridPixelHeight,
+      };
+    }
+
+    return defaultBounds;
+  }
+
+  private getMinimapScale(): { scaleX: number; scaleY: number; offsetX: number; offsetY: number } {
+    const { pixelWidth, pixelHeight } = this.getRenderBounds();
     const offsetX = 4;
     const offsetY = 4;
 
-    this.zoneGraphics.fillStyle(EXTRA_COLORS.water, 0.8);
-    for (let y = 0; y < 3; y++) {
-      this.zoneGraphics.fillRect(
-        offsetX,
-        offsetY + y * 16 * scaleY,
-        this.config.width - 8,
-        16 * scaleY
-      );
-    }
-    for (let y = 3; y < 20; y++) {
-      this.zoneGraphics.fillRect(offsetX, offsetY + y * 16 * scaleY, 5 * 16 * scaleX, 16 * scaleY);
+    if (pixelWidth <= 0 || pixelHeight <= 0) {
+      return { scaleX: 0, scaleY: 0, offsetX, offsetY };
     }
 
-    this.zoneGraphics.fillStyle(EXTRA_COLORS.road, 0.6);
-    this.zoneGraphics.fillRect(
-      offsetX + 17 * 16 * scaleX,
-      offsetY + 12 * 16 * scaleY,
-      23 * 16 * scaleX,
-      4 * 16 * scaleY
-    );
-    this.zoneGraphics.fillRect(
-      offsetX + 17 * 16 * scaleX,
-      offsetY + 16 * 16 * scaleY,
-      4 * 16 * scaleX,
-      22 * 16 * scaleY
-    );
-    this.zoneGraphics.fillRect(
-      offsetX + 37 * 16 * scaleX,
-      offsetY + 18 * 16 * scaleY,
-      3 * 16 * scaleX,
-      15 * 16 * scaleY
-    );
-    this.zoneGraphics.fillRect(
-      offsetX + 17 * 16 * scaleX,
-      offsetY + 36 * 16 * scaleY,
-      41 * 16 * scaleX,
-      14 * 16 * scaleY
-    );
+    return {
+      scaleX: (this.config.width - 8) / pixelWidth,
+      scaleY: (this.config.height - 8) / pixelHeight,
+      offsetX,
+      offsetY,
+    };
+  }
+
+  setWorldGrid(grid: WorldGrid, tileSize = 16): void {
+    this.worldGrid = grid;
+    this.tileSize = tileSize;
+    this.warnedGridBoundsMismatch = false;
+    this.drawTerrain();
+  }
+
+  private drawTerrain(): void {
+    this.terrainGraphics.clear();
+
+    if (!this.worldGrid || this.worldGrid.length === 0) return;
+
+    const gridHeight = this.worldGrid.length;
+    const gridWidth = this.worldGrid[0].length;
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
+
+    const tileW = this.tileSize * scaleX;
+    const tileH = this.tileSize * scaleY;
+
+    for (let ty = 0; ty < gridHeight; ty++) {
+      for (let tx = 0; tx < gridWidth; tx++) {
+        const tile = this.worldGrid[ty][tx];
+        const color = TERRAIN_COLORS[tile.type];
+
+        if (color !== undefined) {
+          this.terrainGraphics.fillStyle(color, 0.7);
+          this.terrainGraphics.fillRect(offsetX + tx * tileW, offsetY + ty * tileH, tileW, tileH);
+        }
+      }
+    }
+  }
+
+  private drawZoneBounds(): void {
+    this.zoneGraphics.clear();
+
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
 
     for (const zoneId of ZONE_IDS) {
       const bounds = ZONE_BOUNDS[zoneId];
       const color = ZONE_COLORS[zoneId];
-      this.zoneGraphics.fillStyle(color, 0.6);
+      this.zoneGraphics.fillStyle(color, 0.2);
       this.zoneGraphics.fillRect(
         offsetX + bounds.x * scaleX,
         offsetY + bounds.y * scaleY,
@@ -145,10 +204,7 @@ export class Minimap {
   ): void {
     this.entityGraphics.clear();
 
-    const scaleX = (this.config.width - 8) / this.config.mapWidth;
-    const scaleY = (this.config.height - 8) / this.config.mapHeight;
-    const offsetX = 4;
-    const offsetY = 4;
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
 
     entities.forEach((entity, id) => {
       let color = this.config.otherPlayerColor;
@@ -177,10 +233,7 @@ export class Minimap {
   updateViewport(camera: Phaser.Cameras.Scene2D.Camera): void {
     this.viewportGraphics.clear();
 
-    const scaleX = (this.config.width - 8) / this.config.mapWidth;
-    const scaleY = (this.config.height - 8) / this.config.mapHeight;
-    const offsetX = 4;
-    const offsetY = 4;
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
 
     const worldViewWidth = camera.zoom > 0 ? camera.width / camera.zoom : 0;
     const worldViewHeight = camera.zoom > 0 ? camera.height / camera.zoom : 0;

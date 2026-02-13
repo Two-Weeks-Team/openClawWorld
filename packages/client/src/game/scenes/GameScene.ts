@@ -124,7 +124,6 @@ export class GameScene extends Phaser.Scene {
     this.initializeWorldGrid();
 
     this.setupSkillKeys();
-    this.setupSkillTargeting();
     this.initializeBuiltinSkills();
 
     this.setupKeyboardFocusHandling();
@@ -205,23 +204,21 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private setupSkillTargeting(): void {
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (!this.targetingMode || this.selectedSkillSlot === null) return;
-      if (!this.skillBar) return;
+  private handleTargetingPointerDown(pointer: Phaser.Input.Pointer): void {
+    if (!this.targetingMode || this.selectedSkillSlot === null) return;
+    if (!this.skillBar) return;
 
-      const skill = this.skillBar.getSkill(this.selectedSkillSlot);
-      if (!skill) return;
+    const skill = this.skillBar.getSkill(this.selectedSkillSlot);
+    if (!skill) return;
 
-      const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
-      const targetEntity = this.findEntityAtPosition(worldPoint.x, worldPoint.y);
+    const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
+    const targetEntity = this.findEntityAtPosition(worldPoint.x, worldPoint.y);
 
-      if (targetEntity) {
-        this.invokeSkillOnTarget(skill, targetEntity);
-      }
+    if (targetEntity) {
+      this.invokeSkillOnTarget(skill, targetEntity);
+    }
 
-      this.cancelTargeting();
-    });
+    this.cancelTargeting();
   }
 
   private initializeBuiltinSkills(): void {
@@ -491,6 +488,10 @@ export class GameScene extends Phaser.Scene {
 
   private setupInput() {
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.targetingMode) {
+        this.handleTargetingPointerDown(pointer);
+        return;
+      }
       if (!this.map) return;
 
       const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;

@@ -1,0 +1,564 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "generated": "2025-02-13",
+  "description": "Kenney asset curation manifest for openClawWorld. All coordinates are 0-indexed (col, row).",
+
+  "sources": {
+    "city": {
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike City Pack/Tilemap/tilemap_packed.png",
+      "tileSize": 16,
+      "spacing": 0,
+      "columns": 37,
+      "rows": 28
+    },
+    "interior": {
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png",
+      "tileSize": 16,
+      "spacing": 1,
+      "columns": 27,
+      "rows": 19
+    },
+    "urban": {
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/RPG Urban Pack/Tilemap/tilemap_packed.png",
+      "tileSize": 16,
+      "spacing": 0,
+      "columns": 20,
+      "rows": 18
+    },
+    "characters": {
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike Characters Pack/Spritesheet/roguelikeChar_transparent.png",
+      "tileSize": 16,
+      "spacing": 1,
+      "columns": 57,
+      "rows": 17
+    }
+  },
+
+  "outputs": {
+    "tileset": {
+      "path": "packages/client/public/assets/maps/tileset.png",
+      "width": 128,
+      "height": 64,
+      "tileSize": 16,
+      "columns": 8,
+      "rows": 4
+    },
+    "npcs": {
+      "pngPath": "packages/client/public/assets/sprites/npcs.png",
+      "jsonPath": "packages/client/public/assets/sprites/npcs.json"
+    },
+    "players": {
+      "pngPath": "packages/client/public/assets/sprites/players.png",
+      "jsonPath": "packages/client/public/assets/sprites/players.json"
+    },
+    "objects": {
+      "pngPath": "packages/client/public/assets/sprites/objects.png",
+      "jsonPath": "packages/client/public/assets/sprites/objects.json"
+    }
+  },
+
+  "tileset": {
+    "description": "32 tiles arranged in 8x4 grid (128x64 pixels)",
+    "tiles": [
+      {
+        "id": "empty",
+        "index": 0,
+        "source": "city",
+        "col": 0,
+        "row": 0,
+        "purpose": "void/transparent"
+      },
+      {
+        "id": "grass_light",
+        "index": 1,
+        "source": "city",
+        "col": 0,
+        "row": 25,
+        "purpose": "park grass"
+      },
+      {
+        "id": "grass_dark",
+        "index": 2,
+        "source": "city",
+        "col": 1,
+        "row": 25,
+        "purpose": "park grass variant"
+      },
+      {
+        "id": "road_h",
+        "index": 3,
+        "source": "city",
+        "col": 13,
+        "row": 21,
+        "purpose": "horizontal road"
+      },
+      {
+        "id": "road_v",
+        "index": 4,
+        "source": "city",
+        "col": 11,
+        "row": 21,
+        "purpose": "vertical road"
+      },
+      {
+        "id": "road_corner_tl",
+        "index": 5,
+        "source": "city",
+        "col": 11,
+        "row": 23,
+        "purpose": "corner top-left"
+      },
+      {
+        "id": "road_corner_tr",
+        "index": 6,
+        "source": "city",
+        "col": 12,
+        "row": 23,
+        "purpose": "corner top-right"
+      },
+      {
+        "id": "sidewalk",
+        "index": 7,
+        "source": "city",
+        "col": 0,
+        "row": 21,
+        "purpose": "pedestrian path"
+      },
+
+      {
+        "id": "floor_lobby",
+        "index": 8,
+        "source": "city",
+        "col": 9,
+        "row": 1,
+        "purpose": "lobby light gray"
+      },
+      {
+        "id": "floor_office",
+        "index": 9,
+        "source": "city",
+        "col": 5,
+        "row": 1,
+        "purpose": "office dark gray"
+      },
+      {
+        "id": "floor_meeting",
+        "index": 10,
+        "source": "city",
+        "col": 9,
+        "row": 2,
+        "purpose": "meeting room"
+      },
+      {
+        "id": "floor_lounge",
+        "index": 11,
+        "source": "city",
+        "col": 13,
+        "row": 1,
+        "purpose": "cafe wooden"
+      },
+      {
+        "id": "floor_arcade",
+        "index": 12,
+        "source": "city",
+        "col": 16,
+        "row": 19,
+        "purpose": "arcade checkered"
+      },
+      {
+        "id": "floor_plaza",
+        "index": 13,
+        "source": "city",
+        "col": 6,
+        "row": 22,
+        "purpose": "plaza stone"
+      },
+      {
+        "id": "floor_park",
+        "index": 14,
+        "source": "city",
+        "col": 2,
+        "row": 25,
+        "purpose": "park dirt path"
+      },
+      {
+        "id": "floor_lake_edge",
+        "index": 15,
+        "source": "city",
+        "col": 26,
+        "row": 5,
+        "purpose": "lake water edge"
+      },
+
+      {
+        "id": "wall_brick",
+        "index": 16,
+        "source": "city",
+        "col": 1,
+        "row": 5,
+        "purpose": "red brick wall"
+      },
+      {
+        "id": "wall_stone",
+        "index": 17,
+        "source": "city",
+        "col": 5,
+        "row": 5,
+        "purpose": "gray stone wall"
+      },
+      {
+        "id": "wall_glass",
+        "index": 18,
+        "source": "city",
+        "col": 17,
+        "row": 6,
+        "purpose": "modern glass"
+      },
+      {
+        "id": "wall_indoor",
+        "index": 19,
+        "source": "city",
+        "col": 21,
+        "row": 16,
+        "purpose": "indoor partition"
+      },
+      {
+        "id": "wall_fence",
+        "index": 20,
+        "source": "city",
+        "col": 19,
+        "row": 16,
+        "purpose": "wood fence"
+      },
+      {
+        "id": "door_closed",
+        "index": 21,
+        "source": "city",
+        "col": 20,
+        "row": 27,
+        "purpose": "wood door closed"
+      },
+      {
+        "id": "door_open",
+        "index": 22,
+        "source": "city",
+        "col": 21,
+        "row": 27,
+        "purpose": "wood door open"
+      },
+      {
+        "id": "water_center",
+        "index": 23,
+        "source": "city",
+        "col": 27,
+        "row": 5,
+        "purpose": "lake water"
+      },
+
+      {
+        "id": "tree_round",
+        "index": 24,
+        "source": "city",
+        "col": 17,
+        "row": 8,
+        "purpose": "round tree"
+      },
+      {
+        "id": "tree_cone",
+        "index": 25,
+        "source": "city",
+        "col": 17,
+        "row": 7,
+        "purpose": "cone tree"
+      },
+      {
+        "id": "bush",
+        "index": 26,
+        "source": "city",
+        "col": 17,
+        "row": 10,
+        "purpose": "small bush"
+      },
+      {
+        "id": "fountain",
+        "index": 27,
+        "source": "city",
+        "col": 17,
+        "row": 3,
+        "purpose": "plaza fountain"
+      },
+      {
+        "id": "bench",
+        "index": 28,
+        "source": "city",
+        "col": 11,
+        "row": 11,
+        "purpose": "park bench"
+      },
+      {
+        "id": "streetlamp",
+        "index": 29,
+        "source": "city",
+        "col": 1,
+        "row": 11,
+        "purpose": "street lamp"
+      },
+      { "id": "sign", "index": 30, "source": "city", "col": 6, "row": 11, "purpose": "info sign" },
+      {
+        "id": "potted_plant",
+        "index": 31,
+        "source": "city",
+        "col": 17,
+        "row": 1,
+        "purpose": "indoor plant"
+      }
+    ]
+  },
+
+  "npcs": {
+    "description": "9 NPC sprites for zone-specific roles",
+    "sprites": [
+      {
+        "id": "greeter",
+        "description": "Lobby reception - friendly, welcoming",
+        "zone": "Lobby",
+        "base": { "col": 0, "row": 1 },
+        "outfit": { "col": 6, "row": 0 },
+        "hair": { "col": 12, "row": 11 },
+        "notes": "Medium skin, purple uniform, blonde hair"
+      },
+      {
+        "id": "security",
+        "description": "Lobby security - helmet, authority",
+        "zone": "Lobby",
+        "base": { "col": 0, "row": 10 },
+        "notes": "Built-in helmet, no customization needed"
+      },
+      {
+        "id": "office-pm",
+        "description": "Office PM - business casual, professional",
+        "zone": "Office",
+        "base": { "col": 0, "row": 1 },
+        "outfit": { "col": 3, "row": 0 },
+        "hair": { "col": 11, "row": 11 },
+        "notes": "Medium skin, brown suit, brown hair"
+      },
+      {
+        "id": "it-help",
+        "description": "Office IT support - casual, glasses",
+        "zone": "Office",
+        "base": { "col": 0, "row": 0 },
+        "outfit": { "col": 5, "row": 0 },
+        "face": { "col": 1, "row": 1 },
+        "notes": "Light skin, blue shirt, glasses"
+      },
+      {
+        "id": "meeting-host",
+        "description": "Meeting coordinator - formal, wise appearance",
+        "zone": "Meeting",
+        "base": { "col": 0, "row": 5 },
+        "outfit": { "col": 2, "row": 3 },
+        "notes": "White-haired elder with robe"
+      },
+      {
+        "id": "barista",
+        "description": "Cafe barista - apron, friendly",
+        "zone": "LoungeCafe",
+        "base": { "col": 0, "row": 0 },
+        "outfit": { "col": 2, "row": 0 },
+        "notes": "Light skin, orange tunic (apron substitute)"
+      },
+      {
+        "id": "arcade-host",
+        "description": "Arcade game master - casual, energetic",
+        "zone": "Arcade",
+        "base": { "col": 0, "row": 8 },
+        "outfit": { "col": 4, "row": 0 },
+        "notes": "Headband warrior style, teal outfit"
+      },
+      {
+        "id": "ranger",
+        "description": "Park ranger - green uniform, outdoor",
+        "zone": "CentralPark",
+        "base": { "col": 0, "row": 6 },
+        "outfit": { "col": 2, "row": 1 },
+        "hair": { "col": 13, "row": 11 },
+        "notes": "Brown-haired youth, green outfit"
+      },
+      {
+        "id": "fountain-keeper",
+        "description": "Plaza fountain maintenance - workwear",
+        "zone": "Plaza",
+        "base": { "col": 0, "row": 1 },
+        "outfit": { "col": 2, "row": 2 },
+        "notes": "Medium skin, worker clothes"
+      }
+    ]
+  },
+
+  "players": {
+    "description": "Player avatar variants",
+    "sprites": [
+      {
+        "id": "player-human",
+        "description": "Human player - default avatar",
+        "base": { "col": 0, "row": 0 },
+        "notes": "Light skin base, customizable"
+      },
+      {
+        "id": "player-agent",
+        "description": "AI agent - hooded mysterious figure",
+        "base": { "col": 0, "row": 7 },
+        "notes": "Hooded figure representing AI agents"
+      },
+      {
+        "id": "player-object",
+        "description": "Object/item entity",
+        "base": { "col": 24, "row": 0 },
+        "notes": "Non-humanoid entity representation"
+      }
+    ]
+  },
+
+  "objects": {
+    "description": "Interactive world objects",
+    "sprites": [
+      {
+        "id": "computer",
+        "source": "interior",
+        "col": 23,
+        "row": 9,
+        "description": "Desktop computer for office"
+      },
+      {
+        "id": "vending",
+        "source": "urban",
+        "col": 10,
+        "row": 10,
+        "description": "Vending machine (drinks/snacks)"
+      },
+      {
+        "id": "whiteboard",
+        "source": "urban",
+        "col": 11,
+        "row": 12,
+        "description": "Meeting room whiteboard"
+      },
+      {
+        "id": "counter",
+        "source": "interior",
+        "col": 12,
+        "row": 10,
+        "description": "Cafe/bar counter"
+      },
+      {
+        "id": "sofa",
+        "source": "interior",
+        "col": 9,
+        "row": 0,
+        "width": 2,
+        "height": 2,
+        "description": "Lounge sofa"
+      },
+      {
+        "id": "table_round",
+        "source": "interior",
+        "col": 8,
+        "row": 0,
+        "description": "Round cafe table"
+      },
+      {
+        "id": "chair",
+        "source": "interior",
+        "col": 0,
+        "row": 2,
+        "description": "Standard chair"
+      }
+    ]
+  },
+
+  "zones": {
+    "description": "Zone-specific asset assignments",
+    "mapping": {
+      "Lobby": {
+        "floor": "floor_lobby",
+        "walls": ["wall_glass", "wall_indoor"],
+        "npcs": ["greeter", "security"],
+        "objects": ["counter"]
+      },
+      "Office": {
+        "floor": "floor_office",
+        "walls": ["wall_indoor"],
+        "npcs": ["office-pm", "it-help"],
+        "objects": ["computer", "whiteboard", "chair"]
+      },
+      "CentralPark": {
+        "floor": "grass_light",
+        "decorations": ["tree_round", "tree_cone", "bush", "bench"],
+        "npcs": ["ranger"],
+        "objects": []
+      },
+      "Arcade": {
+        "floor": "floor_arcade",
+        "walls": ["wall_brick"],
+        "npcs": ["arcade-host"],
+        "objects": ["vending"],
+        "notes": "Arcade game cabinet needs custom sprite"
+      },
+      "Meeting": {
+        "floor": "floor_meeting",
+        "walls": ["wall_indoor"],
+        "npcs": ["meeting-host"],
+        "objects": ["whiteboard", "chair"]
+      },
+      "LoungeCafe": {
+        "floor": "floor_lounge",
+        "walls": ["wall_brick"],
+        "npcs": ["barista"],
+        "objects": ["counter", "sofa", "table_round", "chair"]
+      },
+      "Plaza": {
+        "floor": "floor_plaza",
+        "decorations": ["fountain", "bench", "streetlamp", "potted_plant"],
+        "npcs": ["fountain-keeper"],
+        "objects": []
+      },
+      "Lake": {
+        "floor": "water_center",
+        "walls": [],
+        "npcs": [],
+        "objects": [],
+        "notes": "Water tiles only, no NPCs"
+      }
+    }
+  },
+
+  "gaps": {
+    "description": "Assets not available in Kenney packs",
+    "critical": [
+      {
+        "asset": "arcade_cabinet",
+        "purpose": "Arcade zone game machines",
+        "recommendation": "Create custom 16x32 sprite"
+      },
+      {
+        "asset": "coffee_machine",
+        "purpose": "LoungeCafe beverage maker",
+        "recommendation": "Use vending machine as substitute"
+      }
+    ],
+    "optional": [
+      {
+        "asset": "projector",
+        "purpose": "Meeting room presentations",
+        "recommendation": "Use whiteboard as substitute"
+      },
+      {
+        "asset": "kanban_board",
+        "purpose": "Office task management",
+        "recommendation": "Use whiteboard as substitute"
+      }
+    ]
+  }
+}

@@ -295,6 +295,10 @@ export const ChatMessageSchema = z.object({
   fromName: z.string().min(1).max(64),
   message: z.string().min(1).max(500),
   tsMs: TsMsSchema,
+  targetEntityId: IdEntitySchema.optional(),
+  teamId: z.string().min(1).max(64).optional(),
+  meetingRoomId: z.string().min(1).max(64).optional(),
+  emotes: z.array(z.string().min(1).max(32)).optional(),
 });
 
 export const ChatObserveResponseDataSchema = z.object({

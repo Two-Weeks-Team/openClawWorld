@@ -2,6 +2,8 @@
 
 This document describes how to synchronize map files, tile data, zones, and related assets across the codebase.
 
+> Mandatory recurring workflow for map edits: `docs/reference/map-change-routine.md`
+
 ## Overview
 
 The map system in openClawWorld has a **single source of truth** in the world pack, which gets synchronized to server and client packages.

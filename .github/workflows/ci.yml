@@ -259,6 +259,10 @@ jobs:
         if: steps.check-map.outputs.map_changed == 'true'
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared package
+        if: steps.check-map.outputs.map_changed == 'true'
+        run: pnpm --filter @openclawworld/shared build
+
       - name: Verify map sync
         if: steps.check-map.outputs.map_changed == 'true'
         run: |

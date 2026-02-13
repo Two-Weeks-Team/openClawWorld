@@ -328,6 +328,7 @@ See [Map Sync Process](docs/reference/map-sync-process.md) for detailed document
 - [Demo Runbook](docs/demo-runbook.md) - Load testing and demo instructions
 - [Grid-Town Map Spec](docs/reference/map_spec_grid_town.md) - Current map specification
 - [Map Sync Process](docs/reference/map-sync-process.md) - Map synchronization guide
+- [Kenney Asset Analysis](docs/kenney-asset-analysis.md) - Comprehensive Kenney asset inventory
 - [AIC Schema](docs/aic/v0.1/aic-schema.json) - JSON Schema for AIC API
 - [Claude Commands](.claude/README.md) - Claude Code slash commands guide
 

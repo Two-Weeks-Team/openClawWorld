@@ -1,137 +1,103 @@
 #!/usr/bin/env python3
 """
-Extract tiles from Kenney Roguelike City Pack to create a game tileset.
+Extract tiles from Kenney asset packs using manifest-based configuration.
 
-The city_tilemap.png is 592x448 pixels with 37x28 tiles at 16x16 each.
-No spacing between tiles (packed format).
-
+Reads tile definitions from kenney-curation.json and creates the game tileset.
 Output: 128x64 tileset (8x4 tiles at 16x16)
 """
 
 from PIL import Image
+import json
 import os
+from pathlib import Path
 
-# Source tilemap
-KENNEY_PATH = "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets"
-CITY_TILEMAP = f"{KENNEY_PATH}/Roguelike City Pack/Tilemap/tilemap_packed.png"
-INTERIOR_TILEMAP = (
-    f"{KENNEY_PATH}/Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png"
-)
-
-# Output
-OUTPUT_PATH = "packages/client/public/assets/maps/tileset.png"
-
-# Tile size
-TILE_SIZE = 16
-
-# City tilemap: 37 columns, 28 rows (no spacing in packed version)
-CITY_COLS = 37
-CITY_ROWS = 28
+SCRIPT_DIR = Path(__file__).parent
+MANIFEST_PATH = SCRIPT_DIR / "kenney-curation.json"
 
 
-def get_tile_from_city(img, col, row):
-    """Extract a tile from city tilemap (0-indexed)."""
-    x = col * TILE_SIZE
-    y = row * TILE_SIZE
-    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+def load_manifest():
+    with open(MANIFEST_PATH) as f:
+        return json.load(f)
 
 
-def get_tile_from_interior(img, col, row, spacing=1):
-    """Extract a tile from interior tilemap (0-indexed, with 1px spacing)."""
-    x = col * (TILE_SIZE + spacing)
-    y = row * (TILE_SIZE + spacing)
-    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+def get_tile(img, col, row, tile_size=16, spacing=0):
+    x = col * (tile_size + spacing)
+    y = row * (tile_size + spacing)
+    return img.crop((x, y, x + tile_size, y + tile_size))
 
 
 def main():
-    # Load source tilemaps
-    city_img = Image.open(CITY_TILEMAP)
-    interior_img = Image.open(INTERIOR_TILEMAP)
+    manifest = load_manifest()
+    sources_config = manifest["sources"]
+    output_config = manifest["outputs"]["tileset"]
+    tiles_config = manifest["tileset"]["tiles"]
 
-    print(f"City tilemap size: {city_img.size}")
-    print(f"Interior tilemap size: {interior_img.size}")
+    source_images = {}
+    for source_name, source_info in sources_config.items():
+        path = source_info["path"]
+        if os.path.exists(path):
+            source_images[source_name] = {
+                "image": Image.open(path),
+                "tileSize": source_info["tileSize"],
+                "spacing": source_info["spacing"],
+            }
+            print(f"Loaded {source_name}: {path}")
+        else:
+            print(f"WARNING: Source not found: {path}")
 
-    # Create output tileset (8x4 = 32 tiles)
-    # 128x64 pixels (8 columns, 4 rows)
-    tileset = Image.new("RGBA", (128, 64), (0, 0, 0, 0))
+    output_width = output_config["width"]
+    output_height = output_config["height"]
+    tile_size = output_config["tileSize"]
+    columns = output_config["columns"]
 
-    # Tile mapping based on current game requirements:
-    # Row 0: Basic terrain (grass, road variants)
-    # Row 1: Floor types for different zones
-    # Row 2: Walls, doors, water
-    # Row 3: Decorations, special tiles
+    tileset = Image.new("RGBA", (output_width, output_height), (0, 0, 0, 0))
 
-    # Selected tiles from city_tilemap (by visual inspection of common roguelike layouts):
-    # Grass: typically around row 0-2, col 0-5
-    # Road: typically middle rows
-    # Water: typically bottom rows or edges
-    # Buildings: various
+    for tile_def in tiles_config:
+        tile_id = tile_def["id"]
+        tile_index = tile_def["index"]
+        source_name = tile_def["source"]
+        col = tile_def["col"]
+        row = tile_def["row"]
+        purpose = tile_def.get("purpose", "")
 
-    tile_mapping = [
-        # Row 0: Basic terrain
-        (0, 0, "city"),  # 0: empty/void
-        (1, 0, "city"),  # 1: grass light
-        (2, 0, "city"),  # 2: grass dark
-        (0, 1, "city"),  # 3: road horizontal
-        (1, 1, "city"),  # 4: road vertical
-        (2, 1, "city"),  # 5: road corner
-        (3, 1, "city"),  # 6: road intersection
-        (4, 1, "city"),  # 7: path/sidewalk
-        # Row 1: Zone floors
-        (0, 2, "city"),  # 8: floor_lobby (tile)
-        (1, 2, "city"),  # 9: floor_office
-        (2, 2, "city"),  # 10: floor_meeting
-        (3, 2, "city"),  # 11: floor_lounge
-        (4, 2, "city"),  # 12: floor_arcade
-        (5, 2, "city"),  # 13: floor_plaza
-        (6, 2, "city"),  # 14: floor_park
-        (7, 2, "city"),  # 15: floor_lake (water edge)
-        # Row 2: Walls and barriers
-        (0, 5, "city"),  # 16: wall solid
-        (1, 5, "city"),  # 17: wall_top
-        (2, 5, "city"),  # 18: wall_left
-        (3, 5, "city"),  # 19: wall_right
-        (4, 5, "city"),  # 20: wall_bottom
-        (0, 8, "city"),  # 21: door closed
-        (1, 8, "city"),  # 22: door open
-        (0, 10, "city"),  # 23: water
-        # Row 3: Decorations and special
-        (0, 12, "city"),  # 24: tree
-        (1, 12, "city"),  # 25: bush
-        (2, 12, "city"),  # 26: flower
-        (0, 15, "city"),  # 27: fountain
-        (1, 15, "city"),  # 28: bench
-        (2, 15, "city"),  # 29: lamp
-        (3, 15, "city"),  # 30: sign
-        (4, 15, "city"),  # 31: chest
-    ]
+        out_col = tile_index % columns
+        out_row = tile_index // columns
+        out_x = out_col * tile_size
+        out_y = out_row * tile_size
 
-    # Place tiles into output tileset
-    for idx, (col, row, source) in enumerate(tile_mapping):
-        out_col = idx % 8
-        out_row = idx // 8
-        out_x = out_col * TILE_SIZE
-        out_y = out_row * TILE_SIZE
-
-        try:
-            if source == "city":
-                tile = get_tile_from_city(city_img, col, row)
-            else:
-                tile = get_tile_from_interior(interior_img, col, row)
-
-            tileset.paste(tile, (out_x, out_y))
-            print(f"Tile {idx}: ({col}, {row}) from {source} -> ({out_col}, {out_row})")
-        except Exception as e:
-            print(f"Error extracting tile {idx}: {e}")
-            # Fill with placeholder color
-            placeholder = Image.new("RGBA", (TILE_SIZE, TILE_SIZE), (255, 0, 255, 255))
+        if source_name in source_images:
+            source = source_images[source_name]
+            try:
+                tile = get_tile(
+                    source["image"],
+                    col,
+                    row,
+                    tile_size=source["tileSize"],
+                    spacing=source["spacing"],
+                )
+                tileset.paste(tile, (out_x, out_y))
+                print(
+                    f"[{tile_index:2d}] {tile_id:20s} ({col:2d},{row:2d}) from {source_name:10s} -> ({out_col},{out_row}) | {purpose}"
+                )
+            except Exception as e:
+                print(f"ERROR: Tile {tile_id}: {e}")
+                placeholder = Image.new(
+                    "RGBA", (tile_size, tile_size), (255, 0, 255, 255)
+                )
+                tileset.paste(placeholder, (out_x, out_y))
+        else:
+            print(f"WARNING: Source '{source_name}' not found for tile '{tile_id}'")
+            placeholder = Image.new("RGBA", (tile_size, tile_size), (255, 0, 255, 255))
             tileset.paste(placeholder, (out_x, out_y))
 
-    # Save output
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    tileset.save(OUTPUT_PATH)
-    print(f"\nSaved tileset to {OUTPUT_PATH}")
-    print(f"Output size: {tileset.size}")
+    output_path = output_config["path"]
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    tileset.save(output_path)
+
+    print(f"\n{'=' * 60}")
+    print(f"Saved tileset to {output_path}")
+    print(f"Output size: {tileset.size} ({len(tiles_config)} tiles)")
+    print(f"Manifest version: {manifest['version']}")
 
 
 if __name__ == "__main__":

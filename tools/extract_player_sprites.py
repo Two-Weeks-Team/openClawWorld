@@ -1,61 +1,64 @@
 #!/usr/bin/env python3
-"""Extract player sprites from Kenney Roguelike Characters Pack."""
+"""Extract player sprites from Kenney Roguelike Characters Pack using manifest."""
 
 from PIL import Image
 import json
 import os
+from pathlib import Path
 
-KENNEY_PATH = "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets"
-CHAR_SPRITESHEET = (
-    f"{KENNEY_PATH}/Roguelike Characters Pack/Spritesheet/roguelikeChar_transparent.png"
-)
-
-OUTPUT_PNG = "packages/client/public/assets/sprites/players.png"
-OUTPUT_JSON = "packages/client/public/assets/sprites/players.json"
-
-TILE_SIZE = 16
-SPACING = 1
-
-PLAYER_MAPPING = [
-    {"id": "player-human", "col": 0, "row": 0, "desc": "Human player"},
-    {"id": "player-agent", "col": 1, "row": 0, "desc": "AI agent (robot style)"},
-    {"id": "player-object", "col": 24, "row": 0, "desc": "Object/item entity"},
-]
+SCRIPT_DIR = Path(__file__).parent
+MANIFEST_PATH = SCRIPT_DIR / "kenney-curation.json"
 
 
-def get_tile(img, col, row):
-    x = col * (TILE_SIZE + SPACING)
-    y = row * (TILE_SIZE + SPACING)
-    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+def load_manifest():
+    with open(MANIFEST_PATH) as f:
+        return json.load(f)
+
+
+def get_tile(img, col, row, tile_size=16, spacing=1):
+    x = col * (tile_size + spacing)
+    y = row * (tile_size + spacing)
+    return img.crop((x, y, x + tile_size, y + tile_size))
 
 
 def main():
-    source_img = Image.open(CHAR_SPRITESHEET)
+    manifest = load_manifest()
+    char_source = manifest["sources"]["characters"]
+    players_config = manifest["players"]["sprites"]
+    output_config = manifest["outputs"]["players"]
+
+    source_img = Image.open(char_source["path"])
+    tile_size = char_source["tileSize"]
+    spacing = char_source["spacing"]
     print(f"Source spritesheet size: {source_img.size}")
 
-    num_players = len(PLAYER_MAPPING)
-    output_width = num_players * TILE_SIZE
-    output_height = TILE_SIZE
+    num_players = len(players_config)
+    output_width = num_players * tile_size
+    output_height = tile_size
 
     output_img = Image.new("RGBA", (output_width, output_height), (0, 0, 0, 0))
-
     frames = {}
 
-    for idx, player in enumerate(PLAYER_MAPPING):
-        tile = get_tile(source_img, player["col"], player["row"])
-        out_x = idx * TILE_SIZE
+    for idx, player in enumerate(players_config):
+        player_id = player["id"]
+        base = player["base"]
+        col, row = base["col"], base["row"]
+
+        tile = get_tile(source_img, col, row, tile_size, spacing)
+        out_x = idx * tile_size
         output_img.paste(tile, (out_x, 0))
 
-        frames[player["id"]] = {
-            "frame": {"x": out_x, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
-            "sourceSize": {"w": TILE_SIZE, "h": TILE_SIZE},
-            "spriteSourceSize": {"x": 0, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+        frames[player_id] = {
+            "frame": {"x": out_x, "y": 0, "w": tile_size, "h": tile_size},
+            "sourceSize": {"w": tile_size, "h": tile_size},
+            "spriteSourceSize": {"x": 0, "y": 0, "w": tile_size, "h": tile_size},
         }
-        print(f"Player {player['id']}: ({player['col']}, {player['row']}) -> x={out_x}")
+        desc = player.get("description", "")
+        print(f"Player {player_id:20s}: ({col:2d},{row:2d}) -> x={out_x:3d} | {desc}")
 
-    os.makedirs(os.path.dirname(OUTPUT_PNG), exist_ok=True)
-    output_img.save(OUTPUT_PNG)
-    print(f"\nSaved player spritesheet to {OUTPUT_PNG}")
+    os.makedirs(os.path.dirname(output_config["pngPath"]), exist_ok=True)
+    output_img.save(output_config["pngPath"])
+    print(f"\nSaved player spritesheet to {output_config['pngPath']}")
     print(f"Output size: {output_img.size}")
 
     atlas_json = {
@@ -68,9 +71,10 @@ def main():
         },
     }
 
-    with open(OUTPUT_JSON, "w") as f:
+    with open(output_config["jsonPath"], "w") as f:
         json.dump(atlas_json, f, indent=2)
-    print(f"Saved player atlas JSON to {OUTPUT_JSON}")
+    print(f"Saved player atlas JSON to {output_config['jsonPath']}")
+    print(f"Manifest version: {manifest['version']}")
 
 
 if __name__ == "__main__":

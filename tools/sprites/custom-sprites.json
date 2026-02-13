@@ -1,5 +1,4 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "version": "1.0.0",
   "description": "Custom pixel art sprite definitions for assets not available in Kenney packs",
 
@@ -227,19 +226,19 @@
       "output": "packages/client/public/assets/sprites/atm.png",
       "pixels": [
         "..############..",
-        "..#BbbbbbbbB#...",
-        "..#bBBBBBBBb#...",
-        "..#bBcccccBb#...",
-        "..#bBcWWWcBb#...",
-        "..#bBcWWWcBb#...",
-        "..#bBcccccBb#...",
-        "..#bBBBBBBBb#...",
-        "..#bXXXXXXXb#...",
-        "..#bXGXGXGXb#...",
-        "..#bXXXXXXXb#...",
-        "..#bXGXGXGXb#...",
-        "..#bXXXXXXXb#...",
-        "..#xxxxxxxxx#...",
+        "..#BbbbbbbbbB#..",
+        "..#bBBBBBBBBb#..",
+        "..#bBccccccBb#..",
+        "..#bBcWWWWcBb#..",
+        "..#bBcWWWWcBb#..",
+        "..#bBccccccBb#..",
+        "..#bBBBBBBBBb#..",
+        "..#bXXXXXXXXb#..",
+        "..#bXGXGXGXGb#..",
+        "..#bXXXXXXXXb#..",
+        "..#bXGXGXGXGb#..",
+        "..#bXXXXXXXXb#..",
+        "..#xxxxxxxxxx#..",
         "..############..",
         "................"
       ]

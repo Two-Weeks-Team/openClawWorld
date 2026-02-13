@@ -57,7 +57,9 @@ def main() -> None:
 
         img = generate_sprite(sprite_def, palette, charmap)
 
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        output_dir = os.path.dirname(output_path)
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
         img.save(output_path)
 
         print(f"[{sprite_id}] {img.size[0]}x{img.size[1]} -> {output_path}")

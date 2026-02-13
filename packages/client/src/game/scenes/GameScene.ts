@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Callbacks } from '@colyseus/sdk';
-import { gameClient, type Entity } from '../../network/ColyseusClient';
+import { gameClient, type Entity, type InteractResult } from '../../network/ColyseusClient';
 import { EventNotificationPanel, EVENT_COLORS } from '../../ui/EventNotificationPanel';
 import { Minimap } from '../../ui/Minimap';
 import { ZoneBanner } from '../../ui/ZoneBanner';
@@ -43,6 +43,26 @@ const ZONE_LABEL_BG_Y_ADJUST = 4;
 const DEBUG_LABEL_OFFSET_Y_FACTOR = 0.05;
 const DEBUG_LABEL_MIN_OFFSET_Y = 6;
 const DEBUG_LABEL_MAX_OFFSET_Y = 16;
+
+const DEFAULT_FACILITY_ACTION_BY_TYPE: Record<string, string> = {
+  reception_desk: 'get_info',
+  kanban_terminal: 'view_tasks',
+  whiteboard: 'view',
+  cafe_counter: 'view_menu',
+  vending_machine: 'view_items',
+  schedule_kiosk: 'view_schedule',
+  notice_board: 'read',
+  game_table: 'join',
+  pond_edge: 'view',
+  room_door_a: 'enter',
+  room_door_b: 'enter',
+  room_door_c: 'enter',
+  gate: 'enter',
+  fountain: 'view',
+  arcade_cabinets: 'play',
+  agenda_panel: 'view',
+  watercooler: 'chat',
+};
 
 export class GameScene extends Phaser.Scene {
   private entities: Map<string, Phaser.GameObjects.Container> = new Map();
@@ -540,14 +560,13 @@ export class GameScene extends Phaser.Scene {
     this.interactionPrompt.setPosition(this.cameras.main.width / 2, this.cameras.main.height - 60);
   }
 
-  // TODO(OCW-CONSIST-010): Migrate to server-authoritative interaction flow.
-  // Current: Client reads properties from Tiled map objects directly.
-  // Target: Client sends interact request via gameClient.interact(), server validates
-  //         and returns outcome, client displays server response.
-  // Requires: Map objects need to be registered as server entities for entity ID lookup.
-  // See: GameRoom.handleInteraction() for server-side handler (WebSocket 'interact' message)
-  // See: ColyseusClient.interact() for client-side method (ready to use)
   private handleInteraction(obj: MapObject) {
+    const serverInteraction = this.resolveFacilityInteraction(obj);
+    if (serverInteraction) {
+      gameClient.interact(serverInteraction.targetId, serverInteraction.action);
+      return;
+    }
+
     const objType = this.getObjectProperty(obj, 'type') as string;
 
     switch (objType) {
@@ -583,6 +602,57 @@ export class GameScene extends Phaser.Scene {
       }
       default:
         this.showMessage(`You examine the ${obj.name}.`);
+    }
+  }
+
+  private resolveFacilityInteraction(
+    obj: MapObject
+  ): { targetId: string; action: string } | null {
+    const interactionType = this.getObjectProperty(obj, 'type');
+    if (interactionType !== 'facility') {
+      return null;
+    }
+
+    const zone = this.getObjectProperty(obj, 'zone');
+    if (typeof zone !== 'string' || zone.length === 0) {
+      return null;
+    }
+
+    const action = DEFAULT_FACILITY_ACTION_BY_TYPE[obj.type];
+    if (!action) {
+      return null;
+    }
+
+    return {
+      targetId: `${zone}-${obj.name}`,
+      action,
+    };
+  }
+
+  private handleServerInteractionResult(result: InteractResult): void {
+    const { outcome } = result;
+    if (outcome.message) {
+      this.showMessage(outcome.message);
+      return;
+    }
+
+    if (outcome.type === 'too_far') {
+      this.showMessage('Too far away to interact.');
+      return;
+    }
+
+    if (outcome.type === 'no_effect') {
+      this.showMessage('No effect.');
+      return;
+    }
+
+    if (outcome.type === 'invalid_action') {
+      this.showMessage('Interaction is not available.');
+      return;
+    }
+
+    if (outcome.type === 'ok') {
+      this.showMessage('Interaction complete.');
     }
   }
 
@@ -983,6 +1053,10 @@ export class GameScene extends Phaser.Scene {
     room.onMessage('chat', (data: { from: string; message: string; entityId: string }) => {
       this.showChatBubble(data.entityId, data.message);
       this.notificationPanel?.addEvent('chat', `${data.from}: ${data.message}`, EVENT_COLORS.chat);
+    });
+
+    room.onMessage('interact.result', (result: InteractResult) => {
+      this.handleServerInteractionResult(result);
     });
 
     this.setupSkillEventListeners(room);

@@ -314,10 +314,7 @@ docker compose up -d
 
 ## Run Command
 
-Repository root:
-\`/Users/2weeks/GitHub/openClawWorld\`
-
-Start the loop:
+From the repository root, start the loop:
 
 \`\`\`bash
 pnpm resident-agent-loop [options]

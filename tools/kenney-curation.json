@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "generated": "2025-02-13",
   "description": "Kenney asset curation manifest for openClawWorld. All coordinates are 0-indexed (col, row).",
+  "_contract": {
+    "tileset": "32 slots (8x4 grid at 16x16px). Indices 0-31 are fixed contract.",
+    "npcs": "9 NPC sprites with zone assignments. IDs must match world/packs/base/npcs/*.json",
+    "players": "3 player variants (human, agent, object)",
+    "validation": "Run 'pnpm verify:maps' to validate contract compliance"
+  },
 
   "sources": {
     "city": {

@@ -29,6 +29,33 @@ Start command (shell fallback for any CLI):
 pnpm resident-agent-loop -- --stress medium --agents 10
 ```
 
+## 3-Minute Quick Start (All Supported CLIs)
+
+1. Install and verify prerequisites:
+
+```bash
+pnpm install
+pnpm dev:server  # or: docker compose up -d
+curl -fsS http://localhost:2567/health
+gh auth status
+```
+
+2. Open your target CLI from repository root.
+3. Run the resident-loop command for your CLI:
+
+- Claude Code: `/openclaw-resident-agent-loop --stress medium --agents 10`
+- OpenCode: `/openclaw-resident-agent-loop --stress medium --agents 10`
+- Gemini CLI: `openclaw-resident-agent-loop --stress medium --agents 10`
+- Codex CLI: `openclaw-resident-agent-loop --stress medium --agents 10`
+
+4. Universal fallback for all environments:
+
+```bash
+pnpm resident-agent-loop -- --stress medium --agents 10
+```
+
+5. Stop with `Ctrl+C` for graceful shutdown.
+
 ## Available Commands
 
 | Command                         | Description                                                                          |
@@ -125,6 +152,12 @@ pnpm generate
 ```
 
 For command expansion, update unified definitions in `packages/plugin/scripts/generate-commands.ts` and run `pnpm generate:commands`.
+
+### Extending for Other Teams
+
+1. Add or update commands in `packages/plugin/scripts/generate-commands.ts`.
+2. Regenerate all CLI artifacts with `pnpm generate:commands`.
+3. Commit generated outputs together with source changes so CLI behavior stays synchronized.
 
 ## Creating New Commands
 

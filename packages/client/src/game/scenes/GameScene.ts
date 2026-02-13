@@ -540,6 +540,13 @@ export class GameScene extends Phaser.Scene {
     this.interactionPrompt.setPosition(this.cameras.main.width / 2, this.cameras.main.height - 60);
   }
 
+  // TODO(OCW-CONSIST-010): Migrate to server-authoritative interaction flow.
+  // Current: Client reads properties from Tiled map objects directly.
+  // Target: Client sends interact request via gameClient.interact(), server validates
+  //         and returns outcome, client displays server response.
+  // Requires: Map objects need to be registered as server entities for entity ID lookup.
+  // See: GameRoom.handleInteraction() for server-side handler (WebSocket 'interact' message)
+  // See: ColyseusClient.interact() for client-side method (ready to use)
   private handleInteraction(obj: MapObject) {
     const objType = this.getObjectProperty(obj, 'type') as string;
 

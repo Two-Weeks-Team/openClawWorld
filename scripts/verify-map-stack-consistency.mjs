@@ -128,7 +128,7 @@ function collectUsedTileIds(mapJson) {
   return used;
 }
 
-function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }) {
+function validateCurationStructure(curation) {
   const errors = [];
   const warnings = [];
 
@@ -156,12 +156,21 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
 
   const tileset = curation.tileset;
   if (!tileset || typeof tileset !== 'object' || Array.isArray(tileset)) {
-    return { errors: [...errors, 'curation: tileset must be an object'], warnings };
+    errors.push('curation: tileset must be an object');
   }
 
-  const tileSize = tileset.tileSize;
-  const columns = tileset.columns;
-  const rows = tileset.rows;
+  return { errors, warnings, sourceRootAbs, packs, tileset };
+}
+
+function validateTilesetFields(tileset) {
+  const errors = [];
+
+  const tileSize = tileset?.tileSize;
+  const columns = tileset?.columns;
+  const rows = tileset?.rows;
+  const outputPng = tileset?.outputPng;
+  const outputMeta = tileset?.outputMeta;
+  const slots = tileset?.slots;
 
   if (!isPositiveInt(tileSize)) {
     errors.push(`curation.tileset.tileSize must be a positive integer, got ${tileSize}`);
@@ -179,17 +188,15 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
     errors.push(`curation.tileset.rows must be a positive integer, got ${rows}`);
   }
 
-  const outputPng = tileset.outputPng;
-  const outputMeta = tileset.outputMeta;
   if (typeof outputPng !== 'string' || outputPng.length === 0) {
     errors.push('curation.tileset.outputPng must be a non-empty string');
   }
+
   if (typeof outputMeta !== 'string' || outputMeta.length === 0) {
     errors.push('curation.tileset.outputMeta must be a non-empty string');
   }
 
   const expectedSlots = isPositiveInt(columns) && isPositiveInt(rows) ? columns * rows : null;
-  const slots = tileset.slots;
   if (!Array.isArray(slots)) {
     errors.push('curation.tileset.slots must be an array');
   } else if (expectedSlots !== null && slots.length !== expectedSlots) {
@@ -198,138 +205,161 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
     );
   }
 
-  const seenSlots = new Set();
-  if (Array.isArray(slots) && expectedSlots !== null && packs && typeof packs === 'object') {
-    for (const [index, slot] of slots.entries()) {
-      const base = `curation.tileset.slots[${index}]`;
-      if (!slot || typeof slot !== 'object' || Array.isArray(slot)) {
-        errors.push(`${base} must be an object`);
-        continue;
-      }
+  return { errors, tileSize, columns, rows, outputPng, outputMeta, slots, expectedSlots };
+}
 
-      if (!isNonNegativeInt(slot.slot)) {
-        errors.push(`${base}.slot must be a non-negative integer, got ${slot.slot}`);
-      } else {
-        if (slot.slot >= expectedSlots) {
-          errors.push(`${base}.slot=${slot.slot} out of range (0..${expectedSlots - 1})`);
-        }
-        if (seenSlots.has(slot.slot)) {
-          errors.push(`${base}.slot duplicate value: ${slot.slot}`);
-        }
-        seenSlots.add(slot.slot);
-      }
-
-      if (typeof slot.semantic !== 'string' || slot.semantic.length === 0) {
-        errors.push(`${base}.semantic must be a non-empty string`);
-      }
-
-      const source = slot.source;
-      if (!source || typeof source !== 'object' || Array.isArray(source)) {
-        errors.push(`${base}.source must be an object`);
-        continue;
-      }
-
-      if (typeof source.pack !== 'string' || source.pack.length === 0) {
-        errors.push(`${base}.source.pack must be a non-empty string`);
-      } else if (!(source.pack in packs)) {
-        errors.push(`${base}.source.pack references unknown pack: ${source.pack}`);
-      }
-
-      if (!isNonNegativeInt(source.col)) {
-        errors.push(`${base}.source.col must be a non-negative integer, got ${source.col}`);
-      }
-      if (!isNonNegativeInt(source.row)) {
-        errors.push(`${base}.source.row must be a non-negative integer, got ${source.row}`);
-      }
-    }
-
-    if (seenSlots.size !== expectedSlots) {
-      errors.push(`curation.tileset.slots defines ${seenSlots.size}/${expectedSlots} unique slot indexes`);
-    }
-
-    if (typeof sourceRootAbs === 'string' && sourceRootAbs.length > 0 && existsSync(sourceRootAbs)) {
-      for (const [packName, pack] of Object.entries(packs)) {
-        if (!pack || typeof pack !== 'object' || Array.isArray(pack)) {
-          errors.push(`curation.packs.${packName} must be an object`);
-          continue;
-        }
-
-        if (!isPositiveInt(pack.tileSize)) {
-          errors.push(`curation.packs.${packName}.tileSize must be a positive integer`);
-        } else if (isPositiveInt(tileSize) && pack.tileSize !== tileSize) {
-          errors.push(
-            `curation.packs.${packName}.tileSize=${pack.tileSize} must match curation.tileset.tileSize=${tileSize}`
-          );
-        }
-
-        const spacing = pack.spacing ?? 0;
-        if (!isNonNegativeInt(spacing)) {
-          errors.push(`curation.packs.${packName}.spacing must be a non-negative integer`);
-        }
-
-        if (typeof pack.path !== 'string' || pack.path.length === 0) {
-          errors.push(`curation.packs.${packName}.path must be a non-empty string`);
-        } else {
-          const absolutePackPath = join(sourceRootAbs, pack.path);
-          if (!existsSync(absolutePackPath)) {
-            errors.push(`curation.packs.${packName}.path not found: ${absolutePackPath}`);
-          }
-        }
-      }
-    } else {
-      warnings.push('curation: skipped pack path existence checks because sourceRoot is unavailable');
-    }
-  }
-
-  if (tilesetMeta && typeof tilesetMeta === 'object') {
-    if (isPositiveInt(tileSize)) {
-      if (tilesetMeta.tilewidth !== tileSize) {
-        errors.push(`tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tileSize}`);
-      }
-      if (tilesetMeta.tileheight !== tileSize) {
-        errors.push(`tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tileSize}`);
-      }
-    }
-
-    if (isPositiveInt(columns) && isPositiveInt(rows)) {
-      const tileCount = columns * rows;
-      if (tilesetMeta.columns !== columns) {
-        errors.push(`tileset.json: columns=${tilesetMeta.columns}, expected=${columns}`);
-      }
-      if (tilesetMeta.tilecount !== tileCount) {
-        errors.push(`tileset.json: tilecount=${tilesetMeta.tilecount}, expected=${tileCount}`);
-      }
-      if (isPositiveInt(tileSize)) {
-        const expectedWidth = columns * tileSize;
-        const expectedHeight = rows * tileSize;
-        if (tilesetMeta.imagewidth !== expectedWidth) {
-          errors.push(`tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${expectedWidth}`);
-        }
-        if (tilesetMeta.imageheight !== expectedHeight) {
-          errors.push(`tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${expectedHeight}`);
-        }
-      }
-    }
-
-    if (typeof outputPng === 'string' && outputPng.length > 0) {
-      const expectedImageName = basename(outputPng);
-      if (tilesetMeta.image !== expectedImageName) {
-        errors.push(`tileset.json: image=${tilesetMeta.image}, expected=${expectedImageName}`);
-      }
-    }
-  } else {
-    errors.push('tileset.json metadata must be a JSON object');
-  }
-
-  const usedTileIds = collectUsedTileIds(map.json);
+function validateTilesetSlots({ slots, packs, expectedSlots }) {
+  const errors = [];
   const slotSet = new Set();
-  if (Array.isArray(slots)) {
-    for (const slot of slots) {
-      if (slot && typeof slot === 'object' && isNonNegativeInt(slot.slot)) {
-        slotSet.add(slot.slot);
+
+  if (!Array.isArray(slots) || expectedSlots === null || !packs || typeof packs !== 'object') {
+    return { errors, slotSet };
+  }
+
+  for (const [index, slot] of slots.entries()) {
+    const base = `curation.tileset.slots[${index}]`;
+    if (!slot || typeof slot !== 'object' || Array.isArray(slot)) {
+      errors.push(`${base} must be an object`);
+      continue;
+    }
+
+    if (!isNonNegativeInt(slot.slot)) {
+      errors.push(`${base}.slot must be a non-negative integer, got ${slot.slot}`);
+    } else {
+      if (slot.slot >= expectedSlots) {
+        errors.push(`${base}.slot=${slot.slot} out of range (0..${expectedSlots - 1})`);
+      }
+      if (slotSet.has(slot.slot)) {
+        errors.push(`${base}.slot duplicate value: ${slot.slot}`);
+      }
+      slotSet.add(slot.slot);
+    }
+
+    if (typeof slot.semantic !== 'string' || slot.semantic.length === 0) {
+      errors.push(`${base}.semantic must be a non-empty string`);
+    }
+
+    const source = slot.source;
+    if (!source || typeof source !== 'object' || Array.isArray(source)) {
+      errors.push(`${base}.source must be an object`);
+      continue;
+    }
+
+    if (typeof source.pack !== 'string' || source.pack.length === 0) {
+      errors.push(`${base}.source.pack must be a non-empty string`);
+    } else if (!(source.pack in packs)) {
+      errors.push(`${base}.source.pack references unknown pack: ${source.pack}`);
+    }
+
+    if (!isNonNegativeInt(source.col)) {
+      errors.push(`${base}.source.col must be a non-negative integer, got ${source.col}`);
+    }
+    if (!isNonNegativeInt(source.row)) {
+      errors.push(`${base}.source.row must be a non-negative integer, got ${source.row}`);
+    }
+  }
+
+  if (slotSet.size !== expectedSlots) {
+    errors.push(`curation.tileset.slots defines ${slotSet.size}/${expectedSlots} unique slot indexes`);
+  }
+
+  return { errors, slotSet };
+}
+
+function validatePackDefinitions({ packs, sourceRootAbs, tileSize }) {
+  const errors = [];
+  const warnings = [];
+
+  if (!packs || typeof packs !== 'object' || Array.isArray(packs)) {
+    return { errors, warnings };
+  }
+
+  if (typeof sourceRootAbs !== 'string' || sourceRootAbs.length === 0 || !existsSync(sourceRootAbs)) {
+    warnings.push('curation: skipped pack path existence checks because sourceRoot is unavailable');
+    return { errors, warnings };
+  }
+
+  for (const [packName, pack] of Object.entries(packs)) {
+    if (!pack || typeof pack !== 'object' || Array.isArray(pack)) {
+      errors.push(`curation.packs.${packName} must be an object`);
+      continue;
+    }
+
+    if (!isPositiveInt(pack.tileSize)) {
+      errors.push(`curation.packs.${packName}.tileSize must be a positive integer`);
+    } else if (isPositiveInt(tileSize) && pack.tileSize !== tileSize) {
+      errors.push(
+        `curation.packs.${packName}.tileSize=${pack.tileSize} must match curation.tileset.tileSize=${tileSize}`
+      );
+    }
+
+    const spacing = pack.spacing ?? 0;
+    if (!isNonNegativeInt(spacing)) {
+      errors.push(`curation.packs.${packName}.spacing must be a non-negative integer`);
+    }
+
+    if (typeof pack.path !== 'string' || pack.path.length === 0) {
+      errors.push(`curation.packs.${packName}.path must be a non-empty string`);
+    } else {
+      const absolutePackPath = join(sourceRootAbs, pack.path);
+      if (!existsSync(absolutePackPath)) {
+        errors.push(`curation.packs.${packName}.path not found: ${absolutePackPath}`);
       }
     }
   }
+
+  return { errors, warnings };
+}
+
+function validateTilesetMetaConsistency({ tilesetMeta, tileSize, columns, rows, outputPng }) {
+  const errors = [];
+
+  if (!tilesetMeta || typeof tilesetMeta !== 'object') {
+    return { errors: ['tileset.json metadata must be a JSON object'] };
+  }
+
+  if (isPositiveInt(tileSize)) {
+    if (tilesetMeta.tilewidth !== tileSize) {
+      errors.push(`tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tileSize}`);
+    }
+    if (tilesetMeta.tileheight !== tileSize) {
+      errors.push(`tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tileSize}`);
+    }
+  }
+
+  if (isPositiveInt(columns) && isPositiveInt(rows)) {
+    const tileCount = columns * rows;
+    if (tilesetMeta.columns !== columns) {
+      errors.push(`tileset.json: columns=${tilesetMeta.columns}, expected=${columns}`);
+    }
+    if (tilesetMeta.tilecount !== tileCount) {
+      errors.push(`tileset.json: tilecount=${tilesetMeta.tilecount}, expected=${tileCount}`);
+    }
+    if (isPositiveInt(tileSize)) {
+      const expectedWidth = columns * tileSize;
+      const expectedHeight = rows * tileSize;
+      if (tilesetMeta.imagewidth !== expectedWidth) {
+        errors.push(`tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${expectedWidth}`);
+      }
+      if (tilesetMeta.imageheight !== expectedHeight) {
+        errors.push(`tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${expectedHeight}`);
+      }
+    }
+  }
+
+  if (typeof outputPng === 'string' && outputPng.length > 0) {
+    const expectedImageName = basename(outputPng);
+    if (tilesetMeta.image !== expectedImageName) {
+      errors.push(`tileset.json: image=${tilesetMeta.image}, expected=${expectedImageName}`);
+    }
+  }
+
+  return { errors };
+}
+
+function validateMapTileUsage({ mapJson, slotSet, tileIdContract }) {
+  const errors = [];
+  const usedTileIds = collectUsedTileIds(mapJson);
 
   const tileContractIds = new Set();
   const contractTiles = tileIdContract?.tiles;
@@ -351,6 +381,45 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
       errors.push(`map uses tile ID ${id} but village_tileset.json contract does not define it`);
     }
   }
+
+  return { errors, usedTileIds };
+}
+
+function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }) {
+  const structure = validateCurationStructure(curation);
+  const { errors, warnings, sourceRootAbs, packs, tileset } = structure;
+
+  if (!tileset || typeof tileset !== 'object' || Array.isArray(tileset)) {
+    return { errors, warnings };
+  }
+
+  const tilesetFields = validateTilesetFields(tileset);
+  errors.push(...tilesetFields.errors);
+
+  const { tileSize, columns, rows, outputPng, slots, expectedSlots } = tilesetFields;
+
+  const slotValidation = validateTilesetSlots({ slots, packs, expectedSlots });
+  errors.push(...slotValidation.errors);
+
+  const packValidation = validatePackDefinitions({ packs, sourceRootAbs, tileSize });
+  errors.push(...packValidation.errors);
+  warnings.push(...packValidation.warnings);
+
+  const tilesetMetaValidation = validateTilesetMetaConsistency({
+    tilesetMeta,
+    tileSize,
+    columns,
+    rows,
+    outputPng,
+  });
+  errors.push(...tilesetMetaValidation.errors);
+
+  const mapUsageValidation = validateMapTileUsage({
+    mapJson: map.json,
+    slotSet: slotValidation.slotSet,
+    tileIdContract,
+  });
+  errors.push(...mapUsageValidation.errors);
 
   return { errors, warnings };
 }

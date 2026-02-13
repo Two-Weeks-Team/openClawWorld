@@ -69,3 +69,4 @@
 1. `docs/task-issue-registry-2026-02-13.md`
 2. `docs/reference/map-sync-process.md`
 3. `docs/master-stabilization-plan-2026-02-13.md`
+4. `docs/reference/codeowners-enforcement-setup.md`

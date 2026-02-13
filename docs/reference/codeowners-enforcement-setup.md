@@ -54,7 +54,8 @@ gh api repos/Two-Weeks-Team/openClawWorld/branches/main/protection \
       required_approving_review_count: .required_pull_request_reviews.required_approving_review_count,
       require_code_owner_reviews: .required_pull_request_reviews.require_code_owner_reviews
     },
-    direct_push_blocked: (.allow_force_pushes.enabled == false)
+    pr_required: (.required_pull_request_reviews != null),
+    force_push_blocked: (.allow_force_pushes.enabled == false)
   }'
 ```
 
@@ -76,7 +77,28 @@ To modify branch protection rules via CLI:
 gh api repos/Two-Weeks-Team/openClawWorld/branches/main/protection
 
 # Update settings (requires admin access)
+# Create protection.json with the desired configuration (see example below)
 gh api repos/Two-Weeks-Team/openClawWorld/branches/main/protection -X PUT --input protection.json
+```
+
+### Example protection.json
+
+```json
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": ["Codegen Freshness", "Lint & Format", "Type Check", "Build", "Unit Tests", "Map Consistency"]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": {
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": true,
+    "required_approving_review_count": 1
+  },
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
 ```
 
 See GitHub documentation: https://docs.github.com/en/rest/branches/branch-protection

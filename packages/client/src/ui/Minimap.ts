@@ -95,6 +95,51 @@ export class Minimap {
     this.drawZoneBounds();
   }
 
+  private getRenderBounds(): { pixelWidth: number; pixelHeight: number } {
+    const defaultBounds = {
+      pixelWidth: this.config.mapWidth,
+      pixelHeight: this.config.mapHeight,
+    };
+
+    if (!this.worldGrid || this.worldGrid.length === 0 || this.worldGrid[0].length === 0) {
+      return defaultBounds;
+    }
+
+    const gridPixelWidth = this.worldGrid[0].length * this.tileSize;
+    const gridPixelHeight = this.worldGrid.length * this.tileSize;
+    if (gridPixelWidth !== this.config.mapWidth || gridPixelHeight !== this.config.mapHeight) {
+      if (!this.warnedGridBoundsMismatch) {
+        this.warnedGridBoundsMismatch = true;
+        console.warn(
+          `[Minimap] WorldGrid pixel bounds (${gridPixelWidth}x${gridPixelHeight}) do not match map bounds (${this.config.mapWidth}x${this.config.mapHeight}).`
+        );
+      }
+      return {
+        pixelWidth: gridPixelWidth,
+        pixelHeight: gridPixelHeight,
+      };
+    }
+
+    return defaultBounds;
+  }
+
+  private getMinimapScale(): { scaleX: number; scaleY: number; offsetX: number; offsetY: number } {
+    const { pixelWidth, pixelHeight } = this.getRenderBounds();
+    const offsetX = 4;
+    const offsetY = 4;
+
+    if (pixelWidth <= 0 || pixelHeight <= 0) {
+      return { scaleX: 0, scaleY: 0, offsetX, offsetY };
+    }
+
+    return {
+      scaleX: (this.config.width - 8) / pixelWidth,
+      scaleY: (this.config.height - 8) / pixelHeight,
+      offsetX,
+      offsetY,
+    };
+  }
+
   setWorldGrid(grid: WorldGrid, tileSize = 16): void {
     this.worldGrid = grid;
     this.tileSize = tileSize;
@@ -109,22 +154,7 @@ export class Minimap {
 
     const gridHeight = this.worldGrid.length;
     const gridWidth = this.worldGrid[0].length;
-    const gridPixelWidth = gridWidth * this.tileSize;
-    const gridPixelHeight = gridHeight * this.tileSize;
-    if (
-      !this.warnedGridBoundsMismatch &&
-      (gridPixelWidth !== this.config.mapWidth || gridPixelHeight !== this.config.mapHeight)
-    ) {
-      this.warnedGridBoundsMismatch = true;
-      console.warn(
-        `[Minimap] WorldGrid pixel bounds (${gridPixelWidth}x${gridPixelHeight}) do not match map bounds (${this.config.mapWidth}x${this.config.mapHeight}).`
-      );
-    }
-
-    const scaleX = (this.config.width - 8) / this.config.mapWidth;
-    const scaleY = (this.config.height - 8) / this.config.mapHeight;
-    const offsetX = 4;
-    const offsetY = 4;
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
 
     const tileW = this.tileSize * scaleX;
     const tileH = this.tileSize * scaleY;
@@ -145,15 +175,12 @@ export class Minimap {
   private drawZoneBounds(): void {
     this.zoneGraphics.clear();
 
-    const scaleX = (this.config.width - 8) / this.config.mapWidth;
-    const scaleY = (this.config.height - 8) / this.config.mapHeight;
-    const offsetX = 4;
-    const offsetY = 4;
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
 
     for (const zoneId of ZONE_IDS) {
       const bounds = ZONE_BOUNDS[zoneId];
       const color = ZONE_COLORS[zoneId];
-      this.zoneGraphics.fillStyle(color, 0.6);
+      this.zoneGraphics.fillStyle(color, 0.2);
       this.zoneGraphics.fillRect(
         offsetX + bounds.x * scaleX,
         offsetY + bounds.y * scaleY,
@@ -177,10 +204,7 @@ export class Minimap {
   ): void {
     this.entityGraphics.clear();
 
-    const scaleX = (this.config.width - 8) / this.config.mapWidth;
-    const scaleY = (this.config.height - 8) / this.config.mapHeight;
-    const offsetX = 4;
-    const offsetY = 4;
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
 
     entities.forEach((entity, id) => {
       let color = this.config.otherPlayerColor;
@@ -209,10 +233,7 @@ export class Minimap {
   updateViewport(camera: Phaser.Cameras.Scene2D.Camera): void {
     this.viewportGraphics.clear();
 
-    const scaleX = (this.config.width - 8) / this.config.mapWidth;
-    const scaleY = (this.config.height - 8) / this.config.mapHeight;
-    const offsetX = 4;
-    const offsetY = 4;
+    const { scaleX, scaleY, offsetX, offsetY } = this.getMinimapScale();
 
     const worldViewWidth = camera.zoom > 0 ? camera.width / camera.zoom : 0;
     const worldViewHeight = camera.zoom > 0 ? camera.height / camera.zoom : 0;

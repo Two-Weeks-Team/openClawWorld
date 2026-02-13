@@ -156,6 +156,7 @@ export class GameScene extends Phaser.Scene {
       );
 
       this.clientCollision.setWorldGrid(worldGrid, 16);
+      this.minimap?.setWorldGrid(worldGrid, 16);
     }
   }
 

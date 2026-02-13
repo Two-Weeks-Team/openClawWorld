@@ -37,7 +37,7 @@
 
 4. 증빙 작성
    - 변경 요약, 영향 파일, 검증 결과, 잔여 리스크를 기록한다.
-   - 증빙 템플릿은 이슈 `OCW-CONSIST-017` 완료 후 표준 템플릿을 사용한다.
+   - 증빙 템플릿: [`docs/templates/map-change-evidence.md`](../templates/map-change-evidence.md)
 
 5. PR 제출
    - 이슈 링크, 검증 명령 결과, 영향 범위를 PR 본문에 포함한다.

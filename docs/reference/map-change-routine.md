@@ -54,6 +54,7 @@
 3. collision(0/1) 및 blocked 타일 규칙 확인
 4. NPC id와 atlas frame 일치
 5. README/문서 링크 최신화 여부 확인
+6. Facility zone 매핑은 맵 object(`type=facility`, `zone`) 기준 단일 소스로 유지
 
 ## 현재 고도화 이슈
 

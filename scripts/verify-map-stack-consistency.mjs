@@ -30,6 +30,7 @@ const CONTRACT_PATHS = {
   curation: join(ROOT_DIR, 'tools/kenney-curation.json'),
   tilesetMeta: join(ROOT_DIR, 'packages/client/public/assets/maps/tileset.json'),
   tileIdContract: join(ROOT_DIR, 'world/packs/base/assets/tilesets/village_tileset.json'),
+  manifest: join(ROOT_DIR, 'world/packs/base/manifest.json'),
 };
 
 const DEFAULT_SPAWN_POINT = {
@@ -145,6 +146,141 @@ function collectUsedTileIds(mapJson) {
     }
   }
   return used;
+}
+
+function getObjectStringProperty(obj, name) {
+  const prop = (obj.properties || []).find(p => p.name === name);
+  return typeof prop?.value === 'string' ? prop.value : undefined;
+}
+
+function normalizeFacilityId(value) {
+  return value.trim().replace(/_/g, '-');
+}
+
+function resolveFacilityObjectIds(obj) {
+  const ids = [];
+  const addId = raw => {
+    if (typeof raw !== 'string') {
+      return;
+    }
+    const normalized = normalizeFacilityId(raw);
+    if (normalized.length > 0 && !ids.includes(normalized)) {
+      ids.push(normalized);
+    }
+  };
+
+  const explicitId = getObjectStringProperty(obj, 'facilityId');
+  if (explicitId && explicitId.length > 0) {
+    addId(explicitId);
+  }
+
+  const explicitType = getObjectStringProperty(obj, 'facilityType');
+  if (explicitType && explicitType.length > 0) {
+    addId(explicitType);
+  }
+
+  if (typeof obj.name === 'string' && obj.name.includes('.')) {
+    const suffix = obj.name.split('.').pop();
+    if (suffix && suffix.length > 0) {
+      addId(suffix);
+    }
+  }
+
+  if (typeof obj.type === 'string' && obj.type.length > 0 && obj.type !== 'facility') {
+    addId(obj.type);
+  }
+
+  if (typeof obj.name === 'string' && obj.name.length > 0) {
+    addId(obj.name);
+  }
+
+  return ids;
+}
+
+function extractFacilityObjects(mapJson) {
+  const facilities = [];
+
+  for (const layer of mapJson.layers || []) {
+    if (layer.type !== 'objectgroup' || !Array.isArray(layer.objects)) {
+      continue;
+    }
+
+    for (const obj of layer.objects) {
+      if (getObjectStringProperty(obj, 'type') !== 'facility') {
+        continue;
+      }
+
+      facilities.push({
+        ids: resolveFacilityObjectIds(obj),
+        name: obj.name,
+        zone: getObjectStringProperty(obj, 'zone'),
+      });
+    }
+  }
+
+  return facilities;
+}
+
+function validateFacilityZoneContracts(mapJson, validZones) {
+  const errors = [];
+  const facilities = extractFacilityObjects(mapJson);
+  const mappedFacilityIds = new Map();
+  let validFacilityObjects = 0;
+
+  for (const facility of facilities) {
+    if (facility.ids.length === 0) {
+      errors.push(`facility object "${facility.name}" missing facility identifier`);
+      continue;
+    }
+
+    if (!facility.zone) {
+      errors.push(`facility object "${facility.name}" missing zone property`);
+      continue;
+    }
+
+    if (!validZones.has(facility.zone)) {
+      errors.push(`facility object "${facility.name}" has invalid zone "${facility.zone}"`);
+      continue;
+    }
+
+    const zoneFromNamePrefix = facility.name.includes('.') ? facility.name.split('.')[0] : null;
+    if (zoneFromNamePrefix && zoneFromNamePrefix !== facility.zone) {
+      errors.push(
+        `facility object "${facility.name}" has zone prefix "${zoneFromNamePrefix}" but zone property "${facility.zone}"`
+      );
+    }
+
+    for (const facilityId of facility.ids) {
+      const existing = mappedFacilityIds.get(facilityId);
+      if (existing && existing !== facility.zone) {
+        errors.push(
+          `facility id "${facilityId}" has conflicting zones ("${existing}" vs "${facility.zone}")`
+        );
+        continue;
+      }
+
+      mappedFacilityIds.set(facilityId, facility.zone);
+    }
+
+    validFacilityObjects += 1;
+  }
+
+  const listedFacilities = Array.isArray(mapJson.facilities) ? mapJson.facilities : [];
+  for (const listedFacility of listedFacilities) {
+    if (typeof listedFacility !== 'string') {
+      errors.push(`map facilities entry must be a string, got ${typeof listedFacility}`);
+      continue;
+    }
+
+    const normalized = normalizeFacilityId(listedFacility);
+    if (!mappedFacilityIds.has(normalized)) {
+      errors.push(
+        `map facilities entry "${listedFacility}" has no matching facility object mapping`
+      );
+    }
+  }
+
+  return { errors, count: validFacilityObjects, aliasCount: mappedFacilityIds.size };
 }
 
 function validateCollisionLayer(mapJson) {
@@ -617,6 +753,8 @@ function main() {
   const curation = loadRequiredJson(CONTRACT_PATHS.curation, 'kenney-curation');
   const tilesetMeta = loadRequiredJson(CONTRACT_PATHS.tilesetMeta, 'tileset-meta');
   const tileIdContract = loadRequiredJson(CONTRACT_PATHS.tileIdContract, 'tile-id-contract');
+  const manifest = loadRequiredJson(CONTRACT_PATHS.manifest, 'world-manifest');
+  const validZones = new Set(Array.isArray(manifest.zones) ? manifest.zones : []);
 
   const { errors: curationErrors, usedTileIds } = validateCurationContract({
     map: sourceMap,
@@ -633,6 +771,23 @@ function main() {
 
   console.log('✅ Curation manifest and tileset metadata contract are valid');
   console.log(`✅ Map tile IDs are within contract: ${usedTileIds.join(', ')}\n`);
+
+  console.log('Validating facility zone contracts...');
+  const {
+    errors: facilityErrors,
+    count: facilityCount,
+    aliasCount,
+  } = validateFacilityZoneContracts(sourceMap.json, validZones);
+
+  if (facilityErrors.length > 0) {
+    console.log('❌ FACILITY CONTRACT VALIDATION FAILED\n');
+    facilityErrors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+
+  console.log(
+    `✅ Facility zone contracts are valid (${facilityCount} mapped facilities, ${aliasCount} resolvable IDs)\n`
+  );
 
   console.log('Validating collision layer...');
   const collisionValidation = validateCollisionLayer(sourceMap.json);

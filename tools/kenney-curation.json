@@ -535,17 +535,37 @@
   },
 
   "gaps": {
-    "description": "Assets not available in Kenney packs",
-    "critical": [
+    "description": "Assets not available in Kenney packs - resolved via custom-sprites.json",
+    "resolved": [
       {
         "asset": "arcade_cabinet",
         "purpose": "Arcade zone game machines",
-        "recommendation": "Create custom 16x32 sprite"
+        "solution": "custom-sprites.json -> generate_custom_sprites.py"
       },
       {
         "asset": "coffee_machine",
         "purpose": "LoungeCafe beverage maker",
-        "recommendation": "Use vending machine as substitute"
+        "solution": "custom-sprites.json -> generate_custom_sprites.py"
+      },
+      {
+        "asset": "server_rack",
+        "purpose": "Office server room",
+        "solution": "custom-sprites.json -> generate_custom_sprites.py"
+      },
+      {
+        "asset": "monitor",
+        "purpose": "Office computer display",
+        "solution": "custom-sprites.json -> generate_custom_sprites.py"
+      },
+      {
+        "asset": "jukebox",
+        "purpose": "Arcade/LoungeCafe music",
+        "solution": "custom-sprites.json -> generate_custom_sprites.py"
+      },
+      {
+        "asset": "atm",
+        "purpose": "Lobby banking",
+        "solution": "custom-sprites.json -> generate_custom_sprites.py"
       }
     ],
     "optional": [
@@ -560,5 +580,11 @@
         "recommendation": "Use whiteboard as substitute"
       }
     ]
+  },
+
+  "customSprites": {
+    "description": "Custom pixel art sprites generated from tools/sprites/custom-sprites.json",
+    "generator": "tools/generate_custom_sprites.py",
+    "manifest": "tools/sprites/custom-sprites.json"
   }
 }

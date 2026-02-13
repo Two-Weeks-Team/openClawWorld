@@ -7,6 +7,7 @@ import { getColyseusRoomId } from '../roomRegistry.js';
 
 const MAX_MESSAGE_LENGTH = 500;
 const VALID_CHANNELS = ['proximity', 'global'] as const;
+const PROXIMITY_CHAT_RADIUS = 160; // 10 tiles * 16px per tile
 
 function createErrorResponse(
   code: AicErrorObject['code'],
@@ -131,14 +132,38 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
     const { messageId, tsMs } = result;
 
     // Broadcast to WebSocket clients so human players see AI agent messages in real-time
-    gameRoom.broadcast('chat', {
-      from: agentEntity.name,
-      message,
-      entityId: agentId,
-      channel,
-      messageId,
-      tsMs,
-    });
+    if (channel === 'proximity') {
+      const senderPos = agentEntity.pos;
+
+      gameRoom.clients.forEach(client => {
+        const clientEntity = gameRoom.state.getEntity(client.sessionId);
+        if (!clientEntity) return;
+
+        const dx = clientEntity.pos.x - senderPos.x;
+        const dy = clientEntity.pos.y - senderPos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance <= PROXIMITY_CHAT_RADIUS) {
+          client.send('chat', {
+            from: agentEntity.name,
+            message,
+            entityId: agentId,
+            channel,
+            messageId,
+            tsMs,
+          });
+        }
+      });
+    } else {
+      gameRoom.broadcast('chat', {
+        from: agentEntity.name,
+        message,
+        entityId: agentId,
+        channel,
+        messageId,
+        tsMs,
+      });
+    }
 
     const eventLog = gameRoom.getEventLog();
     eventLog.append('chat.message', roomId, {

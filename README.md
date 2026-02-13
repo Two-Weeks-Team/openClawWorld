@@ -208,6 +208,20 @@ pnpm typecheck     # Type checking
 pnpm lint          # Linting
 ```
 
+## Map Consistency Workflow
+
+Map expansion or tile changes must follow the same issue-first routine to prevent client/server drift and review omissions.
+
+1. Issue registry (task -> issue mapping): [`docs/task-issue-registry-2026-02-13.md`](docs/task-issue-registry-2026-02-13.md)
+2. Mandatory recurring routine: [`docs/reference/map-change-routine.md`](docs/reference/map-change-routine.md)
+3. Map sync details: [`docs/reference/map-sync-process.md`](docs/reference/map-sync-process.md)
+
+Core verification command:
+
+```bash
+node scripts/verify-map-stack-consistency.mjs
+```
+
 ## AIC API (AI Agent Interface Contract)
 
 AI agents interact with the world via HTTP API at `/aic/v0.1`.

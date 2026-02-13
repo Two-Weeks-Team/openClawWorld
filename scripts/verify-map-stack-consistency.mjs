@@ -138,33 +138,44 @@ function normalizeFacilityId(value) {
   return value.trim().replace(/_/g, '-');
 }
 
-function resolveFacilityObjectId(obj) {
+function resolveFacilityObjectIds(obj) {
+  const ids = [];
+  const addId = raw => {
+    if (typeof raw !== 'string') {
+      return;
+    }
+    const normalized = normalizeFacilityId(raw);
+    if (normalized.length > 0 && !ids.includes(normalized)) {
+      ids.push(normalized);
+    }
+  };
+
   const explicitId = getObjectStringProperty(obj, 'facilityId');
   if (explicitId && explicitId.length > 0) {
-    return normalizeFacilityId(explicitId);
+    addId(explicitId);
   }
 
   const explicitType = getObjectStringProperty(obj, 'facilityType');
   if (explicitType && explicitType.length > 0) {
-    return normalizeFacilityId(explicitType);
-  }
-
-  if (typeof obj.type === 'string' && obj.type.length > 0 && obj.type !== 'facility') {
-    return normalizeFacilityId(obj.type);
+    addId(explicitType);
   }
 
   if (typeof obj.name === 'string' && obj.name.includes('.')) {
     const suffix = obj.name.split('.').pop();
     if (suffix && suffix.length > 0) {
-      return normalizeFacilityId(suffix);
+      addId(suffix);
     }
   }
 
-  if (typeof obj.name === 'string' && obj.name.length > 0) {
-    return normalizeFacilityId(obj.name);
+  if (typeof obj.type === 'string' && obj.type.length > 0 && obj.type !== 'facility') {
+    addId(obj.type);
   }
 
-  return undefined;
+  if (typeof obj.name === 'string' && obj.name.length > 0) {
+    addId(obj.name);
+  }
+
+  return ids;
 }
 
 function extractFacilityObjects(mapJson) {
@@ -181,7 +192,7 @@ function extractFacilityObjects(mapJson) {
       }
 
       facilities.push({
-        id: resolveFacilityObjectId(obj),
+        ids: resolveFacilityObjectIds(obj),
         name: obj.name,
         zone: getObjectStringProperty(obj, 'zone'),
       });
@@ -195,22 +206,21 @@ function validateFacilityZoneContracts(mapJson, validZones) {
   const errors = [];
   const facilities = extractFacilityObjects(mapJson);
   const mappedFacilityIds = new Map();
+  let validFacilityObjects = 0;
 
   for (const facility of facilities) {
-    if (!facility.id) {
+    if (facility.ids.length === 0) {
       errors.push(`facility object "${facility.name}" missing facility identifier`);
       continue;
     }
 
     if (!facility.zone) {
-      errors.push(`facility object "${facility.name}" (${facility.id}) missing zone property`);
+      errors.push(`facility object "${facility.name}" missing zone property`);
       continue;
     }
 
     if (!validZones.has(facility.zone)) {
-      errors.push(
-        `facility object "${facility.name}" (${facility.id}) has invalid zone "${facility.zone}"`
-      );
+      errors.push(`facility object "${facility.name}" has invalid zone "${facility.zone}"`);
       continue;
     }
 
@@ -221,15 +231,19 @@ function validateFacilityZoneContracts(mapJson, validZones) {
       );
     }
 
-    const existing = mappedFacilityIds.get(facility.id);
-    if (existing && existing !== facility.zone) {
-      errors.push(
-        `facility id "${facility.id}" has conflicting zones ("${existing}" vs "${facility.zone}")`
-      );
-      continue;
+    for (const facilityId of facility.ids) {
+      const existing = mappedFacilityIds.get(facilityId);
+      if (existing && existing !== facility.zone) {
+        errors.push(
+          `facility id "${facilityId}" has conflicting zones ("${existing}" vs "${facility.zone}")`
+        );
+        continue;
+      }
+
+      mappedFacilityIds.set(facilityId, facility.zone);
     }
 
-    mappedFacilityIds.set(facility.id, facility.zone);
+    validFacilityObjects += 1;
   }
 
   const listedFacilities = Array.isArray(mapJson.facilities) ? mapJson.facilities : [];
@@ -247,7 +261,7 @@ function validateFacilityZoneContracts(mapJson, validZones) {
     }
   }
 
-  return { errors, count: mappedFacilityIds.size };
+  return { errors, count: validFacilityObjects, aliasCount: mappedFacilityIds.size };
 }
 
 function validateCurationStructure(curation) {
@@ -638,10 +652,11 @@ function main() {
   console.log(`✅ Map tile IDs are within contract: ${usedTileIds.join(', ')}\n`);
 
   console.log('Validating facility zone contracts...');
-  const { errors: facilityErrors, count: facilityCount } = validateFacilityZoneContracts(
-    sourceMap.json,
-    validZones
-  );
+  const {
+    errors: facilityErrors,
+    count: facilityCount,
+    aliasCount,
+  } = validateFacilityZoneContracts(sourceMap.json, validZones);
 
   if (facilityErrors.length > 0) {
     console.log('❌ FACILITY CONTRACT VALIDATION FAILED\n');
@@ -649,7 +664,9 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`✅ Facility zone contracts are valid (${facilityCount} mapped facilities)\n`);
+  console.log(
+    `✅ Facility zone contracts are valid (${facilityCount} mapped facilities, ${aliasCount} resolvable IDs)\n`
+  );
 
   console.log('══════════════════════════════════════════════════════════════');
   console.log('✅ MAP STACK CONSISTENCY VERIFIED');

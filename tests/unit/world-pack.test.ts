@@ -316,8 +316,8 @@ describe('WorldPackLoader', () => {
                   id: 1,
                   name: 'office.reception_desk',
                   type: 'reception_desk',
-                  x: 700,
-                  y: 120,
+                  x: 1600,
+                  y: 256,
                   width: 32,
                   height: 32,
                   properties: [

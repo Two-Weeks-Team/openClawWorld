@@ -425,6 +425,15 @@ export class WorldPackLoader {
     const bounds = this.getDefaultZoneBounds(zoneId);
     return objects.filter(obj => {
       if (obj.type === 'spawn') return false;
+
+      const zoneProp = obj.properties?.find(p => p.name === 'zone');
+      if (typeof zoneProp?.value === 'string') {
+        const zoneResult = ZoneIdSchema.safeParse(zoneProp.value);
+        if (zoneResult.success) {
+          return zoneResult.data === zoneId;
+        }
+      }
+
       const cx = obj.x + (obj.width ?? 0) / 2;
       const cy = obj.y + (obj.height ?? 0) / 2;
       return (
@@ -626,30 +635,40 @@ export class WorldPackLoader {
     return facilityId.trim().replace(/_/g, '-');
   }
 
-  private getFacilityObjectId(obj: TiledObject): string | undefined {
+  private getFacilityObjectIdCandidates(obj: TiledObject): string[] {
+    const candidates: string[] = [];
+
+    const addCandidate = (value: string | undefined): void => {
+      if (!value) {
+        return;
+      }
+      const normalized = this.normalizeFacilityId(value);
+      if (normalized.length > 0 && !candidates.includes(normalized)) {
+        candidates.push(normalized);
+      }
+    };
+
     const facilityIdProp = obj.properties?.find(
       p => p.name === 'facilityId' || p.name === 'facilityType'
     );
     if (typeof facilityIdProp?.value === 'string' && facilityIdProp.value.trim().length > 0) {
-      return this.normalizeFacilityId(facilityIdProp.value);
-    }
-
-    if (obj.type && obj.type !== 'facility') {
-      return this.normalizeFacilityId(obj.type);
+      addCandidate(facilityIdProp.value);
     }
 
     if (obj.name.includes('.')) {
       const suffix = obj.name.split('.').pop();
-      if (suffix && suffix.trim().length > 0) {
-        return this.normalizeFacilityId(suffix);
-      }
+      addCandidate(suffix);
+    }
+
+    if (obj.type && obj.type !== 'facility') {
+      addCandidate(obj.type);
     }
 
     if (obj.name.trim().length > 0) {
-      return this.normalizeFacilityId(obj.name);
+      addCandidate(obj.name);
     }
 
-    return undefined;
+    return candidates;
   }
 
   private getFacilityObjectZone(obj: TiledObject): ZoneId | undefined {
@@ -691,8 +710,8 @@ export class WorldPackLoader {
         continue;
       }
 
-      const facilityId = this.getFacilityObjectId(obj);
-      if (!facilityId) {
+      const facilityIds = this.getFacilityObjectIdCandidates(obj);
+      if (facilityIds.length === 0) {
         console.warn(
           `[WorldPackLoader] Facility object "${obj.name}" is missing a resolvable facility ID`
         );
@@ -714,14 +733,16 @@ export class WorldPackLoader {
         continue;
       }
 
-      const existing = assignments.get(facilityId);
-      if (existing && existing !== zoneId) {
-        console.warn(
-          `[WorldPackLoader] Facility "${facilityId}" zone conflict detected (${existing} vs ${zoneId}). Using latest value.`
-        );
-      }
+      for (const facilityId of facilityIds) {
+        const existing = assignments.get(facilityId);
+        if (existing && existing !== zoneId) {
+          console.warn(
+            `[WorldPackLoader] Facility "${facilityId}" zone conflict detected (${existing} vs ${zoneId}). Using latest value.`
+          );
+        }
 
-      assignments.set(facilityId, zoneId);
+        assignments.set(facilityId, zoneId);
+      }
     }
 
     return assignments;

@@ -136,6 +136,7 @@ export class WorldPackLoader {
   private pack: WorldPack | null = null;
   private npcZoneCache: Map<string, ZoneId> = new Map();
   private warnedMissingNpcZones: Set<string> = new Set();
+  private warnedUnknownNpcZoneRefs: Set<string> = new Set();
 
   constructor(packPath: string) {
     this.packPath = resolve(packPath);
@@ -329,7 +330,19 @@ export class WorldPackLoader {
         tileHeight: mapTileHeight,
         layers: raw.layers ?? [],
         objects: zoneObjects,
-        npcs: (raw.npcs ?? []).filter(npc => this.getNpcZone(npc, zoneId)),
+        npcs: (raw.npcs ?? []).filter(npcId => {
+          const npcZone = this.getNpcZone(npcId);
+          if (!npcZone) {
+            if (!this.warnedUnknownNpcZoneRefs.has(npcId)) {
+              this.warnedUnknownNpcZoneRefs.add(npcId);
+              console.warn(
+                `[WorldPackLoader] Unified map references unknown npcId "${npcId}" (zone mapping not found)`
+              );
+            }
+            return false;
+          }
+          return npcZone === zoneId;
+        }),
         facilities: (raw.facilities ?? []).filter(f => this.getFacilityZone(f, zoneId)),
         entrances: zoneEntrances,
       });
@@ -419,30 +432,19 @@ export class WorldPackLoader {
   private loadNpcZoneMapping(): void {
     this.npcZoneCache.clear();
     this.warnedMissingNpcZones.clear();
+    this.warnedUnknownNpcZoneRefs.clear();
 
     const npcsDir = join(this.packPath, 'npcs');
     if (!existsSync(npcsDir)) {
       return;
     }
 
-    const indexPath = join(npcsDir, 'index.json');
-    if (!existsSync(indexPath)) {
+    const npcIds = this.readNpcIndex(npcsDir, 'zone mapping');
+    if (npcIds.length === 0) {
       return;
     }
 
-    let index: { npcs?: string[] };
-    try {
-      const indexContent = readFileSync(indexPath, 'utf-8');
-      index = JSON.parse(indexContent) as { npcs?: string[] };
-    } catch {
-      return;
-    }
-
-    if (!index.npcs || !Array.isArray(index.npcs)) {
-      return;
-    }
-
-    for (const npcId of index.npcs) {
+    for (const npcId of npcIds) {
       const npcPath = join(npcsDir, `${npcId}.json`);
       if (!existsSync(npcPath)) {
         continue;
@@ -477,10 +479,78 @@ export class WorldPackLoader {
         }
 
         this.npcZoneCache.set(npcId, zoneResult.data);
-      } catch {
+      } catch (error) {
+        console.warn(
+          `[WorldPackLoader] Failed to load NPC "${npcId}" for zone mapping: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
         continue;
       }
     }
+
+    this.validateNpcZoneMappingCoverage(npcIds.length);
+  }
+
+  private validateNpcZoneMappingCoverage(expectedCount: number): void {
+    if (expectedCount <= 0) {
+      return;
+    }
+
+    const mappedCount = this.npcZoneCache.size;
+    if (mappedCount === 0) {
+      console.warn(
+        `[WorldPackLoader] NPC zone mapping cache is empty (0/${expectedCount}). Check npcs/index.json and NPC zone fields.`
+      );
+      return;
+    }
+
+    if (mappedCount < expectedCount) {
+      console.warn(
+        `[WorldPackLoader] NPC zone mapping coverage is partial (${mappedCount}/${expectedCount}). NPCs without valid zone will be excluded from zone lists.`
+      );
+    }
+  }
+
+  private readNpcIndex(npcsDir: string, context: 'zone mapping' | 'npc loading'): string[] {
+    const indexPath = join(npcsDir, 'index.json');
+    if (!existsSync(indexPath)) {
+      if (context === 'npc loading') {
+        console.log('[WorldPackLoader] No npcs/index.json found');
+      }
+      return [];
+    }
+
+    let indexContent: string;
+    try {
+      indexContent = readFileSync(indexPath, 'utf-8');
+    } catch (error) {
+      console.warn(
+        `[WorldPackLoader] Failed to read npcs/index.json for ${context}: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+      return [];
+    }
+
+    let index: { npcs?: string[] };
+    try {
+      index = JSON.parse(indexContent) as { npcs?: string[] };
+    } catch (error) {
+      console.warn(
+        `[WorldPackLoader] Failed to parse npcs/index.json for ${context}: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+      return [];
+    }
+
+    if (!index.npcs || !Array.isArray(index.npcs)) {
+      console.warn(`[WorldPackLoader] npcs/index.json missing "npcs" array for ${context}`);
+      return [];
+    }
+
+    return index.npcs;
   }
 
   private validateNpcObjectConsistency(maps: Map<ZoneId, ZoneMapData>): void {
@@ -541,9 +611,8 @@ export class WorldPackLoader {
     // so we only validate explicit references from maps/object layers.
   }
 
-  private getNpcZone(npcId: string, zoneId: ZoneId): boolean {
-    const npcZone = this.npcZoneCache.get(npcId);
-    return npcZone === zoneId;
+  private getNpcZone(npcId: string): ZoneId | undefined {
+    return this.npcZoneCache.get(npcId);
   }
 
   private getFacilityZone(facilityId: string, zoneId: ZoneId): boolean {
@@ -759,35 +828,14 @@ export class WorldPackLoader {
       return [];
     }
 
-    const indexPath = join(npcsDir, 'index.json');
-    if (!existsSync(indexPath)) {
-      console.log('[WorldPackLoader] No npcs/index.json found');
-      return [];
-    }
-
-    let indexContent: string;
-    try {
-      indexContent = readFileSync(indexPath, 'utf-8');
-    } catch {
-      console.warn('[WorldPackLoader] Failed to read npcs/index.json');
-      return [];
-    }
-
-    let index: { npcs?: string[] };
-    try {
-      index = JSON.parse(indexContent) as { npcs?: string[] };
-    } catch {
-      console.warn('[WorldPackLoader] Invalid JSON in npcs/index.json');
-      return [];
-    }
-
-    if (!index.npcs || !Array.isArray(index.npcs)) {
+    const npcIds = this.readNpcIndex(npcsDir, 'npc loading');
+    if (npcIds.length === 0) {
       return [];
     }
 
     const npcs: NpcDefinition[] = [];
 
-    for (const npcId of index.npcs) {
+    for (const npcId of npcIds) {
       const npcPath = join(npcsDir, `${npcId}.json`);
       if (!existsSync(npcPath)) {
         console.warn(`[WorldPackLoader] NPC file not found: ${npcId}.json`);

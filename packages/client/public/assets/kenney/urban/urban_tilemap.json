@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "image": "urban_tilemap.png",
+    "size": { "w": 432, "h": 288 },
+    "scale": 1,
+    "format": "RGBA8888",
+    "app": "kenney-rpg-urban",
+    "tileSize": 16,
+    "spacing": 0,
+    "columns": 27,
+    "rows": 18,
+    "tileCount": 486
+  },
+  "frames": {}
+}

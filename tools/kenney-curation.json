@@ -6,32 +6,32 @@
 
   "sources": {
     "city": {
-      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike City Pack/Tilemap/tilemap_packed.png",
+      "path": "packages/client/public/assets/kenney/tiles/city_tilemap.png",
       "tileSize": 16,
       "spacing": 0,
       "columns": 37,
       "rows": 28
     },
     "interior": {
-      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png",
+      "path": "packages/client/public/assets/kenney/interior/interior_tilemap.png",
       "tileSize": 16,
       "spacing": 1,
       "columns": 27,
-      "rows": 19
+      "rows": 18
     },
     "urban": {
-      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/RPG Urban Pack/Tilemap/tilemap_packed.png",
+      "path": "packages/client/public/assets/kenney/urban/urban_tilemap.png",
       "tileSize": 16,
       "spacing": 0,
-      "columns": 20,
+      "columns": 27,
       "rows": 18
     },
     "characters": {
-      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike Characters Pack/Spritesheet/roguelikeChar_transparent.png",
+      "path": "packages/client/public/assets/kenney/characters/characters_spritesheet.png",
       "tileSize": 16,
       "spacing": 1,
-      "columns": 57,
-      "rows": 17
+      "columns": 54,
+      "rows": 12
     }
   },
 

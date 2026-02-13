@@ -43,7 +43,7 @@ def main():
             }
             print(f"Loaded {source_name}: {path}")
         else:
-            print(f"WARNING: Source not found: {path}")
+            raise FileNotFoundError(f"Source not found: {path}")
 
     output_width = output_config["width"]
     output_height = output_config["height"]
@@ -80,15 +80,9 @@ def main():
                     f"[{tile_index:2d}] {tile_id:20s} ({col:2d},{row:2d}) from {source_name:10s} -> ({out_col},{out_row}) | {purpose}"
                 )
             except Exception as e:
-                print(f"ERROR: Tile {tile_id}: {e}")
-                placeholder = Image.new(
-                    "RGBA", (tile_size, tile_size), (255, 0, 255, 255)
-                )
-                tileset.paste(placeholder, (out_x, out_y))
+                raise RuntimeError(f"Tile extraction failed for {tile_id}: {e}") from e
         else:
-            print(f"WARNING: Source '{source_name}' not found for tile '{tile_id}'")
-            placeholder = Image.new("RGBA", (tile_size, tile_size), (255, 0, 255, 255))
-            tileset.paste(placeholder, (out_x, out_y))
+            raise RuntimeError(f"Source '{source_name}' not loaded for tile '{tile_id}'")
 
     output_path = output_config["path"]
     os.makedirs(os.path.dirname(output_path), exist_ok=True)

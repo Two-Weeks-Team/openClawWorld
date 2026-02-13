@@ -605,9 +605,9 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private resolveFacilityInteraction(
-    obj: MapObject
-  ): { targetId: string; action: string } | null {
+  private resolveFacilityInteraction(obj: MapObject): { targetId: string; action: string } | null {
+    // Tiled custom property `type` is the interaction category (e.g. `facility`),
+    // while `obj.type` is the concrete facility subtype (e.g. `notice_board`).
     const interactionType = this.getObjectProperty(obj, 'type');
     if (interactionType !== 'facility') {
       return null;

@@ -475,9 +475,33 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
       case 'portal':
         if (action === 'use') {
-          const destX = parseInt(target.meta.get('destX') || '0', 10);
-          const destY = parseInt(target.meta.get('destY') || '0', 10);
-          agent.setPosition(destX, destY);
+          const destXRaw = target.meta.get('destX');
+          const destYRaw = target.meta.get('destY');
+          if (destXRaw === undefined || destYRaw === undefined) {
+            return { type: 'invalid_action', message: 'Portal destination is not configured' };
+          }
+
+          const destX = parseInt(destXRaw, 10);
+          const destY = parseInt(destYRaw, 10);
+          if (Number.isNaN(destX) || Number.isNaN(destY)) {
+            return { type: 'invalid_action', message: 'Portal destination is invalid' };
+          }
+
+          if (!this.collisionSystem) {
+            return { type: 'invalid_action', message: 'Collision system is not initialized' };
+          }
+
+          if (!this.collisionSystem.isInBounds(destX, destY)) {
+            return { type: 'invalid_action', message: 'Portal destination is out of bounds' };
+          }
+
+          if (this.collisionSystem.isBlocked(destX, destY)) {
+            return { type: 'invalid_action', message: 'Portal destination is blocked' };
+          }
+
+          const worldPos = this.collisionSystem.tileToWorld(destX, destY);
+          agent.setTile(destX, destY);
+          agent.setPosition(worldPos.x, worldPos.y);
           return { type: 'ok', message: 'Teleported' };
         }
         break;

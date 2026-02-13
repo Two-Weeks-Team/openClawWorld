@@ -3,15 +3,10 @@ import { existsSync, readFileSync } from 'fs';
 import { basename, dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { createHash } from 'crypto';
+import { ZONE_BOUNDS, DEFAULT_SPAWN_POINT, MAP_CONFIG } from '../packages/shared/dist/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = resolve(__dirname, '..');
-
-const MAP_CONFIG = {
-  width: 64,
-  height: 64,
-  tileSize: 16,
-};
 
 const MAP_PATHS = {
   source: join(ROOT_DIR, 'world/packs/base/maps/grid_town_outdoor.json'),
@@ -33,13 +28,6 @@ const CONTRACT_PATHS = {
   manifest: join(ROOT_DIR, 'world/packs/base/manifest.json'),
 };
 
-const DEFAULT_SPAWN_POINT = {
-  x: 512,
-  y: 512,
-  tx: 32,
-  ty: 32,
-};
-
 const VALID_ZONES = [
   'lobby',
   'office',
@@ -51,18 +39,6 @@ const VALID_ZONES = [
   'lake',
 ];
 const VALID_DIRECTIONS = ['north', 'south', 'east', 'west'];
-
-// Zone bounds from packages/shared/src/world.ts
-const ZONE_BOUNDS = {
-  lobby: { x: 96, y: 32, width: 192, height: 192 },
-  office: { x: 672, y: 32, width: 320, height: 224 },
-  'central-park': { x: 320, y: 256, width: 384, height: 320 },
-  arcade: { x: 704, y: 256, width: 288, height: 256 },
-  meeting: { x: 32, y: 448, width: 256, height: 288 },
-  'lounge-cafe': { x: 288, y: 608, width: 320, height: 224 },
-  plaza: { x: 608, y: 608, width: 256, height: 256 },
-  lake: { x: 32, y: 32, width: 64, height: 224 },
-};
 
 function md5(content) {
   return createHash('md5').update(content).digest('hex');
@@ -496,25 +472,23 @@ function validateSpawnReachability(mapJson, collisionData) {
   queue.push({ tx, ty });
   visited.add(`${tx},${ty}`);
 
-  // Check if tile is in a zone
-  function getZoneAtTile(tx, ty) {
-    for (const [zoneName, bounds] of Object.entries(ZONE_BOUNDS)) {
-      const tileX = tx * MAP_CONFIG.tileSize;
-      const tileY = ty * MAP_CONFIG.tileSize;
-      if (
-        tileX >= bounds.x &&
-        tileX < bounds.x + bounds.width &&
-        tileY >= bounds.y &&
-        tileY < bounds.y + bounds.height
-      ) {
-        return zoneName;
+  // Pre-calculate tile-to-zone mapping for O(1) lookup during BFS
+  const tileZoneMap = new Map();
+  for (const [zoneName, bounds] of Object.entries(ZONE_BOUNDS)) {
+    const startTx = Math.floor(bounds.x / MAP_CONFIG.tileSize);
+    const startTy = Math.floor(bounds.y / MAP_CONFIG.tileSize);
+    const endTx = Math.floor((bounds.x + bounds.width) / MAP_CONFIG.tileSize);
+    const endTy = Math.floor((bounds.y + bounds.height) / MAP_CONFIG.tileSize);
+
+    for (let tileX = startTx; tileX < endTx; tileX++) {
+      for (let tileY = startTy; tileY < endTy; tileY++) {
+        tileZoneMap.set(`${tileX},${tileY}`, zoneName);
       }
     }
-    return null;
   }
 
   // Check initial spawn zone
-  const spawnZone = getZoneAtTile(tx, ty);
+  const spawnZone = tileZoneMap.get(`${tx},${ty}`);
   if (spawnZone) {
     reachableZones.add(spawnZone);
   }
@@ -553,8 +527,8 @@ function validateSpawnReachability(mapJson, collisionData) {
       visited.add(key);
       queue.push({ tx: ntx, ty: nty });
 
-      // Check if this tile is in a zone
-      const zone = getZoneAtTile(ntx, nty);
+      // O(1) zone lookup using pre-calculated map
+      const zone = tileZoneMap.get(key);
       if (zone) {
         reachableZones.add(zone);
       }
@@ -564,34 +538,35 @@ function validateSpawnReachability(mapJson, collisionData) {
   // Determine unreachable zones
   const allZones = Object.keys(ZONE_BOUNDS);
 
-  // Check if each zone is 100% blocked (like decorative water)
-  // If so, don't report as unreachable since it's intentional
-  function isZoneFullyBlocked(zoneName) {
+  // Pre-calculate isZoneFullyBlocked for all zones (avoid redundant computation)
+  const isFullyBlockedMap = new Map();
+  for (const zoneName of allZones) {
     const bounds = ZONE_BOUNDS[zoneName];
     const startTx = Math.floor(bounds.x / MAP_CONFIG.tileSize);
     const startTy = Math.floor(bounds.y / MAP_CONFIG.tileSize);
     const endTx = Math.floor((bounds.x + bounds.width) / MAP_CONFIG.tileSize);
     const endTy = Math.floor((bounds.y + bounds.height) / MAP_CONFIG.tileSize);
 
-    for (let tx = startTx; tx < endTx; tx++) {
-      for (let ty = startTy; ty < endTy; ty++) {
-        const index = ty * MAP_CONFIG.width + tx;
+    let isFullyBlocked = true;
+    outer: for (let tileX = startTx; tileX < endTx; tileX++) {
+      for (let tileY = startTy; tileY < endTy; tileY++) {
+        const index = tileY * MAP_CONFIG.width + tileX;
         if (collisionData[index] === 0) {
-          return false; // Has at least one passable tile
+          isFullyBlocked = false;
+          break outer;
         }
       }
     }
-    return true; // All tiles are blocked
+    isFullyBlockedMap.set(zoneName, isFullyBlocked);
   }
 
   const unreachableZones = allZones.filter(z => {
     if (reachableZones.has(z)) return false;
-    // Skip zones that are 100% blocked (decorative/impassable by design)
-    return !isZoneFullyBlocked(z);
+    return !isFullyBlockedMap.get(z);
   });
 
   const fullyBlockedZones = allZones.filter(z => {
-    return !reachableZones.has(z) && isZoneFullyBlocked(z);
+    return !reachableZones.has(z) && isFullyBlockedMap.get(z);
   });
 
   if (unreachableZones.length > 0) {
@@ -1146,12 +1121,12 @@ function main() {
   console.log('  Zone              | Total | Blocked | Passable | Block%');
   console.log('  ------------------|-------|---------|----------|--------');
   for (const stat of zoneStats.stats) {
-    const zoneName = stat.zone.padEnd(17);
+    const zoneName = stat.zone.padEnd(18);
     const total = String(stat.totalTiles).padStart(5);
     const blocked = String(stat.blockedTiles).padStart(7);
     const passable = String(stat.passableTiles).padStart(8);
-    const pct = String(stat.blockPercentage).padStart(6);
-    console.log(`  ${zoneName}| ${total} |   ${blocked} |    ${passable} |  ${pct}%`);
+    const pct = (String(stat.blockPercentage) + '%').padStart(7);
+    console.log(`  ${zoneName}|${total} |${blocked} |${passable} |${pct}`);
   }
   console.log();
 

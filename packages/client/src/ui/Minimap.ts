@@ -37,6 +37,15 @@ const TERRAIN_COLORS: Partial<Record<TileType, number>> = {
   road: 0xa88b5a,
   grass: 0x4a8c4a,
   wall: 0x5a5a5a,
+  floor_lobby: 0xa6bed0,
+  floor_office: 0xb4d2e1,
+  floor_meeting: 0xc8d2c8,
+  floor_lounge: 0x8c8c8c,
+  floor_arcade: 0xd2bea5,
+  floor_plaza: 0xa0a0a0,
+  floor_lake: 0x6ea0d7,
+  door: 0xe6d25a,
+  decoration: 0x7a6b52,
 };
 
 export class Minimap {
@@ -51,6 +60,7 @@ export class Minimap {
   private padding = 10;
   private worldGrid: WorldGrid | null = null;
   private tileSize = 16;
+  private warnedGridBoundsMismatch = false;
 
   constructor(scene: Phaser.Scene, config?: Partial<MinimapConfig>) {
     this.scene = scene;
@@ -88,6 +98,7 @@ export class Minimap {
   setWorldGrid(grid: WorldGrid, tileSize = 16): void {
     this.worldGrid = grid;
     this.tileSize = tileSize;
+    this.warnedGridBoundsMismatch = false;
     this.drawTerrain();
   }
 
@@ -98,11 +109,20 @@ export class Minimap {
 
     const gridHeight = this.worldGrid.length;
     const gridWidth = this.worldGrid[0].length;
-    const pixelWidth = gridWidth * this.tileSize;
-    const pixelHeight = gridHeight * this.tileSize;
+    const gridPixelWidth = gridWidth * this.tileSize;
+    const gridPixelHeight = gridHeight * this.tileSize;
+    if (
+      !this.warnedGridBoundsMismatch &&
+      (gridPixelWidth !== this.config.mapWidth || gridPixelHeight !== this.config.mapHeight)
+    ) {
+      this.warnedGridBoundsMismatch = true;
+      console.warn(
+        `[Minimap] WorldGrid pixel bounds (${gridPixelWidth}x${gridPixelHeight}) do not match map bounds (${this.config.mapWidth}x${this.config.mapHeight}).`
+      );
+    }
 
-    const scaleX = (this.config.width - 8) / pixelWidth;
-    const scaleY = (this.config.height - 8) / pixelHeight;
+    const scaleX = (this.config.width - 8) / this.config.mapWidth;
+    const scaleY = (this.config.height - 8) / this.config.mapHeight;
     const offsetX = 4;
     const offsetY = 4;
 

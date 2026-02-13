@@ -1088,6 +1088,20 @@ class IssueDetector {
     if (recentAgents.length < 2) return null;
 
     const overlapStart = now - CHAT_MISMATCH_OVERLAP_WINDOW_MS;
+    const messageKey = (m: ChatMessage): string => `${m.timestamp}:${m.from}:${m.message}`;
+    const getAgentMessageSet = (
+      messages: ChatMessage[],
+      channel: string,
+      cutoff: number
+    ): Set<string> =>
+      new Set(
+        messages
+          .filter(
+            m => m.channel === channel && m.timestamp >= overlapStart && m.timestamp <= cutoff
+          )
+          .map(messageKey)
+      );
+
     const channelGroups: Map<string, AgentChatInfo[]> = new Map();
     for (const agent of recentAgents) {
       const channels = new Set(agent.messages.map(m => m.channel));
@@ -1100,20 +1114,18 @@ class IssueDetector {
     for (const [channel, channelAgents] of Array.from(channelGroups.entries())) {
       if (channelAgents.length < 2) continue;
 
-      const filteredSets: Map<string, Set<string>> = new Map();
-      for (const agent of channelAgents) {
-        const filtered = agent.messages
-          .filter(m => m.channel === channel && m.timestamp >= overlapStart)
-          .map(m => `${m.from}:${m.message}`);
-        filteredSets.set(agent.agentId, new Set(filtered));
-      }
-
       for (let i = 0; i < channelAgents.length; i++) {
         for (let j = i + 1; j < channelAgents.length; j++) {
           const a1 = channelAgents[i];
           const a2 = channelAgents[j];
-          const set1 = filteredSets.get(a1.agentId)!;
-          const set2 = filteredSets.get(a2.agentId)!;
+          const commonCutoff = Math.min(a1.latestTs, a2.latestTs);
+
+          if (commonCutoff <= 0) continue;
+
+          // Compare only the stable horizon both agents could have observed.
+          // This avoids transient false positives from chatObserve polling skew.
+          const set1 = getAgentMessageSet(a1.messages, channel, commonCutoff);
+          const set2 = getAgentMessageSet(a2.messages, channel, commonCutoff);
 
           const union = new Set([...set1, ...set2]);
           const intersection = new Set([...set1].filter(x => set2.has(x)));
@@ -1151,6 +1163,7 @@ class IssueDetector {
               timestamps: [now, a1.latestTs, a2.latestTs],
               logs: [
                 `Channel: ${channel}`,
+                `Comparable cutoff: ${commonCutoff}`,
                 `Jaccard diff: ${Math.round(jaccardDiff * 100)}%`,
                 `Agent ${a1.agentId}: ${set1.size} messages`,
                 `Agent ${a2.agentId}: ${set2.size} messages`,

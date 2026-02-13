@@ -575,12 +575,53 @@ Reports collision statistics per zone:
 
 **Warning threshold**: Zones with >80% blocked tiles generate a warning (may indicate misconfiguration).
 
-### Validation Exit Codes
+### Validation Severity Levels
 
-| Exit Code | Meaning |
-|-----------|---------|
-| 0 | All validations passed |
-| 1 | One or more validations failed |
+The verification script classifies violations into two severity levels:
+
+### ERROR (CI Blocking)
+
+These violations cause the CI to fail and must be fixed before merging:
+
+| Error Code | Description | Example |
+|------------|-------------|---------|
+| `ZONE_MISMATCH` | NPC/facility zone mismatch | NPC defined in zone A but placed in zone B |
+| `UNKNOWN_NPC_REF` | NPC ID not found in zone mapping | Zone references NPC that doesn't exist |
+| `UNKNOWN_FACILITY_REF` | Facility ID not found | Zone references facility with no object mapping |
+| `INVALID_ZONE_ID` | Invalid zone identifier | Zone property references non-existent zone |
+| `INVALID_ENTRANCE_CONTRACT` | Invalid entrance contract | Entrance connectsTo references invalid zone |
+| `FACILITY_ZONE_CONFLICT` | Facility has conflicting zones | Same facility ID mapped to different zones |
+
+### WARN (Allowed but Reported)
+
+These violations are logged but do not fail CI:
+
+| Warning Code | Description | Example |
+|--------------|-------------|---------|
+| `HIGH_BLOCK_PCT` | Zone has >80% blocked tiles | Lake zone with 100% blocked (intentional) |
+| `MIXED_ENTRANCE_TILES` | Entrance has mixed passable/blocked tiles | Entrance area partially blocked |
+| `MISSING_OPTIONAL` | Optional field missing | Direction property not set |
+| `NPC_ZONE_NOT_MAPPED` | NPC zone mapping not found | NPC exists but zone assignment missing |
+
+### Severity Matrix
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Validation Severity                      │
+├─────────────────────────────────────────────────────────────┤
+│  ERROR (Blocks CI)                                          │
+│  ├── Zone mismatch                                          │
+│  ├── Unknown NPC/facility reference                         │
+│  ├── Invalid zone ID                                        │
+│  └── Invalid entrance contract                              │
+├─────────────────────────────────────────────────────────────┤
+│  WARN (Reported only)                                       │
+│  ├── High block percentage (>80%)                          │
+│  ├── Mixed entrance tiles                                   │
+│  ├── Missing optional fields                                │
+│  └── NPC zone not mapped                                    │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ### CI Integration
 
@@ -590,6 +631,33 @@ The verification script is designed to run in CI/CD pipelines:
 # Example GitHub Actions step
 - name: Verify Map Consistency
   run: node scripts/verify-map-stack-consistency.mjs
+```
+
+**Exit Codes:**
+| Exit Code | Meaning |
+|-----------|---------|
+| 0 | All validations passed (no ERROR-level violations) |
+| 1 | One or more ERROR-level validations failed |
+
+**Note:** WARN-level violations do not cause CI failures but are logged for review.
+
+### Error Output Format
+
+When ERROR-level violations are detected, the script outputs:
+
+```
+❌ FACILITY CONTRACT VALIDATION FAILED
+
+  [ZONE_MISMATCH] facility "reception_desk" has zone prefix "office" but zone property "lobby"
+  [INVALID_ZONE_ID] facility object "meeting.desk" has invalid zone "invalid-zone"
+```
+
+When WARN-level violations are detected:
+
+```
+⚠️  Zone block warnings:
+
+  [HIGH_BLOCK_PCT] zone "lake" has 100% blocked tiles (56/56) - possible misconfiguration
 ```
 
 ## Related Documentation

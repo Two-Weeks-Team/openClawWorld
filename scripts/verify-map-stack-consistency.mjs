@@ -40,6 +40,142 @@ const VALID_ZONES = [
 ];
 const VALID_DIRECTIONS = ['north', 'south', 'east', 'west'];
 
+/**
+ * Validation severity levels
+ * ERROR: Blocks CI - critical consistency violations
+ * WARN: Allowed but reported - non-critical issues
+ */
+const Severity = {
+  ERROR: 'ERROR',
+  WARN: 'WARN',
+};
+
+/**
+ * ERROR-level violations (CI blocking):
+ * - zone mismatch (npc/facility referencing non-existent zone)
+ * - unknown reference (npcId/facilityId not found)
+ * - invalid zone id (zone referenced in entrance doesn't exist)
+ * - invalid entrance contract (connectsTo references invalid zone)
+ *
+ * WARN-level violations (allowed but reported):
+ * - high block percentage (>80% but intentional like water)
+ * - mixed passable/blocked tiles at entrances
+ * - missing optional fields
+ */
+const ValidationErrorCodes = {
+  // ERROR codes
+  ZONE_MISMATCH: {
+    code: 'ZONE_MISMATCH',
+    severity: Severity.ERROR,
+    message: 'NPC/facility zone mismatch',
+  },
+  UNKNOWN_NPC_REFERENCE: {
+    code: 'UNKNOWN_NPC_REF',
+    severity: Severity.ERROR,
+    message: 'NPC ID not found in zone mapping',
+  },
+  UNKNOWN_FACILITY_REFERENCE: {
+    code: 'UNKNOWN_FACILITY_REF',
+    severity: Severity.ERROR,
+    message: 'Facility ID not found',
+  },
+  INVALID_ZONE_ID: {
+    code: 'INVALID_ZONE_ID',
+    severity: Severity.ERROR,
+    message: 'Zone ID does not exist in manifest',
+  },
+  INVALID_ENTRANCE_CONTRACT: {
+    code: 'INVALID_ENTRANCE_CONTRACT',
+    severity: Severity.ERROR,
+    message: 'Entrance connectsTo references invalid zone',
+  },
+  INVALID_ENTRANCE_ZONE: {
+    code: 'INVALID_ENTRANCE_ZONE',
+    severity: Severity.ERROR,
+    message: 'Entrance zone property is invalid',
+  },
+  FACILITY_ZONE_CONFLICT: {
+    code: 'FACILITY_ZONE_CONFLICT',
+    severity: Severity.ERROR,
+    message: 'Facility has conflicting zone assignments',
+  },
+
+  // WARN codes
+  HIGH_BLOCK_PERCENTAGE: {
+    code: 'HIGH_BLOCK_PCT',
+    severity: Severity.WARN,
+    message: 'Zone has high block percentage',
+  },
+  MIXED_ENTRANCE_TILES: {
+    code: 'MIXED_ENTRANCE_TILES',
+    severity: Severity.WARN,
+    message: 'Entrance has mixed passable/blocked tiles',
+  },
+  MISSING_OPTIONAL_FIELD: {
+    code: 'MISSING_OPTIONAL',
+    severity: Severity.WARN,
+    message: 'Optional field is missing',
+  },
+  NPC_ZONE_NOT_MAPPED: {
+    code: 'NPC_ZONE_NOT_MAPPED',
+    severity: Severity.WARN,
+    message: 'NPC zone mapping not found',
+  },
+};
+
+class ValidationResult {
+  constructor() {
+    this.errors = [];
+    this.warnings = [];
+  }
+
+  addError(code, message, context = {}) {
+    this.errors.push({
+      severity: Severity.ERROR,
+      code: code.code,
+      message: code.message,
+      detail: message,
+      context,
+    });
+  }
+
+  addWarning(code, message, context = {}) {
+    this.warnings.push({
+      severity: Severity.WARN,
+      code: code.code,
+      message: code.message,
+      detail: message,
+      context,
+    });
+  }
+
+  hasErrors() {
+    return this.errors.length > 0;
+  }
+
+  hasWarnings() {
+    return this.warnings.length > 0;
+  }
+
+  getAllIssues() {
+    return [...this.errors, ...this.warnings];
+  }
+
+  getErrors() {
+    return this.errors;
+  }
+
+  getWarnings() {
+    return this.warnings;
+  }
+
+  merge(other) {
+    this.errors.push(...other.errors);
+    this.warnings.push(...other.warnings);
+    return this;
+  }
+}
+
 function md5(content) {
   return createHash('md5').update(content).digest('hex');
 }
@@ -210,39 +346,55 @@ function extractFacilityObjects(mapJson) {
 }
 
 function validateFacilityZoneContracts(mapJson, validZones) {
-  const errors = [];
+  const result = new ValidationResult();
   const facilities = extractFacilityObjects(mapJson);
   const mappedFacilityIds = new Map();
   let validFacilityObjects = 0;
 
   for (const facility of facilities) {
     if (facility.ids.length === 0) {
-      errors.push(`facility object "${facility.name}" missing facility identifier`);
+      result.addError(
+        ValidationErrorCodes.UNKNOWN_FACILITY_REFERENCE,
+        `facility object "${facility.name}" missing facility identifier`,
+        { facilityName: facility.name }
+      );
       continue;
     }
 
     if (!facility.zone) {
-      errors.push(`facility object "${facility.name}" missing zone property`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ZONE_ID,
+        `facility object "${facility.name}" missing zone property`,
+        { facilityName: facility.name }
+      );
       continue;
     }
 
     if (!validZones.has(facility.zone)) {
-      errors.push(`facility object "${facility.name}" has invalid zone "${facility.zone}"`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ZONE_ID,
+        `facility object "${facility.name}" has invalid zone "${facility.zone}"`,
+        { facilityName: facility.name, zone: facility.zone }
+      );
       continue;
     }
 
     const zoneFromNamePrefix = facility.name.includes('.') ? facility.name.split('.')[0] : null;
     if (zoneFromNamePrefix && zoneFromNamePrefix !== facility.zone) {
-      errors.push(
-        `facility object "${facility.name}" has zone prefix "${zoneFromNamePrefix}" but zone property "${facility.zone}"`
+      result.addError(
+        ValidationErrorCodes.ZONE_MISMATCH,
+        `facility object "${facility.name}" has zone prefix "${zoneFromNamePrefix}" but zone property "${facility.zone}"`,
+        { facilityName: facility.name, zonePrefix: zoneFromNamePrefix, zoneProperty: facility.zone }
       );
     }
 
     for (const facilityId of facility.ids) {
       const existing = mappedFacilityIds.get(facilityId);
       if (existing && existing !== facility.zone) {
-        errors.push(
-          `facility id "${facilityId}" has conflicting zones ("${existing}" vs "${facility.zone}")`
+        result.addError(
+          ValidationErrorCodes.FACILITY_ZONE_CONFLICT,
+          `facility id "${facilityId}" has conflicting zones ("${existing}" vs "${facility.zone}")`,
+          { facilityId, existingZone: existing, newZone: facility.zone }
         );
         continue;
       }
@@ -256,19 +408,25 @@ function validateFacilityZoneContracts(mapJson, validZones) {
   const listedFacilities = Array.isArray(mapJson.facilities) ? mapJson.facilities : [];
   for (const listedFacility of listedFacilities) {
     if (typeof listedFacility !== 'string') {
-      errors.push(`map facilities entry must be a string, got ${typeof listedFacility}`);
+      result.addError(
+        ValidationErrorCodes.UNKNOWN_FACILITY_REFERENCE,
+        `map facilities entry must be a string, got ${typeof listedFacility}`,
+        { listedFacility }
+      );
       continue;
     }
 
     const normalized = normalizeFacilityId(listedFacility);
     if (!mappedFacilityIds.has(normalized)) {
-      errors.push(
-        `map facilities entry "${listedFacility}" has no matching facility object mapping`
+      result.addError(
+        ValidationErrorCodes.UNKNOWN_FACILITY_REFERENCE,
+        `map facilities entry "${listedFacility}" has no matching facility object mapping`,
+        { facilityId: listedFacility }
       );
     }
   }
 
-  return { errors, count: validFacilityObjects, aliasCount: mappedFacilityIds.size };
+  return { result, count: validFacilityObjects, aliasCount: mappedFacilityIds.size };
 }
 
 function validateCollisionLayer(mapJson) {
@@ -329,11 +487,11 @@ function validateSpawnPoint(mapJson, collisionData) {
 }
 
 function validateEntrances(mapJson) {
-  const errors = [];
+  const result = new ValidationResult();
   const objectsLayer = (mapJson.layers || []).find(l => l.name === 'objects');
 
   if (!objectsLayer || !Array.isArray(objectsLayer.objects)) {
-    return { errors };
+    return { result, entranceCount: 0 };
   }
 
   const entrances = objectsLayer.objects.filter(obj => obj.type === 'building_entrance');
@@ -348,29 +506,57 @@ function validateEntrances(mapJson) {
     const connectsTo = getProp('connectsTo');
 
     if (!zone) {
-      errors.push(`entrance "${name}": missing zone property`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ENTRANCE_ZONE,
+        `entrance "${name}": missing zone property`,
+        { entranceName: name }
+      );
     } else if (!VALID_ZONES.includes(zone)) {
-      errors.push(`entrance "${name}": invalid zone "${zone}"`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ENTRANCE_ZONE,
+        `entrance "${name}": invalid zone "${zone}"`,
+        { entranceName: name, zone }
+      );
     }
 
     if (!direction) {
-      errors.push(`entrance "${name}": missing direction property`);
+      result.addWarning(
+        ValidationErrorCodes.MISSING_OPTIONAL_FIELD,
+        `entrance "${name}": missing direction property`,
+        { entranceName: name, field: 'direction' }
+      );
     } else if (!VALID_DIRECTIONS.includes(direction)) {
-      errors.push(`entrance "${name}": invalid direction "${direction}"`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ENTRANCE_CONTRACT,
+        `entrance "${name}": invalid direction "${direction}"`,
+        { entranceName: name, direction }
+      );
     }
 
     if (!connectsTo) {
-      errors.push(`entrance "${name}": missing connectsTo property`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ENTRANCE_CONTRACT,
+        `entrance "${name}": missing connectsTo property`,
+        { entranceName: name }
+      );
     } else if (!VALID_ZONES.includes(connectsTo)) {
-      errors.push(`entrance "${name}": invalid connectsTo "${connectsTo}"`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ENTRANCE_CONTRACT,
+        `entrance "${name}": invalid connectsTo "${connectsTo}"`,
+        { entranceName: name, connectsTo }
+      );
     }
 
     if (zone && connectsTo && zone === connectsTo) {
-      errors.push(`entrance "${name}": zone and connectsTo are the same ("${zone}")`);
+      result.addError(
+        ValidationErrorCodes.INVALID_ENTRANCE_CONTRACT,
+        `entrance "${name}": zone and connectsTo are the same ("${zone}")`,
+        { entranceName: name, zone, connectsTo }
+      );
     }
   }
 
-  return { errors, entranceCount: entrances.length };
+  return { result, entranceCount: entrances.length };
 }
 
 /**
@@ -378,12 +564,11 @@ function validateEntrances(mapJson) {
  * at their entrance tile coordinates.
  */
 function validateZoneEntrances(mapJson, collisionData) {
-  const errors = [];
-  const warnings = [];
+  const result = new ValidationResult();
   const objectsLayer = (mapJson.layers || []).find(l => l.name === 'objects');
 
   if (!objectsLayer || !Array.isArray(objectsLayer.objects)) {
-    return { errors, warnings, blockedEntrances: 0 };
+    return { result, blockedEntrances: 0, entranceCount: 0 };
   }
 
   const entrances = objectsLayer.objects.filter(obj => obj.type === 'building_entrance');
@@ -433,19 +618,23 @@ function validateZoneEntrances(mapJson, collisionData) {
 
     // Only report error if we checked tiles and found none passable
     if (tilesChecked > 0 && !hasPassableTile) {
-      errors.push(
-        `entrance "${name}" at tiles (${startTx},${startTy})-(${endTx},${endTy}) has no passable tiles (all blocked)`
+      result.addError(
+        ValidationErrorCodes.INVALID_ENTRANCE_CONTRACT,
+        `entrance "${name}" at tiles (${startTx},${startTy})-(${endTx},${endTy}) has no passable tiles (all blocked)`,
+        { entranceName: name, startTx, startTy, endTx, endTy }
       );
       blockedEntrances++;
     } else if (hasBlockedTile && hasPassableTile) {
       // Warn if entrance area has mixed passable/blocked tiles
-      warnings.push(
-        `entrance "${name}" at tiles (${startTx},${startTy})-(${endTx},${endTy}) has mixed passable/blocked tiles`
+      result.addWarning(
+        ValidationErrorCodes.MIXED_ENTRANCE_TILES,
+        `entrance "${name}" at tiles (${startTx},${startTy})-(${endTx},${endTy}) has mixed passable/blocked tiles`,
+        { entranceName: name, startTx, startTy, endTx, endTy }
       );
     }
   }
 
-  return { errors, warnings, blockedEntrances, entranceCount: entrances.length };
+  return { result, blockedEntrances, entranceCount: entrances.length };
 }
 
 /**
@@ -588,8 +777,7 @@ function validateSpawnReachability(mapJson, collisionData) {
  * Warns if any zone has >80% blocked tiles.
  */
 function generateZoneBlockStats(mapJson, collisionData) {
-  const errors = [];
-  const warnings = [];
+  const result = new ValidationResult();
   const stats = [];
   const BLOCK_PERCENTAGE_WARNING_THRESHOLD = 80;
 
@@ -627,13 +815,15 @@ function generateZoneBlockStats(mapJson, collisionData) {
     });
 
     if (blockPercentage >= BLOCK_PERCENTAGE_WARNING_THRESHOLD) {
-      warnings.push(
-        `zone "${zoneName}" has ${blockPercentage}% blocked tiles (${blockedTiles}/${totalTiles}) - possible misconfiguration`
+      result.addWarning(
+        ValidationErrorCodes.HIGH_BLOCK_PERCENTAGE,
+        `zone "${zoneName}" has ${blockPercentage}% blocked tiles (${blockedTiles}/${totalTiles}) - possible misconfiguration`,
+        { zone: zoneName, blockPercentage, blockedTiles, totalTiles }
       );
     }
   }
 
-  return { errors, warnings, stats };
+  return { result, stats };
 }
 
 function validateCurationStructure(curation) {
@@ -1025,15 +1215,23 @@ function main() {
 
   console.log('Validating facility zone contracts...');
   const {
-    errors: facilityErrors,
+    result: facilityResult,
     count: facilityCount,
     aliasCount,
   } = validateFacilityZoneContracts(sourceMap.json, validZones);
 
-  if (facilityErrors.length > 0) {
+  if (facilityResult.hasErrors()) {
     console.log('❌ FACILITY CONTRACT VALIDATION FAILED\n');
-    facilityErrors.forEach(msg => console.log(`  ${msg}`));
+    facilityResult.getErrors().forEach(err => {
+      console.log(`  [${err.code}] ${err.detail}`);
+    });
     process.exit(1);
+  }
+  if (facilityResult.hasWarnings()) {
+    console.log('⚠️  Facility zone warnings:\n');
+    facilityResult.getWarnings().forEach(warn => {
+      console.log(`  [${warn.code}] ${warn.detail}`);
+    });
   }
 
   console.log(
@@ -1062,10 +1260,18 @@ function main() {
 
   console.log('Validating building entrances...');
   const entranceValidation = validateEntrances(sourceMap.json);
-  if (entranceValidation.errors.length > 0) {
+  if (entranceValidation.result.hasErrors()) {
     console.log('❌ ENTRANCE VALIDATION FAILED\n');
-    entranceValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    entranceValidation.result.getErrors().forEach(err => {
+      console.log(`  [${err.code}] ${err.detail}`);
+    });
     process.exit(1);
+  }
+  if (entranceValidation.result.hasWarnings()) {
+    console.log('⚠️  Entrance warnings:\n');
+    entranceValidation.result.getWarnings().forEach(warn => {
+      console.log(`  [${warn.code}] ${warn.detail}`);
+    });
   }
   console.log(
     `✅ ${entranceValidation.entranceCount} building entrances have valid zone/direction/connectsTo\n`
@@ -1076,14 +1282,18 @@ function main() {
     sourceMap.json,
     collisionValidation.collisionData
   );
-  if (zoneEntranceValidation.errors.length > 0) {
+  if (zoneEntranceValidation.result.hasErrors()) {
     console.log('❌ ZONE ENTRANCE COLLISION VALIDATION FAILED\n');
-    zoneEntranceValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    zoneEntranceValidation.result.getErrors().forEach(err => {
+      console.log(`  [${err.code}] ${err.detail}`);
+    });
     process.exit(1);
   }
-  if (zoneEntranceValidation.warnings.length > 0) {
+  if (zoneEntranceValidation.result.hasWarnings()) {
     console.log('⚠️  Zone entrance warnings:\n');
-    zoneEntranceValidation.warnings.forEach(msg => console.log(`  ${msg}`));
+    zoneEntranceValidation.result.getWarnings().forEach(warn => {
+      console.log(`  [${warn.code}] ${warn.detail}`);
+    });
   }
   console.log(
     `✅ ${zoneEntranceValidation.entranceCount} zone entrances have passable collision tiles\n`
@@ -1108,14 +1318,18 @@ function main() {
 
   console.log('Generating zone block statistics...');
   const zoneStats = generateZoneBlockStats(sourceMap.json, collisionValidation.collisionData);
-  if (zoneStats.errors.length > 0) {
+  if (zoneStats.result.hasErrors()) {
     console.log('❌ ZONE BLOCK STATS GENERATION FAILED\n');
-    zoneStats.errors.forEach(msg => console.log(`  ${msg}`));
+    zoneStats.result.getErrors().forEach(err => {
+      console.log(`  [${err.code}] ${err.detail}`);
+    });
     process.exit(1);
   }
-  if (zoneStats.warnings.length > 0) {
+  if (zoneStats.result.hasWarnings()) {
     console.log('⚠️  Zone block warnings:\n');
-    zoneStats.warnings.forEach(msg => console.log(`  ${msg}`));
+    zoneStats.result.getWarnings().forEach(warn => {
+      console.log(`  [${warn.code}] ${warn.detail}`);
+    });
   }
   console.log('✅ Zone block statistics:');
   console.log('  Zone              | Total | Blocked | Passable | Block%');

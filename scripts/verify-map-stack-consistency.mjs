@@ -52,6 +52,18 @@ const VALID_ZONES = [
 ];
 const VALID_DIRECTIONS = ['north', 'south', 'east', 'west'];
 
+// Zone bounds from packages/shared/src/world.ts
+const ZONE_BOUNDS = {
+  lobby: { x: 96, y: 32, width: 192, height: 192 },
+  office: { x: 672, y: 32, width: 320, height: 224 },
+  'central-park': { x: 320, y: 256, width: 384, height: 320 },
+  arcade: { x: 704, y: 256, width: 288, height: 256 },
+  meeting: { x: 32, y: 448, width: 256, height: 288 },
+  'lounge-cafe': { x: 288, y: 608, width: 320, height: 224 },
+  plaza: { x: 608, y: 608, width: 256, height: 256 },
+  lake: { x: 32, y: 32, width: 64, height: 224 },
+};
+
 function md5(content) {
   return createHash('md5').update(content).digest('hex');
 }
@@ -383,6 +395,270 @@ function validateEntrances(mapJson) {
   }
 
   return { errors, entranceCount: entrances.length };
+}
+
+/**
+ * Validates that building_entrance objects have passable collision tiles (value=0)
+ * at their entrance tile coordinates.
+ */
+function validateZoneEntrances(mapJson, collisionData) {
+  const errors = [];
+  const warnings = [];
+  const objectsLayer = (mapJson.layers || []).find(l => l.name === 'objects');
+
+  if (!objectsLayer || !Array.isArray(objectsLayer.objects)) {
+    return { errors, warnings, blockedEntrances: 0 };
+  }
+
+  const entrances = objectsLayer.objects.filter(obj => obj.type === 'building_entrance');
+  let blockedEntrances = 0;
+
+  for (const entrance of entrances) {
+    const name = entrance.name || 'unnamed';
+    const { x, y, width, height } = entrance;
+    const tileSize = MAP_CONFIG.tileSize;
+
+    // Convert pixel coordinates to tile coordinates
+    const startTx = Math.floor(x / tileSize);
+    const startTy = Math.floor(y / tileSize);
+    const endTx = Math.floor((x + width) / tileSize);
+    const endTy = Math.floor((y + height) / tileSize);
+
+    // Skip entrances that are completely outside the map bounds
+    // These are markers for external zone transitions
+    if (startTx >= MAP_CONFIG.width || startTy >= MAP_CONFIG.height || endTx <= 0 || endTy <= 0) {
+      continue;
+    }
+
+    // Clamp to map bounds for partial overlaps
+    const clampedStartTx = Math.max(0, startTx);
+    const clampedStartTy = Math.max(0, startTy);
+    const clampedEndTx = Math.min(MAP_CONFIG.width, endTx);
+    const clampedEndTy = Math.min(MAP_CONFIG.height, endTy);
+
+    // Check all tiles under the entrance area
+    let hasPassableTile = false;
+    let hasBlockedTile = false;
+    let tilesChecked = 0;
+
+    for (let tx = clampedStartTx; tx < clampedEndTx; tx++) {
+      for (let ty = clampedStartTy; ty < clampedEndTy; ty++) {
+        tilesChecked++;
+        const index = ty * MAP_CONFIG.width + tx;
+        if (collisionData && index >= 0 && index < collisionData.length) {
+          if (collisionData[index] === 0) {
+            hasPassableTile = true;
+          } else if (collisionData[index] === 1) {
+            hasBlockedTile = true;
+          }
+        }
+      }
+    }
+
+    // Only report error if we checked tiles and found none passable
+    if (tilesChecked > 0 && !hasPassableTile) {
+      errors.push(
+        `entrance "${name}" at tiles (${startTx},${startTy})-(${endTx},${endTy}) has no passable tiles (all blocked)`
+      );
+      blockedEntrances++;
+    } else if (hasBlockedTile && hasPassableTile) {
+      // Warn if entrance area has mixed passable/blocked tiles
+      warnings.push(
+        `entrance "${name}" at tiles (${startTx},${startTy})-(${endTx},${endTy}) has mixed passable/blocked tiles`
+      );
+    }
+  }
+
+  return { errors, warnings, blockedEntrances, entranceCount: entrances.length };
+}
+
+/**
+ * Implements BFS from spawn point to verify zone reachability.
+ * Returns reachable zones and any unreachable zones.
+ */
+function validateSpawnReachability(mapJson, collisionData) {
+  const errors = [];
+  const reachableZones = new Set();
+  const visited = new Set();
+  const queue = [];
+
+  const { tx, ty } = DEFAULT_SPAWN_POINT;
+  const width = MAP_CONFIG.width;
+  const height = MAP_CONFIG.height;
+
+  // Start BFS from spawn point
+  const startIndex = ty * width + tx;
+  if (collisionData[startIndex] === 1) {
+    errors.push('spawn point is blocked, cannot perform reachability check');
+    return { errors, reachableZones: [], unreachableZones: Object.keys(ZONE_BOUNDS) };
+  }
+
+  queue.push({ tx, ty });
+  visited.add(`${tx},${ty}`);
+
+  // Check if tile is in a zone
+  function getZoneAtTile(tx, ty) {
+    for (const [zoneName, bounds] of Object.entries(ZONE_BOUNDS)) {
+      const tileX = tx * MAP_CONFIG.tileSize;
+      const tileY = ty * MAP_CONFIG.tileSize;
+      if (
+        tileX >= bounds.x &&
+        tileX < bounds.x + bounds.width &&
+        tileY >= bounds.y &&
+        tileY < bounds.y + bounds.height
+      ) {
+        return zoneName;
+      }
+    }
+    return null;
+  }
+
+  // Check initial spawn zone
+  const spawnZone = getZoneAtTile(tx, ty);
+  if (spawnZone) {
+    reachableZones.add(spawnZone);
+  }
+
+  // BFS
+  const directions = [
+    { dx: 0, dy: -1 }, // north
+    { dx: 0, dy: 1 }, // south
+    { dx: -1, dy: 0 }, // west
+    { dx: 1, dy: 0 }, // east
+  ];
+
+  while (queue.length > 0) {
+    const { tx: ctx, ty: cty } = queue.shift();
+
+    for (const { dx, dy } of directions) {
+      const ntx = ctx + dx;
+      const nty = cty + dy;
+
+      // Bounds check
+      if (ntx < 0 || ntx >= width || nty < 0 || nty >= height) {
+        continue;
+      }
+
+      const key = `${ntx},${nty}`;
+      if (visited.has(key)) {
+        continue;
+      }
+
+      // Check collision
+      const index = nty * width + ntx;
+      if (collisionData[index] === 1) {
+        continue; // Blocked tile
+      }
+
+      visited.add(key);
+      queue.push({ tx: ntx, ty: nty });
+
+      // Check if this tile is in a zone
+      const zone = getZoneAtTile(ntx, nty);
+      if (zone) {
+        reachableZones.add(zone);
+      }
+    }
+  }
+
+  // Determine unreachable zones
+  const allZones = Object.keys(ZONE_BOUNDS);
+
+  // Check if each zone is 100% blocked (like decorative water)
+  // If so, don't report as unreachable since it's intentional
+  function isZoneFullyBlocked(zoneName) {
+    const bounds = ZONE_BOUNDS[zoneName];
+    const startTx = Math.floor(bounds.x / MAP_CONFIG.tileSize);
+    const startTy = Math.floor(bounds.y / MAP_CONFIG.tileSize);
+    const endTx = Math.floor((bounds.x + bounds.width) / MAP_CONFIG.tileSize);
+    const endTy = Math.floor((bounds.y + bounds.height) / MAP_CONFIG.tileSize);
+
+    for (let tx = startTx; tx < endTx; tx++) {
+      for (let ty = startTy; ty < endTy; ty++) {
+        const index = ty * MAP_CONFIG.width + tx;
+        if (collisionData[index] === 0) {
+          return false; // Has at least one passable tile
+        }
+      }
+    }
+    return true; // All tiles are blocked
+  }
+
+  const unreachableZones = allZones.filter(z => {
+    if (reachableZones.has(z)) return false;
+    // Skip zones that are 100% blocked (decorative/impassable by design)
+    return !isZoneFullyBlocked(z);
+  });
+
+  const fullyBlockedZones = allZones.filter(z => {
+    return !reachableZones.has(z) && isZoneFullyBlocked(z);
+  });
+
+  if (unreachableZones.length > 0) {
+    errors.push(`unreachable zones from spawn: ${unreachableZones.join(', ')}`);
+  }
+
+  return {
+    errors,
+    reachableZones: [...reachableZones],
+    unreachableZones,
+    fullyBlockedZones,
+    visitedTileCount: visited.size,
+  };
+}
+
+/**
+ * Generates zone block statistics for each zone.
+ * Reports total tiles, blocked tiles, and block percentage.
+ * Warns if any zone has >80% blocked tiles.
+ */
+function generateZoneBlockStats(mapJson, collisionData) {
+  const errors = [];
+  const warnings = [];
+  const stats = [];
+  const BLOCK_PERCENTAGE_WARNING_THRESHOLD = 80;
+
+  for (const [zoneName, bounds] of Object.entries(ZONE_BOUNDS)) {
+    // Convert pixel bounds to tile bounds
+    const startTx = Math.floor(bounds.x / MAP_CONFIG.tileSize);
+    const startTy = Math.floor(bounds.y / MAP_CONFIG.tileSize);
+    const endTx = Math.floor((bounds.x + bounds.width) / MAP_CONFIG.tileSize);
+    const endTy = Math.floor((bounds.y + bounds.height) / MAP_CONFIG.tileSize);
+
+    let totalTiles = 0;
+    let blockedTiles = 0;
+
+    for (let tx = startTx; tx < endTx; tx++) {
+      for (let ty = startTy; ty < endTy; ty++) {
+        totalTiles++;
+        const index = ty * MAP_CONFIG.width + tx;
+        if (collisionData && index >= 0 && index < collisionData.length) {
+          if (collisionData[index] === 1) {
+            blockedTiles++;
+          }
+        }
+      }
+    }
+
+    const passableTiles = totalTiles - blockedTiles;
+    const blockPercentage = totalTiles > 0 ? Math.round((blockedTiles / totalTiles) * 100) : 0;
+
+    stats.push({
+      zone: zoneName,
+      totalTiles,
+      blockedTiles,
+      passableTiles,
+      blockPercentage,
+    });
+
+    if (blockPercentage >= BLOCK_PERCENTAGE_WARNING_THRESHOLD) {
+      warnings.push(
+        `zone "${zoneName}" has ${blockPercentage}% blocked tiles (${blockedTiles}/${totalTiles}) - possible misconfiguration`
+      );
+    }
+  }
+
+  return { errors, warnings, stats };
 }
 
 function validateCurationStructure(curation) {
@@ -819,6 +1095,65 @@ function main() {
   console.log(
     `✅ ${entranceValidation.entranceCount} building entrances have valid zone/direction/connectsTo\n`
   );
+
+  console.log('Validating zone entrance collision...');
+  const zoneEntranceValidation = validateZoneEntrances(
+    sourceMap.json,
+    collisionValidation.collisionData
+  );
+  if (zoneEntranceValidation.errors.length > 0) {
+    console.log('❌ ZONE ENTRANCE COLLISION VALIDATION FAILED\n');
+    zoneEntranceValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  if (zoneEntranceValidation.warnings.length > 0) {
+    console.log('⚠️  Zone entrance warnings:\n');
+    zoneEntranceValidation.warnings.forEach(msg => console.log(`  ${msg}`));
+  }
+  console.log(
+    `✅ ${zoneEntranceValidation.entranceCount} zone entrances have passable collision tiles\n`
+  );
+
+  console.log('Validating spawn reachability (BFS)...');
+  const reachabilityValidation = validateSpawnReachability(
+    sourceMap.json,
+    collisionValidation.collisionData
+  );
+  if (reachabilityValidation.errors.length > 0) {
+    console.log('❌ SPAWN REACHABILITY VALIDATION FAILED\n');
+    reachabilityValidation.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  const reachableCount = reachabilityValidation.reachableZones.length;
+  const totalZones = Object.keys(ZONE_BOUNDS).length;
+  const blockedCount = reachabilityValidation.fullyBlockedZones?.length || 0;
+  console.log(
+    `✅ Spawn reachability: ${reachabilityValidation.visitedTileCount} tiles reachable, ${reachableCount}/${totalZones} zones accessible${blockedCount > 0 ? ` (${blockedCount} fully blocked: ${reachabilityValidation.fullyBlockedZones.join(', ')})` : ''}\n`
+  );
+
+  console.log('Generating zone block statistics...');
+  const zoneStats = generateZoneBlockStats(sourceMap.json, collisionValidation.collisionData);
+  if (zoneStats.errors.length > 0) {
+    console.log('❌ ZONE BLOCK STATS GENERATION FAILED\n');
+    zoneStats.errors.forEach(msg => console.log(`  ${msg}`));
+    process.exit(1);
+  }
+  if (zoneStats.warnings.length > 0) {
+    console.log('⚠️  Zone block warnings:\n');
+    zoneStats.warnings.forEach(msg => console.log(`  ${msg}`));
+  }
+  console.log('✅ Zone block statistics:');
+  console.log('  Zone              | Total | Blocked | Passable | Block%');
+  console.log('  ------------------|-------|---------|----------|--------');
+  for (const stat of zoneStats.stats) {
+    const zoneName = stat.zone.padEnd(17);
+    const total = String(stat.totalTiles).padStart(5);
+    const blocked = String(stat.blockedTiles).padStart(7);
+    const passable = String(stat.passableTiles).padStart(8);
+    const pct = String(stat.blockPercentage).padStart(6);
+    console.log(`  ${zoneName}| ${total} |   ${blocked} |    ${passable} |  ${pct}%`);
+  }
+  console.log();
 
   console.log('══════════════════════════════════════════════════════════════');
   console.log('✅ MAP STACK CONSISTENCY VERIFIED');

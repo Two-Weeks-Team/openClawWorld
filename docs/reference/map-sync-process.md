@@ -492,7 +492,108 @@ for (let i = 0; i < 4096; i++) {
 2. Check door is on building edge (adjacent to road/grass)
 3. Verify ground layer shows building (tile 4) at door position
 
+## Map Stack Consistency Verification
+
+The verification script (`scripts/verify-map-stack-consistency.mjs`) performs automated validation of map integrity, including zone-specific wall and collision checks.
+
+### Running Verification
+
+```bash
+# Run full verification
+node scripts/verify-map-stack-consistency.mjs
+
+# Or via pnpm
+pnpm verify:map-change
+```
+
+### Validation Checks
+
+The script performs the following validations:
+
+| Check | Description | On Failure |
+|-------|-------------|------------|
+| **File Existence** | Source, server, and client map files exist | ❌ Exit with error |
+| **Hash Consistency** | All three map copies have identical MD5 checksums | ❌ Exit with error |
+| **Map Dimensions** | Width, height, and tile size match expected values | ❌ Exit with error |
+| **Tileset Contract** | Correct tileset name and dimensions | ❌ Exit with error |
+| **Kenney Curation** | Asset curation manifest is valid | ❌ Exit with error |
+| **Tile ID Contract** | Used tile IDs are within defined contract | ❌ Exit with error |
+| **Facility Zone Contracts** | Facilities have valid zone assignments | ❌ Exit with error |
+| **Collision Layer** | Contains only binary values (0/1) | ❌ Exit with error |
+| **Spawn Point** | Spawn tile is passable (collision=0) | ❌ Exit with error |
+| **Entrance Properties** | All entrances have valid zone/direction/connectsTo | ❌ Exit with error |
+| **Zone Entrance Collision** | Building entrances have at least one passable tile | ❌ Exit with error |
+| **Spawn Reachability** | BFS verifies zones are reachable from spawn | ❌ Exit with error |
+| **Zone Block Statistics** | Reports blocked/passable tile percentages | ⚠️ Warning if >80% blocked |
+
+### Zone Wall Collision Contract Validation
+
+#### Zone Entrance Passability (Issue #276)
+
+Each `building_entrance` object must have at least one passable tile (collision=0):
+
+```
+✅ Zone entrance collision: 8 zone entrances have passable collision tiles
+```
+
+**Error example**:
+```
+❌ ZONE ENTRANCE COLLISION VALIDATION FAILED
+  entrance "lobby.entrance" at tiles (22,26)-(26,28) has no passable tiles (all blocked)
+```
+
+#### Spawn Reachability (BFS)
+
+Verifies all non-blocked zones can be reached from the spawn point:
+
+```
+✅ Spawn reachability: 3696 tiles reachable, 7/8 zones accessible (1 fully blocked: lake)
+```
+
+Zones that are 100% blocked (like decorative water) are excluded from the reachability requirement.
+
+#### Zone Block Statistics
+
+Reports collision statistics per zone:
+
+```
+✅ Zone block statistics:
+  Zone              | Total | Blocked | Passable | Block%
+  ------------------|-------|---------|----------|--------
+  lobby            |   144 |        42 |         102 |      29%
+  office           |   280 |        62 |         218 |      22%
+  central-park     |   480 |         0 |         480 |       0%
+  arcade           |   288 |        62 |         226 |      22%
+  meeting          |   288 |        60 |         228 |      21%
+  lounge-cafe      |   280 |        60 |         220 |      21%
+  plaza            |   256 |        58 |         198 |      23%
+  lake             |    56 |        56 |           0 |     100%
+
+⚠️  Zone block warnings:
+  zone "lake" has 100% blocked tiles (56/56) - possible misconfiguration
+```
+
+**Warning threshold**: Zones with >80% blocked tiles generate a warning (may indicate misconfiguration).
+
+### Validation Exit Codes
+
+| Exit Code | Meaning |
+|-----------|---------|
+| 0 | All validations passed |
+| 1 | One or more validations failed |
+
+### CI Integration
+
+The verification script is designed to run in CI/CD pipelines:
+
+```yaml
+# Example GitHub Actions step
+- name: Verify Map Consistency
+  run: node scripts/verify-map-stack-consistency.mjs
+```
+
 ## Related Documentation
 
 - [Grid-Town Map Spec](./map_spec_grid_town.md) - Zone layout, facilities, and current map specification
 - [Demo Runbook](../demo-runbook.md) - Testing procedures
+- [Map Change Routine](./map-change-routine.md) - Mandatory workflow for map edits

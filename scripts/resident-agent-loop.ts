@@ -1208,7 +1208,7 @@ class IssueDetector {
   detectStuckAgent(agents: ResidentAgent[]): Issue | null {
     for (const agent of agents) {
       const state = agent.getState();
-      const detectorKey = `stuckAgent:${state.agentId || `unregistered:${state.role}`}`;
+      const detectorKey = `stuckAgent:${state.agentId || `unregistered:${agent.getInstanceId()}`}`;
 
       if (state.role === 'afk' || !state.agentId || !state.sessionToken) {
         this.resetConsecutive(detectorKey);
@@ -1875,6 +1875,7 @@ class ResidentAgent {
   private serverUrl: string;
   private running = false;
   private cycleDelayMs: number;
+  private readonly instanceId = randomBytes(4).toString('hex');
 
   constructor(serverUrl: string, role: AgentRole, cycleDelayMs: number) {
     this.serverUrl = serverUrl;
@@ -1902,6 +1903,10 @@ class ResidentAgent {
 
   getState(): AgentState {
     return this.state;
+  }
+
+  getInstanceId(): string {
+    return this.instanceId;
   }
 
   async register(roomId: string): Promise<boolean> {

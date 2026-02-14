@@ -415,7 +415,6 @@ export class GameScene extends Phaser.Scene {
     this.marker.strokeRect(0, 0, 16, 16);
     this.marker.setVisible(false);
     this.marker.setDepth(100);
-
   }
 
   private createZoneNameLabels(): void {

@@ -115,6 +115,8 @@ export class GameScene extends Phaser.Scene {
   private builtinSkills: SkillDefinition[] = [];
   private _debugBlockedCount = 0;
   private debugInfoTexts: Phaser.GameObjects.Text[] = [];
+  private cameraFollowTargetId: string | null = null;
+  private resizeHandler?: (gameSize: Phaser.Structs.Size) => void;
 
   constructor() {
     super('GameScene');
@@ -124,6 +126,7 @@ export class GameScene extends Phaser.Scene {
     this.createMap();
     this.renderMapObjects();
     this.createZoneNameLabels();
+    this.setupViewportHandling();
     this.setupInput();
     this.setupDebugToggle();
     this.setupInteractionKey();
@@ -184,6 +187,44 @@ export class GameScene extends Phaser.Scene {
       this.clientCollision.setWorldGrid(worldGrid, 16);
       this.minimap?.setWorldGrid(worldGrid, 16);
     }
+  }
+
+  private setupViewportHandling(): void {
+    this.applyCameraViewportSettings();
+    this.resizeHandler = (gameSize: Phaser.Structs.Size) => {
+      this.applyCameraViewportSettings();
+      if (this.interactionPrompt) {
+        this.interactionPrompt.setPosition(gameSize.width / 2, gameSize.height - 60);
+      }
+    };
+    this.scale.on('resize', this.resizeHandler);
+  }
+
+  private applyCameraViewportSettings(): void {
+    if (!this.map) return;
+
+    const mapWidth = this.map.widthInPixels;
+    const mapHeight = this.map.heightInPixels;
+    const camera = this.cameras.main;
+
+    const minZoomToCoverMap = Math.max(camera.width / mapWidth, camera.height / mapHeight, 1);
+    camera.setZoom(minZoomToCoverMap);
+    camera.setBounds(0, 0, mapWidth, mapHeight);
+  }
+
+  private ensureCameraFollowToPlayer(): void {
+    const myEntityId = gameClient.entityId;
+    if (!myEntityId) return;
+
+    const myContainer = this.entities.get(myEntityId);
+    if (!myContainer) return;
+
+    if (this.cameraFollowTargetId === myEntityId) {
+      return;
+    }
+
+    this.cameras.main.startFollow(myContainer, true, 0.1, 0.1);
+    this.cameraFollowTargetId = myEntityId;
   }
 
   private setupKeyboardFocusHandling(): void {
@@ -375,11 +416,6 @@ export class GameScene extends Phaser.Scene {
     this.marker.setVisible(false);
     this.marker.setDepth(100);
 
-    if (this.map) {
-      const mapWidth = this.map.widthInPixels;
-      const mapHeight = this.map.heightInPixels;
-      this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
-    }
   }
 
   private createZoneNameLabels(): void {
@@ -446,8 +482,19 @@ export class GameScene extends Phaser.Scene {
     if (!objects) return;
 
     for (const obj of objects) {
-      const objType = this.getObjectProperty(obj, 'type') as string;
-      if (!objType || objType === 'spawn') continue;
+      const interactionType = this.getObjectProperty(obj, 'type');
+      if (interactionType === 'spawn' || obj.type === 'building_entrance') {
+        continue;
+      }
+
+      // Facility objects are interaction metadata. Their visuals come from tiles/layers.
+      if (interactionType === 'facility') {
+        this.mapObjectData.set(obj.name, obj);
+        continue;
+      }
+
+      const objType = (typeof interactionType === 'string' ? interactionType : obj.type) ?? '';
+      if (!objType) continue;
 
       let atlasKey: 'objects' | 'players' = 'objects';
       let frameKey = '';
@@ -465,7 +512,12 @@ export class GameScene extends Phaser.Scene {
         case 'npc': {
           const npcId = this.getObjectProperty(obj, 'npcId') as string;
           if (npcId) {
-            const npcSprite = this.add.sprite(obj.x + 8, obj.y + 8, 'npcs', npcId);
+            const npcSprite = this.add.sprite(
+              obj.x + obj.width / 2,
+              obj.y + obj.height / 2,
+              'npcs',
+              npcId
+            );
             npcSprite.setDepth(obj.y);
             this.mapObjects.set(obj.name, npcSprite);
             this.mapObjectData.set(obj.name, obj);
@@ -481,13 +533,17 @@ export class GameScene extends Phaser.Scene {
           else if (obj.name.includes('bench')) frameKey = 'bench';
           break;
         default:
-          atlasKey = 'players';
-          frameKey = 'player-object';
+          continue;
       }
 
       if (!frameKey) continue;
 
-      const sprite = this.add.sprite(obj.x + 8, obj.y + 8, atlasKey, frameKey);
+      const sprite = this.add.sprite(
+        obj.x + obj.width / 2,
+        obj.y + obj.height / 2,
+        atlasKey,
+        frameKey
+      );
       sprite.setDepth(obj.y);
 
       if (objType === 'portal') {
@@ -508,7 +564,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private getObjectProperty(obj: MapObject, propName: string): unknown {
-    if (!obj.properties) return obj.type || null;
+    if (!obj.properties) return null;
     const prop = obj.properties.find(p => p.name === propName);
     return prop ? prop.value : null;
   }
@@ -576,7 +632,8 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const objType = this.getObjectProperty(obj, 'type') as string;
+    const interactionType = this.getObjectProperty(obj, 'type');
+    const objType = (typeof interactionType === 'string' ? interactionType : obj.type) ?? '';
 
     switch (objType) {
       case 'sign': {
@@ -998,6 +1055,12 @@ export class GameScene extends Phaser.Scene {
       clearInterval(this.roomCheckInterval);
       this.roomCheckInterval = undefined;
     }
+    if (this.resizeHandler) {
+      this.scale.off('resize', this.resizeHandler);
+      this.resizeHandler = undefined;
+    }
+    this.cameras.main.stopFollow();
+    this.cameraFollowTargetId = null;
     this.zoneNameLabels.forEach(label => label.destroy());
     this.zoneNameLabels = [];
     this.zoneNameBackgrounds.forEach(bg => bg.destroy());
@@ -1067,6 +1130,12 @@ export class GameScene extends Phaser.Scene {
     room.onMessage('interact.result', (result: InteractResult) => {
       this.handleServerInteractionResult(result);
     });
+
+    room.onMessage('assignedEntityId', () => {
+      this.ensureCameraFollowToPlayer();
+    });
+
+    this.ensureCameraFollowToPlayer();
 
     this.setupSkillEventListeners(room);
   }
@@ -1167,6 +1236,7 @@ export class GameScene extends Phaser.Scene {
     this.updateEntityStatus(key, entity);
 
     if (key === gameClient.entityId) {
+      this.ensureCameraFollowToPlayer();
       this.checkZoneChange(entity);
     }
   }
@@ -1253,12 +1323,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   private addEntity(entity: Entity, key: string, type: 'human' | 'agent' | 'object') {
+    if (type === 'object') {
+      // Server-side objects (facilities, etc.) are authoritative interaction targets.
+      // Their visuals are rendered from tile/object layers, so avoid duplicate markers.
+      this.entityData.set(key, entity);
+      return;
+    }
+
     const container = this.add.container(entity.pos.x, entity.pos.y);
     container.setDepth(entity.pos.y);
 
     let frame = 'player-human';
     if (type === 'agent') frame = 'player-agent';
-    if (type === 'object') frame = 'player-object';
 
     const sprite = this.add.sprite(0, 0, 'players', frame);
     sprite.setOrigin(0.5, 0.5);
@@ -1281,7 +1357,7 @@ export class GameScene extends Phaser.Scene {
     this.updateEntityStatus(key, entity);
 
     if (key === gameClient.entityId) {
-      this.cameras.main.startFollow(container, true, 0.1, 0.1);
+      this.ensureCameraFollowToPlayer();
     }
   }
 
@@ -1315,8 +1391,12 @@ export class GameScene extends Phaser.Scene {
     if (entity) {
       entity.destroy();
       this.entities.delete(key);
-      this.entityData.delete(key);
+      if (key === this.cameraFollowTargetId) {
+        this.cameras.main.stopFollow();
+        this.cameraFollowTargetId = null;
+      }
     }
+    this.entityData.delete(key);
   }
 
   private handleKeyboardMovement() {
@@ -1360,11 +1440,13 @@ export class GameScene extends Phaser.Scene {
     let closestDistance = Infinity;
 
     this.mapObjectData.forEach(obj => {
-      const objType = this.getObjectProperty(obj, 'type') as string;
+      const interactionType = this.getObjectProperty(obj, 'type');
+      const objType = (typeof interactionType === 'string' ? interactionType : obj.type) ?? '';
       if (!objType || objType === 'spawn' || objType === 'decoration') return;
+      if (obj.type === 'building_entrance') return;
 
-      const objCenterX = obj.x + 8;
-      const objCenterY = obj.y + 8;
+      const objCenterX = obj.x + obj.width / 2;
+      const objCenterY = obj.y + obj.height / 2;
       const distance = Phaser.Math.Distance.Between(playerX, playerY, objCenterX, objCenterY);
 
       if (distance < interactionRadius && distance < closestDistance) {
@@ -1392,6 +1474,7 @@ export class GameScene extends Phaser.Scene {
     this.skillBar?.update(now);
     this.castBar?.update(now);
     this.updateDebugInfoPanel();
+    this.ensureCameraFollowToPlayer();
   }
 
   private updateDebugInfoPanel(): void {
@@ -1404,6 +1487,7 @@ export class GameScene extends Phaser.Scene {
 
     const entities = new Map<string, { x: number; y: number; kind: string }>();
     this.entityData.forEach((entity, id) => {
+      if (entity.kind !== 'human' && entity.kind !== 'agent') return;
       entities.set(id, { x: entity.pos.x, y: entity.pos.y, kind: entity.kind });
     });
 

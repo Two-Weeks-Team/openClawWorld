@@ -484,6 +484,23 @@ function getCommitSha(): string {
   }
 }
 
+function getTrackedMainSha(): string | null {
+  try {
+    return execSync('git rev-parse origin/main', { encoding: 'utf-8' }).trim().substring(0, 8);
+  } catch {
+    return null;
+  }
+}
+
+function refreshTrackedMainSha(): string | null {
+  try {
+    execSync('git fetch origin main --quiet', { stdio: 'pipe' });
+  } catch {
+    // Fall through and use last known tracked SHA if available.
+  }
+  return getTrackedMainSha();
+}
+
 function ensureDir(dir: string): void {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
@@ -725,6 +742,7 @@ class GitHubIssueReporter {
 
   private formatIssueBody(issue: Issue): string {
     const commitSha = getCommitSha();
+    const trackedMainSha = getTrackedMainSha();
     const timestamp = formatTimestamp();
     const evidence = issue.evidence;
 
@@ -793,6 +811,7 @@ class GitHubIssueReporter {
 
     return `## Build Info
 - Commit SHA: ${commitSha}
+- Tracked origin/main SHA: ${trackedMainSha ?? 'unknown'}
 - Timestamp: ${timestamp}
 
 ## Environment
@@ -2660,6 +2679,10 @@ class ResidentAgentLoop {
   async run(): Promise<void> {
     this.printBanner();
 
+    if (!(await this.ensureRunningLatestMain())) {
+      return;
+    }
+
     if (!(await this.checkServerHealth())) {
       console.error('❌ Server not reachable. Please start the server first.');
       await this.reportDeployIssue('Server unreachable');
@@ -2727,6 +2750,22 @@ class ResidentAgentLoop {
     };
 
     await this.issueReporter.createIssue(issue);
+  }
+
+  private async ensureRunningLatestMain(): Promise<boolean> {
+    const runningSha = getCommitSha();
+    const trackedMainSha = refreshTrackedMainSha();
+    this.state.lastCommitSha = runningSha;
+    saveState(this.state);
+
+    if (!trackedMainSha || runningSha === trackedMainSha) {
+      return true;
+    }
+
+    const reason = `Resident loop running stale commit (${runningSha}); latest tracked origin/main is ${trackedMainSha}. Please restart loop from latest main.`;
+    console.error(`❌ ${reason}`);
+    await this.reportDeployIssue(reason);
+    return false;
   }
 
   private async initializeAgents(): Promise<void> {

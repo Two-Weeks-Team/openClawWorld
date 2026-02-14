@@ -200,6 +200,7 @@ const INTERACTION_HISTORY_MAX_LENGTH = 50;
 const ACTION_LOG_MAX_LENGTH = 20;
 const REREGISTER_MAX_ATTEMPTS = 3;
 const REREGISTER_RETRY_DELAY_MS = 500;
+const RECOVERABLE_UNREGISTER_STATUS_CODES = new Set([401, 403, 404]);
 
 const HIGH_ERROR_RATE_ROLLING_WINDOW = 50;
 const HIGH_ERROR_RATE_MIN_CALLS = 20;
@@ -1207,21 +1208,33 @@ class IssueDetector {
   detectStuckAgent(agents: ResidentAgent[]): Issue | null {
     for (const agent of agents) {
       const state = agent.getState();
+      const detectorKey = `stuckAgent:${state.agentId || `unregistered:${agent.getInstanceId()}`}`;
 
-      if (state.role === 'afk') continue;
+      if (state.role === 'afk' || !state.agentId || !state.sessionToken) {
+        this.resetConsecutive(detectorKey);
+        continue;
+      }
 
       const timeSinceLastAction = Date.now() - state.lastActionTime;
-      if (timeSinceLastAction <= STUCK_AGENT_IDLE_THRESHOLD_MS) continue;
+      if (timeSinceLastAction <= STUCK_AGENT_IDLE_THRESHOLD_MS) {
+        this.resetConsecutive(detectorKey);
+        continue;
+      }
 
       const recentHistory = state.apiCallHistory.slice(-STUCK_AGENT_MIN_API_CALLS * 2);
-      if (recentHistory.length < STUCK_AGENT_MIN_API_CALLS) continue;
+      if (recentHistory.length < STUCK_AGENT_MIN_API_CALLS) {
+        this.resetConsecutive(detectorKey);
+        continue;
+      }
 
       const recentFailures = recentHistory.filter(h => !h.success).length;
       const recentFailRate = recentFailures / recentHistory.length;
 
-      if (recentFailRate < STUCK_AGENT_RECENT_FAIL_RATE_THRESHOLD) continue;
+      if (recentFailRate < STUCK_AGENT_RECENT_FAIL_RATE_THRESHOLD) {
+        this.resetConsecutive(detectorKey);
+        continue;
+      }
 
-      const detectorKey = `stuckAgent:${state.agentId}`;
       const consecutive = this.incrementConsecutive(detectorKey);
       if (consecutive < STUCK_AGENT_CONSECUTIVE_REQUIRED) continue;
 
@@ -1862,6 +1875,7 @@ class ResidentAgent {
   private serverUrl: string;
   private running = false;
   private cycleDelayMs: number;
+  private readonly instanceId = randomBytes(4).toString('hex');
 
   constructor(serverUrl: string, role: AgentRole, cycleDelayMs: number) {
     this.serverUrl = serverUrl;
@@ -1889,6 +1903,10 @@ class ResidentAgent {
 
   getState(): AgentState {
     return this.state;
+  }
+
+  getInstanceId(): string {
+    return this.instanceId;
   }
 
   async register(roomId: string): Promise<boolean> {
@@ -2583,6 +2601,7 @@ class ResidentAgent {
     }
 
     const startMs = Date.now();
+    const currentAgentId = this.state.agentId;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/unregister`, {
         method: 'POST',
@@ -2596,15 +2615,32 @@ class ResidentAgent {
         }),
       });
 
-      if (!response.ok) throw new Error(`Unregister failed: ${response.status}`);
+      if (!response.ok) {
+        if (RECOVERABLE_UNREGISTER_STATUS_CODES.has(response.status)) {
+          this.recordApiCall('unregister', startMs, true);
+          this.clearRegistrationState();
+          this.state.lastAction = `unregister(recovered:${response.status})`;
+          console.warn(
+            `[${currentAgentId}] Unregister returned ${response.status}; continuing with local state reset`
+          );
+          return;
+        }
+        throw new Error(`Unregister failed: ${response.status}`);
+      }
+
       this.recordApiCall('unregister', startMs, true);
-      this.state.sessionToken = '';
-      this.state.agentId = '';
+      this.clearRegistrationState();
       this.state.lastAction = 'unregister';
     } catch (error) {
       this.recordApiCall('unregister', startMs, false);
       throw error;
     }
+  }
+
+  private clearRegistrationState(): void {
+    this.state.sessionToken = '';
+    this.state.agentId = '';
+    this.state.eventCursor = null;
   }
 
   private async ensureRegistered(roomId: string): Promise<void> {
@@ -2630,7 +2666,16 @@ class ResidentAgent {
   }
 
   private async reregister(roomId: string): Promise<void> {
-    await this.unregister();
+    const priorAgentId = this.state.agentId;
+    try {
+      await this.unregister();
+    } catch (error) {
+      console.warn(
+        `[${priorAgentId || 'unknown'}] Unregister failed during reregister; retrying register path: ${String(error)}`
+      );
+      this.clearRegistrationState();
+    }
+
     await sleep(REREGISTER_RETRY_DELAY_MS);
 
     for (let attempt = 1; attempt <= REREGISTER_MAX_ATTEMPTS; attempt++) {

@@ -223,6 +223,7 @@ const POSITION_DESYNC_VIOLATIONS_OUT_OF_THREE = 2;
 
 const CHAT_MISMATCH_RECENT_OBSERVE_WINDOW_MS = 20000;
 const CHAT_MISMATCH_OVERLAP_WINDOW_MS = 30000;
+const CHAT_MISMATCH_MAX_OBSERVE_SKEW_MS = 5000;
 const CHAT_MISMATCH_JACCARD_DIFF_THRESHOLD = 0.4;
 const CHAT_MISMATCH_CONSECUTIVE_REQUIRED = 2;
 
@@ -1118,6 +1119,9 @@ class IssueDetector {
         for (let j = i + 1; j < channelAgents.length; j++) {
           const a1 = channelAgents[i];
           const a2 = channelAgents[j];
+          const observeSkewMs = Math.abs(a1.lastChatObserve - a2.lastChatObserve);
+          if (observeSkewMs > CHAT_MISMATCH_MAX_OBSERVE_SKEW_MS) continue;
+
           const commonCutoff = Math.min(a1.latestTs, a2.latestTs);
 
           if (commonCutoff <= 0) continue;
@@ -1160,10 +1164,13 @@ class IssueDetector {
             frequency: 'sometimes',
             evidence: {
               agentIds: [a1.agentId, a2.agentId],
-              timestamps: [now, a1.latestTs, a2.latestTs],
+              timestamps: [now, a1.latestTs, a2.latestTs, a1.lastChatObserve, a2.lastChatObserve],
               logs: [
                 `Channel: ${channel}`,
                 `Comparable cutoff: ${commonCutoff}`,
+                `Observe skew(ms): ${observeSkewMs}`,
+                `Agent ${a1.agentId} last chatObserve: ${a1.lastChatObserve}`,
+                `Agent ${a2.agentId} last chatObserve: ${a2.lastChatObserve}`,
                 `Jaccard diff: ${Math.round(jaccardDiff * 100)}%`,
                 `Agent ${a1.agentId}: ${set1.size} messages`,
                 `Agent ${a2.agentId}: ${set2.size} messages`,

@@ -10,7 +10,10 @@ interface ChatMessage {
 interface AgentChatData {
   messages: ChatMessage[];
   latestTs: number;
+  lastChatObserve?: number;
 }
+
+const CHAT_MISMATCH_MAX_OBSERVE_SKEW_MS = 5000;
 
 function detectChatMismatch(
   agentChatData: Map<string, AgentChatData>
@@ -37,6 +40,16 @@ function detectChatMismatch(
 
   for (let i = 0; i < agentIds.length; i++) {
     for (let j = i + 1; j < agentIds.length; j++) {
+      const data1 = agentChatData.get(agentIds[i])!;
+      const data2 = agentChatData.get(agentIds[j])!;
+      const observeSkew = Math.abs(
+        (data1.lastChatObserve ?? data1.latestTs) - (data2.lastChatObserve ?? data2.latestTs)
+      );
+
+      if (observeSkew > CHAT_MISMATCH_MAX_OBSERVE_SKEW_MS) {
+        continue;
+      }
+
       const set1 = filteredSets.get(agentIds[i])!;
       const set2 = filteredSets.get(agentIds[j])!;
 
@@ -179,6 +192,51 @@ describe('Chat Mismatch Detection', () => {
       const result = detectChatMismatch(agentChatData);
       expect(result).not.toBeNull();
       expect(result!.hasMismatch).toBe(false);
+    });
+  });
+
+  describe('Observe skew guard', () => {
+    it('should skip comparison when chatObserve timestamps are too far apart', () => {
+      const agentChatData = new Map<string, AgentChatData>();
+
+      agentChatData.set('agent_a', {
+        messages: [
+          { from: 'user1', message: 'Hello', timestamp: 1000, channel: 'global' },
+          { from: 'user2', message: 'World', timestamp: 1001, channel: 'global' },
+        ],
+        latestTs: 1001,
+        lastChatObserve: 1001,
+      });
+
+      agentChatData.set('agent_b', {
+        messages: [{ from: 'user1', message: 'Different', timestamp: 1000, channel: 'global' }],
+        latestTs: 1001,
+        lastChatObserve: 7001,
+      });
+
+      const result = detectChatMismatch(agentChatData);
+      expect(result).not.toBeNull();
+      expect(result!.hasMismatch).toBe(false);
+    });
+
+    it('should still detect mismatch when observe skew is within threshold', () => {
+      const agentChatData = new Map<string, AgentChatData>();
+
+      agentChatData.set('agent_a', {
+        messages: [{ from: 'user1', message: 'Hello', timestamp: 1000, channel: 'global' }],
+        latestTs: 1000,
+        lastChatObserve: 1000,
+      });
+
+      agentChatData.set('agent_b', {
+        messages: [{ from: 'user1', message: 'Different', timestamp: 1000, channel: 'global' }],
+        latestTs: 1000,
+        lastChatObserve: 1200,
+      });
+
+      const result = detectChatMismatch(agentChatData);
+      expect(result).not.toBeNull();
+      expect(result!.hasMismatch).toBe(true);
     });
   });
 

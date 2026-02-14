@@ -198,6 +198,8 @@ const INTERACTION_FAILURE_THRESHOLD = 4;
 const API_HISTORY_MAX_LENGTH = 100;
 const INTERACTION_HISTORY_MAX_LENGTH = 50;
 const ACTION_LOG_MAX_LENGTH = 20;
+const REREGISTER_MAX_ATTEMPTS = 3;
+const REREGISTER_RETRY_DELAY_MS = 500;
 
 const HIGH_ERROR_RATE_ROLLING_WINDOW = 50;
 const HIGH_ERROR_RATE_MIN_CALLS = 20;
@@ -1934,6 +1936,8 @@ class ResidentAgent {
   }
 
   private async performRoleBehavior(): Promise<void> {
+    await this.ensureRegistered('default');
+
     const lastObserveIdx = this.state.actionLog.lastIndexOf('observe');
     if (
       lastObserveIdx === -1 ||
@@ -2140,18 +2144,7 @@ class ResidentAgent {
 
     if (role === 'chaos') {
       candidates.push({
-        action: async () => {
-          await this.unregister();
-          await sleep(500);
-          await this.register('default');
-          this.state.observedEntities.clear();
-          this.state.observedFacilities.clear();
-          this.state.interactionHistory = [];
-          this.state.actionLog = [];
-          this.state.eventCursor = null;
-          this.state.errorCount = 0;
-          await this.observe();
-        },
+        action: async () => this.reregister('default'),
         weight: 0.08 * this.computeNoveltyMultiplier('chaos:reregister'),
         label: 'chaos:reregister',
         category: 'lifecycle',
@@ -2566,6 +2559,10 @@ class ResidentAgent {
   }
 
   private async unregister(): Promise<void> {
+    if (!this.state.agentId || !this.state.sessionToken) {
+      return;
+    }
+
     const startMs = Date.now();
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/unregister`, {
@@ -2582,11 +2579,56 @@ class ResidentAgent {
 
       if (!response.ok) throw new Error(`Unregister failed: ${response.status}`);
       this.recordApiCall('unregister', startMs, true);
+      this.state.sessionToken = '';
+      this.state.agentId = '';
       this.state.lastAction = 'unregister';
     } catch (error) {
       this.recordApiCall('unregister', startMs, false);
       throw error;
     }
+  }
+
+  private async ensureRegistered(roomId: string): Promise<void> {
+    if (this.state.agentId && this.state.sessionToken) {
+      return;
+    }
+
+    const registered = await this.register(roomId);
+    if (!registered) {
+      this.state.lastAction = 'register(retry:failed)';
+      throw new Error('Agent is not registered and automatic re-register failed');
+    }
+  }
+
+  private resetAfterReregister(): void {
+    this.state.observedEntities.clear();
+    this.state.observedFacilities.clear();
+    this.state.chatHistory = [];
+    this.state.interactionHistory = [];
+    this.state.actionLog = [];
+    this.state.eventCursor = null;
+    this.state.errorCount = 0;
+  }
+
+  private async reregister(roomId: string): Promise<void> {
+    await this.unregister();
+    await sleep(REREGISTER_RETRY_DELAY_MS);
+
+    for (let attempt = 1; attempt <= REREGISTER_MAX_ATTEMPTS; attempt++) {
+      const registered = await this.register(roomId);
+      if (registered) {
+        this.resetAfterReregister();
+        await this.observe();
+        return;
+      }
+
+      if (attempt < REREGISTER_MAX_ATTEMPTS) {
+        await sleep(REREGISTER_RETRY_DELAY_MS * attempt);
+      }
+    }
+
+    this.state.lastAction = 'reregister(failed)';
+    throw new Error(`Failed to re-register after ${REREGISTER_MAX_ATTEMPTS} attempts`);
   }
 }
 

@@ -2192,8 +2192,9 @@ class ResidentAgent {
     }
 
     const isStarving = observedFacilities.size === 0 && observedEntities.size === 0;
+    const wanderLabel = isStarving ? 'navigate:wander:starvation' : 'navigate:wander';
     const baseWanderWeight =
-      this.getRolePreference('wander') * this.computeNoveltyMultiplier('navigate:wander');
+      this.getRolePreference('wander') * this.computeNoveltyMultiplier(wanderLabel);
     const wanderWeight = isStarving
       ? Math.max(baseWanderWeight * STARVATION_WANDER_BOOST, STARVATION_MIN_WANDER_WEIGHT)
       : baseWanderWeight;
@@ -2205,7 +2206,7 @@ class ResidentAgent {
     candidates.push({
       action: () => this.moveTo(tx, ty),
       weight: wanderWeight,
-      label: isStarving ? 'navigate:wander:starvation' : 'navigate:wander',
+      label: wanderLabel,
       category: 'navigate',
     });
 

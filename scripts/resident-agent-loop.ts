@@ -149,6 +149,9 @@ interface ApiCallRecord {
   timestamp: number;
   success: boolean;
   responseTime: number;
+  httpStatusCode?: number;
+  errorMessage?: string;
+  errorCode?: string;
 }
 
 interface InteractionRecord {
@@ -1294,6 +1297,21 @@ class IssueDetector {
       const fingerprint = this.generateFingerprint('Performance', 'highErrorRate', 'global');
       if (this.isOnCooldown(fingerprint)) return null;
 
+      const sampleErrors: string[] = [];
+      for (const agent of agents.slice(0, 5)) {
+        const recentFails = agent
+          .getState()
+          .apiCallHistory.filter(h => !h.success && h.errorMessage)
+          .slice(-3);
+        for (const fail of recentFails) {
+          sampleErrors.push(
+            `[${fail.endpoint}] ${fail.errorCode ?? 'unknown'}: ${fail.errorMessage ?? 'no message'} (HTTP ${fail.httpStatusCode ?? '?'})`
+          );
+          if (sampleErrors.length >= 10) break;
+        }
+        if (sampleErrors.length >= 10) break;
+      }
+
       return {
         area: 'Performance',
         title: 'High error rate detected across agents',
@@ -1306,11 +1324,16 @@ class IssueDetector {
         evidence: {
           agentIds: agents.map(a => a.getState().agentId),
           timestamps: [Date.now()],
-          logs: agents.map(a => {
-            const h = a.getState().apiCallHistory.slice(-HIGH_ERROR_RATE_ROLLING_WINDOW);
-            const fails = h.filter(x => !x.success).length;
-            return `${a.getState().agentId}: ${fails}/${h.length} recent failures`;
-          }),
+          logs: [
+            ...agents.slice(0, 30).map(a => {
+              const h = a.getState().apiCallHistory.slice(-HIGH_ERROR_RATE_ROLLING_WINDOW);
+              const fails = h.filter(x => !x.success).length;
+              return `${a.getState().agentId}: ${fails}/${h.length} recent failures`;
+            }),
+            '',
+            '--- Sample Error Messages ---',
+            ...(sampleErrors.length > 0 ? sampleErrors : ['No error details captured']),
+          ],
         },
       };
     } else {
@@ -2234,12 +2257,18 @@ class ResidentAgent {
     return candidates;
   }
 
-  private recordApiCall(endpoint: string, startMs: number, success: boolean): void {
+  private recordApiCall(
+    endpoint: string,
+    startMs: number,
+    success: boolean,
+    errorDetails?: { httpStatusCode?: number; errorMessage?: string; errorCode?: string }
+  ): void {
     this.state.apiCallHistory.push({
       endpoint,
       timestamp: Date.now(),
       success,
       responseTime: Date.now() - startMs,
+      ...errorDetails,
     });
     if (this.state.apiCallHistory.length > API_HISTORY_MAX_LENGTH) {
       this.state.apiCallHistory.shift();
@@ -2248,6 +2277,7 @@ class ResidentAgent {
 
   private async observe(): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/observe`, {
         method: 'POST',
@@ -2263,6 +2293,7 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`Observe failed: ${response.status}`);
 
       const result = await response.json();
@@ -2301,13 +2332,23 @@ class ResidentAgent {
       this.recordApiCall('observe', startMs, true);
       this.state.lastAction = 'observe';
     } catch (error) {
-      this.recordApiCall('observe', startMs, false);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      this.recordApiCall('observe', startMs, false, {
+        httpStatusCode: httpStatus,
+        errorMessage: errMsg,
+        errorCode: httpStatus
+          ? httpStatus >= 500
+            ? 'server_error'
+            : 'client_error'
+          : 'network_error',
+      });
       throw error;
     }
   }
 
   private async moveTo(tx: number, ty: number): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/moveTo`, {
         method: 'POST',
@@ -2323,17 +2364,28 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`Move failed: ${response.status}`);
       this.recordApiCall('moveTo', startMs, true);
       this.state.lastAction = `moveTo(${tx}, ${ty})`;
     } catch (error) {
-      this.recordApiCall('moveTo', startMs, false);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      this.recordApiCall('moveTo', startMs, false, {
+        httpStatusCode: httpStatus,
+        errorMessage: errMsg,
+        errorCode: httpStatus
+          ? httpStatus >= 500
+            ? 'server_error'
+            : 'client_error'
+          : 'network_error',
+      });
       throw error;
     }
   }
 
   private async chat(message: string, channel = 'global'): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/chatSend`, {
         method: 'POST',
@@ -2350,17 +2402,28 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`Chat failed: ${response.status}`);
       this.recordApiCall('chatSend', startMs, true);
       this.state.lastAction = `chat("${message.substring(0, 20)}...")`;
     } catch (error) {
-      this.recordApiCall('chatSend', startMs, false);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      this.recordApiCall('chatSend', startMs, false, {
+        httpStatusCode: httpStatus,
+        errorMessage: errMsg,
+        errorCode: httpStatus
+          ? httpStatus >= 500
+            ? 'server_error'
+            : 'client_error'
+          : 'network_error',
+      });
       throw error;
     }
   }
 
   private async chatObserve(): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/chatObserve`, {
         method: 'POST',
@@ -2375,6 +2438,7 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`ChatObserve failed: ${response.status}`);
 
       const result = await response.json();
@@ -2396,7 +2460,16 @@ class ResidentAgent {
       }
       this.recordApiCall('chatObserve', startMs, true);
     } catch (error) {
-      this.recordApiCall('chatObserve', startMs, false);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      this.recordApiCall('chatObserve', startMs, false, {
+        httpStatusCode: httpStatus,
+        errorMessage: errMsg,
+        errorCode: httpStatus
+          ? httpStatus >= 500
+            ? 'server_error'
+            : 'client_error'
+          : 'network_error',
+      });
       throw error;
     }
   }
@@ -2407,6 +2480,7 @@ class ResidentAgent {
     params?: Record<string, unknown>
   ): Promise<string> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/interact`, {
         method: 'POST',
@@ -2424,6 +2498,7 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`Interact failed: ${response.status}`);
 
       const result = await response.json();
@@ -2436,7 +2511,16 @@ class ResidentAgent {
       this.state.lastAction = `interact(${targetId}, ${action})`;
       return outcome;
     } catch (error) {
-      this.recordApiCall('interact', startMs, false);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      this.recordApiCall('interact', startMs, false, {
+        httpStatusCode: httpStatus,
+        errorMessage: errMsg,
+        errorCode: httpStatus
+          ? httpStatus >= 500
+            ? 'server_error'
+            : 'client_error'
+          : 'network_error',
+      });
       throw error;
     }
   }

@@ -1325,14 +1325,15 @@ class IssueDetector {
           agentIds: agents.map(a => a.getState().agentId),
           timestamps: [Date.now()],
           logs: [
-            ...agents.slice(0, 30).map(a => {
+            '--- Sample Error Messages ---',
+            ...(sampleErrors.length > 0 ? sampleErrors : ['No error details captured']),
+            '',
+            '--- Agent Failure Summary ---',
+            ...agents.slice(0, 15).map(a => {
               const h = a.getState().apiCallHistory.slice(-HIGH_ERROR_RATE_ROLLING_WINDOW);
               const fails = h.filter(x => !x.success).length;
               return `${a.getState().agentId}: ${fails}/${h.length} recent failures`;
             }),
-            '',
-            '--- Sample Error Messages ---',
-            ...(sampleErrors.length > 0 ? sampleErrors : ['No error details captured']),
           ],
         },
       };
@@ -2257,6 +2258,24 @@ class ResidentAgent {
     return candidates;
   }
 
+  private classifyErrorCode(
+    httpStatus: number | undefined
+  ): 'network_error' | 'server_error' | 'client_error' {
+    if (!httpStatus) return 'network_error';
+    return httpStatus >= 500 ? 'server_error' : 'client_error';
+  }
+
+  private buildErrorDetails(
+    httpStatus: number | undefined,
+    error: unknown
+  ): { httpStatusCode?: number; errorMessage: string; errorCode: string } {
+    return {
+      httpStatusCode: httpStatus,
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorCode: this.classifyErrorCode(httpStatus),
+    };
+  }
+
   private recordApiCall(
     endpoint: string,
     startMs: number,
@@ -2527,6 +2546,7 @@ class ResidentAgent {
 
   private async pollEvents(waitMs = 0): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const requestBody: Record<string, unknown> = {
         agentId: this.state.agentId,
@@ -2552,6 +2572,7 @@ class ResidentAgent {
         body: JSON.stringify(requestBody),
       });
 
+      httpStatus = response.status;
       if (!response.ok) {
         const errorBody = await response.text();
         const errorDetail = {
@@ -2579,7 +2600,7 @@ class ResidentAgent {
       this.recordApiCall('pollEvents', startMs, true);
       this.state.lastAction = 'pollEvents';
     } catch (error) {
-      this.recordApiCall('pollEvents', startMs, false);
+      this.recordApiCall('pollEvents', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }
@@ -2591,6 +2612,7 @@ class ResidentAgent {
     department?: string;
   }): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/profile/update`, {
         method: 'POST',
@@ -2605,18 +2627,25 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`ProfileUpdate failed: ${response.status}`);
       if (fields.status) this.state.profileStatus = fields.status;
       this.recordApiCall('profileUpdate', startMs, true);
       this.state.lastAction = `profileUpdate(${fields.status ?? 'fields'})`;
     } catch (error) {
-      this.recordApiCall('profileUpdate', startMs, false);
+      this.recordApiCall(
+        'profileUpdate',
+        startMs,
+        false,
+        this.buildErrorDetails(httpStatus, error)
+      );
       throw error;
     }
   }
 
   private async skillList(category?: string): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/skill/list`, {
         method: 'POST',
@@ -2631,6 +2660,7 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`SkillList failed: ${response.status}`);
 
       const result = await response.json();
@@ -2642,13 +2672,14 @@ class ResidentAgent {
       this.recordApiCall('skillList', startMs, true);
       this.state.lastAction = 'skillList';
     } catch (error) {
-      this.recordApiCall('skillList', startMs, false);
+      this.recordApiCall('skillList', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }
 
   private async skillInstall(skillId: string): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/skill/install`, {
         method: 'POST',
@@ -2664,6 +2695,7 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`SkillInstall failed: ${response.status}`);
       if (!this.state.installedSkills.includes(skillId)) {
         this.state.installedSkills.push(skillId);
@@ -2671,7 +2703,7 @@ class ResidentAgent {
       this.recordApiCall('skillInstall', startMs, true);
       this.state.lastAction = `skillInstall(${skillId})`;
     } catch (error) {
-      this.recordApiCall('skillInstall', startMs, false);
+      this.recordApiCall('skillInstall', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }
@@ -2683,6 +2715,7 @@ class ResidentAgent {
     params?: Record<string, unknown>
   ): Promise<void> {
     const startMs = Date.now();
+    let httpStatus: number | undefined;
     try {
       const response = await fetch(`${this.serverUrl}/aic/v0.1/skill/invoke`, {
         method: 'POST',
@@ -2701,11 +2734,12 @@ class ResidentAgent {
         }),
       });
 
+      httpStatus = response.status;
       if (!response.ok) throw new Error(`SkillInvoke failed: ${response.status}`);
       this.recordApiCall('skillInvoke', startMs, true);
       this.state.lastAction = `skillInvoke(${skillId}:${actionId})`;
     } catch (error) {
-      this.recordApiCall('skillInvoke', startMs, false);
+      this.recordApiCall('skillInvoke', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }

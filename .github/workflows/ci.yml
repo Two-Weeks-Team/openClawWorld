@@ -31,7 +31,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules
@@ -86,7 +86,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules
@@ -121,7 +121,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules
@@ -157,7 +157,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules
@@ -246,7 +246,7 @@ jobs:
 
       - name: Cache node_modules
         if: steps.check-map.outputs.map_changed == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules
@@ -298,7 +298,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules

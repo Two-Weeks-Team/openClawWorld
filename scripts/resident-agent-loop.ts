@@ -192,6 +192,11 @@ const TILE_SIZE = 16;
 const MAX_CYCLES_WITHOUT_OBSERVE = 2;
 const NAVIGATE_WEIGHT_DAMPENING = 0.5;
 const ENTITY_APPROACH_WEIGHT_DAMPENING = 0.3;
+const STARVATION_WANDER_BOOST = 10;
+const STARVATION_MIN_WANDER_WEIGHT = 0.5;
+const MAP_CENTER_X = 32;
+const MAP_CENTER_Y = 32;
+const STARVATION_WANDER_SPREAD = 16;
 const INTERACTION_HISTORY_WINDOW = 10;
 const MIN_INTERACTIONS_FOR_FAILURE_DETECTION = 5;
 const INTERACTION_FAILURE_THRESHOLD = 4;
@@ -2038,6 +2043,22 @@ class ResidentAgent {
     return 0.1;
   }
 
+  private computeCenterBiasedWanderTarget(): { tx: number; ty: number } {
+    const tx = Math.floor(MAP_CENTER_X + (Math.random() - 0.5) * 2 * STARVATION_WANDER_SPREAD);
+    const ty = Math.floor(MAP_CENTER_Y + (Math.random() - 0.5) * 2 * STARVATION_WANDER_SPREAD);
+    return {
+      tx: Math.max(0, Math.min(63, tx)),
+      ty: Math.max(0, Math.min(63, ty)),
+    };
+  }
+
+  private computeRandomWanderTarget(): { tx: number; ty: number } {
+    return {
+      tx: Math.floor(Math.random() * 64),
+      ty: Math.floor(Math.random() * 64),
+    };
+  }
+
   private generateRoleChat(): string {
     const messages = ROLE_CHAT_MESSAGES[this.state.role];
     return messages[Math.floor(Math.random() * messages.length)];
@@ -2170,12 +2191,22 @@ class ResidentAgent {
       });
     }
 
-    const tx = Math.floor(Math.random() * 64);
-    const ty = Math.floor(Math.random() * 64);
+    const isStarving = observedFacilities.size === 0 && observedEntities.size === 0;
+    const wanderLabel = isStarving ? 'navigate:wander:starvation' : 'navigate:wander';
+    const baseWanderWeight =
+      this.getRolePreference('wander') * this.computeNoveltyMultiplier(wanderLabel);
+    const wanderWeight = isStarving
+      ? Math.max(baseWanderWeight * STARVATION_WANDER_BOOST, STARVATION_MIN_WANDER_WEIGHT)
+      : baseWanderWeight;
+
+    const { tx, ty } = isStarving
+      ? this.computeCenterBiasedWanderTarget()
+      : this.computeRandomWanderTarget();
+
     candidates.push({
       action: () => this.moveTo(tx, ty),
-      weight: this.getRolePreference('wander') * this.computeNoveltyMultiplier('navigate:wander'),
-      label: 'navigate:wander',
+      weight: wanderWeight,
+      label: wanderLabel,
       category: 'navigate',
     });
 

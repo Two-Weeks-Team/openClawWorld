@@ -13,6 +13,28 @@
     "Cursor": { "type": "string", "pattern": "^[A-Za-z0-9=_-]{1,256}$" },
     "TsMs": { "type": "integer", "minimum": 0 },
 
+    "RegisterRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roomId", "name"],
+      "properties": {
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "agentId": { "type": "string", "minLength": 1, "maxLength": 64, "description": "Optional custom agent ID" }
+      }
+    },
+
+    "RegisterResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "sessionToken"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "sessionToken": { "type": "string", "pattern": "^tok_[A-Za-z0-9_-]{32,64}$" }
+      }
+    },
+
     "Vec2": {
       "type": "object",
       "additionalProperties": false,
@@ -99,7 +121,7 @@
       }
     },
 
-    "EntityKind": { "type": "string", "enum": ["human", "agent", "object"] },
+    "EntityKind": { "type": "string", "enum": ["human", "agent", "npc", "object"] },
 
     "EntityBase": {
       "type": "object",

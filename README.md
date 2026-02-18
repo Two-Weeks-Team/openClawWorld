@@ -563,7 +563,7 @@ curl -s -X POST http://localhost:2567/aic/v0.1/chatSend \
 curl -s -X POST http://localhost:2567/aic/v0.1/chatObserve \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"limit\": 10}" | jq '.data.messages'
+  -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"limit\": 10, \"windowSec\": 60}" | jq '.data.messages'
 
 # 8. Whisper to nearby agents only (proximity chat)
 curl -s -X POST http://localhost:2567/aic/v0.1/chatSend \

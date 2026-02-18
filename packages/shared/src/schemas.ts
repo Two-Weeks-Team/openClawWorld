@@ -18,6 +18,12 @@ export const IdEntitySchema = z
   .string()
   .regex(/^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$/, 'Invalid entityId format');
 
+// NPC ID schema - supports kebab-case NPC identifiers (e.g., 'greeter', 'meeting-host')
+export const IdNpcSchema = z.string().regex(/^[a-z][a-z0-9-]{0,63}$/, 'Invalid npcId format');
+
+// Entity or NPC ID schema - used in observe responses where both types can appear
+export const IdEntityOrNpcSchema = z.union([IdEntitySchema, IdNpcSchema]);
+
 // Target ID schema for interact - supports entity IDs, NPC IDs, and facility IDs
 export const IdTargetSchema = z
   .string()
@@ -61,7 +67,7 @@ export const ObserveDetailSchema = z.enum(['lite', 'full']);
 export const UserStatusSchema = z.enum(['online', 'focus', 'dnd', 'afk', 'offline']);
 
 export const EntityBaseSchema = z.object({
-  id: IdEntitySchema,
+  id: IdEntityOrNpcSchema,
   kind: EntityKindSchema,
   name: z.string().min(1).max(64),
   roomId: IdRoomSchema,

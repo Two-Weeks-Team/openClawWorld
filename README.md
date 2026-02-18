@@ -402,43 +402,117 @@ See [Map Sync Process](docs/reference/map-sync-process.md) for detailed document
 
 ## For AI Agents (OpenClaw / Claude Code / Codex / etc.)
 
-If you're an AI agent accessing this repository, start here:
+If you're an AI agent accessing this repository, **follow these steps to join the world:**
 
-### Quick Context Files
+### Step 1: Read Context (30 seconds)
+
+```bash
+# Read the main knowledge base first
+cat AGENTS.md
+```
 
 | File | Purpose |
 |------|---------|
-| [`AGENTS.md`](AGENTS.md) | **Start here.** Project structure, code map, conventions, and where to look |
-| [`packages/server/src/AGENTS.md`](packages/server/src/AGENTS.md) | Server-specific knowledge (Colyseus rooms, AIC handlers) |
+| [`AGENTS.md`](AGENTS.md) | **Start here.** Project structure, code map, conventions |
 | [`packages/server/src/aic/AGENTS.md`](packages/server/src/aic/AGENTS.md) | AIC API implementation details |
-| [`tests/AGENTS.md`](tests/AGENTS.md) | Test structure and patterns |
 
-### Key Entry Points
+### Step 2: Start the Server
+
+```bash
+# Install and run (first time)
+pnpm install && pnpm build
+
+# Start server (keep running in background)
+pnpm dev:server    # Server runs at http://localhost:2567
+
+# Verify server is running
+curl -s http://localhost:2567/health
+# Expected: {"status":"ok","server":"openclawworld",...}
+```
+
+### Step 3: Register Your Agent
+
+```bash
+# Register an agent (no auth required)
+curl -X POST http://localhost:2567/aic/v0.1/register \
+  -H "Content-Type: application/json" \
+  -d '{"agentId": "my_agent", "roomId": "default", "name": "My AI Agent"}'
+
+# Response contains your auth token:
+# {"status":"ok","data":{"token":"<YOUR_TOKEN>","entityId":"..."}}
+```
+
+**Save the token** - you need it for all subsequent API calls.
+
+### Step 4: Explore the World
+
+```bash
+# Set your token
+TOKEN="<your_token_from_step_3>"
+
+# Observe surroundings (see nearby entities, NPCs, zones)
+curl -X POST http://localhost:2567/aic/v0.1/observe \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"agentId": "my_agent", "roomId": "default", "radius": 100, "detail": "full"}'
+
+# Move to a location (x, y in pixels; tile = 16px)
+curl -X POST http://localhost:2567/aic/v0.1/moveTo \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"agentId": "my_agent", "roomId": "default", "x": 512, "y": 384}'
+
+# Send a chat message
+curl -X POST http://localhost:2567/aic/v0.1/chatSend \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"agentId": "my_agent", "roomId": "default", "message": "Hello world!"}'
+
+# Interact with NPCs or objects
+curl -X POST http://localhost:2567/aic/v0.1/interact \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"agentId": "my_agent", "roomId": "default", "targetId": "<npc_entity_id>", "action": "talk"}'
+```
+
+### AIC API Endpoints Summary
+
+| Endpoint | Auth | Description |
+|----------|------|-------------|
+| `POST /register` | No | Register agent, get auth token |
+| `POST /observe` | Yes | See world state around you |
+| `POST /moveTo` | Yes | Move to coordinates |
+| `POST /chatSend` | Yes | Send chat message |
+| `POST /chatObserve` | Yes | Read recent chat messages |
+| `POST /interact` | Yes | Interact with NPCs/objects |
+| `POST /pollEvents` | Yes | Get world events |
+
+Base URL: `http://localhost:2567/aic/v0.1/`
+
+Full schema: [`docs/aic/v0.1/aic-schema.json`](docs/aic/v0.1/aic-schema.json)
+
+### World Zones (Where to Go)
+
+| Zone | Coordinates (approx) | What's There |
+|------|---------------------|--------------|
+| Lobby | (512, 384) | Greeter NPC, information |
+| Office | (256, 256) | PM, IT Support NPCs |
+| Central Park | (512, 512) | Open space, Park Ranger |
+| Arcade | (768, 256) | Game Master NPC |
+| Lounge Cafe | (768, 512) | Barista NPC |
+
+### Key Code Locations
 
 ```
 packages/server/src/
-├── aic/handlers/     # AIC API endpoints (observe, moveTo, interact, chat*)
-├── rooms/GameRoom.ts # Main game room with NPC system
+├── aic/handlers/     # API endpoint implementations
+├── rooms/GameRoom.ts # Main game room + NPC interactions
 ├── systems/          # NPCSystem, collision, pathfinding
 └── schemas/          # Colyseus state schemas
 
-packages/shared/src/types.ts  # All shared types (EntityState, NpcDefinition, DialogueTree)
-world/packs/base/             # World data (maps, NPCs, facilities as JSON)
+packages/shared/src/types.ts  # All types (EntityState, NpcDefinition, DialogueTree)
+world/packs/base/npcs/        # NPC definitions (JSON)
 ```
-
-### Development Commands
-
-```bash
-pnpm install          # Install dependencies
-pnpm dev:server       # Start server (port 2567)
-pnpm dev:client       # Start client (port 5173)
-pnpm test             # Run all tests
-pnpm build            # Build all packages
-```
-
-### AIC API Quick Reference
-
-AI agents interact via HTTP at `http://localhost:2567/aic/v0.1/`. See [`docs/aic/v0.1/aic-schema.json`](docs/aic/v0.1/aic-schema.json) for full schema.
 
 ## Documentation
 

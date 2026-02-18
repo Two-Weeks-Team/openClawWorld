@@ -63,6 +63,7 @@ interface AgentState {
   interactionHistory: InteractionRecord[];
   actionLog: string[];
   cycleCount: number;
+  consecutiveAuthErrors: number;
   // Detailed error tracking for issue reporting
   lastError?: {
     endpoint: string;
@@ -209,6 +210,8 @@ const ACTION_LOG_MAX_LENGTH = 20;
 const REREGISTER_MAX_ATTEMPTS = 3;
 const REREGISTER_RETRY_DELAY_MS = 500;
 const RECOVERABLE_UNREGISTER_STATUS_CODES = new Set([401, 403, 404]);
+const AUTH_ERROR_STATUS_CODES = new Set([401, 403]);
+const MAX_CONSECUTIVE_AUTH_ERRORS = 3;
 
 const HIGH_ERROR_RATE_ROLLING_WINDOW = 50;
 const HIGH_ERROR_RATE_MIN_CALLS = 20;
@@ -1927,6 +1930,7 @@ class ResidentAgent {
       interactionHistory: [],
       actionLog: [],
       cycleCount: 0,
+      consecutiveAuthErrors: 0,
     };
   }
 
@@ -1974,13 +1978,57 @@ class ResidentAgent {
       try {
         await this.performRoleBehavior();
         this.state.lastActionTime = Date.now();
+        this.state.consecutiveAuthErrors = 0;
       } catch (error) {
         this.state.errorCount++;
         console.error(`[${this.state.agentId}] Error:`, error);
+
+        if (this.isAuthError(error)) {
+          this.state.consecutiveAuthErrors++;
+          console.warn(
+            `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
+          );
+
+          if (this.state.consecutiveAuthErrors <= MAX_CONSECUTIVE_AUTH_ERRORS) {
+            try {
+              await this.reregister('default');
+              console.log(`[${this.state.agentId}] Re-registration successful after auth error`);
+              this.state.consecutiveAuthErrors = 0;
+            } catch (reregisterError) {
+              console.error(`[${this.state.agentId}] Re-registration failed:`, reregisterError);
+              const backoffMs = this.cycleDelayMs * Math.pow(2, this.state.consecutiveAuthErrors);
+              await sleep(backoffMs);
+            }
+          } else {
+            console.error(
+              `[${this.state.agentId}] Max consecutive auth errors reached, skipping re-registration`
+            );
+          }
+        }
       }
 
       await sleep(this.cycleDelayMs);
     }
+  }
+
+  private isAuthError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message;
+    // Pattern: "Observe failed: 401", "Move failed: 403"
+    const statusMatch = message.match(/failed:\s*(\d{3})/i);
+    if (statusMatch) {
+      const statusCode = parseInt(statusMatch[1], 10);
+      return AUTH_ERROR_STATUS_CODES.has(statusCode);
+    }
+
+    const lowerMessage = message.toLowerCase();
+    return (
+      lowerMessage.includes('unauthorized') ||
+      lowerMessage.includes('authentication') ||
+      lowerMessage.includes('invalid token') ||
+      lowerMessage.includes('expired token')
+    );
   }
 
   stop(): void {

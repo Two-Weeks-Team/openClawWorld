@@ -281,7 +281,7 @@ Analyzed 5 Kenney asset packs to identify all assets needed for the 8 game zones
 ```json
 {
   "version": "1.0.0",
-  "generated": "2025-02-13",
+  "generated": "2026-02-18",
   "sources": {
     "city": "Roguelike City Pack/Tilemap/tilemap_packed.png",
     "interior": "Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png",

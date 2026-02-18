@@ -13,6 +13,10 @@ Based on reference image: `grid_town_layout.png`
 | Map Size (tiles) | 64 x 64 |
 | Actual Map Size (px) | 1024 x 1024 |
 
+> **Coordinate System Note:** All pixel coordinates in this document use the **2048x2048 reference image** coordinate space. To convert to in-game (1024x1024) coordinates:
+> - `game_px = reference_px × 0.5`
+> - Example: Reference (1024, 800) → Game (512, 400)
+
 ## Zone Boundaries (8 Zones)
 
 | Zone | Zone ID | Pixel X | Pixel Y | Width | Height | Description |

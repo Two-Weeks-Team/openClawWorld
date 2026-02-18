@@ -346,6 +346,8 @@ const ROLE_PREFERENCES: Record<AgentRole, Record<string, number>> = {
     cafe_counter: 0.2,
     'entity:approach': 0.2,
     profileUpdate: 0.15,
+    vending_machine: 0.1,
+    signpost: 0.08,
     pollEvents: 0.1,
     navigate: 0.1,
     skillList: 0.03,
@@ -2440,7 +2442,7 @@ class ResidentAgent {
     } else {
       if (prefs[facilityTypeOrKey] !== undefined) return prefs[facilityTypeOrKey];
     }
-    return 0.01;
+    return 0.05;
   }
 
   private computeNoveltyMultiplier(label: string): number {

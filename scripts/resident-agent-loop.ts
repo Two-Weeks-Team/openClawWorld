@@ -63,6 +63,7 @@ interface AgentState {
   interactionHistory: InteractionRecord[];
   actionLog: string[];
   cycleCount: number;
+  consecutiveAuthErrors: number;
   currentMissionIndex: number;
   currentStepIndex: number;
   stepCyclesRemaining: number;
@@ -211,6 +212,8 @@ const ACTION_LOG_MAX_LENGTH = 20;
 const REREGISTER_MAX_ATTEMPTS = 3;
 const REREGISTER_RETRY_DELAY_MS = 500;
 const RECOVERABLE_UNREGISTER_STATUS_CODES = new Set([401, 403, 404]);
+const AUTH_ERROR_STATUS_CODES = new Set([401]);
+const MAX_CONSECUTIVE_AUTH_ERRORS = 3;
 
 const HIGH_ERROR_RATE_ROLLING_WINDOW = 50;
 const HIGH_ERROR_RATE_MIN_CALLS = 20;
@@ -2260,6 +2263,7 @@ class ResidentAgent {
       interactionHistory: [],
       actionLog: [],
       cycleCount: 0,
+      consecutiveAuthErrors: 0,
       currentMissionIndex: Math.floor(Math.random() * ROLE_MISSIONS[role].length),
       currentStepIndex: 0,
       stepCyclesRemaining: ROLE_MISSIONS[role][0]?.steps[0]?.duration ?? 1,
@@ -2310,13 +2314,57 @@ class ResidentAgent {
       try {
         await this.performRoleBehavior();
         this.state.lastActionTime = Date.now();
+        this.state.consecutiveAuthErrors = 0;
       } catch (error) {
         this.state.errorCount++;
         console.error(`[${this.state.agentId}] Error:`, error);
+
+        if (this.isAuthError(error)) {
+          this.state.consecutiveAuthErrors++;
+
+          if (this.state.consecutiveAuthErrors <= MAX_CONSECUTIVE_AUTH_ERRORS) {
+            console.warn(
+              `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
+            );
+            try {
+              await this.reregister('default');
+              console.log(`[${this.state.agentId}] Re-registration successful after auth error`);
+              this.state.consecutiveAuthErrors = 0;
+            } catch (reregisterError) {
+              console.error(`[${this.state.agentId}] Re-registration failed:`, reregisterError);
+              const baseBackoffMs =
+                REREGISTER_RETRY_DELAY_MS * Math.pow(2, this.state.consecutiveAuthErrors);
+              const jitter = baseBackoffMs * 0.25 * (Math.random() * 2 - 1);
+              await sleep(baseBackoffMs + jitter);
+            }
+          } else {
+            console.error(
+              `[${this.state.agentId}] Max consecutive auth errors reached, stopping agent`
+            );
+            this.running = false;
+            return;
+          }
+        }
       }
 
       await sleep(this.cycleDelayMs);
     }
+  }
+
+  private isAuthError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message;
+    // Pattern: "Observe failed: 401", "Move failed: 401"
+    const statusMatch = message.match(/failed:\s*(\d{3})/i);
+    if (statusMatch) {
+      const statusCode = parseInt(statusMatch[1], 10);
+      return AUTH_ERROR_STATUS_CODES.has(statusCode);
+    }
+
+    // Only rely on status code matching; avoid broad string patterns
+    // that could false-positive on unrelated error messages
+    return false;
   }
 
   stop(): void {
@@ -2478,7 +2526,7 @@ class ResidentAgent {
   private buildCandidates(): ActionCandidate[] {
     const candidates: ActionCandidate[] = [];
     const { observedFacilities, observedEntities, position, role } = this.state;
-    
+
     this.advanceMissionStep();
 
     candidates.push({
@@ -2490,14 +2538,20 @@ class ResidentAgent {
 
     candidates.push({
       action: () => this.pollEvents(),
-      weight: this.getRolePreference('pollEvents') * this.computeNoveltyMultiplier('pollEvents') * this.getMissionBoost('pollEvents'),
+      weight:
+        this.getRolePreference('pollEvents') *
+        this.computeNoveltyMultiplier('pollEvents') *
+        this.getMissionBoost('pollEvents'),
       label: 'pollEvents',
       category: 'observe',
     });
 
     candidates.push({
       action: () => this.chatObserve(),
-      weight: this.getRolePreference('chatObserve') * this.computeNoveltyMultiplier('chatObserve') * this.getMissionBoost('chatObserve'),
+      weight:
+        this.getRolePreference('chatObserve') *
+        this.computeNoveltyMultiplier('chatObserve') *
+        this.getMissionBoost('chatObserve'),
       label: 'chatObserve',
       category: 'social',
     });
@@ -2559,7 +2613,10 @@ class ResidentAgent {
 
     const chatLabel = `chat:${role}`;
     const chatWeight = this.shouldChatThisCycle()
-      ? this.getRolePreference('chat') * this.computeNoveltyMultiplier(chatLabel) * this.getMissionBoost('chat') * 2.0
+      ? this.getRolePreference('chat') *
+        this.computeNoveltyMultiplier(chatLabel) *
+        this.getMissionBoost('chat') *
+        2.0
       : this.getRolePreference('chat') * this.computeNoveltyMultiplier(chatLabel) * 0.3;
     candidates.push({
       action: () => this.chat(this.generateRoleChat()),
@@ -2571,7 +2628,10 @@ class ResidentAgent {
     const profileLabel = `profileUpdate:${role}`;
     candidates.push({
       action: () => this.profileUpdate({ status: this.pickRoleStatus() }),
-      weight: this.getRolePreference('profileUpdate') * this.computeNoveltyMultiplier(profileLabel) * this.getMissionBoost('profileUpdate'),
+      weight:
+        this.getRolePreference('profileUpdate') *
+        this.computeNoveltyMultiplier(profileLabel) *
+        this.getMissionBoost('profileUpdate'),
       label: profileLabel,
       category: 'profile',
     });

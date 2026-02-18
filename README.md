@@ -405,7 +405,7 @@ See [Map Sync Process](docs/reference/map-sync-process.md) for detailed document
 
 ## For AI Agents (OpenClaw / Claude Code / Codex / etc.)
 
-> **Prompt to use:** "다음 레포지토리의 README 'For AI Agents' 섹션을 따라서 실행 중인 서버에 에이전트로 월드에 접속해봐. https://github.com/Two-Weeks-Team/openClawWorld"
+> **Prompt to use:** "Follow the 'For AI Agents' section in the README of this repository and connect to the running server as an agent to join the world. https://github.com/Two-Weeks-Team/openClawWorld"
 
 ### Step 1: Read Context
 

@@ -510,6 +510,49 @@ function refreshTrackedMainSha(): string | null {
   return getTrackedMainSha();
 }
 
+/**
+ * Check if there are new commits on origin/main and pull if so.
+ * Returns true if updates were pulled (restart needed).
+ */
+function checkForUpdatesAndPull(): boolean {
+  const currentSha = getCommitSha();
+  const remoteSha = refreshTrackedMainSha();
+
+  if (!remoteSha || currentSha === remoteSha) {
+    return false;
+  }
+
+  console.log(`\n🔄 New commits detected: ${currentSha} → ${remoteSha}`);
+  console.log('   Pulling latest code...');
+
+  try {
+    execSync('git pull origin main --ff-only', { stdio: 'inherit' });
+    console.log('   Installing dependencies...');
+    execSync('pnpm install', { stdio: 'inherit' });
+    return true;
+  } catch (err) {
+    console.error('   ❌ Failed to pull/install:', err);
+    return false;
+  }
+}
+
+/**
+ * Restart the process with the same arguments.
+ * This replaces the current process with a fresh one running updated code.
+ */
+function restartProcess(): never {
+  console.log('\n🔄 Restarting with updated code...\n');
+  const args = process.argv.slice(1);
+  // Use execFileSync in a way that replaces this process
+  // We use process.execPath (node/tsx) and pass all original arguments
+  const { execSync: execSyncRestart } = require('child_process');
+  execSyncRestart(`"${process.execPath}" ${args.map(a => `"${a}"`).join(' ')}`, {
+    stdio: 'inherit',
+    shell: true,
+  });
+  process.exit(0);
+}
+
 function ensureDir(dir: string): void {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
@@ -2982,6 +3025,12 @@ class ResidentAgentLoop {
   private async runCycle(): Promise<void> {
     this.state.cycleCount++;
     console.log(`\n--- Cycle ${this.state.cycleCount} ---`);
+
+    if (checkForUpdatesAndPull()) {
+      console.log('   Gracefully stopping agents before restart...');
+      await this.stopGracefully();
+      restartProcess();
+    }
 
     const issue = this.issueDetector.runAllDetections(this.agents);
 

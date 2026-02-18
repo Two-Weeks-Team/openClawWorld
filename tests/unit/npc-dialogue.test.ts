@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { DialogueTree, DialogueNode, NpcDefinition, InteractOutcome } from '@openclawworld/shared';
+import { describe, it, expect } from 'vitest';
+import type { DialogueTree, NpcDefinition } from '@openclawworld/shared';
 
 describe('NPC Dialogue System', () => {
   describe('DialogueTree type', () => {
@@ -102,7 +102,7 @@ describe('NPC Dialogue System', () => {
 
       expect(npcDef.dialogue).toBeDefined();
       expect(Array.isArray(npcDef.dialogue)).toBe(true);
-      expect((npcDef.dialogue as string[])).toHaveLength(3);
+      expect(npcDef.dialogue as string[]).toHaveLength(3);
     });
   });
 
@@ -140,7 +140,10 @@ describe('NPC Dialogue System', () => {
       dialogueStates: Map<string, { npcId: string; currentNodeId: string }>,
       npcId: string,
       optionIndex?: number
-    ): { nodeId: string; text: string; options: { index: number; text: string }[] } | { action: 'end' } | string {
+    ):
+      | { nodeId: string; text: string; options: { index: number; text: string }[] }
+      | { action: 'end' }
+      | string {
       if (!dialogue) {
         return `${npcName}: "Hello there!"`;
       }

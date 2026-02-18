@@ -210,7 +210,7 @@ const ACTION_LOG_MAX_LENGTH = 20;
 const REREGISTER_MAX_ATTEMPTS = 3;
 const REREGISTER_RETRY_DELAY_MS = 500;
 const RECOVERABLE_UNREGISTER_STATUS_CODES = new Set([401, 403, 404]);
-const AUTH_ERROR_STATUS_CODES = new Set([401, 403]);
+const AUTH_ERROR_STATUS_CODES = new Set([401]);
 const MAX_CONSECUTIVE_AUTH_ERRORS = 3;
 
 const HIGH_ERROR_RATE_ROLLING_WINDOW = 50;
@@ -1996,13 +1996,17 @@ class ResidentAgent {
               this.state.consecutiveAuthErrors = 0;
             } catch (reregisterError) {
               console.error(`[${this.state.agentId}] Re-registration failed:`, reregisterError);
-              const backoffMs = this.cycleDelayMs * Math.pow(2, this.state.consecutiveAuthErrors);
-              await sleep(backoffMs);
+              const baseBackoffMs =
+                REREGISTER_RETRY_DELAY_MS * Math.pow(2, this.state.consecutiveAuthErrors);
+              const jitter = baseBackoffMs * 0.25 * (Math.random() * 2 - 1);
+              await sleep(baseBackoffMs + jitter);
             }
           } else {
             console.error(
-              `[${this.state.agentId}] Max consecutive auth errors reached, skipping re-registration`
+              `[${this.state.agentId}] Max consecutive auth errors reached, stopping agent`
             );
+            this.running = false;
+            return;
           }
         }
       }
@@ -2022,13 +2026,9 @@ class ResidentAgent {
       return AUTH_ERROR_STATUS_CODES.has(statusCode);
     }
 
-    const lowerMessage = message.toLowerCase();
-    return (
-      lowerMessage.includes('unauthorized') ||
-      lowerMessage.includes('authentication') ||
-      lowerMessage.includes('invalid token') ||
-      lowerMessage.includes('expired token')
-    );
+    // Only rely on status code matching; avoid broad string patterns
+    // that could false-positive on unrelated error messages
+    return false;
   }
 
   stop(): void {

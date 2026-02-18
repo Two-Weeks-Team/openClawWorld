@@ -394,6 +394,185 @@
         "nextCursor": { "$ref": "#/$defs/Cursor" },
         "serverTsMs": { "$ref": "#/$defs/TsMs" }
       }
+    },
+
+    "SkillCategory": {
+      "type": "string",
+      "enum": ["movement", "combat", "social", "utility"]
+    },
+
+    "SkillEffectDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "durationMs"],
+      "properties": {
+        "id": { "type": "string" },
+        "durationMs": { "type": "integer", "minimum": 0 },
+        "statModifiers": {
+          "type": "object",
+          "properties": {
+            "speedMultiplier": { "type": "number" }
+          }
+        }
+      }
+    },
+
+    "SkillActionParam": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "required", "description"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "required": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+
+    "SkillAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "cooldownMs": { "type": "integer", "minimum": 0 },
+        "castTimeMs": { "type": "integer", "minimum": 0 },
+        "rangeUnits": { "type": "number", "minimum": 0 },
+        "manaCost": { "type": "number", "minimum": 0 },
+        "params": {
+          "oneOf": [
+            { "type": "array", "items": { "$ref": "#/$defs/SkillActionParam" } },
+            { "type": "object", "additionalProperties": true }
+          ]
+        },
+        "effect": { "$ref": "#/$defs/SkillEffectDefinition" }
+      }
+    },
+
+    "SkillSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string", "enum": ["builtin", "plugin", "custom"] },
+        "pluginId": { "type": "string" }
+      }
+    },
+
+    "SkillDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "description", "category", "actions"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "$ref": "#/$defs/SkillCategory" },
+        "version": { "type": "string" },
+        "icon": { "type": "string" },
+        "emoji": { "type": "string" },
+        "source": { "$ref": "#/$defs/SkillSource" },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/SkillAction" } },
+        "passive": { "type": "boolean" },
+        "prerequisites": { "type": "array", "items": { "type": "string" } },
+        "triggers": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "SkillListRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "category": { "$ref": "#/$defs/SkillCategory" },
+        "installed": { "type": "boolean" }
+      }
+    },
+
+    "SkillListResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skills", "serverTsMs"],
+      "properties": {
+        "skills": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/SkillDefinition" }
+        },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" }
+      }
+    },
+
+    "SkillInstallRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "txId", "skillId"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "skillId": { "type": "string" },
+        "credentials": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+
+    "SkillInstallResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skillId", "installed", "alreadyInstalled", "serverTsMs"],
+      "properties": {
+        "skillId": { "type": "string" },
+        "installed": { "type": "boolean" },
+        "alreadyInstalled": { "type": "boolean" },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" }
+      }
+    },
+
+    "SkillInvokeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agentId", "roomId", "txId", "skillId", "actionId"],
+      "properties": {
+        "agentId": { "$ref": "#/$defs/IdAgent" },
+        "roomId": { "$ref": "#/$defs/IdRoom" },
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "skillId": { "type": "string" },
+        "actionId": { "type": "string" },
+        "targetId": { "$ref": "#/$defs/IdEntity" },
+        "params": { "type": "object", "additionalProperties": true }
+      }
+    },
+
+    "SkillInvokeOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["ok", "pending", "cancelled", "error"]
+        },
+        "message": { "type": "string", "maxLength": 2000 },
+        "data": { "type": "object", "additionalProperties": true },
+        "completionTime": { "$ref": "#/$defs/TsMs" }
+      }
+    },
+
+    "SkillInvokeResponseData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["txId", "outcome", "serverTsMs"],
+      "properties": {
+        "txId": { "$ref": "#/$defs/IdTx" },
+        "outcome": { "$ref": "#/$defs/SkillInvokeOutcome" },
+        "serverTsMs": { "$ref": "#/$defs/TsMs" }
+      }
     }
   }
 }

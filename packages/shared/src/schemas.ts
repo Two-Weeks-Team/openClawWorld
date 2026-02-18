@@ -592,6 +592,7 @@ export const SkillInvokeOutcomeSchema = z.object({
   type: SkillInvokeOutcomeTypeSchema,
   message: z.string().max(500).optional(),
   data: z.record(z.string(), z.unknown()).optional(),
+  completionTime: TsMsSchema.optional(),
 });
 
 export const AgentSkillStateSchema = z.object({
@@ -661,10 +662,10 @@ export const SkillListResponseDataSchema = z.object({
 });
 
 export const SkillInstallResponseDataSchema = z.object({
-  txId: IdTxSchema,
-  applied: z.boolean(),
+  skillId: z.string().min(1).max(64),
+  installed: z.boolean(),
+  alreadyInstalled: z.boolean(),
   serverTsMs: TsMsSchema,
-  skillState: AgentSkillStateSchema,
 });
 
 export const SkillInvokeResponseDataSchema = z.object({

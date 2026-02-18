@@ -1001,6 +1001,8 @@ export type SkillInvokeOutcome = {
   type: SkillInvokeOutcomeType;
   message?: string;
   data?: Record<string, unknown>;
+  /** Unix timestamp (ms) when the pending action will complete. Only present when type='pending'. */
+  completionTime?: number;
 };
 
 export type AgentSkillState = {
@@ -1070,10 +1072,10 @@ export type SkillListResponseData = {
 };
 
 export type SkillInstallResponseData = {
-  txId: string;
-  applied: boolean;
+  skillId: string;
+  installed: boolean;
+  alreadyInstalled: boolean;
   serverTsMs: number;
-  skillState: AgentSkillState;
 };
 
 export type SkillInvokeResponseData = {

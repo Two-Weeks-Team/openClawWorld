@@ -14,7 +14,6 @@ import type {
   SkillInstallResponseData,
   SkillInvokeResponseData,
   SkillDefinition,
-  AgentSkillState,
   AicResult,
 } from '@openclawworld/shared';
 
@@ -122,16 +121,11 @@ describe('Skill System Contract Tests', () => {
   describe('Skill Install Endpoint', () => {
     it('installs skill successfully', async () => {
       const txId = TestData.txId();
-      const skillState: AgentSkillState = {
-        skillId: 'slow_aura',
-        installedAt: TestData.timestamp(),
-        enabled: true,
-      };
       const responseData: SkillInstallResponseData = {
-        txId,
-        applied: true,
+        skillId: 'slow_aura',
+        installed: true,
+        alreadyInstalled: false,
         serverTsMs: TestData.timestamp(),
-        skillState,
       };
 
       mockServer.setHandler('/skill/install', () => jsonResponse(createOkResult(responseData)));
@@ -144,9 +138,9 @@ describe('Skill System Contract Tests', () => {
       });
 
       expectOkResult(result);
-      expect(result.data.applied).toBe(true);
-      expect(result.data.skillState.skillId).toBe('slow_aura');
-      expect(result.data.skillState.enabled).toBe(true);
+      expect(result.data.installed).toBe(true);
+      expect(result.data.skillId).toBe('slow_aura');
+      expect(result.data.alreadyInstalled).toBe(false);
     });
 
     it('returns error for non-existent skill', async () => {

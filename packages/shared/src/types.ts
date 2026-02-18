@@ -45,7 +45,7 @@ export type Vec2 = {
   y: number;
 };
 
-export type EntityKind = 'human' | 'agent' | 'object';
+export type EntityKind = 'human' | 'agent' | 'object' | 'npc';
 export type Facing = 'up' | 'down' | 'left' | 'right';
 export type ChatChannel = 'proximity' | 'global' | 'team' | 'meeting' | 'dm';
 export type ObserveDetail = 'lite' | 'full';

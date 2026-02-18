@@ -72,6 +72,7 @@ function getStaticZonesData(gameRoom: GameRoom): {
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import type { EntitySchema } from '../../schemas/EntitySchema.js';
 import type { FacilitySchema } from '../../schemas/FacilitySchema.js';
+import type { NPCSchema } from '../../schemas/NPCSchema.js';
 
 function entityToBase(entity: EntitySchema): EntityBase {
   return {
@@ -209,6 +210,28 @@ export async function handleObserve(req: Request, res: Response): Promise<void> 
         };
 
         nearby.push(observedEntity);
+      }
+    });
+
+    // Add NPCs to nearby entities
+    gameRoom.state.npcs.forEach((npc: NPCSchema) => {
+      const distance = calculateDistance(agentPos.x, agentPos.y, npc.x, npc.y);
+
+      if (distance <= radius) {
+        const observedNpc: ObservedEntity = {
+          entity: {
+            id: npc.id,
+            kind: 'npc' as const,
+            name: npc.name,
+            roomId: gameRoom.state.roomId,
+            pos: { x: npc.x, y: npc.y },
+            facing: npc.facing,
+          },
+          distance: Math.round(distance * 100) / 100,
+          affords: [{ action: 'talk', label: 'Talk' }],
+        };
+
+        nearby.push(observedNpc);
       }
     });
 

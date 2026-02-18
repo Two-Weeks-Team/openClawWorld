@@ -80,6 +80,11 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
 
     gameRoom.state.addEntity(entity);
 
+    const zoneSystem = gameRoom.getZoneSystem();
+    if (zoneSystem) {
+      zoneSystem.updateEntityZone(agentId, spawnX, spawnY, undefined, undefined, entity);
+    }
+
     const eventLog = gameRoom.getEventLog();
     eventLog.append('presence.join', roomId, {
       entityId: agentId,

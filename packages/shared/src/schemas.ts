@@ -18,6 +18,11 @@ export const IdEntitySchema = z
   .string()
   .regex(/^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$/, 'Invalid entityId format');
 
+// Target ID schema for interact - supports entity IDs, NPC IDs, and facility IDs
+export const IdTargetSchema = z
+  .string()
+  .regex(/^[a-zA-Z][a-zA-Z0-9._-]{0,127}$/, 'Invalid targetId format');
+
 export const IdTxSchema = z.string().regex(/^tx_[a-zA-Z0-9._-]{8,128}$/, 'Invalid txId format');
 
 export const IdMessageSchema = z
@@ -45,7 +50,7 @@ export const TileCoordSchema = z.object({
   ty: z.int().min(0).max(100000),
 });
 
-export const EntityKindSchema = z.enum(['human', 'agent', 'object']);
+export const EntityKindSchema = z.enum(['human', 'agent', 'object', 'npc']);
 
 export const FacingSchema = z.enum(['up', 'down', 'left', 'right']);
 
@@ -157,7 +162,7 @@ export const InteractRequestSchema = z.object({
   agentId: IdAgentSchema,
   roomId: IdRoomSchema,
   txId: IdTxSchema,
-  targetId: IdEntitySchema,
+  targetId: IdTargetSchema,
   action: z.string().min(1).max(64),
   params: z.record(z.string(), z.unknown()).optional(),
 });

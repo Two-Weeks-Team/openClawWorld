@@ -646,7 +646,6 @@ export class GameRoom extends Room<{ state: RoomState }> {
           return { type: 'ok', message: 'Teleported' };
         }
         break;
-
     }
 
     return { type: 'invalid_action', message: `No handler for ${action} on ${objectType}` };
@@ -1040,12 +1039,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     let loadedCount = 0;
     for (const npcDef of this.worldPack.npcs) {
-      const npc = new NPCSchema(
-        `npc_${npcDef.id}`,
-        npcDef.id,
-        npcDef.name,
-        npcDef.role
-      );
+      const npc = new NPCSchema(`npc_${npcDef.id}`, npcDef.id, npcDef.name, npcDef.role);
       npc.setZone(npcDef.zone);
       const pos = npcDef.spawnPosition ?? npcDef.defaultPosition ?? { x: 0, y: 0 };
       npc.setPosition(pos.x, pos.y);

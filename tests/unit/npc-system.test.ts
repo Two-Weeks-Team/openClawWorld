@@ -56,9 +56,7 @@ describe('NPCSystem', () => {
         name: 'Jamie the Barista',
         zone: 'lounge-cafe',
         defaultPosition: { x: 300, y: 200 },
-        schedule: [
-          { time: '09:00', state: 'working', location: { x: 300, y: 200 } },
-        ],
+        schedule: [{ time: '09:00', state: 'working', location: { x: 300, y: 200 } }],
       };
 
       npcSystem.registerNPC(npc, definition);
@@ -190,8 +188,18 @@ describe('NPCSystem', () => {
     it('returns all registered NPCs', () => {
       const npc1 = new NPCSchema('npc-1', 'greeter', 'Sam', 'greeter');
       const npc2 = new NPCSchema('npc-2', 'ranger', 'Quinn', 'ranger');
-      const def1: NpcDefinition = { id: 'greeter', name: 'Sam', zone: 'lobby', defaultPosition: { x: 0, y: 0 } };
-      const def2: NpcDefinition = { id: 'ranger', name: 'Quinn', zone: 'central-park', defaultPosition: { x: 0, y: 0 } };
+      const def1: NpcDefinition = {
+        id: 'greeter',
+        name: 'Sam',
+        zone: 'lobby',
+        defaultPosition: { x: 0, y: 0 },
+      };
+      const def2: NpcDefinition = {
+        id: 'ranger',
+        name: 'Quinn',
+        zone: 'central-park',
+        defaultPosition: { x: 0, y: 0 },
+      };
 
       npcSystem.registerNPC(npc1, def1);
       npcSystem.registerNPC(npc2, def2);

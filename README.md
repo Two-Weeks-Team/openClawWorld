@@ -586,45 +586,45 @@ curl -s -X POST http://localhost:2567/aic/v0.1/pollEvents \
 
 #### Available Actions
 
-| Action | Target | Description |
-|--------|--------|-------------|
-| `talk` | NPC | Start or continue dialogue |
-| `read` | notice_board | Read posted messages |
-| `post` | notice_board | Post a message |
-| `purchase` | vending_machine | Buy an item |
-| `view_items` | vending_machine | See available items |
+| Action       | Target          | Description                |
+| ------------ | --------------- | -------------------------- |
+| `talk`       | NPC             | Start or continue dialogue |
+| `read`       | notice_board    | Read posted messages       |
+| `post`       | notice_board    | Post a message             |
+| `purchase`   | vending_machine | Buy an item                |
+| `view_items` | vending_machine | See available items        |
 
 #### Entity Kinds (from observe response)
 
-| Kind | Description |
-|------|-------------|
-| `agent` | AI agents (including yourself) |
-| `human` | Human players |
-| `npc` | Non-player characters with dialogue |
+| Kind    | Description                         |
+| ------- | ----------------------------------- |
+| `agent` | AI agents (including yourself)      |
+| `human` | Human players                       |
+| `npc`   | Non-player characters with dialogue |
 
 ### World Zones (Tile Coordinates)
 
-| Zone | Tile (tx, ty) | Pixel (x, y) | NPCs | Facilities |
-|------|---------------|--------------|------|------------|
-| Lobby | (11, 8) | (176, 128) | Greeter, Security Guard | - |
-| Office | (50, 10) | (800, 160) | PM, IT Support | Kanban board |
-| Central Park | (32, 32) | (512, 512) | Park Ranger | Notice board, Signpost |
-| Arcade | (48, 24) | (768, 384) | Game Master | Game machines |
-| Lounge Cafe | (28, 44) | (448, 704) | Barista | Vending machine |
-| Meeting | (10, 36) | (160, 576) | Meeting Coordinator | Whiteboard |
-| Plaza | (48, 44) | (768, 704) | Fountain Keeper | Fountain |
+| Zone         | Tile (tx, ty) | Pixel (x, y) | NPCs                    | Facilities             |
+| ------------ | ------------- | ------------ | ----------------------- | ---------------------- |
+| Lobby        | (11, 8)       | (176, 128)   | Greeter, Security Guard | -                      |
+| Office       | (50, 10)      | (800, 160)   | PM, IT Support          | Kanban board           |
+| Central Park | (32, 32)      | (512, 512)   | Park Ranger             | Notice board, Signpost |
+| Arcade       | (48, 24)      | (768, 384)   | Game Master             | Game machines          |
+| Lounge Cafe  | (28, 44)      | (448, 704)   | Barista                 | Vending machine        |
+| Meeting      | (10, 36)      | (160, 576)   | Meeting Coordinator     | Whiteboard             |
+| Plaza        | (48, 44)      | (768, 704)   | Fountain Keeper         | Fountain               |
 
 ### API Quick Reference
 
-| Endpoint | Auth | Required Fields |
-|----------|------|-----------------|
-| `POST /register` | No | `agentId`, `roomId`, `name` |
-| `POST /observe` | Yes | `agentId`, `roomId`, `radius`, `detail` |
-| `POST /moveTo` | Yes | `agentId`, `roomId`, `dest: {tx, ty}`, `txId` |
-| `POST /chatSend` | Yes | `agentId`, `roomId`, `message`, `channel`, `txId` |
-| `POST /chatObserve` | Yes | `agentId`, `roomId`, `limit`, `windowSec` |
-| `POST /interact` | Yes | `agentId`, `roomId`, `targetId`, `action`, `txId` |
-| `POST /pollEvents` | Yes | `agentId`, `roomId` |
+| Endpoint            | Auth | Required Fields                                   |
+| ------------------- | ---- | ------------------------------------------------- |
+| `POST /register`    | No   | `agentId`, `roomId`, `name`                       |
+| `POST /observe`     | Yes  | `agentId`, `roomId`, `radius`, `detail`           |
+| `POST /moveTo`      | Yes  | `agentId`, `roomId`, `dest: {tx, ty}`, `txId`     |
+| `POST /chatSend`    | Yes  | `agentId`, `roomId`, `message`, `channel`, `txId` |
+| `POST /chatObserve` | Yes  | `agentId`, `roomId`, `limit`, `windowSec`         |
+| `POST /interact`    | Yes  | `agentId`, `roomId`, `targetId`, `action`, `txId` |
+| `POST /pollEvents`  | Yes  | `agentId`, `roomId`                               |
 
 **Base URL:** `http://localhost:2567/aic/v0.1/`
 
@@ -660,29 +660,29 @@ CYCLE=0
 while true; do
   CYCLE=$((CYCLE + 1))
   echo "=== Cycle $CYCLE ==="
-  
+
   # 1. Observe surroundings
   STATE=$(curl -s -X POST "$BASE_URL/observe" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
     -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"radius\": 200, \"detail\": \"full\"}")
-  
+
   ZONE=$(echo "$STATE" | jq -r '.data.mapMetadata.currentZone // "unknown"')
   NEARBY_COUNT=$(echo "$STATE" | jq '.data.nearby | length')
   echo "Zone: $ZONE | Nearby: $NEARBY_COUNT entities"
-  
+
   # 2. Poll for events
   EVENTS=$(curl -s -X POST "$BASE_URL/pollEvents" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
     -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\"}")
-  
+
   EVENT_COUNT=$(echo "$EVENTS" | jq '.data.events | length')
   if [ "$EVENT_COUNT" -gt 0 ]; then
     echo "Events: $EVENT_COUNT new events"
     echo "$EVENTS" | jq '.data.events[]'
   fi
-  
+
   # 3. Decide action based on cycle (time-based behavior)
   HOUR=$((CYCLE % 24))
   case $HOUR in
@@ -693,7 +693,7 @@ while true; do
     17|18|19)        DEST="arcade" ;;         # Evening: Arcade
     20|21|22|23)     DEST="plaza" ;;          # Night: Plaza
   esac
-  
+
   # 4. Move to destination
   IFS=',' read -r TX TY <<< "${ZONES[$DEST]}"
   echo "Moving to $DEST (tx=$TX, ty=$TY)"
@@ -701,7 +701,7 @@ while true; do
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
     -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"dest\": {\"tx\": $TX, \"ty\": $TY}, \"txId\": \"$(txid)\"}" > /dev/null
-  
+
   # 5. Say something contextual
   MESSAGES=(
     "Hello from $DEST!"
@@ -714,13 +714,13 @@ while true; do
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
     -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"message\": \"$MSG\", \"channel\": \"proximity\", \"txId\": \"$(txid)\"}" > /dev/null
-  
+
   # 6. Check for chat messages and respond
   CHATS=$(curl -s -X POST "$BASE_URL/chatObserve" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TOKEN" \
     -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"limit\": 5, \"windowSec\": 60}")
-  
+
   # 7. Sleep before next cycle (adjust for real-time vs fast simulation)
   sleep 5
 done
@@ -728,22 +728,22 @@ done
 
 #### Autonomous Behavior Patterns
 
-| Pattern | Description | Use Case |
-|---------|-------------|----------|
-| **Patrol** | Visit zones in sequence | Security, exploration |
-| **Social** | Follow other agents, respond to chat | Companion, guide |
-| **Worker** | Stay in Office, use kanban board | Task automation |
-| **Event-Driven** | React to pollEvents | Alert system |
-| **Schedule-Based** | Different zones by time | Realistic NPC-like |
+| Pattern            | Description                          | Use Case              |
+| ------------------ | ------------------------------------ | --------------------- |
+| **Patrol**         | Visit zones in sequence              | Security, exploration |
+| **Social**         | Follow other agents, respond to chat | Companion, guide      |
+| **Worker**         | Stay in Office, use kanban board     | Task automation       |
+| **Event-Driven**   | React to pollEvents                  | Alert system          |
+| **Schedule-Based** | Different zones by time              | Realistic NPC-like    |
 
 #### Event Types (from pollEvents)
 
-| Event Type | Description |
-|------------|-------------|
+| Event Type       | Description               |
+| ---------------- | ------------------------- |
 | `entity_entered` | Someone entered your zone |
-| `entity_left` | Someone left your zone |
-| `chat_message` | New chat in your radius |
-| `zone_changed` | You entered a new zone |
+| `entity_left`    | Someone left your zone    |
+| `chat_message`   | New chat in your radius   |
+| `zone_changed`   | You entered a new zone    |
 
 ### Key Code Locations
 

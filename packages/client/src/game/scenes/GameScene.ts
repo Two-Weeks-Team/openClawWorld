@@ -1,6 +1,11 @@
 import Phaser from 'phaser';
 import { Callbacks } from '@colyseus/sdk';
-import { gameClient, type Entity, type NPC, type InteractResult } from '../../network/ColyseusClient';
+import {
+  gameClient,
+  type Entity,
+  type NPC,
+  type InteractResult,
+} from '../../network/ColyseusClient';
 import { EventNotificationPanel, EVENT_COLORS } from '../../ui/EventNotificationPanel';
 import { Minimap } from '../../ui/Minimap';
 import { ZoneBanner } from '../../ui/ZoneBanner';

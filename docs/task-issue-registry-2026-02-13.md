@@ -58,14 +58,18 @@
 3. 이후 P1 처리: `005 -> 007 -> 011 -> 012 -> 015 -> 016 -> 017 -> 018`
 4. 각 이슈는 `Registered -> In Progress -> Done` 상태 전환 후 다음 이슈로 이동
 
-## GitHub Issue Links
+## Local Issue IDs
 
-1. `OCW-CONSIST-013`: https://github.com/Two-Weeks-Team/openClawWorld/issues/245
-2. `OCW-CONSIST-014`: https://github.com/Two-Weeks-Team/openClawWorld/issues/246
-3. `OCW-CONSIST-015`: https://github.com/Two-Weeks-Team/openClawWorld/issues/247
-4. `OCW-CONSIST-016`: https://github.com/Two-Weeks-Team/openClawWorld/issues/248
-5. `OCW-CONSIST-017`: https://github.com/Two-Weeks-Team/openClawWorld/issues/249
-6. `OCW-CONSIST-018`: https://github.com/Two-Weeks-Team/openClawWorld/issues/250
+> **Note**: These are internal tracking IDs. GitHub issues were not created for these tasks.
+
+| Local ID | Description | Status |
+|----------|-------------|--------|
+| `OCW-CONSIST-013` | Map-client-server consistency verification | Pending |
+| `OCW-CONSIST-014` | World loader defaults (64x64/16) fallback | Pending |
+| `OCW-CONSIST-015` | Map change routine documentation | Pending |
+| `OCW-CONSIST-016` | Zone boundary validation | Pending |
+| `OCW-CONSIST-017` | NPC position verification | Pending |
+| `OCW-CONSIST-018` | Facility coordinate consistency | Pending |
 
 ## 검증 규칙
 

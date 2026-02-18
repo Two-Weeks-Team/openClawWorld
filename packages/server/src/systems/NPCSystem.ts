@@ -4,8 +4,8 @@ import { EventLog } from '../events/EventLog.js';
 import type { NpcState, NpcDefinition, Facing } from '@openclawworld/shared';
 
 export interface NPCScheduleEntry {
-  hour: number;
-  minute: number;
+  startHour: number;
+  endHour: number;
   state: NpcState;
   targetX?: number;
   targetY?: number;
@@ -28,14 +28,25 @@ export class NPCSystem {
 
     if (definition.schedule) {
       const scheduleEntries: NPCScheduleEntry[] = definition.schedule.map(entry => {
-        const [hour, minute] = entry.time.split(':').map(Number);
-        return {
-          hour,
-          minute,
-          state: entry.state,
-          targetX: entry.location?.x,
-          targetY: entry.location?.y,
-        };
+        if ('startHour' in entry && 'endHour' in entry) {
+          return {
+            startHour: entry.startHour,
+            endHour: entry.endHour,
+            state: entry.state,
+            targetX: entry.position?.x,
+            targetY: entry.position?.y,
+          };
+        } else if ('time' in entry) {
+          const [hour] = entry.time.split(':').map(Number);
+          return {
+            startHour: hour,
+            endHour: hour + 1,
+            state: entry.state,
+            targetX: entry.location?.x,
+            targetY: entry.location?.y,
+          };
+        }
+        return { startHour: 0, endHour: 24, state: 'idle' as NpcState };
       });
       this.schedules.set(npc.id, scheduleEntries);
     }
@@ -74,17 +85,16 @@ export class NPCSystem {
     const schedule = this.schedules.get(npc.id);
     if (schedule) {
       const gameHour = Math.floor((gameTimeMs / 60000) % 24);
-      const gameMinute = Math.floor((gameTimeMs / 1000) % 60);
 
       for (const entry of schedule) {
-        if (entry.hour === gameHour && entry.minute === gameMinute) {
-          if (npc.currentState !== entry.state) {
-            this.transition(npc.id, entry.state, eventLog, roomId);
+        const isInTimeRange = gameHour >= entry.startHour && gameHour < entry.endHour;
+        if (isInTimeRange && npc.currentState !== entry.state) {
+          this.transition(npc.id, entry.state, eventLog, roomId);
 
-            if (entry.targetX !== undefined && entry.targetY !== undefined) {
-              this.targetPositions.set(npc.id, { x: entry.targetX, y: entry.targetY });
-            }
+          if (entry.targetX !== undefined && entry.targetY !== undefined) {
+            this.targetPositions.set(npc.id, { x: entry.targetX, y: entry.targetY });
           }
+          break;
         }
       }
     }

@@ -3,10 +3,12 @@ import { Client, Room } from '@colyseus/sdk';
 import type appConfig from '../../../server/src/app.config.js';
 import type { GameRoom } from '../../../server/src/rooms/GameRoom.js';
 import type { EntitySchema } from '../../../server/src/schemas/EntitySchema.js';
+import type { NPCSchema } from '../../../server/src/schemas/NPCSchema.js';
 import type { RoomState } from '../../../server/src/schemas/RoomState.js';
 import type { SkillDefinition, SkillInvokeOutcome, InteractOutcome } from '@openclawworld/shared';
 
 export type Entity = EntitySchema;
+export type NPC = NPCSchema;
 export type { RoomState, GameRoom };
 
 export type SkillInvokeResult = {

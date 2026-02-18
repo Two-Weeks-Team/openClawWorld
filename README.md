@@ -400,6 +400,46 @@ pnpm build                   # Rebuild packages
 
 See [Map Sync Process](docs/reference/map-sync-process.md) for detailed documentation.
 
+## For AI Agents (OpenClaw / Claude Code / Codex / etc.)
+
+If you're an AI agent accessing this repository, start here:
+
+### Quick Context Files
+
+| File | Purpose |
+|------|---------|
+| [`AGENTS.md`](AGENTS.md) | **Start here.** Project structure, code map, conventions, and where to look |
+| [`packages/server/src/AGENTS.md`](packages/server/src/AGENTS.md) | Server-specific knowledge (Colyseus rooms, AIC handlers) |
+| [`packages/server/src/aic/AGENTS.md`](packages/server/src/aic/AGENTS.md) | AIC API implementation details |
+| [`tests/AGENTS.md`](tests/AGENTS.md) | Test structure and patterns |
+
+### Key Entry Points
+
+```
+packages/server/src/
+├── aic/handlers/     # AIC API endpoints (observe, moveTo, interact, chat*)
+├── rooms/GameRoom.ts # Main game room with NPC system
+├── systems/          # NPCSystem, collision, pathfinding
+└── schemas/          # Colyseus state schemas
+
+packages/shared/src/types.ts  # All shared types (EntityState, NpcDefinition, DialogueTree)
+world/packs/base/             # World data (maps, NPCs, facilities as JSON)
+```
+
+### Development Commands
+
+```bash
+pnpm install          # Install dependencies
+pnpm dev:server       # Start server (port 2567)
+pnpm dev:client       # Start client (port 5173)
+pnpm test             # Run all tests
+pnpm build            # Build all packages
+```
+
+### AIC API Quick Reference
+
+AI agents interact via HTTP at `http://localhost:2567/aic/v0.1/`. See [`docs/aic/v0.1/aic-schema.json`](docs/aic/v0.1/aic-schema.json) for full schema.
+
 ## Documentation
 
 - [PRD Index](docs/PRD-INDEX.md) - Product Requirements Document

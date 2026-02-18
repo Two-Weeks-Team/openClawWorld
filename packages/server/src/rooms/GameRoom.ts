@@ -1,5 +1,6 @@
 import { Room, type Client } from 'colyseus';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { RoomState } from '../schemas/RoomState.js';
 import { EntitySchema } from '../schemas/EntitySchema.js';
 import { GameMap } from '../schemas/GameMap.js';
@@ -24,6 +25,7 @@ import { NPCSystem } from '../systems/NPCSystem.js';
 import { FacilityService } from '../services/FacilityService.js';
 import { registerAllFacilityHandlers, FACILITY_AFFORDANCES } from '../facilities/index.js';
 import { FacilitySchema } from '../schemas/FacilitySchema.js';
+import { NPCSchema } from '../schemas/NPCSchema.js';
 import { PermissionService } from '../services/PermissionService.js';
 import { SafetyService } from '../services/SafetyService.js';
 import { AuditLog } from '../audit/AuditLog.js';
@@ -33,6 +35,7 @@ import type {
   ZoneId,
   SkillDefinition,
   InteractOutcome,
+  DialogueTree,
 } from '@openclawworld/shared';
 import { DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
@@ -40,7 +43,14 @@ import { WorldPackLoader, WorldPackError, type WorldPack } from '../world/WorldP
 import { SkillService } from '../services/SkillService.js';
 
 const DEFAULT_NPC_SEED = 12345;
-const DEFAULT_WORLD_PACK_PATH = resolve(process.cwd(), 'world/packs/base');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const DEFAULT_WORLD_PACK_PATH = resolve(__dirname, '../../../../world/packs/base');
+
+type DialogueState = {
+  npcId: string;
+  currentNodeId: string;
+};
 
 export class GameRoom extends Room<{ state: RoomState }> {
   declare state: RoomState;
@@ -71,6 +81,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   private staleAgentCleanupInterval: NodeJS.Timeout | null = null;
   private skillService: SkillService | null = null;
   private spawnPoint: { x: number; y: number; tx: number; ty: number } = { ...DEFAULT_SPAWN_POINT };
+  private dialogueStates: Map<string, DialogueState> = new Map();
 
   constructor() {
     super();
@@ -91,7 +102,6 @@ export class GameRoom extends Room<{ state: RoomState }> {
     packPath?: string;
   }): void {
     const roomId = options.roomId ?? 'default';
-    const mapId = options.mapId ?? 'village';
     const tickRate = options.tickRate ?? 20;
     const packPath = options.packPath ?? DEFAULT_WORLD_PACK_PATH;
 
@@ -99,7 +109,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     let gameMap: GameMap | undefined;
 
+    // Load world pack first to get entryZone for default mapId
     this.loadWorldPack(packPath);
+    const mapId = options.mapId ?? this.worldPack?.manifest.entryZone ?? 'central-park';
 
     try {
       const parsedMap = this.loadMapFromPackOrFallback(mapId);
@@ -131,6 +143,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     this.facilityService = new FacilityService(this.state);
     registerAllFacilityHandlers(this.facilityService);
     this.loadFacilitiesFromWorldPack();
+    this.loadNpcsFromWorldPack();
     this.permissionService = new PermissionService(this.state);
     this.skillService = new SkillService(this.state);
     this.registerBuiltinSkills();
@@ -382,6 +395,22 @@ export class GameRoom extends Room<{ state: RoomState }> {
       return outcome;
     }
 
+    const targetNpc = this.state.npcs.get(targetId);
+    if (targetNpc && this.npcSystem) {
+      const distance = this.calculateDistance(
+        agentEntity.pos.x,
+        agentEntity.pos.y,
+        targetNpc.x,
+        targetNpc.y
+      );
+
+      if (distance > DEFAULT_PROXIMITY_RADIUS) {
+        return { type: 'too_far', message: `NPC '${targetNpc.name}' is too far away` };
+      }
+
+      return this.handleNpcInteraction(agentId, targetNpc.id, action, params);
+    }
+
     const targetEntity = this.state.getEntity(targetId);
 
     if (!targetEntity) {
@@ -425,6 +454,118 @@ export class GameRoom extends Room<{ state: RoomState }> {
     }
 
     return outcome;
+  }
+
+  private handleNpcInteraction(
+    agentId: string,
+    npcId: string,
+    action: string,
+    params: Record<string, unknown>
+  ): InteractOutcome {
+    if (!this.npcSystem) {
+      return { type: 'invalid_action', message: 'NPC system not initialized' };
+    }
+
+    const npc = this.state.npcs.get(npcId);
+    const npcDef = this.npcSystem.getDefinition(npcId);
+
+    if (!npc || !npcDef) {
+      return { type: 'invalid_action', message: `NPC '${npcId}' not found` };
+    }
+
+    if (action === 'talk') {
+      return this.handleNpcTalk(agentId, npc.id, npc.name, npcDef.dialogue, params);
+    }
+
+    return { type: 'invalid_action', message: `Unknown action '${action}' for NPC` };
+  }
+
+  private handleNpcTalk(
+    agentId: string,
+    npcId: string,
+    npcName: string,
+    dialogue: DialogueTree | string[] | undefined,
+    params: Record<string, unknown>
+  ): InteractOutcome {
+    if (!dialogue) {
+      return { type: 'ok', message: `${npcName}: "Hello there!"` };
+    }
+
+    if (Array.isArray(dialogue)) {
+      const randomIndex = Math.floor(Math.random() * dialogue.length);
+      return { type: 'ok', message: `${npcName}: "${dialogue[randomIndex]}"` };
+    }
+
+    const dialogueState = this.dialogueStates.get(agentId);
+    const optionIndex = typeof params.option === 'number' ? params.option : undefined;
+
+    if (optionIndex !== undefined && dialogueState && dialogueState.npcId === npcId) {
+      const currentNode = dialogue[dialogueState.currentNodeId];
+      if (currentNode && currentNode.options[optionIndex]) {
+        const selectedOption = currentNode.options[optionIndex];
+        const nextNodeId = selectedOption.next;
+
+        if (nextNodeId === null) {
+          this.dialogueStates.delete(agentId);
+          return {
+            type: 'ok',
+            message: JSON.stringify({
+              npcName,
+              npcId,
+              action: 'end',
+              selectedOption: selectedOption.text,
+            }),
+          };
+        }
+
+        const nextNode = dialogue[nextNodeId];
+        if (nextNode) {
+          this.dialogueStates.set(agentId, { npcId, currentNodeId: nextNodeId });
+          return {
+            type: 'ok',
+            message: JSON.stringify({
+              npcName,
+              npcId,
+              nodeId: nextNodeId,
+              text: nextNode.text,
+              options: nextNode.options.map((opt, idx) => ({ index: idx, text: opt.text })),
+            }),
+          };
+        }
+      }
+    }
+
+    const greetingNode = dialogue['greeting'];
+    if (!greetingNode) {
+      const firstKey = Object.keys(dialogue)[0];
+      const firstNode = firstKey ? dialogue[firstKey] : undefined;
+      if (firstNode) {
+        this.dialogueStates.set(agentId, { npcId, currentNodeId: firstKey });
+        return {
+          type: 'ok',
+          message: JSON.stringify({
+            npcName,
+            npcId,
+            nodeId: firstKey,
+            text: firstNode.text,
+            options: firstNode.options.map((opt, idx) => ({ index: idx, text: opt.text })),
+          }),
+        };
+      }
+      return { type: 'ok', message: `${npcName}: "..."` };
+    }
+
+    this.dialogueStates.set(agentId, { npcId, currentNodeId: 'greeting' });
+    return {
+      type: 'ok',
+      message: JSON.stringify({
+        npcName,
+        npcId,
+        nodeId: 'greeting',
+        text: greetingNode.text,
+        options: greetingNode.options.map((opt, idx) => ({ index: idx, text: opt.text })),
+      }),
+    };
   }
 
   private handleObjectInteraction(
@@ -506,13 +647,6 @@ export class GameRoom extends Room<{ state: RoomState }> {
         }
         break;
 
-      case 'npc':
-        if (action === 'talk') {
-          const npcName = target.meta.get('name') || 'Stranger';
-          const dialogue = target.meta.get('dialogue') || 'Hello there!';
-          return { type: 'ok', message: `${npcName}: "${dialogue}"` };
-        }
-        break;
     }
 
     return { type: 'invalid_action', message: `No handler for ${action} on ${objectType}` };
@@ -897,5 +1031,33 @@ export class GameRoom extends Room<{ state: RoomState }> {
     }
 
     console.log(`[GameRoom] Registered ${loadedCount} facilities from world pack`);
+  }
+
+  private loadNpcsFromWorldPack(): void {
+    if (!this.worldPack) {
+      return;
+    }
+
+    let loadedCount = 0;
+    for (const npcDef of this.worldPack.npcs) {
+      const npc = new NPCSchema(
+        `npc_${npcDef.id}`,
+        npcDef.id,
+        npcDef.name,
+        npcDef.role
+      );
+      npc.setZone(npcDef.zone);
+      const pos = npcDef.spawnPosition ?? npcDef.defaultPosition ?? { x: 0, y: 0 };
+      npc.setPosition(pos.x, pos.y);
+      this.state.addNPC(npc);
+
+      if (this.npcSystem) {
+        this.npcSystem.registerNPC(npc, npcDef);
+      }
+
+      loadedCount++;
+    }
+
+    console.log(`[GameRoom] Registered ${loadedCount} NPCs from world pack`);
   }
 }

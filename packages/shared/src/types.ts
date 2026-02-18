@@ -811,18 +811,42 @@ export type NpcRole =
   | 'tutorial_guide'
   | 'quest_giver'
   | 'meeting_host'
-  | 'arcade_host';
+  | 'arcade_host'
+  | 'greeter'
+  | 'ranger'
+  | 'fountain_keeper';
 
-export type NpcState = 'idle' | 'walking' | 'talking' | 'working' | 'break';
+export type NpcState = 'idle' | 'walking' | 'talking' | 'working' | 'break' | 'patrolling';
+
+// Dialogue system types
+export type DialogueOption = {
+  text: string;
+  next: string | null; // null = end conversation
+};
+
+export type DialogueNode = {
+  id: string;
+  text: string;
+  options: DialogueOption[];
+};
+
+export type DialogueTree = Record<string, DialogueNode>;
+
+// Schedule entry: supports both time-based ("HH:MM") and hour-range formats
+export type NpcScheduleEntry =
+  | { time: string; state: NpcState; location?: Vec2 }
+  | { startHour: number; endHour: number; state: NpcState; position?: Vec2 };
 
 export type NpcDefinition = {
   id: string;
   name: string;
-  role: NpcRole;
+  role?: NpcRole;
+  sprite?: string;
   zone: ZoneId;
-  spawnPosition: Vec2;
-  dialogue: string[];
-  schedule?: Array<{ time: string; state: NpcState; location?: Vec2 }>;
+  spawnPosition?: Vec2;
+  defaultPosition?: Vec2;
+  dialogue?: DialogueTree | string[];
+  schedule?: NpcScheduleEntry[];
 };
 
 // Facilities

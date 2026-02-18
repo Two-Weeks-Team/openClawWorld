@@ -16,6 +16,17 @@
       "value": "grid_town"
     }
   ],
+  "npcs": [
+    "greeter",
+    "security",
+    "office-pm",
+    "it-help",
+    "meeting-host",
+    "barista",
+    "arcade-host",
+    "ranger",
+    "fountain-keeper"
+  ],
   "layers": [
     {
       "id": 1,

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Callbacks } from '@colyseus/sdk';
-import { gameClient, type Entity, type InteractResult } from '../../network/ColyseusClient';
+import { gameClient, type Entity, type NPC, type InteractResult } from '../../network/ColyseusClient';
 import { EventNotificationPanel, EVENT_COLORS } from '../../ui/EventNotificationPanel';
 import { Minimap } from '../../ui/Minimap';
 import { ZoneBanner } from '../../ui/ZoneBanner';
@@ -67,6 +67,8 @@ const DEFAULT_FACILITY_ACTION_BY_TYPE: Record<string, string> = {
 export class GameScene extends Phaser.Scene {
   private entities: Map<string, Phaser.GameObjects.Container> = new Map();
   private entityData: Map<string, Entity> = new Map();
+  private npcContainers: Map<string, Phaser.GameObjects.Container> = new Map();
+  private npcData: Map<string, NPC> = new Map();
   private chatBubbles = new Map<string, Phaser.GameObjects.Container>();
   private mapObjects = new Map<string, Phaser.GameObjects.Sprite>();
   private mapObjectData = new Map<string, MapObject>();
@@ -1064,6 +1066,9 @@ export class GameScene extends Phaser.Scene {
     this.zoneNameLabels = [];
     this.zoneNameBackgrounds.forEach(bg => bg.destroy());
     this.zoneNameBackgrounds = [];
+    this.npcContainers.forEach(container => container.destroy());
+    this.npcContainers.clear();
+    this.npcData.clear();
     this.notificationPanel?.destroy();
     this.minimap?.destroy();
     this.zoneBanner?.destroy();
@@ -1120,6 +1125,12 @@ export class GameScene extends Phaser.Scene {
       callbacks.onChange(entity, () => this.updateEntityData(entity, key));
     });
     callbacks.onRemove('objects', (_entity, key) => this.removeEntity(key));
+
+    callbacks.onAdd('npcs', (npc, key) => {
+      this.addNPC(npc, key);
+      callbacks.onChange(npc, () => this.updateNPCData(npc, key));
+    });
+    callbacks.onRemove('npcs', (_npc, key) => this.removeNPC(key));
 
     room.onMessage('chat', (data: { from: string; message: string; entityId: string }) => {
       this.showChatBubble(data.entityId, data.message);
@@ -1398,6 +1409,58 @@ export class GameScene extends Phaser.Scene {
     this.entityData.delete(key);
   }
 
+  private addNPC(npc: NPC, key: string) {
+    const container = this.add.container(npc.x, npc.y);
+    container.setDepth(npc.y);
+
+    const sprite = this.add.sprite(0, 0, 'players', 'player-human');
+    sprite.setOrigin(0.5, 0.5);
+    sprite.setTint(0x66dd66);
+
+    const nameTag = this.add.text(0, -24, npc.name, {
+      fontSize: '11px',
+      color: '#ffffff',
+      backgroundColor: '#228822aa',
+      padding: { x: 4, y: 2 },
+    });
+    nameTag.setOrigin(0.5, 0.5);
+
+    const roleTag = this.add.text(0, -38, `[${npc.role}]`, {
+      fontSize: '9px',
+      color: '#aaffaa',
+    });
+    roleTag.setOrigin(0.5, 0.5);
+
+    container.add([sprite, nameTag, roleTag]);
+    this.npcContainers.set(key, container);
+    this.npcData.set(key, npc);
+  }
+
+  private removeNPC(key: string) {
+    const container = this.npcContainers.get(key);
+    if (container) {
+      container.destroy();
+      this.npcContainers.delete(key);
+    }
+    this.npcData.delete(key);
+  }
+
+  private updateNPCData(npc: NPC, key: string) {
+    this.npcData.set(key, npc);
+  }
+
+  private interpolateNPCs() {
+    this.npcData.forEach((npc, key) => {
+      const container = this.npcContainers.get(key);
+      if (container) {
+        const t = 0.15;
+        container.x = Phaser.Math.Linear(container.x, npc.x, t);
+        container.y = Phaser.Math.Linear(container.y, npc.y, t);
+        container.setDepth(container.y);
+      }
+    });
+  }
+
   private handleKeyboardMovement() {
     if (!this.cursors || !this.wasdKeys) return;
     // Priority: Targeting > ChatFocus > Idle (see Input State Machine comments at top)
@@ -1467,6 +1530,7 @@ export class GameScene extends Phaser.Scene {
     const now = Date.now();
     this.handleKeyboardMovement();
     this.interpolateEntities();
+    this.interpolateNPCs();
     this.checkNearbyObjects();
     this.notificationPanel?.update(delta);
     this.updateMinimap();

@@ -840,10 +840,9 @@ function checkForUpdatesAndPull(): boolean {
 function restartProcess(): never {
   console.log('\n🔄 Restarting with updated code...\n');
   const args = process.argv.slice(1);
-  // Use execFileSync in a way that replaces this process
+  // Use execSync (already imported) to restart the process
   // We use process.execPath (node/tsx) and pass all original arguments
-  const { execSync: execSyncRestart } = require('child_process');
-  execSyncRestart(`"${process.execPath}" ${args.map(a => `"${a}"`).join(' ')}`, {
+  execSync(`"${process.execPath}" ${args.map(a => `"${a}"`).join(' ')}`, {
     stdio: 'inherit',
     shell: true,
   });

@@ -347,7 +347,7 @@ const ROLE_PREFERENCES: Record<AgentRole, Record<string, number>> = {
     'entity:approach': 0.2,
     profileUpdate: 0.15,
     vending_machine: 0.1,
-    signpost: 0.08,
+    notice_board: 0.08,
     pollEvents: 0.1,
     navigate: 0.1,
     skillList: 0.03,

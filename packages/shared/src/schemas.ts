@@ -16,7 +16,7 @@ export const IdAgentSchema = z.string().regex(/^[a-zA-Z0-9._-]{1,64}$/, 'Invalid
 
 export const IdEntitySchema = z
   .string()
-  .regex(/^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$/, 'Invalid entityId format');
+  .regex(/^(hum|agt|obj|npc)_[a-zA-Z0-9._-]{1,64}$/, 'Invalid entityId format');
 
 // Target ID schema for interact - supports entity IDs, NPC IDs, and facility IDs
 export const IdTargetSchema = z

@@ -1094,7 +1094,7 @@ These choices affect implementation but do not block the PRD:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-02-10 | Initial PRD created |
+| 1.0 | 2026-02-18 | Initial PRD created |
 
 ---
 

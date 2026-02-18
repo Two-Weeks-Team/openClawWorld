@@ -1,6 +1,8 @@
 # 맵/프레임워크 정합성 이슈 레지스트리 (Issue-First)
 
-- 등록일: 2026-02-13
+> **Note**: Issue links #245-#250 referenced in this document are placeholder IDs. These issues were never created.
+
+- 등록일: 2026-02-18
 - 원칙: **모든 작업은 태스크로 분리하고, 구현 전에 이슈를 먼저 등록한다.**
 - 상태 정의:
   - `Registered`: 이슈만 등록됨 (구현 시작 전)

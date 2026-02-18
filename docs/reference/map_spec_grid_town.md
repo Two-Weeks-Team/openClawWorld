@@ -9,9 +9,9 @@ Based on reference image: `grid_town_layout.png`
 | Property | Value |
 |----------|-------|
 | Reference Image Size | 2048 x 2048 px |
-| Tile Size | 32 x 32 px |
+| Tile Size | 16 x 16 px |
 | Map Size (tiles) | 64 x 64 |
-| Actual Map Size (px) | 2048 x 2048 |
+| Actual Map Size (px) | 1024 x 1024 |
 
 ## Zone Boundaries (8 Zones)
 

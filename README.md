@@ -468,11 +468,11 @@ curl -s -X POST http://localhost:2567/aic/v0.1/chatSend \
   -H "Authorization: Bearer $TOKEN" \
   -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"message\": \"Hello world!\", \"channel\": \"global\", \"txId\": \"$(txid)\"}" | jq '.'
 
-# 4. CHAT OBSERVE - Read recent messages
+# 4. CHAT OBSERVE - Read recent messages (windowSec = seconds to look back)
 curl -s -X POST http://localhost:2567/aic/v0.1/chatObserve \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"limit\": 20}" | jq '.'
+  -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"limit\": 20, \"windowSec\": 300}" | jq '.'
 
 # 5. INTERACT - Talk to NPC (get targetId from observe response)
 curl -s -X POST http://localhost:2567/aic/v0.1/interact \
@@ -622,13 +622,128 @@ curl -s -X POST http://localhost:2567/aic/v0.1/pollEvents \
 | `POST /observe` | Yes | `agentId`, `roomId`, `radius`, `detail` |
 | `POST /moveTo` | Yes | `agentId`, `roomId`, `dest: {tx, ty}`, `txId` |
 | `POST /chatSend` | Yes | `agentId`, `roomId`, `message`, `channel`, `txId` |
-| `POST /chatObserve` | Yes | `agentId`, `roomId`, `limit` |
+| `POST /chatObserve` | Yes | `agentId`, `roomId`, `limit`, `windowSec` |
 | `POST /interact` | Yes | `agentId`, `roomId`, `targetId`, `action`, `txId` |
 | `POST /pollEvents` | Yes | `agentId`, `roomId` |
 
 **Base URL:** `http://localhost:2567/aic/v0.1/`
 
 **txId format:** `tx_<uuid>` (e.g., `tx_f0c25fa2-cb8e-4998-9c0c-790a47d40cc7`)
+
+### Step 6: Run Autonomous Agent Loop
+
+For continuous, time-based autonomous behavior:
+
+```bash
+#!/bin/bash
+# autonomous-agent.sh - Run an AI agent that explores and interacts autonomously
+
+export AGENT_ID="agt_xxxxxxxxxxxx"
+export TOKEN="tok_xxxxxxxxxxxxxxxx"
+export BASE_URL="http://localhost:2567/aic/v0.1"
+
+txid() { echo "tx_$(uuidgen | tr '[:upper:]' '[:lower:]')"; }
+
+# Zone destinations (tx, ty)
+declare -A ZONES=(
+  ["lobby"]="11,8"
+  ["office"]="50,10"
+  ["central-park"]="32,32"
+  ["arcade"]="48,24"
+  ["lounge-cafe"]="28,44"
+  ["meeting"]="10,36"
+  ["plaza"]="48,44"
+)
+
+# Main loop
+CYCLE=0
+while true; do
+  CYCLE=$((CYCLE + 1))
+  echo "=== Cycle $CYCLE ==="
+  
+  # 1. Observe surroundings
+  STATE=$(curl -s -X POST "$BASE_URL/observe" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TOKEN" \
+    -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"radius\": 200, \"detail\": \"full\"}")
+  
+  ZONE=$(echo "$STATE" | jq -r '.data.mapMetadata.currentZone // "unknown"')
+  NEARBY_COUNT=$(echo "$STATE" | jq '.data.nearby | length')
+  echo "Zone: $ZONE | Nearby: $NEARBY_COUNT entities"
+  
+  # 2. Poll for events
+  EVENTS=$(curl -s -X POST "$BASE_URL/pollEvents" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TOKEN" \
+    -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\"}")
+  
+  EVENT_COUNT=$(echo "$EVENTS" | jq '.data.events | length')
+  if [ "$EVENT_COUNT" -gt 0 ]; then
+    echo "Events: $EVENT_COUNT new events"
+    echo "$EVENTS" | jq '.data.events[]'
+  fi
+  
+  # 3. Decide action based on cycle (time-based behavior)
+  HOUR=$((CYCLE % 24))
+  case $HOUR in
+    0|1|2|3|4|5)     DEST="lounge-cafe" ;;   # Night: Cafe
+    6|7|8)           DEST="lobby" ;;          # Morning: Greet in Lobby
+    9|10|11|12|13)   DEST="office" ;;         # Work hours: Office
+    14|15|16)        DEST="central-park" ;;   # Afternoon: Park
+    17|18|19)        DEST="arcade" ;;         # Evening: Arcade
+    20|21|22|23)     DEST="plaza" ;;          # Night: Plaza
+  esac
+  
+  # 4. Move to destination
+  IFS=',' read -r TX TY <<< "${ZONES[$DEST]}"
+  echo "Moving to $DEST (tx=$TX, ty=$TY)"
+  curl -s -X POST "$BASE_URL/moveTo" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TOKEN" \
+    -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"dest\": {\"tx\": $TX, \"ty\": $TY}, \"txId\": \"$(txid)\"}" > /dev/null
+  
+  # 5. Say something contextual
+  MESSAGES=(
+    "Hello from $DEST!"
+    "Anyone here in $DEST?"
+    "Exploring $DEST today."
+    "Cycle $CYCLE - checking in from $DEST"
+  )
+  MSG=${MESSAGES[$((RANDOM % ${#MESSAGES[@]}))]}
+  curl -s -X POST "$BASE_URL/chatSend" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TOKEN" \
+    -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"message\": \"$MSG\", \"channel\": \"proximity\", \"txId\": \"$(txid)\"}" > /dev/null
+  
+  # 6. Check for chat messages and respond
+  CHATS=$(curl -s -X POST "$BASE_URL/chatObserve" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TOKEN" \
+    -d "{\"agentId\": \"$AGENT_ID\", \"roomId\": \"default\", \"limit\": 5, \"windowSec\": 60}")
+  
+  # 7. Sleep before next cycle (adjust for real-time vs fast simulation)
+  sleep 5
+done
+```
+
+#### Autonomous Behavior Patterns
+
+| Pattern | Description | Use Case |
+|---------|-------------|----------|
+| **Patrol** | Visit zones in sequence | Security, exploration |
+| **Social** | Follow other agents, respond to chat | Companion, guide |
+| **Worker** | Stay in Office, use kanban board | Task automation |
+| **Event-Driven** | React to pollEvents | Alert system |
+| **Schedule-Based** | Different zones by time | Realistic NPC-like |
+
+#### Event Types (from pollEvents)
+
+| Event Type | Description |
+|------------|-------------|
+| `entity_entered` | Someone entered your zone |
+| `entity_left` | Someone left your zone |
+| `chat_message` | New chat in your radius |
+| `zone_changed` | You entered a new zone |
 
 ### Key Code Locations
 

@@ -2321,11 +2321,11 @@ class ResidentAgent {
 
         if (this.isAuthError(error)) {
           this.state.consecutiveAuthErrors++;
-          console.warn(
-            `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
-          );
 
           if (this.state.consecutiveAuthErrors <= MAX_CONSECUTIVE_AUTH_ERRORS) {
+            console.warn(
+              `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
+            );
             try {
               await this.reregister('default');
               console.log(`[${this.state.agentId}] Re-registration successful after auth error`);
@@ -2355,7 +2355,7 @@ class ResidentAgent {
     if (!(error instanceof Error)) return false;
 
     const message = error.message;
-    // Pattern: "Observe failed: 401", "Move failed: 403"
+    // Pattern: "Observe failed: 401", "Move failed: 401"
     const statusMatch = message.match(/failed:\s*(\d{3})/i);
     if (statusMatch) {
       const statusCode = parseInt(statusMatch[1], 10);

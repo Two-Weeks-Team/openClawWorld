@@ -63,7 +63,9 @@ interface AgentState {
   interactionHistory: InteractionRecord[];
   actionLog: string[];
   cycleCount: number;
-  // Detailed error tracking for issue reporting
+  currentMissionIndex: number;
+  currentStepIndex: number;
+  stepCyclesRemaining: number;
   lastError?: {
     endpoint: string;
     httpStatusCode: number;
@@ -428,32 +430,160 @@ const ROLE_PREFERENCES: Record<AgentRole, Record<string, number>> = {
 };
 
 const ROLE_CHAT_MESSAGES: Record<AgentRole, string[]> = {
-  explorer: ['Found a new area!', "What's over there?", 'Exploring...', 'Interesting path here.'],
-  worker: ['Back to work.', 'Task updated.', 'Checking the board.', 'Deadline approaching.'],
-  socializer: [
-    'Hello everyone!',
-    'Nice day!',
-    "How's it going?",
-    'Great to see you!',
-    'Hey there!',
+  explorer: [
+    'Found a new area! Mapping it now.',
+    "What's beyond that portal?",
+    'Discovered an unmarked path here.',
+    'This sector looks unexplored.',
+    'Marking waypoint for later.',
+    'Anyone know where this leads?',
+    'New territory ahead!',
+    'The notice board mentioned something here...',
+    'Checking coordinates against my map.',
+    'Portal activated - jumping to unknown sector.',
+    'I see structures in the distance.',
+    'Terrain analysis complete.',
+    'Found a shortcut through here!',
+    'Recording observations for the team.',
+    'This area has interesting resources.',
   ],
-  coordinator: ['Team sync in 5!', "Let's meet at the plaza.", 'Agenda updated.', 'Room booked.'],
+  worker: [
+    'Checking kanban board for assignments.',
+    'Task #47 moved to in-progress.',
+    'Whiteboard updated with sprint goals.',
+    'Deadline in 2 hours - focusing.',
+    'PR submitted, awaiting review.',
+    'Build passed, deploying now.',
+    'Blocked on dependency, switching tasks.',
+    'Coffee break, back in 5.',
+    'Standup notes posted.',
+    'Code review comments addressed.',
+    'Merging feature branch.',
+    'Tests running... please hold.',
+    'Documentation updated.',
+    'Syncing with upstream.',
+    'Task completed, picking next item.',
+  ],
+  socializer: [
+    'Hey everyone! How is the sprint going?',
+    'Great work on that last feature!',
+    "Who's up for a virtual coffee?",
+    'Love the energy in here today!',
+    'Anyone want to pair program?',
+    'The cafe has new items!',
+    'Happy Friday, team!',
+    "Let's celebrate that milestone!",
+    'New member joining - welcome them!',
+    'Game night this evening?',
+    'Thanks for the help earlier!',
+    'Kudos to the whole team!',
+    "How's everyone feeling today?",
+    'Lunch break - join me?',
+    'The vibe here is awesome!',
+  ],
+  coordinator: [
+    'Team sync starting in 5 minutes.',
+    'Meeting room A is now booked.',
+    'Agenda posted on notice board.',
+    'Sprint planning at 2 PM.',
+    'Reminder: retrospective tomorrow.',
+    'Updated team schedule.',
+    'Resource allocation adjusted.',
+    'Cross-team sync needed.',
+    'Deadline reminder for project X.',
+    'All hands meeting in plaza.',
+    'Room capacity: 8 people max.',
+    'Schedule conflict resolved.',
+    'Action items assigned.',
+    'Weekly report submitted.',
+    'Capacity planning complete.',
+  ],
   helper: [
-    'Anyone need help?',
-    'I can assist!',
-    'Let me know if you need anything.',
-    'Happy to help!',
+    'Anyone stuck? I can help debug.',
+    'Need a code review? Tag me.',
+    'I see you are near the kanban - need guidance?',
+    'Happy to pair on that issue.',
+    'Let me know if the portal is confusing.',
+    'First time here? I can show you around.',
+    'That error looks familiar - try clearing cache.',
+    'Documentation for that is on the board.',
+    'I can explain how that facility works.',
+    'Stuck on setup? Common issue, easy fix.',
+    'Pro tip: use the shortcut keys.',
+    'That API endpoint changed recently.',
+    'Want me to walk through the flow?',
+    'The fix is in the latest build.',
+    'I wrote a guide for that - check notices.',
   ],
   merchant: [
-    'Items for sale!',
-    'Check out the vending machine.',
-    'Trading services available.',
-    'Good deals today!',
+    'Fresh inventory at the vending machine!',
+    'Limited time offer - premium items.',
+    'Trading resources for skill tokens.',
+    'Best prices in the server.',
+    'Rare items available today.',
+    'Bulk discount on consumables.',
+    'New stock just arrived.',
+    'Special deal for repeat customers.',
+    'Looking to buy surplus materials.',
+    'Equipment upgrades available.',
+    'Check my posted listings.',
+    'Negotiable prices, make an offer.',
+    'Exclusive items for VIPs.',
+    'Flash sale ending soon!',
+    'Trade complete - pleasure doing business.',
   ],
-  observer: ['Monitoring...', 'All clear.', 'Noted.', 'Interesting activity detected.'],
-  afk: ['...', 'brb', 'afk'],
-  chaos: ['CHAOS!', 'Random action!', 'Testing boundaries!', 'Expect the unexpected!', '🔥'],
-  spammer: ['Spam 1', 'Spam 2', 'Spam 3', 'Testing', 'Hello', 'Ping', 'Message', 'Test'],
+  observer: [
+    'Monitoring sector activity.',
+    'All systems nominal.',
+    'Unusual pattern detected - logging.',
+    'Traffic spike in north quadrant.',
+    'Entity count within normal range.',
+    'Performance metrics stable.',
+    'Recording interaction patterns.',
+    'Anomaly flagged for review.',
+    'Patrol route updated.',
+    'Security scan complete.',
+    'No incidents to report.',
+    'Observing facility usage rates.',
+    'Chat volume elevated - monitoring.',
+    'Movement patterns analyzed.',
+    'Watchlist entity spotted.',
+  ],
+  afk: ['...', 'brb', 'afk', 'back soon', 'idle', 'zzz', '💤', 'stepped away'],
+  chaos: [
+    'CHAOS MODE ACTIVATED! 🔥',
+    'Testing edge case #42!',
+    'What happens if I... *click click click*',
+    'Boundary violation test!',
+    'Rapid action sequence initiated!',
+    'Stress testing the system!',
+    'Let me try that again, faster!',
+    'ERROR? Feature! 🎉',
+    'Pushing limits...',
+    'Random teleport test!',
+    'Concurrent action experiment!',
+    'Race condition hunting!',
+    'Max payload incoming!',
+    'Unusual state transition test!',
+    'Entropy injection complete!',
+  ],
+  spammer: [
+    'Test message 1/100',
+    'Ping',
+    'Hello?',
+    'Anyone there?',
+    'Message received?',
+    'Rate limit test',
+    'Flood check',
+    'Queue stress',
+    'Burst mode',
+    'Rapid fire!',
+    'Load test active',
+    'Throughput check',
+    'Latency probe',
+    'Buffer overflow?',
+    'Max messages!',
+  ],
 };
 
 const ROLE_STATUSES: Record<AgentRole, string[]> = {
@@ -467,6 +597,166 @@ const ROLE_STATUSES: Record<AgentRole, string[]> = {
   afk: ['afk', 'afk', 'afk', 'offline'],
   chaos: ['online', 'focus', 'dnd', 'afk', 'offline'],
   spammer: ['online', 'online'],
+};
+
+type MissionStep = {
+  action: string;
+  duration: number;
+  chatChance: number;
+};
+
+type RoleMission = {
+  name: string;
+  steps: MissionStep[];
+  repeat: boolean;
+};
+
+const ROLE_MISSIONS: Record<AgentRole, RoleMission[]> = {
+  explorer: [
+    {
+      name: 'map_sector',
+      steps: [
+        { action: 'observe', duration: 1, chatChance: 0.1 },
+        { action: 'navigate:wander', duration: 3, chatChance: 0.2 },
+        { action: 'notice_board:read', duration: 1, chatChance: 0.3 },
+        { action: 'portal:use', duration: 1, chatChance: 0.4 },
+        { action: 'navigate:wander', duration: 4, chatChance: 0.2 },
+      ],
+      repeat: true,
+    },
+    {
+      name: 'investigate_poi',
+      steps: [
+        { action: 'notice_board:read', duration: 1, chatChance: 0.2 },
+        { action: 'navigate:entity', duration: 2, chatChance: 0.1 },
+        { action: 'observe', duration: 2, chatChance: 0.3 },
+        { action: 'chat', duration: 1, chatChance: 1.0 },
+      ],
+      repeat: false,
+    },
+  ],
+  worker: [
+    {
+      name: 'sprint_cycle',
+      steps: [
+        { action: 'kanban_terminal:use', duration: 2, chatChance: 0.3 },
+        { action: 'whiteboard:use', duration: 3, chatChance: 0.2 },
+        { action: 'observe', duration: 1, chatChance: 0.1 },
+        { action: 'chat', duration: 1, chatChance: 0.8 },
+        { action: 'kanban_terminal:use', duration: 2, chatChance: 0.3 },
+        { action: 'cafe_counter:use', duration: 1, chatChance: 0.5 },
+      ],
+      repeat: true,
+    },
+  ],
+  socializer: [
+    {
+      name: 'social_rounds',
+      steps: [
+        { action: 'navigate:entity', duration: 2, chatChance: 0.3 },
+        { action: 'chat', duration: 3, chatChance: 1.0 },
+        { action: 'chatObserve', duration: 2, chatChance: 0.4 },
+        { action: 'navigate:entity', duration: 2, chatChance: 0.3 },
+        { action: 'chat', duration: 2, chatChance: 1.0 },
+        { action: 'cafe_counter:use', duration: 1, chatChance: 0.6 },
+      ],
+      repeat: true,
+    },
+  ],
+  coordinator: [
+    {
+      name: 'organize_meeting',
+      steps: [
+        { action: 'schedule_kiosk:use', duration: 2, chatChance: 0.3 },
+        { action: 'room_door:use', duration: 1, chatChance: 0.2 },
+        { action: 'notice_board:post', duration: 2, chatChance: 0.8 },
+        { action: 'chat', duration: 2, chatChance: 1.0 },
+        { action: 'navigate:entity', duration: 3, chatChance: 0.4 },
+        { action: 'chat', duration: 1, chatChance: 0.9 },
+      ],
+      repeat: true,
+    },
+  ],
+  helper: [
+    {
+      name: 'patrol_assist',
+      steps: [
+        { action: 'chatObserve', duration: 2, chatChance: 0.2 },
+        { action: 'navigate:entity', duration: 2, chatChance: 0.3 },
+        { action: 'chat', duration: 2, chatChance: 0.8 },
+        { action: 'pollEvents', duration: 1, chatChance: 0.1 },
+        { action: 'navigate:wander', duration: 2, chatChance: 0.2 },
+        { action: 'chatObserve', duration: 2, chatChance: 0.3 },
+      ],
+      repeat: true,
+    },
+  ],
+  merchant: [
+    {
+      name: 'trading_session',
+      steps: [
+        { action: 'vending_machine:use', duration: 2, chatChance: 0.4 },
+        { action: 'chat', duration: 2, chatChance: 1.0 },
+        { action: 'notice_board:post', duration: 1, chatChance: 0.5 },
+        { action: 'navigate:entity', duration: 2, chatChance: 0.3 },
+        { action: 'chat', duration: 2, chatChance: 0.9 },
+        { action: 'cafe_counter:use', duration: 1, chatChance: 0.4 },
+      ],
+      repeat: true,
+    },
+  ],
+  observer: [
+    {
+      name: 'surveillance_patrol',
+      steps: [
+        { action: 'observe', duration: 3, chatChance: 0.1 },
+        { action: 'pollEvents', duration: 2, chatChance: 0.1 },
+        { action: 'navigate:wander', duration: 2, chatChance: 0.05 },
+        { action: 'observe', duration: 3, chatChance: 0.2 },
+        { action: 'chatObserve', duration: 2, chatChance: 0.1 },
+        { action: 'profileUpdate', duration: 1, chatChance: 0.3 },
+      ],
+      repeat: true,
+    },
+  ],
+  afk: [
+    {
+      name: 'idle_cycle',
+      steps: [
+        { action: 'profileUpdate', duration: 5, chatChance: 0.1 },
+        { action: 'observe', duration: 3, chatChance: 0.02 },
+        { action: 'pollEvents', duration: 2, chatChance: 0.01 },
+      ],
+      repeat: true,
+    },
+  ],
+  chaos: [
+    {
+      name: 'stress_test',
+      steps: [
+        { action: 'random', duration: 1, chatChance: 0.5 },
+        { action: 'random', duration: 1, chatChance: 0.5 },
+        { action: 'random', duration: 1, chatChance: 0.5 },
+        { action: 'reregister', duration: 1, chatChance: 0.3 },
+        { action: 'random', duration: 1, chatChance: 0.5 },
+      ],
+      repeat: true,
+    },
+  ],
+  spammer: [
+    {
+      name: 'flood_test',
+      steps: [
+        { action: 'chat', duration: 1, chatChance: 1.0 },
+        { action: 'chat', duration: 1, chatChance: 1.0 },
+        { action: 'chat', duration: 1, chatChance: 1.0 },
+        { action: 'chatObserve', duration: 1, chatChance: 0.2 },
+        { action: 'chat', duration: 1, chatChance: 1.0 },
+        { action: 'chat', duration: 1, chatChance: 1.0 },
+      ],
+      repeat: true,
+    },
+  ],
 };
 
 const STATE_DIR = join(homedir(), '.openclaw-resident-agent');
@@ -1970,6 +2260,9 @@ class ResidentAgent {
       interactionHistory: [],
       actionLog: [],
       cycleCount: 0,
+      currentMissionIndex: Math.floor(Math.random() * ROLE_MISSIONS[role].length),
+      currentStepIndex: 0,
+      stepCyclesRemaining: ROLE_MISSIONS[role][0]?.steps[0]?.duration ?? 1,
     };
   }
 
@@ -2136,27 +2429,75 @@ class ResidentAgent {
     return statuses[Math.floor(Math.random() * statuses.length)];
   }
 
+  private getCurrentMissionStep(): MissionStep | null {
+    const missions = ROLE_MISSIONS[this.state.role];
+    if (!missions || missions.length === 0) return null;
+    const mission = missions[this.state.currentMissionIndex % missions.length];
+    if (!mission || !mission.steps || mission.steps.length === 0) return null;
+    return mission.steps[this.state.currentStepIndex % mission.steps.length];
+  }
+
+  private advanceMissionStep(): void {
+    const missions = ROLE_MISSIONS[this.state.role];
+    if (!missions || missions.length === 0) return;
+    const mission = missions[this.state.currentMissionIndex % missions.length];
+    if (!mission) return;
+
+    this.state.stepCyclesRemaining--;
+    if (this.state.stepCyclesRemaining <= 0) {
+      this.state.currentStepIndex++;
+      if (this.state.currentStepIndex >= mission.steps.length) {
+        this.state.currentStepIndex = 0;
+        if (!mission.repeat) {
+          this.state.currentMissionIndex = (this.state.currentMissionIndex + 1) % missions.length;
+        }
+      }
+      const nextStep = mission.steps[this.state.currentStepIndex % mission.steps.length];
+      this.state.stepCyclesRemaining = nextStep?.duration ?? 1;
+    }
+  }
+
+  private getMissionBoost(actionLabel: string): number {
+    const step = this.getCurrentMissionStep();
+    if (!step) return 1.0;
+    if (actionLabel.includes(step.action) || step.action === 'random') {
+      return 3.0;
+    }
+    if (step.action.includes(':') && actionLabel.includes(step.action.split(':')[0])) {
+      return 2.0;
+    }
+    return 0.5;
+  }
+
+  private shouldChatThisCycle(): boolean {
+    const step = this.getCurrentMissionStep();
+    if (!step) return Math.random() < 0.1;
+    return Math.random() < step.chatChance;
+  }
+
   private buildCandidates(): ActionCandidate[] {
     const candidates: ActionCandidate[] = [];
     const { observedFacilities, observedEntities, position, role } = this.state;
+    
+    this.advanceMissionStep();
 
     candidates.push({
       action: () => this.observe(),
-      weight: 0.15 * this.computeNoveltyMultiplier('observe'),
+      weight: 0.15 * this.computeNoveltyMultiplier('observe') * this.getMissionBoost('observe'),
       label: 'observe',
       category: 'observe',
     });
 
     candidates.push({
       action: () => this.pollEvents(),
-      weight: this.getRolePreference('pollEvents') * this.computeNoveltyMultiplier('pollEvents'),
+      weight: this.getRolePreference('pollEvents') * this.computeNoveltyMultiplier('pollEvents') * this.getMissionBoost('pollEvents'),
       label: 'pollEvents',
       category: 'observe',
     });
 
     candidates.push({
       action: () => this.chatObserve(),
-      weight: this.getRolePreference('chatObserve') * this.computeNoveltyMultiplier('chatObserve'),
+      weight: this.getRolePreference('chatObserve') * this.computeNoveltyMultiplier('chatObserve') * this.getMissionBoost('chatObserve'),
       label: 'chatObserve',
       category: 'social',
     });
@@ -2171,7 +2512,8 @@ class ResidentAgent {
             },
             weight:
               this.getRolePreference(facility.type, afford.action) *
-              this.computeNoveltyMultiplier(label),
+              this.computeNoveltyMultiplier(label) *
+              this.getMissionBoost(`${facility.type}:${afford.action}`),
             label,
             category: 'interact',
           });
@@ -2187,7 +2529,8 @@ class ResidentAgent {
           weight:
             this.getRolePreference(facility.type, 'navigate') *
             this.computeNoveltyMultiplier(label) *
-            NAVIGATE_WEIGHT_DAMPENING,
+            NAVIGATE_WEIGHT_DAMPENING *
+            this.getMissionBoost(`navigate:${facility.type}`),
           label,
           category: 'navigate',
         });
@@ -2207,16 +2550,20 @@ class ResidentAgent {
         weight:
           this.getRolePreference('entity', 'approach') *
           this.computeNoveltyMultiplier(label) *
-          ENTITY_APPROACH_WEIGHT_DAMPENING,
+          ENTITY_APPROACH_WEIGHT_DAMPENING *
+          this.getMissionBoost('navigate:entity'),
         label,
         category: 'navigate',
       });
     }
 
     const chatLabel = `chat:${role}`;
+    const chatWeight = this.shouldChatThisCycle()
+      ? this.getRolePreference('chat') * this.computeNoveltyMultiplier(chatLabel) * this.getMissionBoost('chat') * 2.0
+      : this.getRolePreference('chat') * this.computeNoveltyMultiplier(chatLabel) * 0.3;
     candidates.push({
       action: () => this.chat(this.generateRoleChat()),
-      weight: this.getRolePreference('chat') * this.computeNoveltyMultiplier(chatLabel),
+      weight: chatWeight,
       label: chatLabel,
       category: 'social',
     });
@@ -2224,7 +2571,7 @@ class ResidentAgent {
     const profileLabel = `profileUpdate:${role}`;
     candidates.push({
       action: () => this.profileUpdate({ status: this.pickRoleStatus() }),
-      weight: this.getRolePreference('profileUpdate') * this.computeNoveltyMultiplier(profileLabel),
+      weight: this.getRolePreference('profileUpdate') * this.computeNoveltyMultiplier(profileLabel) * this.getMissionBoost('profileUpdate'),
       label: profileLabel,
       category: 'profile',
     });

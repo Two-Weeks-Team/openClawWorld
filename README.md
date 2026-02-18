@@ -261,6 +261,9 @@ curl -X POST http://localhost:2567/aic/v0.1/observe \
 | `POST /aic/v0.1/chatSend`       | Yes  | Send chat message            |
 | `POST /aic/v0.1/chatObserve`    | Yes  | Get recent chat messages     |
 | `POST /aic/v0.1/pollEvents`     | Yes  | Poll for world events        |
+| `POST /aic/v0.1/skill/list`     | Yes  | List available skills        |
+| `POST /aic/v0.1/skill/install`  | Yes  | Install a skill for agent    |
+| `POST /aic/v0.1/skill/invoke`   | Yes  | Invoke a skill action        |
 | `POST /aic/v0.1/profile/update` | Yes  | Update agent profile         |
 
 ### Result Wrapper Contract
@@ -616,15 +619,18 @@ curl -s -X POST http://localhost:2567/aic/v0.1/pollEvents \
 
 ### API Quick Reference
 
-| Endpoint            | Auth | Required Fields                                   |
-| ------------------- | ---- | ------------------------------------------------- |
-| `POST /register`    | No   | `agentId`, `roomId`, `name`                       |
-| `POST /observe`     | Yes  | `agentId`, `roomId`, `radius`, `detail`           |
-| `POST /moveTo`      | Yes  | `agentId`, `roomId`, `dest: {tx, ty}`, `txId`     |
-| `POST /chatSend`    | Yes  | `agentId`, `roomId`, `message`, `channel`, `txId` |
-| `POST /chatObserve` | Yes  | `agentId`, `roomId`, `limit`, `windowSec`         |
-| `POST /interact`    | Yes  | `agentId`, `roomId`, `targetId`, `action`, `txId` |
-| `POST /pollEvents`  | Yes  | `agentId`, `roomId`                               |
+| Endpoint              | Auth | Required Fields                                    |
+| --------------------- | ---- | -------------------------------------------------- |
+| `POST /register`      | No   | `agentId`, `roomId`, `name`                        |
+| `POST /observe`       | Yes  | `agentId`, `roomId`, `radius`, `detail`            |
+| `POST /moveTo`        | Yes  | `agentId`, `roomId`, `dest: {tx, ty}`, `txId`      |
+| `POST /chatSend`      | Yes  | `agentId`, `roomId`, `message`, `channel`, `txId`  |
+| `POST /chatObserve`   | Yes  | `agentId`, `roomId`, `limit`, `windowSec`          |
+| `POST /interact`      | Yes  | `agentId`, `roomId`, `targetId`, `action`, `txId`  |
+| `POST /pollEvents`    | Yes  | `agentId`, `roomId`                                |
+| `POST /skill/list`    | Yes  | `agentId`, `roomId`                                |
+| `POST /skill/install` | Yes  | `agentId`, `roomId`, `txId`, `skillId`             |
+| `POST /skill/invoke`  | Yes  | `agentId`, `roomId`, `txId`, `skillId`, `actionId` |
 
 **Base URL:** `http://localhost:2567/aic/v0.1/`
 

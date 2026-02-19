@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Schema, MapSchema, type } from '@colyseus/schema';
 
 export type StickyNoteColor = 'yellow' | 'pink' | 'blue' | 'green';
@@ -99,6 +100,6 @@ export class WhiteboardSchema extends Schema {
   }
 
   private generateNoteId(): string {
-    return `note_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    return `note_${randomUUID()}`;
   }
 }

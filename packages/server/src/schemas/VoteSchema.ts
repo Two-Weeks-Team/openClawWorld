@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Schema, MapSchema, type } from '@colyseus/schema';
 
 export interface VoteOptionData {
@@ -178,7 +179,7 @@ export class VoteSchema extends Schema {
   }
 
   private generateOptionId(): string {
-    return `option_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    return `option_${randomUUID()}`;
   }
 
   private reorderOptions(): void {

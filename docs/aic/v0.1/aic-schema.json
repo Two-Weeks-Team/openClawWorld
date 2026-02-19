@@ -9,6 +9,8 @@
     "IdRoom": { "type": "string", "pattern": "^[a-zA-Z0-9._-]{1,64}$" },
     "IdAgent": { "type": "string", "pattern": "^[a-zA-Z0-9._-]{1,64}$" },
     "IdEntity": { "type": "string", "pattern": "^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$" },
+    "IdNpc": { "type": "string", "pattern": "^(npc_)?[a-z][a-z0-9-]{0,63}$" },
+    "IdEntityOrNpc": { "oneOf": [{ "$ref": "#/$defs/IdEntity" }, { "$ref": "#/$defs/IdNpc" }] },
     "IdTx": { "type": "string", "pattern": "^tx_[a-zA-Z0-9._-]{8,128}$" },
     "Cursor": { "type": "string", "pattern": "^[A-Za-z0-9=_-]{1,256}$" },
     "TsMs": { "type": "integer", "minimum": 0 },
@@ -128,7 +130,7 @@
       "additionalProperties": false,
       "required": ["id", "kind", "name", "pos", "roomId"],
       "properties": {
-        "id": { "$ref": "#/$defs/IdEntity" },
+        "id": { "$ref": "#/$defs/IdEntityOrNpc" },
         "kind": { "$ref": "#/$defs/EntityKind" },
         "name": { "type": "string", "minLength": 1, "maxLength": 64 },
         "roomId": { "$ref": "#/$defs/IdRoom" },

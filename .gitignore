@@ -50,7 +50,8 @@ temp/
 # Python
 __pycache__/
 *.pyc
-*.pyo
+.venv/
+venv/
 .ruff_cache/
 
 # Extracted/generated assets

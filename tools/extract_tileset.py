@@ -14,27 +14,10 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
 
 from PIL import Image
 
-SCRIPT_DIR = Path(__file__).parent
-MANIFEST_PATH = SCRIPT_DIR / "kenney-curation.json"
-
-
-def load_manifest() -> dict:
-    """Load kenney-curation.json manifest file."""
-    with open(MANIFEST_PATH) as f:
-        return json.load(f)
-
-
-def get_tile(
-    img: Image.Image, col: int, row: int, tile_size: int = 16, spacing: int = 0
-) -> Image.Image:
-    """Extract a single tile from a spritesheet at the given grid position."""
-    x = col * (tile_size + spacing)
-    y = row * (tile_size + spacing)
-    return img.crop((x, y, x + tile_size, y + tile_size))
+from extract_utils import load_manifest, get_tile
 
 
 def verify_extraction(
@@ -260,7 +243,8 @@ def main() -> None:
     print(f"Manifest version: {manifest['version']}")
 
     if args.verify:
-        verify_extraction(tileset, tiles_config, source_images, output_config)
+        if not verify_extraction(tileset, tiles_config, source_images, output_config):
+            sys.exit(1)
 
     if args.preview:
         preview_path = output_path.replace(".png", "_preview.png")

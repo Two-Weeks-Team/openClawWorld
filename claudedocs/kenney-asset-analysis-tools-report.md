@@ -67,7 +67,7 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 
 ### 3.1 도구 파이프라인
 
-```
+```text
                           ┌─────────────────────────────┐
                           │   Kenney PNG 소스 파일       │
                           │   (city, interior, urban,    │
@@ -128,7 +128,7 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 
 모든 분석/비교 도구의 핵심. `imagehash` 라이브러리 사용.
 
-```
+```text
 이미지 → 32x32 축소 → DCT 변환 → 중앙값 기준 이진화 → 64비트 해시
 ```
 
@@ -141,7 +141,7 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 
 각 타일의 dominant color RGB 분석 → 규칙 기반 분류:
 
-```
+```text
 ├── Blue > Red×1.3 & Blue > Green×1.2    → water
 ├── Green > Red×1.2 & Green > Blue×1.2   → nature
 ├── R ≈ G ≈ B (차이 <30)
@@ -158,7 +158,7 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 
 픽셀 아트에 특화된 2배 확대 알고리즘:
 
-```
+```text
 입력 3×3 이웃:         출력 2×2 블록:
       A                  P0 P1
     C P B       →        P2 P3
@@ -177,7 +177,7 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 
 두 타일 A, B 사이의 전환 타일을 gradient mask로 생성:
 
-```
+```text
 방향별 마스크 (0.0 = 타일A, 1.0 = 타일B):
 
   left→right    top→bottom     diagonal
@@ -194,7 +194,7 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 
 ### 4.1 타일맵 분석 결과
 
-```
+```text
                    총타일   비공백  중복그룹  카테고리
 City      37×28   1,036   1,035    154      7
 Interior  26×17     442     435     89      7
@@ -206,7 +206,7 @@ TinyTown  12×11     132     132     20      7
 
 ### 4.2 카테고리별 타일 분포
 
-```
+```text
 Category       City  Interior  Urban  TinyTown  Total
 ──────────────────────────────────────────────────────
 road           312      18       42       -      372
@@ -224,7 +224,7 @@ Total        1,035     435      486     132    2,088
 
 ### 4.3 스프라이트시트 분석 결과
 
-```
+```text
 Characters Spritesheet (918×203 px)
   - 총 스프라이트:     416개
   - 유사도 그룹:        60개 (같은 캐릭터의 변형)
@@ -233,7 +233,7 @@ Characters Spritesheet (918×203 px)
 
 ### 4.4 현재 프로젝트 타일 검증
 
-```
+```text
 compare_tiles.py 실행 결과:
   - 비교 대상: 32개 프로젝트 타일 vs 1,035개 City 타일
   - Exact Match (거리 0): 32/32 (100%)
@@ -249,7 +249,7 @@ compare_tiles.py 실행 결과:
 
 ### 5.1 analyze_tileset.py
 
-```
+```text
 용도: 임의의 Kenney 타일맵 PNG → 타일 메타데이터 JSON 자동 추출
 
 입력: --input PNG --tile-size N --spacing N
@@ -283,7 +283,7 @@ compare_tiles.py 실행 결과:
 
 ### 5.2 analyze_spritesheet.py
 
-```
+```text
 용도: 캐릭터/오브젝트 스프라이트시트 → 스프라이트 감지 + 애니메이션 추정
 
 모드:
@@ -304,7 +304,7 @@ compare_tiles.py 실행 결과:
 
 ### 5.3 compare_tiles.py
 
-```
+```text
 용도: 프로젝트 타일셋 ↔ 원본 Kenney 타일맵 교차 비교
 
 입력: --current PNG --reference PNG --threshold N
@@ -318,7 +318,7 @@ compare_tiles.py 실행 결과:
 
 ### 5.4 generate_tiles.py
 
-```
+```text
 용도: 타일 리사이징, 색상 변환, 블렌딩, 전환 타일/오토타일 생성
 
 9개 서브커맨드:
@@ -341,7 +341,7 @@ compare_tiles.py 실행 결과:
 
 ### 5.5 기존 스크립트 보강
 
-```
+```text
 모든 extract 스크립트에 공통 추가:
 
   --verify    추출 후 pHash 비교로 원본-추출물 정합성 자동 검증
@@ -361,7 +361,7 @@ extract_object_sprites.py 추가 변경:
 
 ### 6.1 기존 워크플로우 (Before)
 
-```
+```text
 1. Kenney PNG 파일을 이미지 뷰어로 열기
 2. 눈으로 타일 좌표(col, row) 확인
 3. kenney-curation.json에 수동으로 좌표 입력
@@ -374,7 +374,7 @@ extract_object_sprites.py 추가 변경:
 
 ### 6.2 새 워크플로우 (After)
 
-```
+```text
 1. analyze_tileset.py 실행 → 자동 분류 리포트 생성 (30초)
 2. 리포트에서 카테고리별 타일 후보 확인 (jq 필터링)
 3. 타일 크기 다르면 → generate_tiles.py batch-resize로 변환
@@ -429,7 +429,7 @@ extract_object_sprites.py 추가 변경:
 
 ## 8. Dependencies
 
-```
+```text
 tools/requirements.txt:
   Pillow>=10.0.0        이미지 로드/조작/저장
   imagehash>=4.3.0      perceptual hash (pHash) 생성/비교
@@ -468,7 +468,7 @@ tools/requirements.txt:
 
 ## 10. File Tree (Final)
 
-```
+```text
 tools/
 ├── analysis/                              # 신규 - 분석 결과 저장소
 │   ├── roguelike_city_analysis.json        #   244 KB
@@ -539,7 +539,7 @@ tools/
 
 통합 파이프라인 도구로 전체 워크플로우를 단일 커맨드로 실행:
 
-```
+```bash
 python tools/asset_pipeline.py full \
   --source tilemap.png --project tileset.png \
   --tile-size 16 --output-dir tools/analysis/city/
@@ -583,7 +583,7 @@ python tools/asset_pipeline.py full \
 
 #### Bayer Dithering
 
-```
+```text
 4x4 Bayer 매트릭스:         적용 결과 (grass→dirt):
  0  8  2 10                 G G D G
 12  4 14  6       →         D G D G
@@ -596,7 +596,7 @@ python tools/asset_pipeline.py full \
 
 #### 47-Tile Bitmask Autotiling
 
-```
+```text
 8비트 비트마스크: N(1) NE(2) E(4) SE(8) S(16) SW(32) W(64) NW(128)
 
 코너 규칙: NE는 N과 E가 모두 존재할 때만 유효
@@ -608,7 +608,7 @@ python tools/asset_pipeline.py full \
 
 #### Palette Swap
 
-```
+```text
 기존 HSV 시프트:                  팔레트 스왑:
   각 픽셀 → HSV → 시프트 → RGB     팔레트 추출 → 타겟 팔레트 매핑
   결과: 연속적 색상 변화             결과: 이산적 색상 교체
@@ -635,7 +635,7 @@ python tools/asset_pipeline.py full \
 
 ### 12.7 파일 트리 (v2 최종)
 
-```
+```text
 tools/
 ├── analysis/                              # 분석 결과
 │   ├── roguelike_city_analysis.json

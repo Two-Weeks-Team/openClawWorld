@@ -457,15 +457,14 @@ def compute_tile_relationships(
         sequence = [t["index"]]
         for offset in range(1, 8):
             next_col = col + offset
-            next_idx = row * max(t["col"] + 1, 1)  # approximate grid cols
             # Look for next tile in sequence
             found = None
             for t2 in non_blank:
                 if t2["col"] == next_col and t2["row"] == row:
-                    dist = hashes.get(t["index"], None)
-                    dist2 = hashes.get(t2["index"], None)
-                    if dist is not None and dist2 is not None:
-                        if dist - dist2 <= duplicate_threshold + 2:
+                    hash_a = hashes.get(t["index"], None)
+                    hash_b = hashes.get(t2["index"], None)
+                    if hash_a is not None and hash_b is not None:
+                        if hash_a - hash_b <= duplicate_threshold + 2:
                             found = t2
                     break
             if found:

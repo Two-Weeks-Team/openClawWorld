@@ -219,13 +219,10 @@ def _scale3x_vectorized(tile: Image.Image) -> Image.Image:
     bf = neq(B, F)
 
     bf_eq = eq(B, F)
-    bh = neq(B, H)
-    df = neq(D, F)
 
     fh = eq(F, H)
 
     dh_eq = eq(D, H)
-    df_eq = eq(D, F)
 
     result = np.zeros((h * 3, w * 3, 4), dtype=np.uint8)
 
@@ -842,32 +839,31 @@ def generate_autotile47_set(
     outputs = {}
 
     w, h = center_tile.size
-    generated_bitmasks = set()
 
-    # Generate all 47 unique tiles
-    for bitmask, name in sorted(BLOB47_CATEGORIES.items()):
-        if bitmask in generated_bitmasks:
+    # Generate all 47 unique tiles and cache them for sheet assembly
+    sorted_items = sorted(BLOB47_CATEGORIES.items())
+    generated_tiles = {}
+
+    for bitmask, name in sorted_items:
+        if bitmask in generated_tiles:
             continue
-
         tile = generate_autotile47_tile(center_tile, bg_tile, bitmask, matrix_size)
         filename = f"{base_name}_{name}_{bitmask:03d}.png"
         path = os.path.join(output_dir, filename)
         tile.save(path)
         outputs[name] = path
-        generated_bitmasks.add(bitmask)
+        generated_tiles[bitmask] = tile
 
-    # Generate combined tilemap (8 columns)
-    sorted_masks = sorted(BLOB47_CATEGORIES.keys())
-    n_tiles = len(sorted_masks)
+    # Generate combined tilemap (8 columns) using cached tiles
+    n_tiles = len(sorted_items)
     cols = 8
     rows = math.ceil(n_tiles / cols)
 
     sheet = Image.new("RGBA", (cols * w, rows * h), (0, 0, 0, 0))
-    for i, bitmask in enumerate(sorted_masks):
+    for i, (bitmask, _name) in enumerate(sorted_items):
         col = i % cols
         row = i // cols
-        tile = generate_autotile47_tile(center_tile, bg_tile, bitmask, matrix_size)
-        sheet.paste(tile, (col * w, row * h))
+        sheet.paste(generated_tiles[bitmask], (col * w, row * h))
 
     sheet_path = os.path.join(output_dir, f"{base_name}_autotile47_sheet.png")
     sheet.save(sheet_path)

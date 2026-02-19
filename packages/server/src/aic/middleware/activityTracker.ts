@@ -6,12 +6,14 @@ import { getColyseusRoomId } from '../roomRegistry.js';
 export function activityTrackerMiddleware(req: Request, _res: Response, next: NextFunction): void {
   const body = req.body as { agentId?: string; roomId?: string } | undefined;
 
-  if (!body?.agentId || !body?.roomId) {
+  // Use body params if available, otherwise fall back to auth middleware values
+  const agentId = body?.agentId || req.authAgentId;
+  const roomId = body?.roomId || req.authRoomId;
+
+  if (!agentId || !roomId) {
     next();
     return;
   }
-
-  const { agentId, roomId } = body;
 
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);

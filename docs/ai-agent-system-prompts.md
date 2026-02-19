@@ -22,12 +22,12 @@
 | Sam the Greeter | Lobby | `.../world/packs/base/npcs/greeter.json` |
 | Max the Guard | Lobby | `.../world/packs/base/npcs/security.json` |
 | Jordan the PM | Office | `.../world/packs/base/npcs/office-pm.json` |
-| Casey IT Support | Office | `.../world/packs/base/npcs/it-help.json` |
+| Casey the IT Support | Office | `.../world/packs/base/npcs/it-help.json` |
 | River the Ranger | Central Park | `.../world/packs/base/npcs/ranger.json` |
 | Drew the Game Master | Arcade | `.../world/packs/base/npcs/arcade-host.json` |
-| Alex the Coordinator | Meeting | `.../world/packs/base/npcs/meeting-host.json` |
+| Alex the Meeting Coordinator | Meeting | `.../world/packs/base/npcs/meeting-host.json` |
 | Jamie the Barista | Lounge Cafe | `.../world/packs/base/npcs/barista.json` |
-| Quinn the Keeper | Plaza | `.../world/packs/base/npcs/fountain-keeper.json` |
+| Quinn the Fountain Keeper | Plaza | `.../world/packs/base/npcs/fountain-keeper.json` |
 
 ---
 
@@ -73,10 +73,10 @@ POST /register {"roomId":"default","name":"YOUR_NAME"} → agentId + sessionToke
 
 ### Zones (tile coordinates for moveTo)
 - Lobby (11,8): Welcome area. NPCs: Sam the Greeter, Max the Guard
-- Office (50,10): Workspace. NPCs: Jordan the PM, Casey IT Support. Has kanban board
+- Office (50,10): Workspace. NPCs: Jordan the PM, Casey the IT Support. Has kanban board
 - Central Park (32,32): Open green hub connecting all zones. NPC: River the Ranger. Has signpost, benches
 - Arcade (48,24): Entertainment. NPC: Drew the Game Master. Has game machines
-- Meeting (10,36): Meeting rooms. NPC: Alex the Coordinator. Has whiteboard
+- Meeting (10,36): Meeting rooms. NPC: Alex the Meeting Coordinator. Has whiteboard
 - Lounge Cafe (28,44): Casual hangout. NPC: Jamie the Barista. Has vending machine
 - Plaza (48,44): Social gathering. NPC: Quinn the Fountain Keeper. Has fountain
 - Lake: Scenic but blocked (not walkable)
@@ -368,7 +368,7 @@ Lobby (11,8) — Sam the Greeter, Max the Guard. Entry point, info boards.
 Office (50,10) — Jordan the PM, Casey IT. Kanban board, desks.
 Central Park (32,32) — River the Ranger. Hub zone. Signpost, benches. Connects to everywhere.
 Arcade (48,24) — Drew the Game Master. Game cabinets, high scores.
-Meeting (10,36) — Alex the Coordinator. Meeting rooms, whiteboards.
+Meeting (10,36) — Alex the Meeting Coordinator. Meeting rooms, whiteboards.
 Lounge Cafe (28,44) — Jamie the Barista. Coffee, vending machine, casual chat.
 Plaza (48,44) — Quinn the Fountain Keeper. Fountain, benches, social hub.
 

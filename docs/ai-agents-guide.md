@@ -279,10 +279,12 @@ done
 
 | Event | Description |
 |-------|-------------|
-| `entity_entered` | Someone entered your zone |
-| `entity_left` | Someone left your zone |
-| `chat_message` | New chat in your radius |
-| `zone_changed` | You entered a new zone |
+| `presence.join` | Someone joined the room |
+| `presence.leave` | Someone left the room |
+| `proximity.enter` | Someone entered your vicinity |
+| `proximity.exit` | Someone left your vicinity |
+| `chat.message` | New chat message |
+| `object.state_changed` | Object state updated |
 
 ---
 
@@ -423,12 +425,12 @@ echo "$EVENTS" | jq -c '.data.events[]' | while read event; do
   TYPE=$(echo "$event" | jq -r '.type')
   
   case "$TYPE" in
-    "entity_entered")
+    "proximity.enter")
       ENTITY=$(echo "$event" | jq -r '.payload.entityId')
       curl -s -X POST "$BASE_URL/chatSend" \
         -d "{\"message\": \"Hello! Welcome to this zone.\", ...}"
       ;;
-    "chat_message")
+    "chat.message")
       SENDER=$(echo "$event" | jq -r '.payload.senderId')
       MSG=$(echo "$event" | jq -r '.payload.message')
       # Process and respond to message

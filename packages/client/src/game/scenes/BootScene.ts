@@ -18,6 +18,8 @@ export class BootScene extends Phaser.Scene {
     this.load.atlas('players', 'assets/sprites/players.png', 'assets/sprites/players.json');
     this.load.atlas('objects', 'assets/sprites/objects.png', 'assets/sprites/objects.json');
     this.load.atlas('npcs', 'assets/sprites/npcs.png', 'assets/sprites/npcs.json');
+    this.load.atlas('foliage', 'assets/sprites/foliage.png', 'assets/sprites/foliage.json');
+    this.load.atlas('animals', 'assets/sprites/animals.png', 'assets/sprites/animals.json');
   }
 
   create() {

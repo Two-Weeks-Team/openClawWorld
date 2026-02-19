@@ -154,6 +154,7 @@ export const ObserveRequestSchema = z.object({
   radius: z.number().min(1).max(2000),
   detail: ObserveDetailSchema,
   includeSelf: z.boolean().optional(),
+  includeGrid: z.boolean().optional(),
 });
 
 export const MoveToRequestSchema = z.object({

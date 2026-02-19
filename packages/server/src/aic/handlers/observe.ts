@@ -144,19 +144,32 @@ function createErrorResponse(
   };
 }
 
-function buildMapMetadata(gameRoom: GameRoom, currentZone: string | null): MapMetadata {
+function buildMapMetadata(
+  gameRoom: GameRoom,
+  currentZone: string | null,
+  includeGrid?: boolean
+): MapMetadata {
   const staticData = getStaticZonesData(gameRoom);
 
-  return {
+  const metadata: MapMetadata = {
     currentZone: currentZone && isValidZoneId(currentZone) ? currentZone : null,
     zones: staticData.zones,
     mapSize: staticData.mapSize,
   };
+
+  if (includeGrid) {
+    const collisionSystem = gameRoom.getCollisionSystem();
+    if (collisionSystem) {
+      metadata.collisionGrid = collisionSystem.getGrid();
+    }
+  }
+
+  return metadata;
 }
 
 export async function handleObserve(req: Request, res: Response): Promise<void> {
   const body = req.validatedBody as ObserveRequest;
-  const { agentId, roomId, radius } = body;
+  const { agentId, roomId, radius, includeGrid } = body;
 
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);
@@ -266,7 +279,7 @@ export async function handleObserve(req: Request, res: Response): Promise<void> 
       facilities: nearbyFacilities,
       serverTsMs: Date.now(),
       room: roomInfo,
-      mapMetadata: buildMapMetadata(gameRoom, agentEntity.currentZone || null),
+      mapMetadata: buildMapMetadata(gameRoom, agentEntity.currentZone || null, includeGrid),
     };
 
     res.status(200).json({

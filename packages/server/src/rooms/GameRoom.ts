@@ -42,6 +42,7 @@ import { DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 import { WorldPackLoader, WorldPackError, type WorldPack } from '../world/WorldPackLoader.js';
 import { SkillService } from '../services/SkillService.js';
+import { invalidateAgentToken } from '../aic/tokenRegistry.js';
 import { registerRoom, unregisterRoom } from '../aic/roomRegistry.js';
 
 const DEFAULT_NPC_SEED = 12345;
@@ -736,6 +737,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
   override onDispose(): void {
     unregisterRoom(this.state.roomId);
     console.log(`[GameRoom] Disposing room ${this.state.roomId}`);
+
+    // Invalidate tokens for all remaining agents before disposing
+    this.state.agents.forEach((_entity, agentId) => {
+      invalidateAgentToken(agentId);
+    });
+
     this.clientEntities.clear();
     this.recentProximityEvents = [];
 
@@ -769,6 +776,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
       }
 
       this.state.removeEntity(id, 'agent');
+      const tokenInvalidated = invalidateAgentToken(id);
+      if (!tokenInvalidated) {
+        console.warn(
+          `[GameRoom] stale agent ${id} (${name}) had no token registered in tokenRegistry`
+        );
+      }
 
       this.eventLog.append('presence.leave', this.state.roomId, {
         entityId: id,

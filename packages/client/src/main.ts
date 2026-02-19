@@ -9,7 +9,9 @@ const channelSelect = document.getElementById('channel-select') as HTMLDivElemen
 const channelListEl = document.getElementById('channel-list') as HTMLDivElement;
 const refreshBtn = document.getElementById('refresh-btn') as HTMLButtonElement;
 const nameInputArea = document.getElementById('name-input-area') as HTMLDivElement;
-const selectedChannelLabel = document.getElementById('selected-channel-label') as HTMLParagraphElement;
+const selectedChannelLabel = document.getElementById(
+  'selected-channel-label'
+) as HTMLParagraphElement;
 const usernameInput = document.getElementById('username-input') as HTMLInputElement;
 const joinBtn = document.getElementById('join-btn') as HTMLButtonElement;
 const backBtn = document.getElementById('back-btn') as HTMLButtonElement;
@@ -48,7 +50,9 @@ async function loadChannels(): Promise<void> {
       btn.innerHTML = `${label} <span class="occupancy">${ch.occupancy}/${ch.maxOccupancy}</span>`;
 
       if (!isFull) {
-        btn.addEventListener('click', () => selectChannel(ch.channelId, ch.occupancy, ch.maxOccupancy));
+        btn.addEventListener('click', () =>
+          selectChannel(ch.channelId, ch.occupancy, ch.maxOccupancy)
+        );
       }
       channelListEl.appendChild(btn);
     });

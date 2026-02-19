@@ -55,17 +55,13 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
         console.log(`[RegisterHandler] Auto-assigned to channel '${targetRoomId}'`);
       } catch (assignError) {
         console.error(`[RegisterHandler] Failed to assign channel:`, assignError);
-        res
-          .status(500)
-          .json(createErrorResponse('internal', 'Failed to assign channel', true));
+        res.status(500).json(createErrorResponse('internal', 'Failed to assign channel', true));
         return;
       }
     } else {
       colyseusRoomId = getColyseusRoomId(targetRoomId);
       if (!colyseusRoomId) {
-        console.log(
-          `[RegisterHandler] No room found for '${targetRoomId}', creating new room`
-        );
+        console.log(`[RegisterHandler] No room found for '${targetRoomId}', creating new room`);
         try {
           const roomRef = await matchMaker.createRoom('game', { roomId: targetRoomId });
           colyseusRoomId = roomRef.roomId;

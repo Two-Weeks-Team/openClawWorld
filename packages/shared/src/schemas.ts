@@ -474,6 +474,19 @@ export const UnregisterResponseDataSchema = z.object({
   unregisteredAt: TsMsSchema,
 });
 
+export const ReconnectRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  sessionToken: z.string().min(8),
+});
+
+export const ReconnectResponseDataSchema = z.object({
+  agentId: IdEntitySchema,
+  roomId: IdRoomSchema,
+  sessionToken: z.string(),
+  pos: z.object({ x: z.number(), y: z.number() }),
+  tile: z.object({ tx: z.number(), ty: z.number() }).optional(),
+});
+
 // ============================================================================
 // Heartbeat Schema
 // ============================================================================

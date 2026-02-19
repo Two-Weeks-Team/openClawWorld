@@ -43,48 +43,28 @@
         flex-direction: column;
         gap: 6px;
         margin: 10px 0;
-        max-height: 240px;
+        max-height: 200px;
         overflow-y: auto;
       }
       .channel-btn {
-        padding: 10px 16px;
-        border: 1px solid #555;
-        border-radius: 6px;
-        background: #3a3a3a;
+        padding: 8px 12px;
+        border: 1px solid #666;
+        border-radius: 4px;
+        background: #444;
         color: white;
         cursor: pointer;
         text-align: left;
         font-size: 14px;
-        transition: background 0.15s;
       }
-      .channel-btn:hover:not(:disabled) {
-        background: #4a4a4a;
-        border-color: #7a7a7a;
+      .channel-btn:hover:not(:disabled) { background: #555; border-color: #8cf; }
+      .channel-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+      .channel-btn.selected { border-color: #4af; background: #336; }
+      #channel-select button, #name-input button {
+        margin: 4px; padding: 6px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;
       }
-      .channel-btn:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
-      .channel-btn .occupancy {
-        float: right;
-        color: #aaa;
-      }
-      .channel-btn.full .occupancy {
-        color: #e55;
-      }
-      #refresh-btn, #back-btn {
-        padding: 6px 14px;
-        border: 1px solid #555;
-        border-radius: 4px;
-        background: #3a3a3a;
-        color: #ccc;
-        cursor: pointer;
-        font-size: 13px;
-        margin-top: 8px;
-      }
-      #refresh-btn:hover, #back-btn:hover {
-        background: #4a4a4a;
-      }
+      #refresh-btn { background: #555; color: white; }
+      #join-btn { background: #4a4; color: white; }
+      #back-btn { background: #555; color: white; }
       #chat-container {
         position: absolute;
         bottom: 10px;
@@ -121,17 +101,15 @@
     <div id="ui-layer">
       <div id="login-screen">
         <h2>OpenClawWorld</h2>
-        <!-- Step 1: Channel Selection -->
         <div id="channel-select">
-          <h3>Select Channel</h3>
+          <h3 style="margin:0 0 8px">Select Channel</h3>
           <div id="channel-list">Loading...</div>
           <button id="refresh-btn">Refresh</button>
         </div>
-        <!-- Step 2: Name Input (shown after channel selection) -->
-        <div id="name-input-area" style="display: none;">
-          <p id="selected-channel-label" style="color: #aaa; margin: 8px 0;"></p>
+        <div id="name-input" style="display:none;">
+          <p id="selected-channel-label" style="margin:4px 0 8px;color:#8cf;"></p>
           <input type="text" id="username-input" placeholder="Enter Name" />
-          <div style="margin-top: 10px;">
+          <div style="margin-top:8px;">
             <button id="join-btn">Join World</button>
             <button id="back-btn">Back</button>
           </div>

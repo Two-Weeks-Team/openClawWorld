@@ -1032,7 +1032,7 @@ export type SkillActionParam = {
 
 export type SkillAction = {
   id: string;
-  name?: string;
+  name: string;
   label?: string;
   description: string;
   cooldownMs?: number;

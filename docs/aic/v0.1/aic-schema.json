@@ -432,10 +432,10 @@
     "SkillAction": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "description"],
+      "required": ["id", "name", "description"],
       "properties": {
         "id": { "type": "string" },
-        "name": { "type": "string" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 128 },
         "label": { "type": "string" },
         "description": { "type": "string" },
         "cooldownMs": { "type": "integer", "minimum": 0 },
@@ -517,7 +517,7 @@
         "agentId": { "$ref": "#/$defs/IdAgent" },
         "roomId": { "$ref": "#/$defs/IdRoom" },
         "txId": { "$ref": "#/$defs/IdTx" },
-        "skillId": { "type": "string" },
+        "skillId": { "type": "string", "minLength": 1, "maxLength": 64 },
         "credentials": { "type": "object", "additionalProperties": { "type": "string" } }
       }
     },
@@ -542,8 +542,8 @@
         "agentId": { "$ref": "#/$defs/IdAgent" },
         "roomId": { "$ref": "#/$defs/IdRoom" },
         "txId": { "$ref": "#/$defs/IdTx" },
-        "skillId": { "type": "string" },
-        "actionId": { "type": "string" },
+        "skillId": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "actionId": { "type": "string", "minLength": 1, "maxLength": 64 },
         "targetId": { "$ref": "#/$defs/IdEntity" },
         "params": { "type": "object", "additionalProperties": true }
       }
@@ -556,7 +556,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["ok", "pending", "cancelled", "error"]
+          "enum": ["ok", "pending", "cancelled"]
         },
         "message": { "type": "string", "maxLength": 2000 },
         "data": { "type": "object", "additionalProperties": true },

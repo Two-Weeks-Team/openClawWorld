@@ -33,7 +33,10 @@
     "extract:assets": "python tools/extract_assets/extract.py --all",
     "generate:tools": "pnpm --filter @openclawworld/plugin generate",
     "generate:commands": "pnpm --filter @openclawworld/plugin generate:commands",
-    "generate": "pnpm generate:tools && pnpm generate:commands"
+    "generate": "pnpm generate:tools && pnpm generate:commands",
+    "ecosystem": "tsx packages/ecosystem/src/index.ts",
+    "ecosystem:start": "tsx packages/ecosystem/src/index.ts start",
+    "ecosystem:status": "tsx packages/ecosystem/src/index.ts status"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

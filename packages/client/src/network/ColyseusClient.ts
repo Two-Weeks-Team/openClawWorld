@@ -27,11 +27,26 @@ export type InstalledSkill = {
   enabled: boolean;
 };
 
+export type ChannelInfo = {
+  channelId: string;
+  occupancy: number;
+  maxOccupancy: number;
+};
+
 function getServerEndpoint(): string {
   const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const port = import.meta.env.VITE_SERVER_PORT ?? '2567';
   const protocol =
     typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${hostname}:2567`;
+  return `${protocol}//${hostname}:${port}`;
+}
+
+function getHttpEndpoint(): string {
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const port = import.meta.env.VITE_SERVER_PORT ?? '2567';
+  const protocol =
+    typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
+  return `${protocol}//${hostname}:${port}`;
 }
 
 export class ColyseusClient {
@@ -44,9 +59,37 @@ export class ColyseusClient {
     this.client = new Client<typeof appConfig>(endpoint);
   }
 
-  async connect(name: string): Promise<Room<GameRoom>> {
+  async fetchChannels(): Promise<ChannelInfo[]> {
+    const url = `${getHttpEndpoint()}/aic/v0.1/channels`;
     try {
-      this.room = await this.client.joinOrCreate('game', { name });
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        const body = await resp.text().catch(() => '(unable to read response body)');
+        console.error(
+          '[ColyseusClient] fetchChannels failed:',
+          `status=${resp.status} statusText="${resp.statusText}" url="${url}" body=${body}`
+        );
+        return [];
+      }
+      const json = await resp.json();
+      return json.data?.channels ?? [];
+    } catch (error) {
+      console.error(
+        '[ColyseusClient] fetchChannels failed:',
+        `url="${url}"`,
+        error instanceof Error
+          ? { message: error.message, name: error.name, stack: error.stack }
+          : error
+      );
+      return [];
+    }
+  }
+
+  async connect(name: string, roomId?: string): Promise<Room<GameRoom>> {
+    try {
+      const options: Record<string, string> = { name };
+      if (roomId) options.roomId = roomId;
+      this.room = await this.client.joinOrCreate('game', options);
       this._sessionId = this.room.sessionId;
 
       this.room.onMessage('assignedEntityId', (data: { entityId: string }) => {

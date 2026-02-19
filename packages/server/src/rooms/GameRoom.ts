@@ -15,6 +15,7 @@ import {
   DEFAULT_MOVE_SPEED,
   AGENT_TIMEOUT_MS,
   AGENT_CLEANUP_INTERVAL_MS,
+  MAX_CHANNEL_OCCUPANCY,
 } from '../constants.js';
 import { EventLog } from '../events/EventLog.js';
 import { MovementSystem } from '../movement/MovementSystem.js';
@@ -319,6 +320,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   getNPCSystem(): NPCSystem | null {
     return this.npcSystem;
+  }
+
+  getOccupancy(): number {
+    return this.state.humans.size + this.state.agents.size;
   }
 
   getChatSystem(): ChatSystem | null {
@@ -664,6 +669,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   override onJoin(client: Client, options: { name?: string }): void {
+    if (this.getOccupancy() >= MAX_CHANNEL_OCCUPANCY) {
+      throw new Error('Channel is full');
+    }
+
     const name = options.name ?? `Player ${client.sessionId.slice(0, 6)}`;
     const entityId = this.generateEntityId('human');
 

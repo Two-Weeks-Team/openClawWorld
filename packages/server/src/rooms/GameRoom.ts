@@ -778,7 +778,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
       this.state.removeEntity(id, 'agent');
       const tokenInvalidated = invalidateAgentToken(id);
       if (!tokenInvalidated) {
-        console.warn(`[GameRoom] stale agent ${id} (${name}) had no token registered in tokenRegistry`);
+        console.warn(
+          `[GameRoom] stale agent ${id} (${name}) had no token registered in tokenRegistry`
+        );
       }
 
       this.eventLog.append('presence.leave', this.state.roomId, {

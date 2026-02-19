@@ -661,7 +661,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/RegisterRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 name: 'Helper Bot',
               },
             },
@@ -714,7 +714,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/UnregisterRequest' },
               example: {
                 agentId: 'agt_abc123def456',
-                roomId: 'default',
+                roomId: 'auto',
               },
             },
           },
@@ -773,7 +773,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/ObserveRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 radius: 100,
                 detail: 'full',
                 includeSelf: true,
@@ -814,7 +814,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/MoveToRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 txId: 'tx_abc123def456',
                 dest: { tx: 15, ty: 10 },
                 mode: 'walk',
@@ -855,7 +855,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/InteractRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 txId: 'tx_interact_001',
                 targetId: 'obj_sign_welcome',
                 action: 'read',
@@ -897,7 +897,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/ChatSendRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 txId: 'tx_chat_001',
                 channel: 'proximity',
                 message: 'Hello everyone!',
@@ -937,7 +937,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/ChatObserveRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 windowSec: 60,
                 channel: 'proximity',
               },
@@ -976,7 +976,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/PollEventsRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 sinceCursor: 'YWJjMTIz',
                 limit: 50,
                 waitMs: 5000,
@@ -1015,7 +1015,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/ProfileUpdateRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 name: 'Super Helper Bot',
                 meta: { level: 5 },
               },
@@ -1054,7 +1054,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/SkillListRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 category: 'movement',
                 installed: true,
               },
@@ -1117,7 +1117,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/SkillInstallRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 txId: 'tx_install_001',
                 skillId: 'movement_sprint',
               },
@@ -1168,7 +1168,7 @@ The same \`txId\` will return the same result without re-executing the action.
               schema: { $ref: '#/components/schemas/SkillInvokeRequest' },
               example: {
                 agentId: 'agent_helper',
-                roomId: 'default',
+                roomId: 'auto',
                 txId: 'tx_invoke_001',
                 skillId: 'movement_sprint',
                 actionId: 'sprint',

@@ -2767,7 +2767,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           radius: 200,
           detail: 'full',
         }),
@@ -2838,7 +2838,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           txId: generateTxId(),
           dest: { tx, ty },
         }),
@@ -2875,7 +2875,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           txId: generateTxId(),
           channel,
           message,
@@ -2913,7 +2913,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           windowSec: 60,
         }),
       });
@@ -2970,7 +2970,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           txId: generateTxId(),
           targetId,
           action,
@@ -3011,7 +3011,7 @@ class ResidentAgent {
     try {
       const requestBody: Record<string, unknown> = {
         agentId: this.state.agentId,
-        roomId: 'default',
+        roomId: 'auto',
         limit: 50,
       };
       if (this.state.eventCursor) {
@@ -3083,7 +3083,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           ...fields,
         }),
       });
@@ -3116,7 +3116,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           ...(category && { category }),
         }),
       });
@@ -3150,7 +3150,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           txId: generateTxId(),
           skillId,
         }),
@@ -3186,7 +3186,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
           txId: generateTxId(),
           skillId,
           actionId,
@@ -3221,7 +3221,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'default',
+          roomId: 'auto',
         }),
       });
 
@@ -3564,7 +3564,7 @@ function parseArgs(): Config {
     stressLevel: 'medium',
     chaosEnabled: false,
     dryRun: false,
-    roomId: 'default',
+    roomId: 'auto',
     cycleDelayMs: 2000,
     issueCheckIntervalMs: 10000,
   };

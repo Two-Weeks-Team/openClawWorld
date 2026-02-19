@@ -8,7 +8,7 @@ import { EntitySchema } from '../../schemas/EntitySchema.js';
 import { getColyseusRoomId } from '../roomRegistry.js';
 import { registerToken } from '../tokenRegistry.js';
 import { assignChannel, canJoinChannel } from '../channelManager.js';
-import { DEFAULT_SPAWN_POSITION, DEFAULT_TILE_SIZE } from '../../constants.js';
+import { DEFAULT_SPAWN_POSITION, DEFAULT_TILE_SIZE, CHANNEL_PREFIX } from '../../constants.js';
 
 function generateAgentId(): string {
   return `agt_${uuidv4().replace(/-/g, '').substring(0, 12)}`;
@@ -36,6 +36,19 @@ function createErrorResponse(
 export async function handleRegister(req: Request, res: Response): Promise<void> {
   const body = req.validatedBody as RegisterRequest;
   const { name, roomId } = body;
+
+  if (roomId !== 'auto' && !roomId.startsWith(`${CHANNEL_PREFIX}-`)) {
+    res
+      .status(400)
+      .json(
+        createErrorResponse(
+          'bad_request',
+          `Invalid roomId: must be 'auto' or start with '${CHANNEL_PREFIX}-'`,
+          false
+        )
+      );
+    return;
+  }
 
   try {
     // Resolve channel: 'auto' or seamless fallback when specified channel is full

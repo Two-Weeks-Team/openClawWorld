@@ -21,3 +21,7 @@ export function unregisterRoom(customRoomId: string): void {
 export function hasRoom(customRoomId: string): boolean {
   return roomIdMapping.has(customRoomId);
 }
+
+export function getAllRoomEntries(): Array<[string, string]> {
+  return Array.from(roomIdMapping.entries());
+}

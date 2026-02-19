@@ -33,6 +33,7 @@ import { handleInteract } from './handlers/interact.js';
 import { handleChatSend } from './handlers/chatSend.js';
 import { handleChatObserve } from './handlers/chatObserve.js';
 import { handlePollEvents } from './handlers/pollEvents.js';
+import { handleChannels } from './handlers/channels.js';
 import { handleRegister } from './handlers/register.js';
 import { handleUnregister } from './handlers/unregister.js';
 import { handleProfileUpdate } from './handlers/profileUpdate.js';
@@ -41,6 +42,9 @@ import { handleSkillInstall } from './handlers/skillInstall.js';
 import { handleSkillInvoke } from './handlers/skillInvoke.js';
 
 const router: Router = Router();
+
+// Channel listing is UNAUTHENTICATED - clients call this before login
+router.get('/channels', handleChannels);
 
 // Register endpoint is UNAUTHENTICATED - agents call this to get their first token
 router.post(

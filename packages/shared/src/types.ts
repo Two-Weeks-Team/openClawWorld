@@ -464,6 +464,54 @@ export type StatusResponseData = {
 };
 
 // ============================================================================
+// Meeting API Types
+// ============================================================================
+
+export type MeetingListRequest = {
+  agentId: string;
+  roomId: string;
+};
+
+export type MeetingInfo = {
+  meetingId: string;
+  name: string;
+  hostId: string;
+  participantCount: number;
+  capacity: number;
+};
+
+export type MeetingListResponseData = {
+  meetings: MeetingInfo[];
+};
+
+export type MeetingJoinRequest = {
+  agentId: string;
+  roomId: string;
+  meetingId: string;
+};
+
+export type MeetingJoinResponseData = {
+  meetingId: string;
+  role: string;
+  participants: Array<{
+    entityId: string;
+    name: string;
+    role: string;
+  }>;
+};
+
+export type MeetingLeaveRequest = {
+  agentId: string;
+  roomId: string;
+  meetingId: string;
+};
+
+export type MeetingLeaveResponseData = {
+  meetingId: string;
+  leftAt: number;
+};
+
+// ============================================================================
 // Map Types
 // ============================================================================
 

@@ -1,0 +1,196 @@
+{
+  "tileSize": 16,
+  "cols": 8,
+  "rows": 6,
+  "totalTiles": 47,
+  "bitmaskMap": {
+    "0": {
+      "name": "isolated",
+      "index": 0
+    },
+    "1": {
+      "name": "n_only",
+      "index": 1
+    },
+    "4": {
+      "name": "e_only",
+      "index": 2
+    },
+    "5": {
+      "name": "ne_corner",
+      "index": 3
+    },
+    "7": {
+      "name": "ne_corner_filled",
+      "index": 4
+    },
+    "16": {
+      "name": "s_only",
+      "index": 5
+    },
+    "17": {
+      "name": "ns_pipe",
+      "index": 6
+    },
+    "20": {
+      "name": "se_corner",
+      "index": 7
+    },
+    "21": {
+      "name": "nse_tee",
+      "index": 8
+    },
+    "23": {
+      "name": "nse_inner_se",
+      "index": 9
+    },
+    "28": {
+      "name": "se_corner_filled",
+      "index": 10
+    },
+    "29": {
+      "name": "nse_inner_ne",
+      "index": 11
+    },
+    "31": {
+      "name": "nse_both",
+      "index": 12
+    },
+    "64": {
+      "name": "w_only",
+      "index": 13
+    },
+    "65": {
+      "name": "nw_corner",
+      "index": 14
+    },
+    "68": {
+      "name": "ew_pipe",
+      "index": 15
+    },
+    "69": {
+      "name": "new_tee",
+      "index": 16
+    },
+    "71": {
+      "name": "new_inner_ne",
+      "index": 17
+    },
+    "80": {
+      "name": "sw_corner",
+      "index": 18
+    },
+    "81": {
+      "name": "nsw_tee",
+      "index": 19
+    },
+    "84": {
+      "name": "sew_tee",
+      "index": 20
+    },
+    "85": {
+      "name": "cross",
+      "index": 21
+    },
+    "87": {
+      "name": "cross_ne",
+      "index": 22
+    },
+    "92": {
+      "name": "sew_inner_se",
+      "index": 23
+    },
+    "93": {
+      "name": "cross_se",
+      "index": 24
+    },
+    "95": {
+      "name": "cross_ne_se",
+      "index": 25
+    },
+    "112": {
+      "name": "sw_corner_filled",
+      "index": 26
+    },
+    "113": {
+      "name": "nsw_inner_sw",
+      "index": 27
+    },
+    "116": {
+      "name": "sew_inner_sw",
+      "index": 28
+    },
+    "117": {
+      "name": "cross_sw",
+      "index": 29
+    },
+    "119": {
+      "name": "cross_ne_sw",
+      "index": 30
+    },
+    "124": {
+      "name": "sew_both",
+      "index": 31
+    },
+    "125": {
+      "name": "cross_se_sw",
+      "index": 32
+    },
+    "127": {
+      "name": "cross_ne_se_sw",
+      "index": 33
+    },
+    "193": {
+      "name": "nw_corner_filled",
+      "index": 34
+    },
+    "197": {
+      "name": "new_inner_nw",
+      "index": 35
+    },
+    "199": {
+      "name": "new_both",
+      "index": 36
+    },
+    "209": {
+      "name": "nsw_inner_nw",
+      "index": 37
+    },
+    "213": {
+      "name": "cross_nw",
+      "index": 38
+    },
+    "215": {
+      "name": "cross_nw_se",
+      "index": 39
+    },
+    "221": {
+      "name": "cross_nw_sw",
+      "index": 40
+    },
+    "223": {
+      "name": "cross_nw_ne_se",
+      "index": 41
+    },
+    "241": {
+      "name": "nsw_both",
+      "index": 42
+    },
+    "245": {
+      "name": "cross_nw_ne",
+      "index": 43
+    },
+    "247": {
+      "name": "cross_nw_se_sw",
+      "index": 44
+    },
+    "253": {
+      "name": "cross_nw_ne_sw",
+      "index": 45
+    },
+    "255": {
+      "name": "full",
+      "index": 46
+    }
+  }
+}

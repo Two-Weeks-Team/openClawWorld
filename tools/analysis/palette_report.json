@@ -1,0 +1,197 @@
+{
+  "timestamp": "2026-02-19T15:26:04.169438",
+  "packs": [
+    {
+      "name": "roguelike_city",
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike City Pack/Tilemap/tilemap_packed.png",
+      "stats": {
+        "totalOpaquePixels": 210487,
+        "uniqueColors": 132,
+        "luminanceMean": 151.04047405302939,
+        "luminanceStd": 45.508441788586026,
+        "luminanceMin": 60.0,
+        "luminanceMax": 255.0,
+        "hueDistribution": {
+          "0-30deg": 0.34941165029660604,
+          "30-60deg": 0.25556744140814935,
+          "60-90deg": 0.008655061752406885,
+          "90-120deg": 0.0,
+          "120-150deg": 0.1955654964504522,
+          "150-180deg": 0.023047748711465525,
+          "180-210deg": 0.1640571817562968,
+          "210-240deg": 0.0036954196246231645,
+          "240-270deg": 0.0,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.0
+        }
+      }
+    },
+    {
+      "name": "rpg_urban",
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/RPG Urban Pack/Tilemap/tilemap_packed.png",
+      "stats": {
+        "totalOpaquePixels": 91666,
+        "uniqueColors": 106,
+        "luminanceMean": 141.83151361464448,
+        "luminanceStd": 38.47866239005363,
+        "luminanceMin": 54.544,
+        "luminanceMax": 255.0,
+        "hueDistribution": {
+          "0-30deg": 0.3008359825738844,
+          "30-60deg": 0.12645708230307312,
+          "60-90deg": 0.0,
+          "90-120deg": 0.0,
+          "120-150deg": 0.0,
+          "150-180deg": 0.09749205227834687,
+          "180-210deg": 0.057223595902507945,
+          "210-240deg": 0.1940421523607677,
+          "240-270deg": 0.20487460261391735,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.01907453196750265
+        }
+      }
+    },
+    {
+      "name": "tiny_town",
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Tiny Town/Tilemap/tilemap_packed.png",
+      "stats": {
+        "totalOpaquePixels": 26637,
+        "uniqueColors": 26,
+        "luminanceMean": 125.63184472725906,
+        "luminanceStd": 57.945551583653845,
+        "luminanceMin": 42.74,
+        "luminanceMax": 255.0,
+        "hueDistribution": {
+          "0-30deg": 0.2976324689966178,
+          "30-60deg": 0.03945885005636979,
+          "60-90deg": 0.0,
+          "90-120deg": 0.08117249154453213,
+          "120-150deg": 0.021044720030063885,
+          "150-180deg": 0.0,
+          "180-210deg": 0.002254791431792559,
+          "210-240deg": 0.29800826756858323,
+          "240-270deg": 0.0,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.26042841037204056
+        }
+      }
+    },
+    {
+      "name": "roguelike_interior",
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike Interior Pack/Tilesheets/roguelikeIndoor_transparent.png",
+      "stats": {
+        "totalOpaquePixels": 87872,
+        "uniqueColors": 76,
+        "luminanceMean": 149.0678839675892,
+        "luminanceStd": 35.24047284455279,
+        "luminanceMin": 63.99999999999999,
+        "luminanceMax": 255.0,
+        "hueDistribution": {
+          "0-30deg": 0.3177792465300727,
+          "30-60deg": 0.5257105089226702,
+          "60-90deg": 0.0013218770654329147,
+          "90-120deg": 0.0013218770654329147,
+          "120-150deg": 0.14064771976206214,
+          "150-180deg": 0.012954395241242565,
+          "180-210deg": 0.00026437541308658297,
+          "210-240deg": 0.0,
+          "240-270deg": 0.0,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.0
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "packA": "roguelike_city",
+      "packB": "rpg_urban",
+      "score": 85.0,
+      "compatible": true,
+      "issues": ["Somewhat different hue distributions (sim=0.67)"],
+      "details": {
+        "luminanceDiff": 9.2,
+        "contrastRangeDiff": 5.5,
+        "colorCountA": 132,
+        "colorCountB": 106
+      }
+    },
+    {
+      "packA": "roguelike_city",
+      "packB": "tiny_town",
+      "score": 45.0,
+      "compatible": false,
+      "issues": [
+        "Moderate luminance difference: 25.4",
+        "Very different hue distributions (sim=0.47)",
+        "Large color count difference: 132 vs 26"
+      ],
+      "details": {
+        "luminanceDiff": 25.4,
+        "contrastRangeDiff": 17.3,
+        "colorCountA": 132,
+        "colorCountB": 26
+      }
+    },
+    {
+      "packA": "roguelike_city",
+      "packB": "roguelike_interior",
+      "score": 100.0,
+      "compatible": true,
+      "issues": [],
+      "details": {
+        "luminanceDiff": 2.0,
+        "contrastRangeDiff": 4.0,
+        "colorCountA": 132,
+        "colorCountB": 76
+      }
+    },
+    {
+      "packA": "rpg_urban",
+      "packB": "tiny_town",
+      "score": 85.0,
+      "compatible": true,
+      "issues": ["Large color count difference: 106 vs 26"],
+      "details": {
+        "luminanceDiff": 16.2,
+        "contrastRangeDiff": 11.8,
+        "colorCountA": 106,
+        "colorCountB": 26
+      }
+    },
+    {
+      "packA": "rpg_urban",
+      "packB": "roguelike_interior",
+      "score": 85.0,
+      "compatible": true,
+      "issues": ["Somewhat different hue distributions (sim=0.58)"],
+      "details": {
+        "luminanceDiff": 7.2,
+        "contrastRangeDiff": 9.5,
+        "colorCountA": 106,
+        "colorCountB": 76
+      }
+    },
+    {
+      "packA": "tiny_town",
+      "packB": "roguelike_interior",
+      "score": 60.0,
+      "compatible": true,
+      "issues": [
+        "Moderate luminance difference: 23.4",
+        "Very different hue distributions (sim=0.37)"
+      ],
+      "details": {
+        "luminanceDiff": 23.4,
+        "contrastRangeDiff": 21.3,
+        "colorCountA": 26,
+        "colorCountB": 76
+      }
+    }
+  ],
+  "overallCompatibility": false
+}

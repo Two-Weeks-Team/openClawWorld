@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-02-19T15:26:53.125841",
+  "packs": [
+    {
+      "name": "roguelike_city",
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike City Pack/Tilemap/tilemap_packed.png",
+      "stats": {
+        "totalOpaquePixels": 210487,
+        "uniqueColors": 132,
+        "luminanceMean": 151.04047405302939,
+        "luminanceStd": 45.508441788586026,
+        "luminanceMin": 60.0,
+        "luminanceMax": 255.0,
+        "hueDistribution": {
+          "0-30deg": 0.34941165029660604,
+          "30-60deg": 0.25556744140814935,
+          "60-90deg": 0.008655061752406885,
+          "90-120deg": 0.0,
+          "120-150deg": 0.1955654964504522,
+          "150-180deg": 0.023047748711465525,
+          "180-210deg": 0.1640571817562968,
+          "210-240deg": 0.0036954196246231645,
+          "240-270deg": 0.0,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.0
+        }
+      }
+    },
+    {
+      "name": "tiny_town_normalized",
+      "path": "tools/analysis/palettes/tiny_town_normalized.png",
+      "stats": {
+        "totalOpaquePixels": 26637,
+        "uniqueColors": 27,
+        "luminanceMean": 124.54520907009045,
+        "luminanceStd": 52.72529724128343,
+        "luminanceMin": 48.870000000000005,
+        "luminanceMax": 250.99999999999997,
+        "hueDistribution": {
+          "0-30deg": 0.16992353440951571,
+          "30-60deg": 0.21112999150382328,
+          "60-90deg": 0.0,
+          "90-120deg": 0.08666100254885302,
+          "120-150deg": 0.02888700084961767,
+          "150-180deg": 0.0,
+          "180-210deg": 0.002548853016142736,
+          "210-240deg": 0.2064570943075616,
+          "240-270deg": 0.0,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.29439252336448596
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "packA": "roguelike_city",
+      "packB": "tiny_town_normalized",
+      "score": 60.0,
+      "compatible": true,
+      "issues": [
+        "Moderate luminance difference: 26.5",
+        "Somewhat different hue distributions (sim=0.52)",
+        "Large color count difference: 132 vs 27"
+      ],
+      "details": {
+        "luminanceDiff": 26.5,
+        "contrastRangeDiff": 7.1,
+        "colorCountA": 132,
+        "colorCountB": 27
+      }
+    }
+  ],
+  "overallCompatibility": true
+}

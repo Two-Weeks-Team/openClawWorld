@@ -11,6 +11,7 @@ import { Minimap } from '../../ui/Minimap';
 import { ZoneBanner } from '../../ui/ZoneBanner';
 import { TileInterpreter } from '../../world/TileInterpreter';
 import { ClientCollisionSystem } from '../../systems/CollisionSystem';
+import { AudioManager, AudioKeys } from '../../systems/AudioManager';
 import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
 import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
@@ -108,6 +109,7 @@ export class GameScene extends Phaser.Scene {
   private chatInputFocused = false;
   private skillBar?: SkillBar;
   private castBar?: CastBar;
+  private audioManager?: AudioManager;
   private skillKeys?: Phaser.Input.Keyboard.Key[];
   private targetingMode = false;
   private selectedSkillSlot: number | null = null;
@@ -155,6 +157,7 @@ export class GameScene extends Phaser.Scene {
     this.zoneBanner = new ZoneBanner(this);
     this.skillBar = new SkillBar(this);
     this.castBar = new CastBar(this);
+    this.audioManager = new AudioManager(this);
 
     this.tileInterpreter = new TileInterpreter(16);
     this.clientCollision = new ClientCollisionSystem();
@@ -164,6 +167,7 @@ export class GameScene extends Phaser.Scene {
     this.initializeBuiltinSkills();
 
     this.setupKeyboardFocusHandling();
+    this.setupAudioControls();
   }
 
   private initializeWorldGrid(): void {
@@ -247,6 +251,18 @@ export class GameScene extends Phaser.Scene {
       this.chatInputFocused = false;
       this.setWasdKeysEnabled(true);
     });
+  }
+
+  private setupAudioControls(): void {
+    // M key toggles mute
+    this.input.keyboard?.addKey('M').on('down', () => {
+      if (this.chatInputFocused) return;
+      const muted = this.audioManager?.toggleMute();
+      this.notificationPanel?.addEvent('system', muted ? 'Audio muted' : 'Audio unmuted', 0xaaaaaa);
+    });
+
+    // Start background music (deferred until user interaction unlocks audio context)
+    this.audioManager?.playBgm();
   }
 
   private setWasdKeysEnabled(enabled: boolean): void {
@@ -594,6 +610,7 @@ export class GameScene extends Phaser.Scene {
         this.marker?.setPosition(pointerTileX * 16, pointerTileY * 16);
         this.marker?.setVisible(true);
 
+        this.audioManager?.playSfx(AudioKeys.CLICK, 0.4);
         gameClient.moveTo(pointerTileX, pointerTileY);
       }
     });
@@ -609,6 +626,7 @@ export class GameScene extends Phaser.Scene {
   private setupInteractionKey() {
     this.input.keyboard?.addKey('E').on('down', () => {
       if (this.nearbyObject) {
+        this.audioManager?.playSfx(AudioKeys.CONFIRM, 0.6);
         this.handleInteraction(this.nearbyObject);
       }
     });
@@ -1082,6 +1100,7 @@ export class GameScene extends Phaser.Scene {
     this.zoneBanner?.destroy();
     this.skillBar?.destroy();
     this.castBar?.destroy();
+    this.audioManager?.destroy();
   }
 
   private setupRoomListeners() {
@@ -1292,6 +1311,7 @@ export class GameScene extends Phaser.Scene {
         `Entered zone: ${currentZone}`,
         EVENT_COLORS['zone.enter']
       );
+      this.audioManager?.playSfx(AudioKeys.BONG);
     }
 
     this.previousZone = currentZone;
@@ -1491,6 +1511,7 @@ export class GameScene extends Phaser.Scene {
       const now = this.time.now;
       if (now - this.lastMoveTime > 150) {
         gameClient.moveTo(myPlayer.tile.tx + dx, myPlayer.tile.ty + dy);
+        this.audioManager?.playFootstep();
         this.lastMoveTime = now;
       }
     }

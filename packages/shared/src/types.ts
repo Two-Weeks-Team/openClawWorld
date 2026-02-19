@@ -171,7 +171,7 @@ export type ObserveResponseData = {
   mapMetadata?: MapMetadata;
 };
 
-export type MoveToResult = 'accepted' | 'rejected' | 'no_op';
+export type MoveToResult = 'accepted' | 'rejected' | 'no_op' | 'no_path';
 
 export type MoveToResponseData = {
   txId: string;

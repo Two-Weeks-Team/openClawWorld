@@ -1,6 +1,6 @@
 import type { CollisionSystem } from '../collision/CollisionSystem.js';
 import type { EntitySchema } from '../schemas/EntitySchema.js';
-import type { MoveToResult, Facing } from '@openclawworld/shared';
+import type { MoveToResult, Facing, TileCoord } from '@openclawworld/shared';
 import { MAX_MOVE_SPEED } from '../constants.js';
 
 export { type MoveToResult };
@@ -10,6 +10,7 @@ interface MovementState {
   destY: number;
   destTx: number;
   destTy: number;
+  waypoints: TileCoord[];
 }
 
 export class MovementSystem {
@@ -67,6 +68,30 @@ export class MovementSystem {
       destY: destWorld.y,
       destTx,
       destTy,
+      waypoints: [],
+    });
+
+    return 'accepted';
+  }
+
+  /**
+   * Set a multi-waypoint path for an entity (from A* pathfinding).
+   * The entity will follow waypoints sequentially.
+   */
+  setPath(entityId: string, path: TileCoord[]): MoveToResult {
+    if (path.length === 0) {
+      return 'no_op';
+    }
+
+    const first = path[0];
+    const destWorld = this.collisionSystem.tileToWorld(first.tx, first.ty);
+
+    this.destinations.set(entityId, {
+      destX: destWorld.x,
+      destY: destWorld.y,
+      destTx: first.tx,
+      destTy: first.ty,
+      waypoints: path.slice(1),
     });
 
     return 'accepted';
@@ -92,7 +117,18 @@ export class MovementSystem {
       if (distance < 1) {
         entity.setPosition(movementState.destX, movementState.destY);
         entity.setTile(movementState.destTx, movementState.destTy);
-        this.destinations.delete(entityId);
+
+        // Advance to next waypoint if available
+        if (movementState.waypoints.length > 0) {
+          const next = movementState.waypoints.shift()!;
+          const nextWorld = this.collisionSystem.tileToWorld(next.tx, next.ty);
+          movementState.destX = nextWorld.x;
+          movementState.destY = nextWorld.y;
+          movementState.destTx = next.tx;
+          movementState.destTy = next.ty;
+        } else {
+          this.destinations.delete(entityId);
+        }
         continue;
       }
 

@@ -1,0 +1,290 @@
+[
+  {
+    "id": 32,
+    "type": "city_road_0",
+    "collision": false,
+    "source": "roguelike_city[8]"
+  },
+  {
+    "id": 33,
+    "type": "city_road_1",
+    "collision": false,
+    "source": "roguelike_city[89]"
+  },
+  {
+    "id": 34,
+    "type": "city_road_2",
+    "collision": false,
+    "source": "roguelike_city[174]"
+  },
+  {
+    "id": 35,
+    "type": "city_road_3",
+    "collision": false,
+    "source": "roguelike_city[308]"
+  },
+  {
+    "id": 36,
+    "type": "city_road_4",
+    "collision": false,
+    "source": "roguelike_city[485]"
+  },
+  {
+    "id": 37,
+    "type": "city_road_5",
+    "collision": false,
+    "source": "roguelike_city[600]"
+  },
+  {
+    "id": 38,
+    "type": "city_road_6",
+    "collision": false,
+    "source": "roguelike_city[723]"
+  },
+  {
+    "id": 39,
+    "type": "city_road_7",
+    "collision": false,
+    "source": "roguelike_city[799]"
+  },
+  {
+    "id": 40,
+    "type": "city_nature_0",
+    "collision": false,
+    "source": "roguelike_city[32]"
+  },
+  {
+    "id": 41,
+    "type": "city_nature_1",
+    "collision": false,
+    "source": "roguelike_city[162]"
+  },
+  {
+    "id": 42,
+    "type": "city_nature_2",
+    "collision": false,
+    "source": "roguelike_city[288]"
+  },
+  {
+    "id": 43,
+    "type": "city_nature_3",
+    "collision": false,
+    "source": "roguelike_city[443]"
+  },
+  {
+    "id": 44,
+    "type": "city_nature_4",
+    "collision": false,
+    "source": "roguelike_city[623]"
+  },
+  {
+    "id": 45,
+    "type": "city_nature_5",
+    "collision": false,
+    "source": "roguelike_city[670]"
+  },
+  {
+    "id": 46,
+    "type": "city_nature_6",
+    "collision": false,
+    "source": "roguelike_city[33]"
+  },
+  {
+    "id": 47,
+    "type": "city_nature_7",
+    "collision": false,
+    "source": "roguelike_city[34]"
+  },
+  {
+    "id": 48,
+    "type": "city_wall_0",
+    "collision": true,
+    "source": "roguelike_city[323]"
+  },
+  {
+    "id": 49,
+    "type": "city_wall_1",
+    "collision": true,
+    "source": "roguelike_city[520]"
+  },
+  {
+    "id": 50,
+    "type": "city_wall_2",
+    "collision": true,
+    "source": "roguelike_city[712]"
+  },
+  {
+    "id": 51,
+    "type": "city_wall_3",
+    "collision": true,
+    "source": "roguelike_city[786]"
+  },
+  {
+    "id": 52,
+    "type": "city_wall_4",
+    "collision": true,
+    "source": "roguelike_city[807]"
+  },
+  {
+    "id": 53,
+    "type": "city_wall_5",
+    "collision": true,
+    "source": "roguelike_city[860]"
+  },
+  {
+    "id": 54,
+    "type": "city_wall_6",
+    "collision": true,
+    "source": "roguelike_city[898]"
+  },
+  {
+    "id": 55,
+    "type": "city_wall_7",
+    "collision": true,
+    "source": "roguelike_city[481]"
+  },
+  {
+    "id": 56,
+    "type": "city_brick_0",
+    "collision": true,
+    "source": "roguelike_city[143]"
+  },
+  {
+    "id": 57,
+    "type": "city_brick_1",
+    "collision": true,
+    "source": "roguelike_city[508]"
+  },
+  {
+    "id": 58,
+    "type": "city_brick_2",
+    "collision": true,
+    "source": "roguelike_city[287]"
+  },
+  {
+    "id": 59,
+    "type": "city_brick_3",
+    "collision": true,
+    "source": "roguelike_city[289]"
+  },
+  {
+    "id": 60,
+    "type": "city_floor_0",
+    "collision": false,
+    "source": "roguelike_city[235]"
+  },
+  {
+    "id": 61,
+    "type": "city_floor_1",
+    "collision": false,
+    "source": "roguelike_city[311]"
+  },
+  {
+    "id": 62,
+    "type": "city_floor_2",
+    "collision": false,
+    "source": "roguelike_city[363]"
+  },
+  {
+    "id": 63,
+    "type": "city_floor_3",
+    "collision": false,
+    "source": "roguelike_city[423]"
+  },
+  {
+    "id": 64,
+    "type": "city_floor_4",
+    "collision": false,
+    "source": "roguelike_city[474]"
+  },
+  {
+    "id": 65,
+    "type": "city_floor_5",
+    "collision": false,
+    "source": "roguelike_city[667]"
+  },
+  {
+    "id": 66,
+    "type": "city_floor_6",
+    "collision": false,
+    "source": "roguelike_city[769]"
+  },
+  {
+    "id": 67,
+    "type": "city_floor_7",
+    "collision": false,
+    "source": "roguelike_city[875]"
+  },
+  {
+    "id": 68,
+    "type": "city_deco_0",
+    "collision": false,
+    "source": "roguelike_city[24]"
+  },
+  {
+    "id": 69,
+    "type": "city_deco_1",
+    "collision": false,
+    "source": "roguelike_city[68]"
+  },
+  {
+    "id": 70,
+    "type": "city_deco_2",
+    "collision": false,
+    "source": "roguelike_city[142]"
+  },
+  {
+    "id": 71,
+    "type": "city_deco_3",
+    "collision": false,
+    "source": "roguelike_city[182]"
+  },
+  {
+    "id": 72,
+    "type": "city_deco_4",
+    "collision": false,
+    "source": "roguelike_city[213]"
+  },
+  {
+    "id": 73,
+    "type": "city_deco_5",
+    "collision": false,
+    "source": "roguelike_city[267]"
+  },
+  {
+    "id": 74,
+    "type": "city_deco_6",
+    "collision": false,
+    "source": "roguelike_city[380]"
+  },
+  {
+    "id": 75,
+    "type": "city_deco_7",
+    "collision": false,
+    "source": "roguelike_city[707]"
+  },
+  {
+    "id": 76,
+    "type": "city_wood_0",
+    "collision": false,
+    "source": "roguelike_city[0]"
+  },
+  {
+    "id": 77,
+    "type": "city_wood_1",
+    "collision": false,
+    "source": "roguelike_city[260]"
+  },
+  {
+    "id": 78,
+    "type": "city_wood_2",
+    "collision": false,
+    "source": "roguelike_city[502]"
+  },
+  {
+    "id": 79,
+    "type": "city_wood_3",
+    "collision": false,
+    "source": "roguelike_city[655]"
+  }
+]

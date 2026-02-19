@@ -4,7 +4,7 @@
   "generated": "2026-02-19",
   "description": "Kenney asset curation manifest for openClawWorld. All coordinates are 0-indexed (col, row).",
   "_contract": {
-    "tileset": "32 slots (8x4 grid at 16x16px). Indices 0-31 are fixed contract.",
+    "tileset": "80 slots (8x10 grid at 16x16px). Indices 0-31 original, 32-79 city pack.",
     "npcs": "9 NPC sprites with zone assignments. IDs must match world/packs/base/npcs/*.json",
     "players": "3 player variants (human, agent, object)",
     "validation": "Run 'pnpm verify:maps' to validate contract compliance"
@@ -78,10 +78,10 @@
     "tileset": {
       "path": "packages/client/public/assets/maps/tileset.png",
       "width": 128,
-      "height": 64,
+      "height": 160,
       "tileSize": 16,
       "columns": 8,
-      "rows": 4
+      "rows": 10
     },
     "npcs": {
       "pngPath": "packages/client/public/assets/sprites/npcs.png",
@@ -98,7 +98,7 @@
   },
 
   "tileset": {
-    "description": "32 tiles arranged in 8x4 grid (128x64 pixels)",
+    "description": "80 tiles arranged in 8x10 grid (128x160 pixels). Indices 0-31: original tiles, 32-79: Roguelike City Pack tiles.",
     "tiles": [
       {
         "id": "empty",
@@ -351,6 +351,390 @@
         "col": 17,
         "row": 1,
         "purpose": "indoor plant"
+      },
+      {
+        "id": "city_road_0",
+        "index": 32,
+        "source": "city",
+        "col": 8,
+        "row": 0,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_road_1",
+        "index": 33,
+        "source": "city",
+        "col": 15,
+        "row": 2,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_road_2",
+        "index": 34,
+        "source": "city",
+        "col": 26,
+        "row": 4,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_road_3",
+        "index": 35,
+        "source": "city",
+        "col": 12,
+        "row": 8,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_road_4",
+        "index": 36,
+        "source": "city",
+        "col": 4,
+        "row": 13,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_road_5",
+        "index": 37,
+        "source": "city",
+        "col": 8,
+        "row": 16,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_road_6",
+        "index": 38,
+        "source": "city",
+        "col": 20,
+        "row": 19,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_road_7",
+        "index": 39,
+        "source": "city",
+        "col": 22,
+        "row": 21,
+        "purpose": "city road tile"
+      },
+      {
+        "id": "city_nature_0",
+        "index": 40,
+        "source": "city",
+        "col": 32,
+        "row": 0,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_nature_1",
+        "index": 41,
+        "source": "city",
+        "col": 14,
+        "row": 4,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_nature_2",
+        "index": 42,
+        "source": "city",
+        "col": 29,
+        "row": 7,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_nature_3",
+        "index": 43,
+        "source": "city",
+        "col": 36,
+        "row": 11,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_nature_4",
+        "index": 44,
+        "source": "city",
+        "col": 31,
+        "row": 16,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_nature_5",
+        "index": 45,
+        "source": "city",
+        "col": 4,
+        "row": 18,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_nature_6",
+        "index": 46,
+        "source": "city",
+        "col": 33,
+        "row": 0,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_nature_7",
+        "index": 47,
+        "source": "city",
+        "col": 34,
+        "row": 0,
+        "purpose": "city nature tile"
+      },
+      {
+        "id": "city_wall_0",
+        "index": 48,
+        "source": "city",
+        "col": 27,
+        "row": 8,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_wall_1",
+        "index": 49,
+        "source": "city",
+        "col": 2,
+        "row": 14,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_wall_2",
+        "index": 50,
+        "source": "city",
+        "col": 9,
+        "row": 19,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_wall_3",
+        "index": 51,
+        "source": "city",
+        "col": 9,
+        "row": 21,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_wall_4",
+        "index": 52,
+        "source": "city",
+        "col": 30,
+        "row": 21,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_wall_5",
+        "index": 53,
+        "source": "city",
+        "col": 9,
+        "row": 23,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_wall_6",
+        "index": 54,
+        "source": "city",
+        "col": 10,
+        "row": 24,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_wall_7",
+        "index": 55,
+        "source": "city",
+        "col": 0,
+        "row": 13,
+        "purpose": "city wall tile"
+      },
+      {
+        "id": "city_brick_0",
+        "index": 56,
+        "source": "city",
+        "col": 32,
+        "row": 3,
+        "purpose": "city brick tile"
+      },
+      {
+        "id": "city_brick_1",
+        "index": 57,
+        "source": "city",
+        "col": 27,
+        "row": 13,
+        "purpose": "city brick tile"
+      },
+      {
+        "id": "city_brick_2",
+        "index": 58,
+        "source": "city",
+        "col": 28,
+        "row": 7,
+        "purpose": "city brick tile"
+      },
+      {
+        "id": "city_brick_3",
+        "index": 59,
+        "source": "city",
+        "col": 30,
+        "row": 7,
+        "purpose": "city brick tile"
+      },
+      {
+        "id": "city_floor_0",
+        "index": 60,
+        "source": "city",
+        "col": 13,
+        "row": 6,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_floor_1",
+        "index": 61,
+        "source": "city",
+        "col": 15,
+        "row": 8,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_floor_2",
+        "index": 62,
+        "source": "city",
+        "col": 30,
+        "row": 9,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_floor_3",
+        "index": 63,
+        "source": "city",
+        "col": 16,
+        "row": 11,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_floor_4",
+        "index": 64,
+        "source": "city",
+        "col": 30,
+        "row": 12,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_floor_5",
+        "index": 65,
+        "source": "city",
+        "col": 1,
+        "row": 18,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_floor_6",
+        "index": 66,
+        "source": "city",
+        "col": 29,
+        "row": 20,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_floor_7",
+        "index": 67,
+        "source": "city",
+        "col": 24,
+        "row": 23,
+        "purpose": "city floor tile"
+      },
+      {
+        "id": "city_deco_0",
+        "index": 68,
+        "source": "city",
+        "col": 24,
+        "row": 0,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_deco_1",
+        "index": 69,
+        "source": "city",
+        "col": 31,
+        "row": 1,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_deco_2",
+        "index": 70,
+        "source": "city",
+        "col": 31,
+        "row": 3,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_deco_3",
+        "index": 71,
+        "source": "city",
+        "col": 34,
+        "row": 4,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_deco_4",
+        "index": 72,
+        "source": "city",
+        "col": 28,
+        "row": 5,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_deco_5",
+        "index": 73,
+        "source": "city",
+        "col": 8,
+        "row": 7,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_deco_6",
+        "index": 74,
+        "source": "city",
+        "col": 10,
+        "row": 10,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_deco_7",
+        "index": 75,
+        "source": "city",
+        "col": 4,
+        "row": 19,
+        "purpose": "city deco tile"
+      },
+      {
+        "id": "city_wood_0",
+        "index": 76,
+        "source": "city",
+        "col": 0,
+        "row": 0,
+        "purpose": "city wood tile"
+      },
+      {
+        "id": "city_wood_1",
+        "index": 77,
+        "source": "city",
+        "col": 1,
+        "row": 7,
+        "purpose": "city wood tile"
+      },
+      {
+        "id": "city_wood_2",
+        "index": 78,
+        "source": "city",
+        "col": 21,
+        "row": 13,
+        "purpose": "city wood tile"
+      },
+      {
+        "id": "city_wood_3",
+        "index": 79,
+        "source": "city",
+        "col": 26,
+        "row": 17,
+        "purpose": "city wood tile"
       }
     ]
   },

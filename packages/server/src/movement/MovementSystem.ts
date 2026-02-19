@@ -22,7 +22,12 @@ export class MovementSystem {
     this.baseSpeed = Math.min(speed, MAX_MOVE_SPEED);
   }
 
-  setDestination(entityId: string, destTx: number, destTy: number): MoveToResult {
+  setDestination(
+    entityId: string,
+    destTx: number,
+    destTy: number,
+    currentPos?: { x: number; y: number }
+  ): MoveToResult {
     const destWorld = this.collisionSystem.tileToWorld(destTx, destTy);
 
     if (!this.collisionSystem.isInBounds(destTx, destTy)) {
@@ -36,6 +41,25 @@ export class MovementSystem {
     const existing = this.destinations.get(entityId);
     if (existing && existing.destTx === destTx && existing.destTy === destTy) {
       return 'no_op';
+    }
+
+    // If current position is provided, validate that the first movement step won't be blocked
+    if (currentPos) {
+      const dx = destWorld.x - currentPos.x;
+      const dy = destWorld.y - currentPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance >= 1) {
+        // Simulate one tick of movement to check the first step
+        const stepDistance = Math.min(this.baseSpeed * 0.05, distance); // ~1 tick at 20 fps
+        const stepX = currentPos.x + (dx / distance) * stepDistance;
+        const stepY = currentPos.y + (dy / distance) * stepDistance;
+        const stepTile = this.collisionSystem.worldToTile(stepX, stepY);
+
+        if (this.collisionSystem.isBlocked(stepTile.tx, stepTile.ty)) {
+          return 'rejected';
+        }
+      }
     }
 
     this.destinations.set(entityId, {

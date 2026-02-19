@@ -28,26 +28,49 @@ async function loadChannels(): Promise<void> {
   try {
     const channels = await gameClient.fetchChannels();
 
+    channelListEl.innerHTML = '';
+
     if (channels.length === 0) {
-      // No channels yet — show default option
-      channelListEl.innerHTML = '';
+      // No channels yet — show default option to create channel-1
       const btn = document.createElement('button');
       btn.className = 'channel-btn';
-      btn.innerHTML = `Channel 1 <span class="occupancy">0/30</span>`;
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = 'Channel 1';
+      const occupancySpan = document.createElement('span');
+      occupancySpan.className = 'occupancy';
+      occupancySpan.textContent = '0/30';
+      btn.appendChild(labelSpan);
+      btn.appendChild(occupancySpan);
       btn.addEventListener('click', () => selectChannel('channel-1', 0, 30));
       channelListEl.appendChild(btn);
       return;
     }
 
-    channelListEl.innerHTML = '';
+    const allFull = channels.every((ch: ChannelInfo) => ch.occupancy >= ch.maxOccupancy);
+    if (allFull) {
+      // All channels full — show message and auto-retry
+      const msg = document.createElement('p');
+      msg.textContent = 'All channels are full. Retrying in 5 seconds...';
+      channelListEl.appendChild(msg);
+      setTimeout(() => loadChannels(), 5000);
+      return;
+    }
+
     channels.forEach((ch: ChannelInfo) => {
       const btn = document.createElement('button');
       const isFull = ch.occupancy >= ch.maxOccupancy;
       btn.className = `channel-btn${isFull ? ' full' : ''}`;
       btn.disabled = isFull;
 
+      // Use textContent to avoid XSS from server-provided channelId
       const label = ch.channelId.replace('channel-', 'Channel ');
-      btn.innerHTML = `${label} <span class="occupancy">${ch.occupancy}/${ch.maxOccupancy}</span>`;
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = label;
+      const occupancySpan = document.createElement('span');
+      occupancySpan.className = 'occupancy';
+      occupancySpan.textContent = `${ch.occupancy}/${ch.maxOccupancy}`;
+      btn.appendChild(labelSpan);
+      btn.appendChild(occupancySpan);
 
       if (!isFull) {
         btn.addEventListener('click', () =>
@@ -56,7 +79,8 @@ async function loadChannels(): Promise<void> {
       }
       channelListEl.appendChild(btn);
     });
-  } catch {
+  } catch (err) {
+    console.error('[loadChannels] Failed to fetch channels:', err);
     channelListEl.textContent = 'Failed to load channels';
   }
 }

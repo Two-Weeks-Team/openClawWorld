@@ -58,14 +58,19 @@ export class EventLog {
    * @param limit - Maximum number of events to return
    * @returns Object containing events and the next cursor
    */
-  getSince(cursor: string, limit: number): { events: EventEnvelope[]; nextCursor: string } {
+  getSince(
+    cursor: string,
+    limit: number
+  ): { events: EventEnvelope[]; nextCursor: string; cursorExpired: boolean } {
     // Find the index of the event with the given cursor
     const index = this.events.findIndex(e => e.cursor === cursor);
 
     let startIndex: number;
+    let cursorExpired = false;
     if (index === -1) {
-      // Cursor not found - return events from beginning (cursor expired or invalid)
-      startIndex = 0;
+      // Cursor expired or invalid — skip past events, start from current position
+      startIndex = this.events.length;
+      cursorExpired = true;
     } else {
       // Start after the found cursor
       startIndex = index + 1;
@@ -73,9 +78,9 @@ export class EventLog {
 
     const endIndex = Math.min(startIndex + limit, this.events.length);
     const events = this.events.slice(startIndex, endIndex);
-    const nextCursor = events.length > 0 ? events[events.length - 1].cursor : cursor;
+    const nextCursor = events.length > 0 ? events[events.length - 1].cursor : this.getCurrentCursor();
 
-    return { events, nextCursor };
+    return { events, nextCursor, cursorExpired };
   }
 
   /**

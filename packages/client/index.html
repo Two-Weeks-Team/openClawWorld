@@ -36,6 +36,54 @@
         pointer-events: auto;
         color: white;
         text-align: center;
+        min-width: 280px;
+      }
+      #channel-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 10px 0;
+        max-height: 240px;
+        overflow-y: auto;
+      }
+      .channel-btn {
+        padding: 10px 16px;
+        border: 1px solid #555;
+        border-radius: 6px;
+        background: #3a3a3a;
+        color: white;
+        cursor: pointer;
+        text-align: left;
+        font-size: 14px;
+        transition: background 0.15s;
+      }
+      .channel-btn:hover:not(:disabled) {
+        background: #4a4a4a;
+        border-color: #7a7a7a;
+      }
+      .channel-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .channel-btn .occupancy {
+        float: right;
+        color: #aaa;
+      }
+      .channel-btn.full .occupancy {
+        color: #e55;
+      }
+      #refresh-btn, #back-btn {
+        padding: 6px 14px;
+        border: 1px solid #555;
+        border-radius: 4px;
+        background: #3a3a3a;
+        color: #ccc;
+        cursor: pointer;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+      #refresh-btn:hover, #back-btn:hover {
+        background: #4a4a4a;
       }
       #chat-container {
         position: absolute;
@@ -73,8 +121,21 @@
     <div id="ui-layer">
       <div id="login-screen">
         <h2>OpenClawWorld</h2>
-        <input type="text" id="username-input" placeholder="Enter Name" />
-        <button id="join-btn">Join World</button>
+        <!-- Step 1: Channel Selection -->
+        <div id="channel-select">
+          <h3>Select Channel</h3>
+          <div id="channel-list">Loading...</div>
+          <button id="refresh-btn">Refresh</button>
+        </div>
+        <!-- Step 2: Name Input (shown after channel selection) -->
+        <div id="name-input-area" style="display: none;">
+          <p id="selected-channel-label" style="color: #aaa; margin: 8px 0;"></p>
+          <input type="text" id="username-input" placeholder="Enter Name" />
+          <div style="margin-top: 10px;">
+            <button id="join-btn">Join World</button>
+            <button id="back-btn">Back</button>
+          </div>
+        </div>
       </div>
       <div id="chat-container">
         <div id="chat-messages"></div>

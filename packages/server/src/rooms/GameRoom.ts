@@ -15,6 +15,7 @@ import {
   DEFAULT_MOVE_SPEED,
   AGENT_TIMEOUT_MS,
   AGENT_CLEANUP_INTERVAL_MS,
+  MAX_CHANNEL_OCCUPANCY,
 } from '../constants.js';
 import { EventLog } from '../events/EventLog.js';
 import { MovementSystem } from '../movement/MovementSystem.js';
@@ -41,6 +42,7 @@ import { DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 import { WorldPackLoader, WorldPackError, type WorldPack } from '../world/WorldPackLoader.js';
 import { SkillService } from '../services/SkillService.js';
+import { registerRoom, unregisterRoom } from '../aic/roomRegistry.js';
 
 const DEFAULT_NPC_SEED = 12345;
 const __filename = fileURLToPath(import.meta.url);
@@ -140,6 +142,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
     this.setMetadata({ roomId });
+    registerRoom(roomId, this.roomId);
     this.facilityService = new FacilityService(this.state);
     registerAllFacilityHandlers(this.facilityService);
     this.loadFacilitiesFromWorldPack();
@@ -351,6 +354,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   getSkillService(): SkillService | null {
     return this.skillService;
+  }
+
+  getOccupancy(): number {
+    return this.state.humans.size + this.state.agents.size;
   }
 
   handleInteraction(
@@ -664,6 +671,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   override onJoin(client: Client, options: { name?: string }): void {
+    if (this.getOccupancy() >= MAX_CHANNEL_OCCUPANCY) {
+      throw new Error('Channel is full');
+    }
+
     const name = options.name ?? `Player ${client.sessionId.slice(0, 6)}`;
     const entityId = this.generateEntityId('human');
 
@@ -723,6 +734,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   override onDispose(): void {
+    unregisterRoom(this.state.roomId);
     console.log(`[GameRoom] Disposing room ${this.state.roomId}`);
     this.clientEntities.clear();
     this.recentProximityEvents = [];

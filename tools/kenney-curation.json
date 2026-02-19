@@ -1,13 +1,40 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
-  "generated": "2025-02-13",
+  "version": "1.1.0",
+  "generated": "2026-02-19",
   "description": "Kenney asset curation manifest for openClawWorld. All coordinates are 0-indexed (col, row).",
   "_contract": {
     "tileset": "32 slots (8x4 grid at 16x16px). Indices 0-31 are fixed contract.",
     "npcs": "9 NPC sprites with zone assignments. IDs must match world/packs/base/npcs/*.json",
     "players": "3 player variants (human, agent, object)",
     "validation": "Run 'pnpm verify:maps' to validate contract compliance"
+  },
+
+  "analysis": {
+    "description": "Auto-generated analysis metadata from tools/analyze_tileset.py",
+    "reports": {
+      "city": "tools/analysis/roguelike_city_analysis.json",
+      "interior": "tools/analysis/roguelike_interior_analysis.json",
+      "urban": "tools/analysis/rpg_urban_analysis.json",
+      "characters": "tools/analysis/roguelike_characters_analysis.json",
+      "tinytown": "tools/analysis/tiny_town_analysis.json"
+    },
+    "lastAnalyzed": "2026-02-19",
+    "tools": {
+      "analyzer": "tools/analyze_tileset.py",
+      "spritesheetAnalyzer": "tools/analyze_spritesheet.py",
+      "comparator": "tools/compare_tiles.py",
+      "generator": "tools/generate_tiles.py",
+      "pipeline": "tools/asset_pipeline.py"
+    },
+    "capabilities": {
+      "deepMetrics": ["edgeConnectivity", "symmetryDetection", "paletteComplexity", "patternFrequency", "tileRelationships"],
+      "scaling": ["nearest", "scale2x", "scale3x", "hqx"],
+      "transitions": ["bayerDither2x2", "bayerDither4x4", "bayerDither8x8", "smoothGradient"],
+      "colorVariants": ["paletteSwap", "hsvShift", "seasonal6", "custom"],
+      "autotiling": ["simple9tile", "bitmask47tile"],
+      "paletteOps": ["extract", "normalize", "crossPackCompare"]
+    }
   },
 
   "sources": {

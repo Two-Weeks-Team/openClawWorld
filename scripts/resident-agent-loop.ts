@@ -2333,27 +2333,27 @@ class ResidentAgent {
         if (this.isAuthError(error)) {
           this.state.consecutiveAuthErrors++;
 
-          if (this.state.consecutiveAuthErrors <= MAX_CONSECUTIVE_AUTH_ERRORS) {
-            console.warn(
-              `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
-            );
-            try {
-              await this.reregister('default');
-              console.log(`[${this.state.agentId}] Re-registration successful after auth error`);
-              this.state.consecutiveAuthErrors = 0;
-            } catch (reregisterError) {
-              console.error(`[${this.state.agentId}] Re-registration failed:`, reregisterError);
-              const baseBackoffMs =
-                REREGISTER_RETRY_DELAY_MS * Math.pow(2, this.state.consecutiveAuthErrors);
-              const jitter = baseBackoffMs * 0.25 * (Math.random() * 2 - 1);
-              await sleep(baseBackoffMs + jitter);
-            }
-          } else {
+          if (this.state.consecutiveAuthErrors > MAX_CONSECUTIVE_AUTH_ERRORS) {
             console.error(
-              `[${this.state.agentId}] Max consecutive auth errors reached, stopping agent`
+              `[${this.state.agentId}] Max consecutive auth errors (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}) reached, stopping agent`
             );
             this.running = false;
             return;
+          }
+
+          console.warn(
+            `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
+          );
+          try {
+            await this.reregister('default');
+            console.log(`[${this.state.agentId}] Re-registration successful after auth error`);
+            this.state.consecutiveAuthErrors = 0;
+          } catch (reregisterError) {
+            console.error(`[${this.state.agentId}] Re-registration failed:`, reregisterError);
+            const baseBackoffMs =
+              REREGISTER_RETRY_DELAY_MS * Math.pow(2, this.state.consecutiveAuthErrors);
+            const jitter = baseBackoffMs * 0.25 * (Math.random() * 2 - 1);
+            await sleep(baseBackoffMs + jitter);
           }
         }
       }
@@ -2451,7 +2451,11 @@ class ResidentAgent {
     } else {
       if (prefs[facilityTypeOrKey] !== undefined) return prefs[facilityTypeOrKey];
     }
-    return 0.05;
+    // Role-aware fallback: use the minimum of existing preferences to avoid
+    // unknown facilities outweighing intentionally low-weight role actions
+    const prefValues = Object.values(prefs);
+    const minPref = prefValues.length > 0 ? Math.min(...prefValues) : 0.01;
+    return minPref;
   }
 
   private computeNoveltyMultiplier(label: string): number {

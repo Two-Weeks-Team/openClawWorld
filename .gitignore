@@ -45,6 +45,14 @@ temp/
 
 # Work artifacts
 .sisyphus/
+.serena/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ruff_cache/
 
 # Extracted/generated assets
 assets/extracted/

@@ -1,32 +1,29 @@
 #!/usr/bin/env python3
-"""Extract NPC sprites from Kenney Roguelike Characters Pack using manifest."""
+"""Extract NPC sprites from Kenney Roguelike Characters Pack using manifest.
+
+Flags:
+  --verify   Verify extraction by comparing pHash against source
+  --preview  Generate labeled preview PNG
+"""
+
+import argparse
+import os
+import sys
 
 from PIL import Image
-import json
-import os
-from pathlib import Path
 
-SCRIPT_DIR = Path(__file__).parent
-MANIFEST_PATH = SCRIPT_DIR / "kenney-curation.json"
-
-
-def load_manifest() -> dict:
-    """Load kenney-curation.json manifest file."""
-    with open(MANIFEST_PATH) as f:
-        return json.load(f)
-
-
-def get_tile(
-    img: Image.Image, col: int, row: int, tile_size: int = 16, spacing: int = 1
-) -> Image.Image:
-    """Extract a single tile from a spritesheet at the given grid position."""
-    x = col * (tile_size + spacing)
-    y = row * (tile_size + spacing)
-    return img.crop((x, y, x + tile_size, y + tile_size))
+from extract_utils import load_manifest, get_tile, verify_sprites, generate_sprite_preview
 
 
 def main() -> None:
     """Extract NPC sprites from manifest and save as spritesheet with atlas JSON."""
+    import json
+
+    parser = argparse.ArgumentParser(description="Extract NPC sprites from Kenney characters pack.")
+    parser.add_argument("--verify", action="store_true", help="Verify extraction accuracy")
+    parser.add_argument("--preview", action="store_true", help="Generate labeled preview PNG")
+    args = parser.parse_args()
+
     manifest = load_manifest()
     char_source = manifest["sources"]["characters"]
     npcs_config = manifest["npcs"]["sprites"]
@@ -61,7 +58,7 @@ def main() -> None:
         zone = npc.get("zone", "Unknown")
         print(f"NPC {npc_id:20s}: ({col:2d},{row:2d}) -> x={out_x:3d} | Zone: {zone}")
 
-    os.makedirs(os.path.dirname(output_config["pngPath"]), exist_ok=True)
+    os.makedirs(os.path.dirname(output_config["pngPath"]) or ".", exist_ok=True)
     output_img.save(output_config["pngPath"])
     print(f"\nSaved NPC spritesheet to {output_config['pngPath']}")
     print(f"Output size: {output_img.size}")
@@ -80,6 +77,14 @@ def main() -> None:
         json.dump(atlas_json, f, indent=2)
     print(f"Saved NPC atlas JSON to {output_config['jsonPath']}")
     print(f"Manifest version: {manifest['version']}")
+
+    if args.verify:
+        if not verify_sprites(output_img, npcs_config, source_img, tile_size, spacing, label="NPC sprites"):
+            sys.exit(1)
+
+    if args.preview:
+        preview_path = output_config["pngPath"].replace(".png", "_preview.png")
+        generate_sprite_preview(output_img, npcs_config, tile_size, preview_path)
 
 
 if __name__ == "__main__":

@@ -1,148 +1,176 @@
 #!/usr/bin/env python3
-"""Extract object sprites from Kenney Roguelike packs.
+"""Extract object sprites from Kenney Roguelike packs using manifest.
 
-Extracts decorative objects and interactive items from:
-- City tilemap subset in repository
-- Interior tilemap subset in repository
-
+Reads object definitions from kenney-curation.json instead of hardcoded arrays.
 Output: objects.png atlas + objects.json (Phaser atlas format)
+
+Flags:
+  --verify   Verify extraction by comparing pHash against source
+  --preview  Generate labeled preview PNG
 """
 
-from PIL import Image
+import argparse
 import json
 import os
+import sys
 
-KENNEY_PATH = "packages/client/public/assets/kenney"
-CITY_TILEMAP = f"{KENNEY_PATH}/tiles/city_tilemap.png"
-INTERIOR_SPRITESHEET = f"{KENNEY_PATH}/interior/interior_tilemap.png"
+from PIL import Image
 
-OUTPUT_PNG = "packages/client/public/assets/sprites/objects.png"
-OUTPUT_JSON = "packages/client/public/assets/sprites/objects.json"
-
-TILE_SIZE = 16
-SPACING = 1  # For spaced tilesheets
-CITY_COLS = 37  # city_tilemap.png columns at 16x16
-
-# Object mapping using individual tile files for City Pack
-# Tile numbers determined from Kenney Roguelike City Pack analysis
-# Row 20-23 contains decorative objects
-CITY_OBJECTS = [
-    # Fountain - water feature (tile 919 is a nice fountain base)
-    {"id": "fountain", "tile_num": 919, "desc": "Fountain - plaza decoration"},
-    # Bench - seating (tile 958 is a wooden bench)
-    {"id": "bench", "tile_num": 958, "desc": "Bench - park seating"},
-    # Lamp - street lighting (tile 765 is a lamp post)
-    {"id": "lamp", "tile_num": 765, "desc": "Lamp - street light"},
-    # Sign - information board (tile 882 is a signpost)
-    {"id": "sign", "tile_num": 882, "desc": "Sign - information board"},
-]
-
-# Interior objects using spritesheet coordinates (col, row)
-# Interior Pack: 27 cols x 18 rows, 1px spacing
-INTERIOR_OBJECTS = [
-    # Chest closed - treasure container (around row 12-13)
-    {"id": "chest", "col": 24, "row": 12, "desc": "Chest - closed treasure"},
-    # Chest open - opened container
-    {"id": "chest-open", "col": 25, "row": 12, "desc": "Chest - opened"},
-    # Portal - magical doorway (around row 15-16)
-    {"id": "portal", "col": 0, "row": 17, "desc": "Portal - magical doorway"},
-]
+from extract_utils import load_manifest, get_tile, generate_sprite_preview
 
 
-def get_city_tile(img: Image.Image, tile_num: int) -> Image.Image:
-    """Extract a city tile using 1-based tile index."""
-    if tile_num <= 0:
-        raise ValueError(f"tile_num must be >= 1, got {tile_num}")
+def verify_extraction(
+    output_img: Image.Image,
+    objects_extracted: list,
+    source_images: dict,
+) -> bool:
+    """Verify each extracted object sprite against the source."""
+    try:
+        import imagehash
+    except ImportError:
+        print("Warning: imagehash not installed, skipping verification")
+        return True
 
-    tile_index = tile_num - 1
-    col = tile_index % CITY_COLS
-    row = tile_index // CITY_COLS
-    x = col * TILE_SIZE
-    y = row * TILE_SIZE
+    print(f"\n{'=' * 60}")
+    print("VERIFICATION: Object sprites")
+    print(f"{'=' * 60}")
 
-    if x + TILE_SIZE > img.width or y + TILE_SIZE > img.height:
-        raise ValueError(
-            f"tile_{tile_num:04d} out of bounds (col={col}, row={row}) for image {img.size}"
-        )
+    all_pass = True
+    for entry in objects_extracted:
+        obj_id = entry["id"]
+        out_x = entry["out_x"]
+        w = entry.get("w", 16)
+        h = entry.get("h", 16)
 
-    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+        extracted = output_img.crop((out_x, 0, out_x + w, h))
+        h_ext = imagehash.phash(extracted)
 
+        source_name = entry["source"]
+        if source_name in source_images:
+            src = source_images[source_name]
+            src_ts = src["tileSize"]
+            obj_tw = w // src_ts if w > src_ts else 1
+            obj_th = h // src_ts if h > src_ts else 1
+            original = get_tile(
+                src["image"],
+                entry["col"], entry["row"],
+                tile_size=src_ts,
+                spacing=src["spacing"],
+                width=obj_tw, height=obj_th,
+            )
+            h_orig = imagehash.phash(original)
+            dist = h_ext - h_orig
+            status = "PASS" if dist == 0 else f"FAIL(dist={dist})"
+            if dist > 0:
+                all_pass = False
+        else:
+            status = "SKIP(no source)"
 
-def get_interior_tile(img: Image.Image, col: int, row: int) -> Image.Image:
-    """Extract tile from Interior spritesheet with 1px spacing."""
-    x = col * (TILE_SIZE + SPACING)
-    y = row * (TILE_SIZE + SPACING)
-    if x + TILE_SIZE > img.width or y + TILE_SIZE > img.height:
-        raise ValueError(
-            f"interior tile out of bounds (col={col}, row={row}) for image {img.size}"
-        )
-    return img.crop((x, y, x + TILE_SIZE, y + TILE_SIZE))
+        print(f"  {obj_id:20s} {status}")
+
+    return all_pass
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Extract object sprites from Kenney packs.")
+    parser.add_argument("--verify", action="store_true", help="Verify extraction accuracy")
+    parser.add_argument("--preview", action="store_true", help="Generate labeled preview PNG")
+    args = parser.parse_args()
+
     print("=== Extracting Object Sprites from Kenney Packs ===\n")
 
-    # Load source tilemaps/spritesheets from tracked repo assets
-    city_img = Image.open(CITY_TILEMAP).convert("RGBA")
-    interior_img = Image.open(INTERIOR_SPRITESHEET).convert("RGBA")
-    print(f"City tilemap size: {city_img.size}")
-    print(f"Interior spritesheet size: {interior_img.size}")
+    manifest = load_manifest()
+    sources_config = manifest["sources"]
+    objects_config = manifest["objects"]["sprites"]
+    output_config = manifest["outputs"]["objects"]
 
-    # Calculate output dimensions
-    all_objects = CITY_OBJECTS + INTERIOR_OBJECTS
-    num_objects = len(all_objects)
-    output_width = num_objects * TILE_SIZE
-    output_height = TILE_SIZE
+    # Load source images
+    source_images = {}
+    for source_name, source_info in sources_config.items():
+        path = source_info["path"]
+        if os.path.exists(path):
+            source_images[source_name] = {
+                "image": Image.open(path).convert("RGBA"),
+                "tileSize": source_info["tileSize"],
+                "spacing": source_info["spacing"],
+            }
+            print(f"Loaded {source_name}: {path} ({source_images[source_name]['image'].size})")
 
-    # Create output atlas
+    # Pre-compute output dimensions accounting for multi-tile objects
+    # Use source tileSize for each object rather than hardcoded value
+    total_width = 0
+    max_height = 0
+    for obj in objects_config:
+        source_name = obj["source"]
+        src_ts = source_images[source_name]["tileSize"] if source_name in source_images else 16
+        obj_w = obj.get("width", 1) * src_ts
+        obj_h = obj.get("height", 1) * src_ts
+        total_width += obj_w
+        max_height = max(max_height, obj_h)
+
+    if max_height == 0:
+        max_height = 16
+
+    output_width = total_width
+    output_height = max_height
+
     output_img = Image.new("RGBA", (output_width, output_height), (0, 0, 0, 0))
     frames = {}
+    objects_extracted = []
+    out_x = 0
 
-    idx = 0
+    for obj in objects_config:
+        obj_id = obj["id"]
+        source_name = obj["source"]
+        col = obj["col"]
+        row = obj["row"]
+        obj_tw = obj.get("width", 1)
+        obj_th = obj.get("height", 1)
+        desc = obj.get("description", "")
 
-    # Extract city objects from packed city tilemap
-    print("\n--- City Pack Objects ---")
-    for obj in CITY_OBJECTS:
+        if source_name not in source_images:
+            print(f"  WARNING: Source '{source_name}' not found for {obj_id}, skipping")
+            continue
+
+        src = source_images[source_name]
+        src_ts = src["tileSize"]
         try:
-            tile = get_city_tile(city_img, obj["tile_num"])
-            out_x = idx * TILE_SIZE
-            output_img.paste(tile, (out_x, 0))
+            sprite = get_tile(
+                src["image"], col, row, src_ts, src["spacing"],
+                width=obj_tw, height=obj_th,
+            )
+            w = sprite.width
+            h = sprite.height
+            output_img.paste(sprite, (out_x, 0))
 
-            frames[obj["id"]] = {
-                "frame": {"x": out_x, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
-                "sourceSize": {"w": TILE_SIZE, "h": TILE_SIZE},
-                "spriteSourceSize": {"x": 0, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
+            frames[obj_id] = {
+                "frame": {"x": out_x, "y": 0, "w": w, "h": h},
+                "sourceSize": {"w": w, "h": h},
+                "spriteSourceSize": {"x": 0, "y": 0, "w": w, "h": h},
             }
-            print(f"  {obj['id']}: tile_{obj['tile_num']:04d} -> x={out_x}")
-            idx += 1
-        except ValueError as e:
-            print(f"  WARNING: {e}")
 
-    # Extract Interior Pack objects (spritesheet)
-    print("\n--- Interior Pack Objects ---")
-    for obj in INTERIOR_OBJECTS:
-        try:
-            tile = get_interior_tile(interior_img, obj["col"], obj["row"])
-            out_x = idx * TILE_SIZE
-            output_img.paste(tile, (out_x, 0))
+            objects_extracted.append({
+                "id": obj_id,
+                "source": source_name,
+                "col": col,
+                "row": row,
+                "out_x": out_x,
+                "w": w,
+                "h": h,
+            })
 
-            frames[obj["id"]] = {
-                "frame": {"x": out_x, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
-                "sourceSize": {"w": TILE_SIZE, "h": TILE_SIZE},
-                "spriteSourceSize": {"x": 0, "y": 0, "w": TILE_SIZE, "h": TILE_SIZE},
-            }
-            print(f"  {obj['id']}: ({obj['col']}, {obj['row']}) -> x={out_x}")
-            idx += 1
-        except ValueError as e:
-            print(f"  WARNING: {e}")
+            size_str = f"{obj_tw}x{obj_th}" if obj_tw > 1 or obj_th > 1 else "1x1"
+            print(f"  {obj_id:15s}: ({col:2d},{row:2d}) {size_str:>3s} from {source_name:10s} -> x={out_x} | {desc}")
+            out_x += w
+        except Exception as e:
+            print(f"  WARNING: Failed to extract {obj_id}: {e}")
 
-    # Save output PNG
-    os.makedirs(os.path.dirname(OUTPUT_PNG), exist_ok=True)
-    output_img.save(OUTPUT_PNG)
-    print(f"\nSaved object spritesheet to {OUTPUT_PNG}")
-    print(f"Output size: {output_img.size} ({idx} objects)")
+    # Save output
+    os.makedirs(os.path.dirname(output_config["pngPath"]) or ".", exist_ok=True)
+    output_img.save(output_config["pngPath"])
+    print(f"\nSaved object spritesheet to {output_config['pngPath']}")
+    print(f"Output size: {output_img.size} ({len(frames)} objects)")
 
-    # Create Phaser atlas JSON
     atlas_json = {
         "frames": frames,
         "meta": {
@@ -153,15 +181,26 @@ def main():
         },
     }
 
-    with open(OUTPUT_JSON, "w") as f:
+    with open(output_config["jsonPath"], "w") as f:
         json.dump(atlas_json, f, indent=2)
-    print(f"Saved object atlas JSON to {OUTPUT_JSON}")
+    print(f"Saved object atlas JSON to {output_config['jsonPath']}")
 
-    # Print summary
     print("\n=== Object Atlas Summary ===")
     print(f"Total objects: {len(frames)}")
     for obj_id in frames:
         print(f"  - {obj_id}")
+
+    if args.verify:
+        if not verify_extraction(output_img, objects_extracted, source_images):
+            sys.exit(1)
+
+    if args.preview:
+        preview_path = output_config["pngPath"].replace(".png", "_preview.png")
+        generate_sprite_preview(
+            output_img, objects_extracted, 16, preview_path,
+            get_out_x=lambda item, idx: item["out_x"],
+            get_dimensions=lambda item: (item.get("w", 16), item.get("h", 16)),
+        )
 
 
 if __name__ == "__main__":

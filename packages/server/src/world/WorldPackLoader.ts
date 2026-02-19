@@ -1216,7 +1216,11 @@ export class WorldPackLoader {
         x: position.x ?? 0,
         y: position.y ?? 0,
       },
-      dialogue: Array.isArray(raw.dialogue) ? raw.dialogue : [],
+      dialogue: Array.isArray(raw.dialogue)
+        ? raw.dialogue
+        : raw.dialogue && typeof raw.dialogue === 'object'
+          ? (raw.dialogue as NpcDefinition['dialogue'])
+          : undefined,
       schedule: Array.isArray(raw.schedule)
         ? raw.schedule.map(s => {
             const item = s as {

@@ -2,8 +2,8 @@
   "timestamp": "2026-02-19T15:26:53.125841",
   "packs": [
     {
-      "name": "tilemap_packed",
-      "path": "/Users/kimsejun/Documents/GitHub/openClawWorld/docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike City Pack/Tilemap/tilemap_packed.png",
+      "name": "roguelike_city",
+      "path": "docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike City Pack/Tilemap/tilemap_packed.png",
       "stats": {
         "totalOpaquePixels": 210487,
         "uniqueColors": 132,
@@ -56,7 +56,7 @@
   ],
   "comparisons": [
     {
-      "packA": "tilemap_packed",
+      "packA": "roguelike_city",
       "packB": "tiny_town_normalized",
       "score": 60.0,
       "compatible": true,

@@ -725,6 +725,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   override onDispose(): void {
     console.log(`[GameRoom] Disposing room ${this.state.roomId}`);
+
+    // Invalidate tokens for all remaining agents before disposing
+    this.state.agents.forEach((_entity, agentId) => {
+      invalidateAgentToken(agentId);
+    });
+
     this.clientEntities.clear();
     this.recentProximityEvents = [];
 
@@ -758,7 +764,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
       }
 
       this.state.removeEntity(id, 'agent');
-      invalidateAgentToken(id);
+      const tokenInvalidated = invalidateAgentToken(id);
+      if (!tokenInvalidated) {
+        console.warn(`[GameRoom] stale agent ${id} (${name}) had no token registered in tokenRegistry`);
+      }
 
       this.eventLog.append('presence.leave', this.state.roomId, {
         entityId: id,

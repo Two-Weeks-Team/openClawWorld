@@ -14,12 +14,20 @@ const MAP_PATHS = {
   client: join(ROOT_DIR, 'packages/client/public/assets/maps/village.json'),
 };
 
-const EXPECTED_TILESET = {
-  name: 'tileset',
-  tilewidth: 16,
-  tileheight: 16,
-  image: 'tileset.png',
-};
+const EXPECTED_TILESETS = [
+  {
+    name: 'tileset',
+    tilewidth: 16,
+    tileheight: 16,
+    image: 'tileset.png',
+  },
+  {
+    name: 'tinytown_tileset',
+    tilewidth: 16,
+    tileheight: 16,
+    image: 'tinytown_tileset.png',
+  },
+];
 
 const CONTRACT_PATHS = {
   curation: join(ROOT_DIR, 'tools/kenney-curation.json'),
@@ -235,14 +243,19 @@ function validateTileset(map, name) {
     return errors;
   }
 
-  if (tilesets.length > 1) {
-    errors.push(`${name}: expected 1 tileset, found ${tilesets.length}`);
+  if (tilesets.length > EXPECTED_TILESETS.length) {
+    errors.push(
+      `${name}: expected at most ${EXPECTED_TILESETS.length} tilesets, found ${tilesets.length}`
+    );
   }
 
-  const tileset = tilesets[0];
-  for (const [key, expected] of Object.entries(EXPECTED_TILESET)) {
-    if (tileset[key] !== expected) {
-      errors.push(`${name}: tileset.${key}=${tileset[key]}, expected=${expected}`);
+  for (let i = 0; i < Math.min(tilesets.length, EXPECTED_TILESETS.length); i++) {
+    const tileset = tilesets[i];
+    const expected = EXPECTED_TILESETS[i];
+    for (const [key, expectedVal] of Object.entries(expected)) {
+      if (tileset[key] !== expectedVal) {
+        errors.push(`${name}: tilesets[${i}].${key}=${tileset[key]}, expected=${expectedVal}`);
+      }
     }
   }
 
@@ -1187,7 +1200,7 @@ function main() {
   }
 
   console.log(
-    `✅ All maps use tileset: ${EXPECTED_TILESET.name} (${EXPECTED_TILESET.tilewidth}x${EXPECTED_TILESET.tileheight}px)\n`
+    `✅ All maps use tilesets: ${EXPECTED_TILESETS.map(ts => ts.name).join(', ')} (16x16px)\n`
   );
 
   console.log('Validating Kenney curation contract...');

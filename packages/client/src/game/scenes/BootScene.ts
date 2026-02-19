@@ -25,6 +25,11 @@ export class BootScene extends Phaser.Scene {
     this.load.atlas('npcs', 'assets/sprites/npcs.png', 'assets/sprites/npcs.json');
     this.load.atlas('foliage', 'assets/sprites/foliage.png', 'assets/sprites/foliage.json');
     this.load.atlas('animals', 'assets/sprites/animals.png', 'assets/sprites/animals.json');
+    this.load.atlas(
+      'character_pack',
+      'assets/sprites/character_pack.png',
+      'assets/sprites/character_pack.json'
+    );
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
 
     // Audio assets (Interface Sounds + RPG Audio + Music Loops)

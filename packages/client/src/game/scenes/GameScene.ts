@@ -14,6 +14,7 @@ import { ClientCollisionSystem } from '../../systems/CollisionSystem';
 import { AudioManager, AudioKeys } from '../../systems/AudioManager';
 import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
+import { skinTintFromId, createHeadSprite, CHARACTER_PACK_KEY } from '../CharacterPack';
 import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
 import {
   ZONE_BOUNDS,
@@ -1442,11 +1443,19 @@ export class GameScene extends Phaser.Scene {
     const container = this.add.container(entity.pos.x, entity.pos.y);
     container.setDepth(entity.pos.y);
 
-    let frame = 'player-human';
-    if (type === 'agent') frame = 'player-agent';
-
-    const sprite = this.add.sprite(0, 0, 'players', frame);
-    sprite.setOrigin(0.5, 0.5);
+    // Use the modular character pack for avatar variety: each entity gets a
+    // deterministic skin tint derived from its ID, falling back to the legacy
+    // players atlas when the character_pack texture is unavailable.
+    let sprite: Phaser.GameObjects.Sprite;
+    if (this.textures.exists(CHARACTER_PACK_KEY)) {
+      const tint = skinTintFromId(key);
+      sprite = createHeadSprite(this, tint);
+    } else {
+      let frame = 'player-human';
+      if (type === 'agent') frame = 'player-agent';
+      sprite = this.add.sprite(0, 0, 'players', frame);
+      sprite.setOrigin(0.5, 0.5);
+    }
 
     const text = this.add.text(0, -20, entity.name, {
       fontSize: '12px',
@@ -1514,9 +1523,17 @@ export class GameScene extends Phaser.Scene {
     const container = this.add.container(npc.x, npc.y);
     container.setDepth(npc.y);
 
-    const sprite = this.add.sprite(0, 0, 'players', 'player-human');
-    sprite.setOrigin(0.5, 0.5);
-    sprite.setTint(0x66dd66);
+    // NPC avatars use the character pack with a deterministic tint from the
+    // NPC's definition ID, falling back to the legacy green-tinted sprite.
+    let sprite: Phaser.GameObjects.Sprite;
+    if (this.textures.exists(CHARACTER_PACK_KEY)) {
+      const tint = skinTintFromId(npc.definitionId || key);
+      sprite = createHeadSprite(this, tint);
+    } else {
+      sprite = this.add.sprite(0, 0, 'players', 'player-human');
+      sprite.setOrigin(0.5, 0.5);
+      sprite.setTint(0x66dd66);
+    }
 
     const nameTag = this.add.text(0, -24, npc.name, {
       fontSize: '11px',

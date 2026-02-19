@@ -1812,12 +1812,12 @@ class IssueDetector {
       });
     }
 
-    for (const [tileBucket, entries] of Array.from(tileBuckets.entries())) {
+    for (const [tileBucket, entries] of tileBuckets) {
       if (entries.length < 2) continue;
       const baseline = entries[0].facilityIds.join(',');
       for (let i = 1; i < entries.length; i++) {
         const current = entries[i].facilityIds.join(',');
-        if (current !== baseline && baseline.length > 0 && current.length > 0) {
+        if (current !== baseline) {
           return {
             area: 'Sync',
             title: `Observe inconsistency at tile ${tileBucket}`,
@@ -1831,8 +1831,8 @@ class IssueDetector {
               agentIds: [entries[0].agentId, entries[i].agentId],
               timestamps: [Date.now()],
               logs: [
-                `${entries[0].agentId} at (${entries[0].position.x},${entries[0].position.y}): ${baseline}`,
-                `${entries[i].agentId} at (${entries[i].position.x},${entries[i].position.y}): ${current}`,
+                `${entries[0].agentId} at (${entries[0].position.x.toFixed(0)}, ${entries[0].position.y.toFixed(0)}): ${baseline}`,
+                `${entries[i].agentId} at (${entries[i].position.x.toFixed(0)}, ${entries[i].position.y.toFixed(0)}): ${current}`,
               ],
             },
           };

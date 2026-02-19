@@ -1,0 +1,7064 @@
+{
+  "source": "packages/client/public/assets/kenney/urban/urban_tilemap.png",
+  "grid": {
+    "cols": 27,
+    "rows": 18,
+    "tileSize": 16,
+    "spacing": 0
+  },
+  "totalTiles": 486,
+  "nonBlankTiles": 486,
+  "tiles": [
+    {
+      "index": 0,
+      "col": 0,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "8003070f1f3f7e7a",
+      "isEmpty": false
+    },
+    {
+      "index": 1,
+      "col": 1,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "eddbf78f10782022",
+      "isEmpty": false
+    },
+    {
+      "index": 2,
+      "col": 2,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "d556525a4b6b2a2e",
+      "isEmpty": false
+    },
+    {
+      "index": 3,
+      "col": 3,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "8003070f1f3e7f7a",
+      "isEmpty": false
+    },
+    {
+      "index": 4,
+      "col": 4,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "d556525b4a6b2a2e",
+      "isEmpty": false
+    },
+    {
+      "index": 5,
+      "col": 5,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "ad52a54a55aa55ab",
+      "isEmpty": false
+    },
+    {
+      "index": 6,
+      "col": 6,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "f807f00f00ff00ff",
+      "isEmpty": false
+    },
+    {
+      "index": 7,
+      "col": 7,
+      "row": 0,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "c413164e5b3b6e3c",
+      "isEmpty": false
+    },
+    {
+      "index": 8,
+      "col": 8,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "800f0f0f70777774",
+      "isEmpty": false
+    },
+    {
+      "index": 9,
+      "col": 9,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8a0a0a2820202020",
+      "isEmpty": false
+    },
+    {
+      "index": 10,
+      "col": 10,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d55a5a5a2f2a2b23",
+      "isEmpty": false
+    },
+    {
+      "index": 11,
+      "col": 11,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "800b0f2f753a757a",
+      "isEmpty": false
+    },
+    {
+      "index": 12,
+      "col": 12,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d55e5a7a206f202f",
+      "isEmpty": false
+    },
+    {
+      "index": 13,
+      "col": 13,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "a54ab5aa55aa55aa",
+      "isEmpty": false
+    },
+    {
+      "index": 14,
+      "col": 14,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "e00fe0ff00ff003f",
+      "isEmpty": false
+    },
+    {
+      "index": 15,
+      "col": 15,
+      "row": 0,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "800a0a0a282a2a2a",
+      "isEmpty": false
+    },
+    {
+      "index": 16,
+      "col": 16,
+      "row": 0,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "b1c6936c6b3ac7a0",
+      "isEmpty": false
+    },
+    {
+      "index": 17,
+      "col": 17,
+      "row": 0,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "f0878789a372787c",
+      "isEmpty": false
+    },
+    {
+      "index": 18,
+      "col": 18,
+      "row": 0,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "f0d98db6d06c1327",
+      "isEmpty": false
+    },
+    {
+      "index": 19,
+      "col": 19,
+      "row": 0,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "a5d2d6d2f10d292d",
+      "isEmpty": false
+    },
+    {
+      "index": 20,
+      "col": 20,
+      "row": 0,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "80fffde79e00412c",
+      "isEmpty": false
+    },
+    {
+      "index": 21,
+      "col": 21,
+      "row": 0,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "89f6ed89b26d0532",
+      "isEmpty": false
+    },
+    {
+      "index": 22,
+      "col": 22,
+      "row": 0,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "d5aaaa929c65513e",
+      "isEmpty": false
+    },
+    {
+      "index": 23,
+      "col": 23,
+      "row": 0,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "cb663c343938e4d9",
+      "isEmpty": false
+    },
+    {
+      "index": 24,
+      "col": 24,
+      "row": 0,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "822828200aa0228a",
+      "isEmpty": false
+    },
+    {
+      "index": 25,
+      "col": 25,
+      "row": 0,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "822828202aa0228a",
+      "isEmpty": false
+    },
+    {
+      "index": 26,
+      "col": 26,
+      "row": 0,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9e3369616c6db18c",
+      "isEmpty": false
+    },
+    {
+      "index": 27,
+      "col": 0,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "e07874eed6f060f0",
+      "isEmpty": false
+    },
+    {
+      "index": 28,
+      "col": 1,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "ad08760ed4fb60b3",
+      "isEmpty": false
+    },
+    {
+      "index": 29,
+      "col": 2,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "b509f6ae80fd60a5",
+      "isEmpty": false
+    },
+    {
+      "index": 30,
+      "col": 3,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "80fc07e13f8177d4",
+      "isEmpty": false
+    },
+    {
+      "index": 31,
+      "col": 4,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "d5a95ab46ad52ac1",
+      "isEmpty": false
+    },
+    {
+      "index": 32,
+      "col": 5,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "ada9a5ad85555455",
+      "isEmpty": false
+    },
+    {
+      "index": 33,
+      "col": 6,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "fcf8fcfcf0d00003",
+      "isEmpty": false
+    },
+    {
+      "index": 34,
+      "col": 7,
+      "row": 1,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "e0f936ac96f960b0",
+      "isEmpty": false
+    },
+    {
+      "index": 35,
+      "col": 8,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80000100f000ff00",
+      "isEmpty": false
+    },
+    {
+      "index": 36,
+      "col": 9,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8000000000000000",
+      "isEmpty": false
+    },
+    {
+      "index": 37,
+      "col": 10,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d5005400a500aa00",
+      "isEmpty": false
+    },
+    {
+      "index": 38,
+      "col": 11,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80f43f9075c8778d",
+      "isEmpty": false
+    },
+    {
+      "index": 39,
+      "col": 12,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d5a17ad5219d22dc",
+      "isEmpty": false
+    },
+    {
+      "index": 40,
+      "col": 13,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "a5a5a59555555555",
+      "isEmpty": false
+    },
+    {
+      "index": 41,
+      "col": 14,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "f1f1f1f30e0c18f0",
+      "isEmpty": false
+    },
+    {
+      "index": 42,
+      "col": 15,
+      "row": 1,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80000000a000aa00",
+      "isEmpty": false
+    },
+    {
+      "index": 43,
+      "col": 16,
+      "row": 1,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "e4663393ccd96631",
+      "isEmpty": false
+    },
+    {
+      "index": 44,
+      "col": 17,
+      "row": 1,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "e0777c80c00f877f",
+      "isEmpty": false
+    },
+    {
+      "index": 45,
+      "col": 18,
+      "row": 1,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "b4073cc3ca4bcb3c",
+      "isEmpty": false
+    },
+    {
+      "index": 46,
+      "col": 19,
+      "row": 1,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "b5382dd5b542d22b",
+      "isEmpty": false
+    },
+    {
+      "index": 47,
+      "col": 20,
+      "row": 1,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "800800ef827fff7e",
+      "isEmpty": false
+    },
+    {
+      "index": 48,
+      "col": 21,
+      "row": 1,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "9e1c1eb6e363e160",
+      "isEmpty": false
+    },
+    {
+      "index": 49,
+      "col": 22,
+      "row": 1,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "d55455e8d52aaa0f",
+      "isEmpty": false
+    },
+    {
+      "index": 50,
+      "col": 23,
+      "row": 1,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c26d743c6b3236c9",
+      "isEmpty": false
+    },
+    {
+      "index": 51,
+      "col": 24,
+      "row": 1,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d32c7a643ec2358e",
+      "isEmpty": false
+    },
+    {
+      "index": 52,
+      "col": 25,
+      "row": 1,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d32c7a643e62349e",
+      "isEmpty": false
+    },
+    {
+      "index": 53,
+      "col": 26,
+      "row": 1,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "973821693c67639d",
+      "isEmpty": false
+    },
+    {
+      "index": 54,
+      "col": 0,
+      "row": 2,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "80f807f07e817f9c",
+      "isEmpty": false
+    },
+    {
+      "index": 55,
+      "col": 1,
+      "row": 2,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "8d20778612f568f7",
+      "isEmpty": false
+    },
+    {
+      "index": 56,
+      "col": 2,
+      "row": 2,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "d5a952a56ad52ac9",
+      "isEmpty": false
+    },
+    {
+      "index": 57,
+      "col": 3,
+      "row": 2,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "806007871f9f7f78",
+      "isEmpty": false
+    },
+    {
+      "index": 58,
+      "col": 4,
+      "row": 2,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "cd5bf7ad10f12822",
+      "isEmpty": false
+    },
+    {
+      "index": 59,
+      "col": 5,
+      "row": 2,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "d5b552d64acb2a29",
+      "isEmpty": false
+    },
+    {
+      "index": 60,
+      "col": 6,
+      "row": 2,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "c5b112c61b9b6e3c",
+      "isEmpty": false
+    },
+    {
+      "index": 61,
+      "col": 7,
+      "row": 2,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "c0f916a43fc16ed8",
+      "isEmpty": false
+    },
+    {
+      "index": 62,
+      "col": 8,
+      "row": 2,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80f01fc077e8778b",
+      "isEmpty": false
+    },
+    {
+      "index": 63,
+      "col": 9,
+      "row": 2,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8aa0288a208a02a8",
+      "isEmpty": false
+    },
+    {
+      "index": 64,
+      "col": 10,
+      "row": 2,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d5a54ad5219d22dd",
+      "isEmpty": false
+    },
+    {
+      "index": 65,
+      "col": 11,
+      "row": 2,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80f70f8977e87708",
+      "isEmpty": false
+    },
+    {
+      "index": 66,
+      "col": 12,
+      "row": 2,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8a82288a20282028",
+      "isEmpty": false
+    },
+    {
+      "index": 67,
+      "col": 13,
+      "row": 2,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d5a25ade22bd225c",
+      "isEmpty": false
+    },
+    {
+      "index": 68,
+      "col": 14,
+      "row": 2,
+      "dominantColor": [
+        96,
+        112,
+        112
+      ],
+      "category": "wall",
+      "phash": "80a20a8a2aa82a08",
+      "isEmpty": false
+    },
+    {
+      "index": 69,
+      "col": 15,
+      "row": 2,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80a00a8020882288",
+      "isEmpty": false
+    },
+    {
+      "index": 70,
+      "col": 16,
+      "row": 2,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "f166cc393498cc67",
+      "isEmpty": false
+    },
+    {
+      "index": 71,
+      "col": 17,
+      "row": 2,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "f06b4cccb6b42d31",
+      "isEmpty": false
+    },
+    {
+      "index": 72,
+      "col": 18,
+      "row": 2,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "adc6925b4f34a649",
+      "isEmpty": false
+    },
+    {
+      "index": 73,
+      "col": 19,
+      "row": 2,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "a5d13fe11c37c01e",
+      "isEmpty": false
+    },
+    {
+      "index": 74,
+      "col": 20,
+      "row": 2,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "80e4cc9bf4269bd9",
+      "isEmpty": false
+    },
+    {
+      "index": 75,
+      "col": 21,
+      "row": 2,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "cb9c9c5a31e372a1",
+      "isEmpty": false
+    },
+    {
+      "index": 76,
+      "col": 22,
+      "row": 2,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "d5c4989bb330f31a",
+      "isEmpty": false
+    },
+    {
+      "index": 77,
+      "col": 23,
+      "row": 2,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c32d746c713e3ec0",
+      "isEmpty": false
+    },
+    {
+      "index": 78,
+      "col": 24,
+      "row": 2,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "86792f306a9760db",
+      "isEmpty": false
+    },
+    {
+      "index": 79,
+      "col": 25,
+      "row": 2,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "86792fb06a3760cb",
+      "isEmpty": false
+    },
+    {
+      "index": 80,
+      "col": 26,
+      "row": 2,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9778217964636b95",
+      "isEmpty": false
+    },
+    {
+      "index": 81,
+      "col": 0,
+      "row": 3,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "84704287877f787d",
+      "isEmpty": false
+    },
+    {
+      "index": 82,
+      "col": 1,
+      "row": 3,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "845757a6e9593c49",
+      "isEmpty": false
+    },
+    {
+      "index": 83,
+      "col": 2,
+      "row": 3,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "d12736d2da2a2e2b",
+      "isEmpty": false
+    },
+    {
+      "index": 84,
+      "col": 3,
+      "row": 3,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "8a70538a856b7a7d",
+      "isEmpty": false
+    },
+    {
+      "index": 85,
+      "col": 4,
+      "row": 3,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "d53116ded06e2f28",
+      "isEmpty": false
+    },
+    {
+      "index": 86,
+      "col": 5,
+      "row": 3,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "d8a5595ab52b52a5",
+      "isEmpty": false
+    },
+    {
+      "index": 87,
+      "col": 6,
+      "row": 3,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "8ef10c1fe07f07e0",
+      "isEmpty": false
+    },
+    {
+      "index": 88,
+      "col": 7,
+      "row": 3,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c4311696c36f386f",
+      "isEmpty": false
+    },
+    {
+      "index": 89,
+      "col": 8,
+      "row": 3,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80428387077f7e7e",
+      "isEmpty": false
+    },
+    {
+      "index": 90,
+      "col": 9,
+      "row": 3,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8653d786435f3643",
+      "isEmpty": false
+    },
+    {
+      "index": 91,
+      "col": 10,
+      "row": 3,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d537d6d2522a2a2b",
+      "isEmpty": false
+    },
+    {
+      "index": 92,
+      "col": 11,
+      "row": 3,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8026078a077f7e7d",
+      "isEmpty": false
+    },
+    {
+      "index": 93,
+      "col": 12,
+      "row": 3,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d57356df406a2b28",
+      "isEmpty": false
+    },
+    {
+      "index": 94,
+      "col": 13,
+      "row": 3,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "c9b46d4a15ab52b5",
+      "isEmpty": false
+    },
+    {
+      "index": 95,
+      "col": 14,
+      "row": 3,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8ce17c1f40ff07e0",
+      "isEmpty": false
+    },
+    {
+      "index": 96,
+      "col": 15,
+      "row": 3,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "c4331296436f3a6f",
+      "isEmpty": false
+    },
+    {
+      "index": 97,
+      "col": 16,
+      "row": 3,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "e46cc3b91b943c96",
+      "isEmpty": false
+    },
+    {
+      "index": 98,
+      "col": 17,
+      "row": 3,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "f07887707f887c83",
+      "isEmpty": false
+    },
+    {
+      "index": 99,
+      "col": 18,
+      "row": 3,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "f03c9f0762e0199f",
+      "isEmpty": false
+    },
+    {
+      "index": 100,
+      "col": 19,
+      "row": 3,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "b529d28f2ad429d6",
+      "isEmpty": false
+    },
+    {
+      "index": 101,
+      "col": 20,
+      "row": 3,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "807f80b77f807f90",
+      "isEmpty": false
+    },
+    {
+      "index": 102,
+      "col": 21,
+      "row": 3,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "e603934d4cb372ec",
+      "isEmpty": false
+    },
+    {
+      "index": 103,
+      "col": 22,
+      "row": 3,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "d52ad5f022d52a97",
+      "isEmpty": false
+    },
+    {
+      "index": 104,
+      "col": 23,
+      "row": 3,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "cb663c36793806d9",
+      "isEmpty": false
+    },
+    {
+      "index": 105,
+      "col": 24,
+      "row": 3,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "822828200aa0828a",
+      "isEmpty": false
+    },
+    {
+      "index": 106,
+      "col": 25,
+      "row": 3,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "822a28202aa0820a",
+      "isEmpty": false
+    },
+    {
+      "index": 107,
+      "col": 26,
+      "row": 3,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9e3269632c6dd38c",
+      "isEmpty": false
+    },
+    {
+      "index": 108,
+      "col": 0,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "8c73197c03797c4b",
+      "isEmpty": false
+    },
+    {
+      "index": 109,
+      "col": 1,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "a073592e475b364b",
+      "isEmpty": false
+    },
+    {
+      "index": 110,
+      "col": 2,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "d1335c2c562d2dcd",
+      "isEmpty": false
+    },
+    {
+      "index": 111,
+      "col": 3,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "82da7ba4ad8550d7",
+      "isEmpty": false
+    },
+    {
+      "index": 112,
+      "col": 4,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "d78f3ef078d02582",
+      "isEmpty": false
+    },
+    {
+      "index": 113,
+      "col": 5,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "da5a4ba5a5155555",
+      "isEmpty": false
+    },
+    {
+      "index": 114,
+      "col": 6,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "8f0f1ff8f0700707",
+      "isEmpty": false
+    },
+    {
+      "index": 115,
+      "col": 7,
+      "row": 4,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "cd73183c4669b8cd",
+      "isEmpty": false
+    },
+    {
+      "index": 116,
+      "col": 8,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "8873097c0079ff4f",
+      "isEmpty": false
+    },
+    {
+      "index": 117,
+      "col": 9,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "a0337d2c635934cf",
+      "isEmpty": false
+    },
+    {
+      "index": 118,
+      "col": 10,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "dd23552c55292aed",
+      "isEmpty": false
+    },
+    {
+      "index": 119,
+      "col": 11,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80da2ba43d8555df",
+      "isEmpty": false
+    },
+    {
+      "index": 120,
+      "col": 12,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d58f7ef168d4018a",
+      "isEmpty": false
+    },
+    {
+      "index": 121,
+      "col": 13,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "ca4ba9a5a5555555",
+      "isEmpty": false
+    },
+    {
+      "index": 122,
+      "col": 14,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "9f1ffef8f0400107",
+      "isEmpty": false
+    },
+    {
+      "index": 123,
+      "col": 15,
+      "row": 4,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "cd73113c4169bacd",
+      "isEmpty": false
+    },
+    {
+      "index": 124,
+      "col": 16,
+      "row": 4,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "914e9b6c6b3a4fa0",
+      "isEmpty": false
+    },
+    {
+      "index": 125,
+      "col": 17,
+      "row": 4,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "e00f8f89a372787c",
+      "isEmpty": false
+    },
+    {
+      "index": 126,
+      "col": 18,
+      "row": 4,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "f0d98db6d06c1327",
+      "isEmpty": false
+    },
+    {
+      "index": 127,
+      "col": 19,
+      "row": 4,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "955aced2f10d292d",
+      "isEmpty": false
+    },
+    {
+      "index": 128,
+      "col": 20,
+      "row": 4,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "80fffde79e00412c",
+      "isEmpty": false
+    },
+    {
+      "index": 129,
+      "col": 21,
+      "row": 4,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "89f6ed89b26d0532",
+      "isEmpty": false
+    },
+    {
+      "index": 130,
+      "col": 22,
+      "row": 4,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "d5aaaa929c65513e",
+      "isEmpty": false
+    },
+    {
+      "index": 131,
+      "col": 23,
+      "row": 4,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c26f743c69303ecc",
+      "isEmpty": false
+    },
+    {
+      "index": 132,
+      "col": 24,
+      "row": 4,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d32c7a653e623586",
+      "isEmpty": false
+    },
+    {
+      "index": 133,
+      "col": 25,
+      "row": 4,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "d32c7a653e623586",
+      "isEmpty": false
+    },
+    {
+      "index": 134,
+      "col": 26,
+      "row": 4,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "973831693c656b99",
+      "isEmpty": false
+    },
+    {
+      "index": 135,
+      "col": 0,
+      "row": 5,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "848d73e03f83788f",
+      "isEmpty": false
+    },
+    {
+      "index": 136,
+      "col": 1,
+      "row": 5,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "81a973d62cd37b84",
+      "isEmpty": false
+    },
+    {
+      "index": 137,
+      "col": 2,
+      "row": 5,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "d1d936a548d62dca",
+      "isEmpty": false
+    },
+    {
+      "index": 138,
+      "col": 3,
+      "row": 5,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "80f873828f83787f",
+      "isEmpty": false
+    },
+    {
+      "index": 139,
+      "col": 4,
+      "row": 5,
+      "dominantColor": [
+        112,
+        112,
+        160
+      ],
+      "category": "water",
+      "phash": "82d75786a8d77d08",
+      "isEmpty": false
+    },
+    {
+      "index": 140,
+      "col": 5,
+      "row": 5,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d5a536d5da52292a",
+      "isEmpty": false
+    },
+    {
+      "index": 141,
+      "col": 6,
+      "row": 5,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "80a822820a02282a",
+      "isEmpty": false
+    },
+    {
+      "index": 142,
+      "col": 7,
+      "row": 5,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "c1cb33a44e9139cf",
+      "isEmpty": false
+    },
+    {
+      "index": 143,
+      "col": 8,
+      "row": 5,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "80bc03f07f8178bf",
+      "isEmpty": false
+    },
+    {
+      "index": 144,
+      "col": 9,
+      "row": 5,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "83a97bc62c9333ac",
+      "isEmpty": false
+    },
+    {
+      "index": 145,
+      "col": 10,
+      "row": 5,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "d5e9569528d525ca",
+      "isEmpty": false
+    },
+    {
+      "index": 146,
+      "col": 11,
+      "row": 5,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "80f803823f837e7f",
+      "isEmpty": false
+    },
+    {
+      "index": 147,
+      "col": 12,
+      "row": 5,
+      "dominantColor": [
+        176,
+        144,
+        112
+      ],
+      "category": "wood",
+      "phash": "82d757c728d75701",
+      "isEmpty": false
+    },
+    {
+      "index": 148,
+      "col": 13,
+      "row": 5,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "d5a156d74ad22b2a",
+      "isEmpty": false
+    },
+    {
+      "index": 149,
+      "col": 14,
+      "row": 5,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "80a802822a022a2a",
+      "isEmpty": false
+    },
+    {
+      "index": 150,
+      "col": 15,
+      "row": 5,
+      "dominantColor": [
+        160,
+        160,
+        176
+      ],
+      "category": "road",
+      "phash": "c1e913c46f9139ce",
+      "isEmpty": false
+    },
+    {
+      "index": 151,
+      "col": 16,
+      "row": 5,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "e4663393ccd96631",
+      "isEmpty": false
+    },
+    {
+      "index": 152,
+      "col": 17,
+      "row": 5,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "80777081c05f8f7f",
+      "isEmpty": false
+    },
+    {
+      "index": 153,
+      "col": 18,
+      "row": 5,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "b4073cc3ca4bcb3c",
+      "isEmpty": false
+    },
+    {
+      "index": 154,
+      "col": 19,
+      "row": 5,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "953c2dd4956ad22b",
+      "isEmpty": false
+    },
+    {
+      "index": 155,
+      "col": 20,
+      "row": 5,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "800000ef827fff7f",
+      "isEmpty": false
+    },
+    {
+      "index": 156,
+      "col": 21,
+      "row": 5,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "9e1c1eb6f363e140",
+      "isEmpty": false
+    },
+    {
+      "index": 157,
+      "col": 22,
+      "row": 5,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "d55455e8d52aaa0f",
+      "isEmpty": false
+    },
+    {
+      "index": 158,
+      "col": 23,
+      "row": 5,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c26d742e31343fd4",
+      "isEmpty": false
+    },
+    {
+      "index": 159,
+      "col": 24,
+      "row": 5,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "86792f306a3760db",
+      "isEmpty": false
+    },
+    {
+      "index": 160,
+      "col": 25,
+      "row": 5,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "867b2f306a3760d3",
+      "isEmpty": false
+    },
+    {
+      "index": 161,
+      "col": 26,
+      "row": 5,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9738317b64616fc1",
+      "isEmpty": false
+    },
+    {
+      "index": 162,
+      "col": 0,
+      "row": 6,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a9d47063cf94b49a",
+      "isEmpty": false
+    },
+    {
+      "index": 163,
+      "col": 1,
+      "row": 6,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c6e63b18c0e6f7c0",
+      "isEmpty": false
+    },
+    {
+      "index": 164,
+      "col": 2,
+      "row": 6,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "94ca4b3b3f3c64c4",
+      "isEmpty": false
+    },
+    {
+      "index": 165,
+      "col": 3,
+      "row": 6,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "99a6267f7b7828a0",
+      "isEmpty": false
+    },
+    {
+      "index": 166,
+      "col": 4,
+      "row": 6,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "995a696579869969",
+      "isEmpty": false
+    },
+    {
+      "index": 167,
+      "col": 5,
+      "row": 6,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "99a63d4943493db6",
+      "isEmpty": false
+    },
+    {
+      "index": 168,
+      "col": 6,
+      "row": 6,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "999a6167699a6966",
+      "isEmpty": false
+    },
+    {
+      "index": 169,
+      "col": 7,
+      "row": 6,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "999e616666696996",
+      "isEmpty": false
+    },
+    {
+      "index": 170,
+      "col": 8,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "80060f0f1f1f3f2f",
+      "isEmpty": false
+    },
+    {
+      "index": 171,
+      "col": 9,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "f2201e206f53277f",
+      "isEmpty": false
+    },
+    {
+      "index": 172,
+      "col": 10,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "d5565a5a6a4a6a2b",
+      "isEmpty": false
+    },
+    {
+      "index": 173,
+      "col": 11,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "8002070e1f3f7f3f",
+      "isEmpty": false
+    },
+    {
+      "index": 174,
+      "col": 12,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "d556525a4a6b6a2b",
+      "isEmpty": false
+    },
+    {
+      "index": 175,
+      "col": 13,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "d5aa5daa551a516a",
+      "isEmpty": false
+    },
+    {
+      "index": 176,
+      "col": 14,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "80ff18ff085b026f",
+      "isEmpty": false
+    },
+    {
+      "index": 177,
+      "col": 15,
+      "row": 6,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "91461a0e4f3b6e6e",
+      "isEmpty": false
+    },
+    {
+      "index": 178,
+      "col": 16,
+      "row": 6,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "b166cc3b3498cc67",
+      "isEmpty": false
+    },
+    {
+      "index": 179,
+      "col": 17,
+      "row": 6,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "e06b4dccb6b42d31",
+      "isEmpty": false
+    },
+    {
+      "index": 180,
+      "col": 18,
+      "row": 6,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "ad87925b4f34a649",
+      "isEmpty": false
+    },
+    {
+      "index": 181,
+      "col": 19,
+      "row": 6,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "b5993fe11c36c01e",
+      "isEmpty": false
+    },
+    {
+      "index": 182,
+      "col": 20,
+      "row": 6,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "80e4cc9bf4269bd9",
+      "isEmpty": false
+    },
+    {
+      "index": 183,
+      "col": 21,
+      "row": 6,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "cb9c9c5a31e372a1",
+      "isEmpty": false
+    },
+    {
+      "index": 184,
+      "col": 22,
+      "row": 6,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "d5c4989bb330f31a",
+      "isEmpty": false
+    },
+    {
+      "index": 185,
+      "col": 23,
+      "row": 6,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "cb6438733596ccc9",
+      "isEmpty": false
+    },
+    {
+      "index": 186,
+      "col": 24,
+      "row": 6,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "976b69341fc1c91c",
+      "isEmpty": false
+    },
+    {
+      "index": 187,
+      "col": 25,
+      "row": 6,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "873a78611fb0ca8f",
+      "isEmpty": false
+    },
+    {
+      "index": 188,
+      "col": 26,
+      "row": 6,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9e316d3661c3999c",
+      "isEmpty": false
+    },
+    {
+      "index": 189,
+      "col": 0,
+      "row": 7,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "a9a956a956a956a9",
+      "isEmpty": false
+    },
+    {
+      "index": 190,
+      "col": 1,
+      "row": 7,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "cccb333c32343373",
+      "isEmpty": false
+    },
+    {
+      "index": 191,
+      "col": 2,
+      "row": 7,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "b4b448b54bb56b49",
+      "isEmpty": false
+    },
+    {
+      "index": 192,
+      "col": 3,
+      "row": 7,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "999965996698e665",
+      "isEmpty": false
+    },
+    {
+      "index": 193,
+      "col": 4,
+      "row": 7,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "9999679986996666",
+      "isEmpty": false
+    },
+    {
+      "index": 194,
+      "col": 5,
+      "row": 7,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "9999669966996696",
+      "isEmpty": false
+    },
+    {
+      "index": 195,
+      "col": 6,
+      "row": 7,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "99c66934366961ee",
+      "isEmpty": false
+    },
+    {
+      "index": 196,
+      "col": 7,
+      "row": 7,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "999965996698f661",
+      "isEmpty": false
+    },
+    {
+      "index": 197,
+      "col": 8,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "80a51b9b7b1b720f",
+      "isEmpty": false
+    },
+    {
+      "index": 198,
+      "col": 9,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "f1251f987b12036f",
+      "isEmpty": false
+    },
+    {
+      "index": 199,
+      "col": 10,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "d5061fd87f1a234a",
+      "isEmpty": false
+    },
+    {
+      "index": 200,
+      "col": 11,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "80f40ff17f807f84",
+      "isEmpty": false
+    },
+    {
+      "index": 201,
+      "col": 12,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "d5ad52b46ad522c5",
+      "isEmpty": false
+    },
+    {
+      "index": 202,
+      "col": 13,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "d5555f953d112165",
+      "isEmpty": false
+    },
+    {
+      "index": 203,
+      "col": 14,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "91051bb87b52726f",
+      "isEmpty": false
+    },
+    {
+      "index": 204,
+      "col": 15,
+      "row": 7,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "91461b9a3b1b734b",
+      "isEmpty": false
+    },
+    {
+      "index": 205,
+      "col": 16,
+      "row": 7,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "c46553f15b943e94",
+      "isEmpty": false
+    },
+    {
+      "index": 206,
+      "col": 17,
+      "row": 7,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "c07087e67f8c7d81",
+      "isEmpty": false
+    },
+    {
+      "index": 207,
+      "col": 18,
+      "row": 7,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "f0389f8762e0199f",
+      "isEmpty": false
+    },
+    {
+      "index": 208,
+      "col": 19,
+      "row": 7,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "b525ca8f1ed829d4",
+      "isEmpty": false
+    },
+    {
+      "index": 209,
+      "col": 20,
+      "row": 7,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "806bd2973f847e98",
+      "isEmpty": false
+    },
+    {
+      "index": 210,
+      "col": 21,
+      "row": 7,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "c60393cd4cb372ec",
+      "isEmpty": false
+    },
+    {
+      "index": 211,
+      "col": 22,
+      "row": 7,
+      "dominantColor": [
+        192,
+        112,
+        64
+      ],
+      "category": "wood",
+      "phash": "d56ae0d030cd2f97",
+      "isEmpty": false
+    },
+    {
+      "index": 212,
+      "col": 23,
+      "row": 7,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d26d703c6b343ec1",
+      "isEmpty": false
+    },
+    {
+      "index": 213,
+      "col": 24,
+      "row": 7,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d32e7a643e62b18c",
+      "isEmpty": false
+    },
+    {
+      "index": 214,
+      "col": 25,
+      "row": 7,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d32e7a653e62318c",
+      "isEmpty": false
+    },
+    {
+      "index": 215,
+      "col": 26,
+      "row": 7,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "877835693c616b95",
+      "isEmpty": false
+    },
+    {
+      "index": 216,
+      "col": 0,
+      "row": 8,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "a9a95656565656a9",
+      "isEmpty": false
+    },
+    {
+      "index": 217,
+      "col": 1,
+      "row": 8,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "fbff7c3e1282c040",
+      "isEmpty": false
+    },
+    {
+      "index": 218,
+      "col": 2,
+      "row": 8,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8080000080800000",
+      "isEmpty": false
+    },
+    {
+      "index": 219,
+      "col": 3,
+      "row": 8,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "aeaa2b6b42d6911d",
+      "isEmpty": false
+    },
+    {
+      "index": 220,
+      "col": 4,
+      "row": 8,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "fcfc0707030703fe",
+      "isEmpty": false
+    },
+    {
+      "index": 221,
+      "col": 5,
+      "row": 8,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a00a2888882082a0",
+      "isEmpty": false
+    },
+    {
+      "index": 222,
+      "col": 6,
+      "row": 8,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "802a2a2080802a82",
+      "isEmpty": false
+    },
+    {
+      "index": 223,
+      "col": 7,
+      "row": 8,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "802a2a8280a02a20",
+      "isEmpty": false
+    },
+    {
+      "index": 224,
+      "col": 8,
+      "row": 8,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "80f80ff07f807fa8",
+      "isEmpty": false
+    },
+    {
+      "index": 225,
+      "col": 9,
+      "row": 8,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "e0d71eb85b9213e2",
+      "isEmpty": false
+    },
+    {
+      "index": 226,
+      "col": 10,
+      "row": 8,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "d5ad5ab42ad522c5",
+      "isEmpty": false
+    },
+    {
+      "index": 227,
+      "col": 11,
+      "row": 8,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "80e00f861f9e7f3c",
+      "isEmpty": false
+    },
+    {
+      "index": 228,
+      "col": 12,
+      "row": 8,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "e09b0aa07d92376f",
+      "isEmpty": false
+    },
+    {
+      "index": 229,
+      "col": 13,
+      "row": 8,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "d5a552d06acb2a6b",
+      "isEmpty": false
+    },
+    {
+      "index": 230,
+      "col": 14,
+      "row": 8,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c1a11e866b9b3a6e",
+      "isEmpty": false
+    },
+    {
+      "index": 231,
+      "col": 15,
+      "row": 8,
+      "dominantColor": [
+        80,
+        176,
+        208
+      ],
+      "category": "decoration",
+      "phash": "c5bc1eb03b913ac5",
+      "isEmpty": false
+    },
+    {
+      "index": 232,
+      "col": 16,
+      "row": 8,
+      "dominantColor": [
+        64,
+        208,
+        160
+      ],
+      "category": "nature",
+      "phash": "c63a39656433716e",
+      "isEmpty": false
+    },
+    {
+      "index": 233,
+      "col": 17,
+      "row": 8,
+      "dominantColor": [
+        64,
+        208,
+        160
+      ],
+      "category": "nature",
+      "phash": "ce39a6ce1964339a",
+      "isEmpty": false
+    },
+    {
+      "index": 234,
+      "col": 18,
+      "row": 8,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "a4495a5b56d65555",
+      "isEmpty": false
+    },
+    {
+      "index": 235,
+      "col": 19,
+      "row": 8,
+      "dominantColor": [
+        64,
+        208,
+        160
+      ],
+      "category": "nature",
+      "phash": "fd215a5f55007555",
+      "isEmpty": false
+    },
+    {
+      "index": 236,
+      "col": 20,
+      "row": 8,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "f11c0f1f07873971",
+      "isEmpty": false
+    },
+    {
+      "index": 237,
+      "col": 21,
+      "row": 8,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "93b1c44e2ee49b1b",
+      "isEmpty": false
+    },
+    {
+      "index": 238,
+      "col": 22,
+      "row": 8,
+      "dominantColor": [
+        32,
+        128,
+        112
+      ],
+      "category": "decoration",
+      "phash": "931b6ce4319366c7",
+      "isEmpty": false
+    },
+    {
+      "index": 239,
+      "col": 23,
+      "row": 8,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c33d706f31343ee0",
+      "isEmpty": false
+    },
+    {
+      "index": 240,
+      "col": 24,
+      "row": 8,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "867b2f306a36e0d9",
+      "isEmpty": false
+    },
+    {
+      "index": 241,
+      "col": 25,
+      "row": 8,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "867b2f306a376499",
+      "isEmpty": false
+    },
+    {
+      "index": 242,
+      "col": 26,
+      "row": 8,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9678353a64616bb5",
+      "isEmpty": false
+    },
+    {
+      "index": 243,
+      "col": 0,
+      "row": 9,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "a88228282a8a8280",
+      "isEmpty": false
+    },
+    {
+      "index": 244,
+      "col": 1,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "cbf4704f2693c658",
+      "isEmpty": false
+    },
+    {
+      "index": 245,
+      "col": 2,
+      "row": 9,
+      "dominantColor": [
+        96,
+        112,
+        112
+      ],
+      "category": "wall",
+      "phash": "802a2882aa88020a",
+      "isEmpty": false
+    },
+    {
+      "index": 246,
+      "col": 3,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "86b829475af9951d",
+      "isEmpty": false
+    },
+    {
+      "index": 247,
+      "col": 4,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a2aa2a2a0a8280a0",
+      "isEmpty": false
+    },
+    {
+      "index": 248,
+      "col": 5,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a00a208a88200220",
+      "isEmpty": false
+    },
+    {
+      "index": 249,
+      "col": 6,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "802a202a8a802a8a",
+      "isEmpty": false
+    },
+    {
+      "index": 250,
+      "col": 7,
+      "row": 9,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "800a2a828a808220",
+      "isEmpty": false
+    },
+    {
+      "index": 251,
+      "col": 8,
+      "row": 9,
+      "dominantColor": [
+        192,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "ce64319364ce7699",
+      "isEmpty": false
+    },
+    {
+      "index": 252,
+      "col": 9,
+      "row": 9,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "ce33716431c66799",
+      "isEmpty": false
+    },
+    {
+      "index": 253,
+      "col": 10,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8a2020882082a288",
+      "isEmpty": false
+    },
+    {
+      "index": 254,
+      "col": 11,
+      "row": 9,
+      "dominantColor": [
+        48,
+        48,
+        64
+      ],
+      "category": "wall",
+      "phash": "c06f3f903691f1ca",
+      "isEmpty": false
+    },
+    {
+      "index": 255,
+      "col": 12,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "802222222a880a88",
+      "isEmpty": false
+    },
+    {
+      "index": 256,
+      "col": 13,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "80202020228a0a8a",
+      "isEmpty": false
+    },
+    {
+      "index": 257,
+      "col": 14,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "80222222888a0a88",
+      "isEmpty": false
+    },
+    {
+      "index": 258,
+      "col": 15,
+      "row": 9,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "802020208a820a8a",
+      "isEmpty": false
+    },
+    {
+      "index": 259,
+      "col": 16,
+      "row": 9,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "90b134ce66cc679b",
+      "isEmpty": false
+    },
+    {
+      "index": 260,
+      "col": 17,
+      "row": 9,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "91d1744c66df7119",
+      "isEmpty": false
+    },
+    {
+      "index": 261,
+      "col": 18,
+      "row": 9,
+      "dominantColor": [
+        32,
+        128,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a449d29694b6adad",
+      "isEmpty": false
+    },
+    {
+      "index": 262,
+      "col": 19,
+      "row": 9,
+      "dominantColor": [
+        64,
+        208,
+        160
+      ],
+      "category": "nature",
+      "phash": "9b0657886433df99",
+      "isEmpty": false
+    },
+    {
+      "index": 263,
+      "col": 20,
+      "row": 9,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "f11c87c3c1c3f0f8",
+      "isEmpty": false
+    },
+    {
+      "index": 264,
+      "col": 21,
+      "row": 9,
+      "dominantColor": [
+        64,
+        208,
+        160
+      ],
+      "category": "nature",
+      "phash": "c43cb1316616b3eb",
+      "isEmpty": false
+    },
+    {
+      "index": 265,
+      "col": 22,
+      "row": 9,
+      "dominantColor": [
+        32,
+        128,
+        112
+      ],
+      "category": "decoration",
+      "phash": "cc6c39b3666e2619",
+      "isEmpty": false
+    },
+    {
+      "index": 266,
+      "col": 23,
+      "row": 9,
+      "dominantColor": [
+        128,
+        64,
+        32
+      ],
+      "category": "decoration",
+      "phash": "dae02d2f2d36e164",
+      "isEmpty": false
+    },
+    {
+      "index": 267,
+      "col": 24,
+      "row": 9,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "82282a202a20a222",
+      "isEmpty": false
+    },
+    {
+      "index": 268,
+      "col": 25,
+      "row": 9,
+      "dominantColor": [
+        128,
+        64,
+        32
+      ],
+      "category": "decoration",
+      "phash": "82282a202aa0a022",
+      "isEmpty": false
+    },
+    {
+      "index": 269,
+      "col": 26,
+      "row": 9,
+      "dominantColor": [
+        128,
+        64,
+        32
+      ],
+      "category": "decoration",
+      "phash": "8fb4787a7863b430",
+      "isEmpty": false
+    },
+    {
+      "index": 270,
+      "col": 0,
+      "row": 10,
+      "dominantColor": [
+        128,
+        128,
+        160
+      ],
+      "category": "decoration",
+      "phash": "80002a2a008082aa",
+      "isEmpty": false
+    },
+    {
+      "index": 271,
+      "col": 1,
+      "row": 10,
+      "dominantColor": [
+        80,
+        80,
+        96
+      ],
+      "category": "wall",
+      "phash": "80002a2a008082aa",
+      "isEmpty": false
+    },
+    {
+      "index": 272,
+      "col": 2,
+      "row": 10,
+      "dominantColor": [
+        80,
+        80,
+        96
+      ],
+      "category": "wall",
+      "phash": "8a08222a20082222",
+      "isEmpty": false
+    },
+    {
+      "index": 273,
+      "col": 3,
+      "row": 10,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "8228282828822a82",
+      "isEmpty": false
+    },
+    {
+      "index": 274,
+      "col": 4,
+      "row": 10,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "80202a0a288a0a8a",
+      "isEmpty": false
+    },
+    {
+      "index": 275,
+      "col": 5,
+      "row": 10,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "80280a0a2880aa82",
+      "isEmpty": false
+    },
+    {
+      "index": 276,
+      "col": 6,
+      "row": 10,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "956b689597e86239",
+      "isEmpty": false
+    },
+    {
+      "index": 277,
+      "col": 7,
+      "row": 10,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "852d2e1e7a69692e",
+      "isEmpty": false
+    },
+    {
+      "index": 278,
+      "col": 8,
+      "row": 10,
+      "dominantColor": [
+        112,
+        32,
+        48
+      ],
+      "category": "decoration",
+      "phash": "8a282082208a8880",
+      "isEmpty": false
+    },
+    {
+      "index": 279,
+      "col": 9,
+      "row": 10,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8a202022208aa288",
+      "isEmpty": false
+    },
+    {
+      "index": 280,
+      "col": 10,
+      "row": 10,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8a202020208aa28a",
+      "isEmpty": false
+    },
+    {
+      "index": 281,
+      "col": 11,
+      "row": 10,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8288282082820a8a",
+      "isEmpty": false
+    },
+    {
+      "index": 282,
+      "col": 12,
+      "row": 10,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "888822222288882a",
+      "isEmpty": false
+    },
+    {
+      "index": 283,
+      "col": 13,
+      "row": 10,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c73831655d924dc7",
+      "isEmpty": false
+    },
+    {
+      "index": 284,
+      "col": 14,
+      "row": 10,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8228282028822282",
+      "isEmpty": false
+    },
+    {
+      "index": 285,
+      "col": 15,
+      "row": 10,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8228282088820282",
+      "isEmpty": false
+    },
+    {
+      "index": 286,
+      "col": 16,
+      "row": 10,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "91b135c66cc67593",
+      "isEmpty": false
+    },
+    {
+      "index": 287,
+      "col": 17,
+      "row": 10,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "93916cc66ccf3193",
+      "isEmpty": false
+    },
+    {
+      "index": 288,
+      "col": 18,
+      "row": 10,
+      "dominantColor": [
+        160,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "ada4d456aab254b5",
+      "isEmpty": false
+    },
+    {
+      "index": 289,
+      "col": 19,
+      "row": 10,
+      "dominantColor": [
+        48,
+        192,
+        160
+      ],
+      "category": "decoration",
+      "phash": "9bb3444c6edb1319",
+      "isEmpty": false
+    },
+    {
+      "index": 290,
+      "col": 20,
+      "row": 10,
+      "dominantColor": [
+        160,
+        80,
+        64
+      ],
+      "category": "brick",
+      "phash": "fef18183e2c2071f",
+      "isEmpty": false
+    },
+    {
+      "index": 291,
+      "col": 21,
+      "row": 10,
+      "dominantColor": [
+        32,
+        128,
+        112
+      ],
+      "category": "decoration",
+      "phash": "ce2c39b133ce6686",
+      "isEmpty": false
+    },
+    {
+      "index": 292,
+      "col": 22,
+      "row": 10,
+      "dominantColor": [
+        32,
+        128,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d1c66c31716c6679",
+      "isEmpty": false
+    },
+    {
+      "index": 293,
+      "col": 23,
+      "row": 10,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d24fe01d6f3c1ae0",
+      "isEmpty": false
+    },
+    {
+      "index": 294,
+      "col": 24,
+      "row": 10,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d30c3acc3f6831e6",
+      "isEmpty": false
+    },
+    {
+      "index": 295,
+      "col": 25,
+      "row": 10,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d20c3ae43f6ab1e4",
+      "isEmpty": false
+    },
+    {
+      "index": 296,
+      "col": 26,
+      "row": 10,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "871ab5483a694fb5",
+      "isEmpty": false
+    },
+    {
+      "index": 297,
+      "col": 0,
+      "row": 11,
+      "dominantColor": [
+        80,
+        80,
+        96
+      ],
+      "category": "wall",
+      "phash": "c1453e3e45c193be",
+      "isEmpty": false
+    },
+    {
+      "index": 298,
+      "col": 1,
+      "row": 11,
+      "dominantColor": [
+        80,
+        80,
+        96
+      ],
+      "category": "wall",
+      "phash": "80802a2880822a28",
+      "isEmpty": false
+    },
+    {
+      "index": 299,
+      "col": 2,
+      "row": 11,
+      "dominantColor": [
+        80,
+        80,
+        96
+      ],
+      "category": "wall",
+      "phash": "8888222222222022",
+      "isEmpty": false
+    },
+    {
+      "index": 300,
+      "col": 3,
+      "row": 11,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "802a2a8080822828",
+      "isEmpty": false
+    },
+    {
+      "index": 301,
+      "col": 4,
+      "row": 11,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "c53e7ac185d2693c",
+      "isEmpty": false
+    },
+    {
+      "index": 302,
+      "col": 5,
+      "row": 11,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "916e6e9390d06f66",
+      "isEmpty": false
+    },
+    {
+      "index": 303,
+      "col": 6,
+      "row": 11,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "80282a2a2a8a2828",
+      "isEmpty": false
+    },
+    {
+      "index": 304,
+      "col": 7,
+      "row": 11,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "d13a2e2d297a6b26",
+      "isEmpty": false
+    },
+    {
+      "index": 305,
+      "col": 8,
+      "row": 11,
+      "dominantColor": [
+        48,
+        64,
+        128
+      ],
+      "category": "water",
+      "phash": "822a282020882882",
+      "isEmpty": false
+    },
+    {
+      "index": 306,
+      "col": 9,
+      "row": 11,
+      "dominantColor": [
+        48,
+        64,
+        128
+      ],
+      "category": "water",
+      "phash": "8228282228882882",
+      "isEmpty": false
+    },
+    {
+      "index": 307,
+      "col": 10,
+      "row": 11,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "8a28208220880822",
+      "isEmpty": false
+    },
+    {
+      "index": 308,
+      "col": 11,
+      "row": 11,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c99d343033c71d5b",
+      "isEmpty": false
+    },
+    {
+      "index": 309,
+      "col": 12,
+      "row": 11,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "eccc3531333346ce",
+      "isEmpty": false
+    },
+    {
+      "index": 310,
+      "col": 13,
+      "row": 11,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c99c303336cd9967",
+      "isEmpty": false
+    },
+    {
+      "index": 311,
+      "col": 14,
+      "row": 11,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a28808800a820a28",
+      "isEmpty": false
+    },
+    {
+      "index": 312,
+      "col": 15,
+      "row": 11,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a0080a0a80820aa0",
+      "isEmpty": false
+    },
+    {
+      "index": 313,
+      "col": 16,
+      "row": 11,
+      "dominantColor": [
+        240,
+        112,
+        64
+      ],
+      "category": "brick",
+      "phash": "c63a39656433716e",
+      "isEmpty": false
+    },
+    {
+      "index": 314,
+      "col": 17,
+      "row": 11,
+      "dominantColor": [
+        240,
+        112,
+        64
+      ],
+      "category": "brick",
+      "phash": "ce39a6ce1964338b",
+      "isEmpty": false
+    },
+    {
+      "index": 315,
+      "col": 18,
+      "row": 11,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "a4495a5b56d65555",
+      "isEmpty": false
+    },
+    {
+      "index": 316,
+      "col": 19,
+      "row": 11,
+      "dominantColor": [
+        240,
+        112,
+        64
+      ],
+      "category": "brick",
+      "phash": "fd21525f55007755",
+      "isEmpty": false
+    },
+    {
+      "index": 317,
+      "col": 20,
+      "row": 11,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "f11c0f0f03c7f871",
+      "isEmpty": false
+    },
+    {
+      "index": 318,
+      "col": 21,
+      "row": 11,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "93b1c64e2ec49b1b",
+      "isEmpty": false
+    },
+    {
+      "index": 319,
+      "col": 22,
+      "row": 11,
+      "dominantColor": [
+        144,
+        48,
+        16
+      ],
+      "category": "brick",
+      "phash": "931b6ce43393268f",
+      "isEmpty": false
+    },
+    {
+      "index": 320,
+      "col": 23,
+      "row": 11,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d20fe41d2f3c1be0",
+      "isEmpty": false
+    },
+    {
+      "index": 321,
+      "col": 24,
+      "row": 11,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "86582f996a3d64b3",
+      "isEmpty": false
+    },
+    {
+      "index": 322,
+      "col": 25,
+      "row": 11,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "86582fb06a3fe4b1",
+      "isEmpty": false
+    },
+    {
+      "index": 323,
+      "col": 26,
+      "row": 11,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "875ab54872694eb5",
+      "isEmpty": false
+    },
+    {
+      "index": 324,
+      "col": 0,
+      "row": 12,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "953d3c646647627a",
+      "isEmpty": false
+    },
+    {
+      "index": 325,
+      "col": 1,
+      "row": 12,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "c06a6d333313372f",
+      "isEmpty": false
+    },
+    {
+      "index": 326,
+      "col": 2,
+      "row": 12,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "853d3c6466e647d2",
+      "isEmpty": false
+    },
+    {
+      "index": 327,
+      "col": 3,
+      "row": 12,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "963032793ec9cec9",
+      "isEmpty": false
+    },
+    {
+      "index": 328,
+      "col": 4,
+      "row": 12,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "80807f7ff0f07878",
+      "isEmpty": false
+    },
+    {
+      "index": 329,
+      "col": 5,
+      "row": 12,
+      "dominantColor": [
+        48,
+        160,
+        112
+      ],
+      "category": "nature",
+      "phash": "8080002aaaaa2a2a",
+      "isEmpty": false
+    },
+    {
+      "index": 330,
+      "col": 6,
+      "row": 12,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "d5d52a29b5a52d25",
+      "isEmpty": false
+    },
+    {
+      "index": 331,
+      "col": 7,
+      "row": 12,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "80802a2a82822222",
+      "isEmpty": false
+    },
+    {
+      "index": 332,
+      "col": 8,
+      "row": 12,
+      "dominantColor": [
+        32,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "80802a28a0a02820",
+      "isEmpty": false
+    },
+    {
+      "index": 333,
+      "col": 9,
+      "row": 12,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d2252df829077ee2",
+      "isEmpty": false
+    },
+    {
+      "index": 334,
+      "col": 10,
+      "row": 12,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "93ce39316c93396c",
+      "isEmpty": false
+    },
+    {
+      "index": 335,
+      "col": 11,
+      "row": 12,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "9b9b2466ce64319b",
+      "isEmpty": false
+    },
+    {
+      "index": 336,
+      "col": 12,
+      "row": 12,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "843b6e2e3964e4b3",
+      "isEmpty": false
+    },
+    {
+      "index": 337,
+      "col": 13,
+      "row": 12,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "c43b6e6c396464b3",
+      "isEmpty": false
+    },
+    {
+      "index": 338,
+      "col": 14,
+      "row": 12,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "84336e2e3b6e2c33",
+      "isEmpty": false
+    },
+    {
+      "index": 339,
+      "col": 15,
+      "row": 12,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "822828288282028a",
+      "isEmpty": false
+    },
+    {
+      "index": 340,
+      "col": 16,
+      "row": 12,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "98b134ce66cc669b",
+      "isEmpty": false
+    },
+    {
+      "index": 341,
+      "col": 17,
+      "row": 12,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "99b366cc66c73119",
+      "isEmpty": false
+    },
+    {
+      "index": 342,
+      "col": 18,
+      "row": 12,
+      "dominantColor": [
+        144,
+        48,
+        16
+      ],
+      "category": "brick",
+      "phash": "a449d29694b6adad",
+      "isEmpty": false
+    },
+    {
+      "index": 343,
+      "col": 19,
+      "row": 12,
+      "dominantColor": [
+        240,
+        112,
+        64
+      ],
+      "category": "brick",
+      "phash": "9b06578c4433df99",
+      "isEmpty": false
+    },
+    {
+      "index": 344,
+      "col": 20,
+      "row": 12,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "f11c87c3c1c3f0f8",
+      "isEmpty": false
+    },
+    {
+      "index": 345,
+      "col": 21,
+      "row": 12,
+      "dominantColor": [
+        240,
+        112,
+        64
+      ],
+      "category": "brick",
+      "phash": "c43cb1316616b3eb",
+      "isEmpty": false
+    },
+    {
+      "index": 346,
+      "col": 22,
+      "row": 12,
+      "dominantColor": [
+        144,
+        48,
+        16
+      ],
+      "category": "brick",
+      "phash": "cc6c39b3664c6699",
+      "isEmpty": false
+    },
+    {
+      "index": 347,
+      "col": 23,
+      "row": 12,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "db643461639acec9",
+      "isEmpty": false
+    },
+    {
+      "index": 348,
+      "col": 24,
+      "row": 12,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "822a20a02a808a08",
+      "isEmpty": false
+    },
+    {
+      "index": 349,
+      "col": 25,
+      "row": 12,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "822a20a00aa08a08",
+      "isEmpty": false
+    },
+    {
+      "index": 350,
+      "col": 26,
+      "row": 12,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "8e31693436cb9b9c",
+      "isEmpty": false
+    },
+    {
+      "index": 351,
+      "col": 0,
+      "row": 13,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "859c9e33cce3e1c1",
+      "isEmpty": false
+    },
+    {
+      "index": 352,
+      "col": 1,
+      "row": 13,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "d04b4b4bc33cb53c",
+      "isEmpty": false
+    },
+    {
+      "index": 353,
+      "col": 2,
+      "row": 13,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "d068693933b31797",
+      "isEmpty": false
+    },
+    {
+      "index": 354,
+      "col": 3,
+      "row": 13,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "c365672c639c999c",
+      "isEmpty": false
+    },
+    {
+      "index": 355,
+      "col": 4,
+      "row": 13,
+      "dominantColor": [
+        96,
+        112,
+        112
+      ],
+      "category": "wall",
+      "phash": "f870707e7d607e80",
+      "isEmpty": false
+    },
+    {
+      "index": 356,
+      "col": 5,
+      "row": 13,
+      "dominantColor": [
+        96,
+        112,
+        112
+      ],
+      "category": "wall",
+      "phash": "885d5f4c5d0c0cf7",
+      "isEmpty": false
+    },
+    {
+      "index": 357,
+      "col": 6,
+      "row": 13,
+      "dominantColor": [
+        96,
+        112,
+        112
+      ],
+      "category": "wall",
+      "phash": "a92f2d2b2b282bd5",
+      "isEmpty": false
+    },
+    {
+      "index": 358,
+      "col": 7,
+      "row": 13,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a0555f5555a801ff",
+      "isEmpty": false
+    },
+    {
+      "index": 359,
+      "col": 8,
+      "row": 13,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "80717161678f9f8e",
+      "isEmpty": false
+    },
+    {
+      "index": 360,
+      "col": 9,
+      "row": 13,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "8000000000808080",
+      "isEmpty": false
+    },
+    {
+      "index": 361,
+      "col": 10,
+      "row": 13,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "d524243432dbdadb",
+      "isEmpty": false
+    },
+    {
+      "index": 362,
+      "col": 11,
+      "row": 13,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "813b6e9b91c6b11b",
+      "isEmpty": false
+    },
+    {
+      "index": 363,
+      "col": 12,
+      "row": 13,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "848c2b333bce6c9b",
+      "isEmpty": false
+    },
+    {
+      "index": 364,
+      "col": 13,
+      "row": 13,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "91666c993b664e99",
+      "isEmpty": false
+    },
+    {
+      "index": 365,
+      "col": 14,
+      "row": 13,
+      "dominantColor": [
+        192,
+        176,
+        144
+      ],
+      "category": "decoration",
+      "phash": "c49933339b66cc99",
+      "isEmpty": false
+    },
+    {
+      "index": 366,
+      "col": 15,
+      "row": 13,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a0880a0a80800822",
+      "isEmpty": false
+    },
+    {
+      "index": 367,
+      "col": 16,
+      "row": 13,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "91b135c66cc67593",
+      "isEmpty": false
+    },
+    {
+      "index": 368,
+      "col": 17,
+      "row": 13,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "93b126ce6c8e3993",
+      "isEmpty": false
+    },
+    {
+      "index": 369,
+      "col": 18,
+      "row": 13,
+      "dominantColor": [
+        144,
+        112,
+        96
+      ],
+      "category": "wood",
+      "phash": "aba45456aab6d4a5",
+      "isEmpty": false
+    },
+    {
+      "index": 370,
+      "col": 19,
+      "row": 13,
+      "dominantColor": [
+        208,
+        96,
+        48
+      ],
+      "category": "brick",
+      "phash": "9bb3514c6cdb1319",
+      "isEmpty": false
+    },
+    {
+      "index": 371,
+      "col": 20,
+      "row": 13,
+      "dominantColor": [
+        144,
+        112,
+        96
+      ],
+      "category": "wood",
+      "phash": "fffb0101f0e0037e",
+      "isEmpty": false
+    },
+    {
+      "index": 372,
+      "col": 21,
+      "row": 13,
+      "dominantColor": [
+        144,
+        48,
+        16
+      ],
+      "category": "brick",
+      "phash": "ce6c399133ce6686",
+      "isEmpty": false
+    },
+    {
+      "index": 373,
+      "col": 22,
+      "row": 13,
+      "dominantColor": [
+        144,
+        48,
+        16
+      ],
+      "category": "brick",
+      "phash": "d9c66c31714c66d9",
+      "isEmpty": false
+    },
+    {
+      "index": 374,
+      "col": 23,
+      "row": 13,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "da2f743461321ee5",
+      "isEmpty": false
+    },
+    {
+      "index": 375,
+      "col": 24,
+      "row": 13,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "d30e7ae53662938c",
+      "isEmpty": false
+    },
+    {
+      "index": 376,
+      "col": 25,
+      "row": 13,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c30e7a653762b1cc",
+      "isEmpty": false
+    },
+    {
+      "index": 377,
+      "col": 26,
+      "row": 13,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "8f7a216134674bb5",
+      "isEmpty": false
+    },
+    {
+      "index": 378,
+      "col": 0,
+      "row": 14,
+      "dominantColor": [
+        112,
+        112,
+        160
+      ],
+      "category": "water",
+      "phash": "c0953de44ed25ace",
+      "isEmpty": false
+    },
+    {
+      "index": 379,
+      "col": 1,
+      "row": 14,
+      "dominantColor": [
+        112,
+        112,
+        160
+      ],
+      "category": "water",
+      "phash": "95c068b15b874f9b",
+      "isEmpty": false
+    },
+    {
+      "index": 380,
+      "col": 2,
+      "row": 14,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d2696d363617991c",
+      "isEmpty": false
+    },
+    {
+      "index": 381,
+      "col": 3,
+      "row": 14,
+      "dominantColor": [
+        192,
+        112,
+        80
+      ],
+      "category": "wood",
+      "phash": "800a200a208aa0aa",
+      "isEmpty": false
+    },
+    {
+      "index": 382,
+      "col": 4,
+      "row": 14,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "80f77cf774627500",
+      "isEmpty": false
+    },
+    {
+      "index": 383,
+      "col": 5,
+      "row": 14,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "fcf5239554625523",
+      "isEmpty": false
+    },
+    {
+      "index": 384,
+      "col": 6,
+      "row": 14,
+      "dominantColor": [
+        208,
+        128,
+        80
+      ],
+      "category": "wood",
+      "phash": "d7a22ba22ba22b37",
+      "isEmpty": false
+    },
+    {
+      "index": 385,
+      "col": 7,
+      "row": 14,
+      "dominantColor": [
+        112,
+        64,
+        80
+      ],
+      "category": "decoration",
+      "phash": "fd55555555015555",
+      "isEmpty": false
+    },
+    {
+      "index": 386,
+      "col": 8,
+      "row": 14,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "807171718f879f8e",
+      "isEmpty": false
+    },
+    {
+      "index": 387,
+      "col": 9,
+      "row": 14,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "8000000080808080",
+      "isEmpty": false
+    },
+    {
+      "index": 388,
+      "col": 10,
+      "row": 14,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "d5252424dad2dadb",
+      "isEmpty": false
+    },
+    {
+      "index": 389,
+      "col": 11,
+      "row": 14,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "8080808080822a2a",
+      "isEmpty": false
+    },
+    {
+      "index": 390,
+      "col": 12,
+      "row": 14,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "c5813b3bc46e6e91",
+      "isEmpty": false
+    },
+    {
+      "index": 391,
+      "col": 13,
+      "row": 14,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "c6cc393365ccc633",
+      "isEmpty": false
+    },
+    {
+      "index": 392,
+      "col": 14,
+      "row": 14,
+      "dominantColor": [
+        128,
+        96,
+        96
+      ],
+      "category": "decoration",
+      "phash": "c4d93b916ec46ccc",
+      "isEmpty": false
+    },
+    {
+      "index": 393,
+      "col": 15,
+      "row": 14,
+      "dominantColor": [
+        128,
+        64,
+        32
+      ],
+      "category": "decoration",
+      "phash": "b649b26d52ad915a",
+      "isEmpty": false
+    },
+    {
+      "index": 394,
+      "col": 16,
+      "row": 14,
+      "dominantColor": [
+        240,
+        160,
+        64
+      ],
+      "category": "wood",
+      "phash": "e11ce33807f0e70f",
+      "isEmpty": false
+    },
+    {
+      "index": 395,
+      "col": 17,
+      "row": 14,
+      "dominantColor": [
+        128,
+        64,
+        32
+      ],
+      "category": "decoration",
+      "phash": "802a802a08800a28",
+      "isEmpty": false
+    },
+    {
+      "index": 396,
+      "col": 18,
+      "row": 14,
+      "dominantColor": [
+        240,
+        160,
+        64
+      ],
+      "category": "wood",
+      "phash": "b449b66d52a5b25a",
+      "isEmpty": false
+    },
+    {
+      "index": 397,
+      "col": 19,
+      "row": 14,
+      "dominantColor": [
+        128,
+        64,
+        32
+      ],
+      "category": "decoration",
+      "phash": "e31ce73807f8c20f",
+      "isEmpty": false
+    },
+    {
+      "index": 398,
+      "col": 20,
+      "row": 14,
+      "dominantColor": [
+        128,
+        64,
+        32
+      ],
+      "category": "decoration",
+      "phash": "802a80222a800a2a",
+      "isEmpty": false
+    },
+    {
+      "index": 399,
+      "col": 21,
+      "row": 14,
+      "dominantColor": [
+        16,
+        80,
+        64
+      ],
+      "category": "decoration",
+      "phash": "802a802aa0822a80",
+      "isEmpty": false
+    },
+    {
+      "index": 400,
+      "col": 22,
+      "row": 14,
+      "dominantColor": [
+        16,
+        80,
+        64
+      ],
+      "category": "decoration",
+      "phash": "802a802aaa002a80",
+      "isEmpty": false
+    },
+    {
+      "index": 401,
+      "col": 23,
+      "row": 14,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "cb3f742c71301ee4",
+      "isEmpty": false
+    },
+    {
+      "index": 402,
+      "col": 24,
+      "row": 14,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "865b2fb06237c2d9",
+      "isEmpty": false
+    },
+    {
+      "index": 403,
+      "col": 25,
+      "row": 14,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "965b2f306237e499",
+      "isEmpty": false
+    },
+    {
+      "index": 404,
+      "col": 26,
+      "row": 14,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9e6a217934674bb1",
+      "isEmpty": false
+    },
+    {
+      "index": 405,
+      "col": 0,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d55e47537e541115",
+      "isEmpty": false
+    },
+    {
+      "index": 406,
+      "col": 1,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "e1e58e96316d0e33",
+      "isEmpty": false
+    },
+    {
+      "index": 407,
+      "col": 2,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "ccb4275bc78568a5",
+      "isEmpty": false
+    },
+    {
+      "index": 408,
+      "col": 3,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c4da4b692f273e90",
+      "isEmpty": false
+    },
+    {
+      "index": 409,
+      "col": 4,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "84da4a6b2f273e98",
+      "isEmpty": false
+    },
+    {
+      "index": 410,
+      "col": 5,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "84da4a6b2f273e98",
+      "isEmpty": false
+    },
+    {
+      "index": 411,
+      "col": 6,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "84da5b6f2d273690",
+      "isEmpty": false
+    },
+    {
+      "index": 412,
+      "col": 7,
+      "row": 15,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "9568686a25975f95",
+      "isEmpty": false
+    },
+    {
+      "index": 413,
+      "col": 8,
+      "row": 15,
+      "dominantColor": [
+        224,
+        224,
+        240
+      ],
+      "category": "light_surface",
+      "phash": "c03d3d3f70d257c0",
+      "isEmpty": false
+    },
+    {
+      "index": 414,
+      "col": 9,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c7bc38b883c711c7",
+      "isEmpty": false
+    },
+    {
+      "index": 415,
+      "col": 10,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "92e96dedd6924492",
+      "isEmpty": false
+    },
+    {
+      "index": 416,
+      "col": 11,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "9b9b2466ce64319b",
+      "isEmpty": false
+    },
+    {
+      "index": 417,
+      "col": 12,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c43b6e6e39646433",
+      "isEmpty": false
+    },
+    {
+      "index": 418,
+      "col": 13,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "913b6e6c3964e493",
+      "isEmpty": false
+    },
+    {
+      "index": 419,
+      "col": 14,
+      "row": 15,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c4262e3b1b6e6e31",
+      "isEmpty": false
+    },
+    {
+      "index": 420,
+      "col": 15,
+      "row": 15,
+      "dominantColor": [
+        208,
+        144,
+        48
+      ],
+      "category": "wood",
+      "phash": "8ebc70ae78a650a7",
+      "isEmpty": false
+    },
+    {
+      "index": 421,
+      "col": 16,
+      "row": 15,
+      "dominantColor": [
+        240,
+        160,
+        64
+      ],
+      "category": "wood",
+      "phash": "dac125e221f327f2",
+      "isEmpty": false
+    },
+    {
+      "index": 422,
+      "col": 17,
+      "row": 15,
+      "dominantColor": [
+        240,
+        160,
+        64
+      ],
+      "category": "wood",
+      "phash": "c4c431f16fc624bb",
+      "isEmpty": false
+    },
+    {
+      "index": 423,
+      "col": 18,
+      "row": 15,
+      "dominantColor": [
+        240,
+        160,
+        64
+      ],
+      "category": "wood",
+      "phash": "8f9470a674a672a7",
+      "isEmpty": false
+    },
+    {
+      "index": 424,
+      "col": 19,
+      "row": 15,
+      "dominantColor": [
+        208,
+        144,
+        48
+      ],
+      "category": "wood",
+      "phash": "dbe125d92cf201f2",
+      "isEmpty": false
+    },
+    {
+      "index": 425,
+      "col": 20,
+      "row": 15,
+      "dominantColor": [
+        240,
+        160,
+        64
+      ],
+      "category": "wood",
+      "phash": "c4c43b913fc66c93",
+      "isEmpty": false
+    },
+    {
+      "index": 426,
+      "col": 21,
+      "row": 15,
+      "dominantColor": [
+        32,
+        112,
+        80
+      ],
+      "category": "nature",
+      "phash": "c4c439316fc66c3b",
+      "isEmpty": false
+    },
+    {
+      "index": 427,
+      "col": 22,
+      "row": 15,
+      "dominantColor": [
+        80,
+        80,
+        64
+      ],
+      "category": "wall",
+      "phash": "909292864ec76fcf",
+      "isEmpty": false
+    },
+    {
+      "index": 428,
+      "col": 23,
+      "row": 15,
+      "dominantColor": [
+        48,
+        48,
+        48
+      ],
+      "category": "wall",
+      "phash": "cf66394e613266c9",
+      "isEmpty": false
+    },
+    {
+      "index": 429,
+      "col": 24,
+      "row": 15,
+      "dominantColor": [
+        48,
+        48,
+        48
+      ],
+      "category": "wall",
+      "phash": "c62e33b14ee4389b",
+      "isEmpty": false
+    },
+    {
+      "index": 430,
+      "col": 25,
+      "row": 15,
+      "dominantColor": [
+        96,
+        96,
+        80
+      ],
+      "category": "wall",
+      "phash": "822828202a80228a",
+      "isEmpty": false
+    },
+    {
+      "index": 431,
+      "col": 26,
+      "row": 15,
+      "dominantColor": [
+        48,
+        48,
+        48
+      ],
+      "category": "wall",
+      "phash": "9a336c3b3067339c",
+      "isEmpty": false
+    },
+    {
+      "index": 432,
+      "col": 0,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d4348c237ac9b3cb",
+      "isEmpty": false
+    },
+    {
+      "index": 433,
+      "col": 1,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "92c478c9c7196d67",
+      "isEmpty": false
+    },
+    {
+      "index": 434,
+      "col": 2,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "807308b768ed78fa",
+      "isEmpty": false
+    },
+    {
+      "index": 435,
+      "col": 3,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "b2d80f9f38b54b42",
+      "isEmpty": false
+    },
+    {
+      "index": 436,
+      "col": 4,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d5c15d9a1d302dcd",
+      "isEmpty": false
+    },
+    {
+      "index": 437,
+      "col": 5,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "e08f8f1e78786163",
+      "isEmpty": false
+    },
+    {
+      "index": 438,
+      "col": 6,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "b5dada69292d2436",
+      "isEmpty": false
+    },
+    {
+      "index": 439,
+      "col": 7,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "ad52a55ab5aa55a8",
+      "isEmpty": false
+    },
+    {
+      "index": 440,
+      "col": 8,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "f807f807e0ef00f3",
+      "isEmpty": false
+    },
+    {
+      "index": 441,
+      "col": 9,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "ee9a3861d34e0e93",
+      "isEmpty": false
+    },
+    {
+      "index": 442,
+      "col": 10,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c4993b66399964cd",
+      "isEmpty": false
+    },
+    {
+      "index": 443,
+      "col": 11,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d13b6e9991c6b119",
+      "isEmpty": false
+    },
+    {
+      "index": 444,
+      "col": 12,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "84cc23333bce6c9b",
+      "isEmpty": false
+    },
+    {
+      "index": 445,
+      "col": 13,
+      "row": 16,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "d1e664991b664e99",
+      "isEmpty": false
+    },
+    {
+      "index": 446,
+      "col": 14,
+      "row": 16,
+      "dominantColor": [
+        160,
+        144,
+        192
+      ],
+      "category": "decoration",
+      "phash": "d19933339966cc99",
+      "isEmpty": false
+    },
+    {
+      "index": 447,
+      "col": 15,
+      "row": 16,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "b449b66d52ad9259",
+      "isEmpty": false
+    },
+    {
+      "index": 448,
+      "col": 16,
+      "row": 16,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "e31ce33807f8e70c",
+      "isEmpty": false
+    },
+    {
+      "index": 449,
+      "col": 17,
+      "row": 16,
+      "dominantColor": [
+        112,
+        32,
+        48
+      ],
+      "category": "decoration",
+      "phash": "802a802a2880282a",
+      "isEmpty": false
+    },
+    {
+      "index": 450,
+      "col": 18,
+      "row": 16,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "b449b66d52ad9259",
+      "isEmpty": false
+    },
+    {
+      "index": 451,
+      "col": 19,
+      "row": 16,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "e31ce33807f8e70c",
+      "isEmpty": false
+    },
+    {
+      "index": 452,
+      "col": 20,
+      "row": 16,
+      "dominantColor": [
+        112,
+        32,
+        48
+      ],
+      "category": "decoration",
+      "phash": "802a802aaa802a2a",
+      "isEmpty": false
+    },
+    {
+      "index": 453,
+      "col": 21,
+      "row": 16,
+      "dominantColor": [
+        64,
+        160,
+        112
+      ],
+      "category": "nature",
+      "phash": "9cb5716a718c71ca",
+      "isEmpty": false
+    },
+    {
+      "index": 454,
+      "col": 22,
+      "row": 16,
+      "dominantColor": [
+        96,
+        96,
+        80
+      ],
+      "category": "wall",
+      "phash": "db3826e924db24d3",
+      "isEmpty": false
+    },
+    {
+      "index": 455,
+      "col": 23,
+      "row": 16,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c62d303c69b23eec",
+      "isEmpty": false
+    },
+    {
+      "index": 456,
+      "col": 24,
+      "row": 16,
+      "dominantColor": [
+        48,
+        48,
+        48
+      ],
+      "category": "wall",
+      "phash": "c32c3ae13fc2349e",
+      "isEmpty": false
+    },
+    {
+      "index": 457,
+      "col": 25,
+      "row": 16,
+      "dominantColor": [
+        96,
+        96,
+        80
+      ],
+      "category": "wall",
+      "phash": "d32c7ae53ec23486",
+      "isEmpty": false
+    },
+    {
+      "index": 458,
+      "col": 26,
+      "row": 16,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "937865693ce56319",
+      "isEmpty": false
+    },
+    {
+      "index": 459,
+      "col": 0,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "81b05eac2beb50af",
+      "isEmpty": false
+    },
+    {
+      "index": 460,
+      "col": 1,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "cf648b3a70ca34cb",
+      "isEmpty": false
+    },
+    {
+      "index": 461,
+      "col": 2,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "f007c6ccb2334d9e",
+      "isEmpty": false
+    },
+    {
+      "index": 462,
+      "col": 3,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "9dc2273d623c9cc3",
+      "isEmpty": false
+    },
+    {
+      "index": 463,
+      "col": 4,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a595ca8ca573a5cc",
+      "isEmpty": false
+    },
+    {
+      "index": 464,
+      "col": 5,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "e0709fc37887719c",
+      "isEmpty": false
+    },
+    {
+      "index": 465,
+      "col": 6,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "b525da966dd224c9",
+      "isEmpty": false
+    },
+    {
+      "index": 466,
+      "col": 7,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "a9ada5a585555555",
+      "isEmpty": false
+    },
+    {
+      "index": 467,
+      "col": 8,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "fcfcf8f8f4600103",
+      "isEmpty": false
+    },
+    {
+      "index": 468,
+      "col": 9,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "f63495d8632762ca",
+      "isEmpty": false
+    },
+    {
+      "index": 469,
+      "col": 10,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c34b3eb49c43cb38",
+      "isEmpty": false
+    },
+    {
+      "index": 470,
+      "col": 11,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "8080808080822a2a",
+      "isEmpty": false
+    },
+    {
+      "index": 471,
+      "col": 12,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c5813b3bc46e6e91",
+      "isEmpty": false
+    },
+    {
+      "index": 472,
+      "col": 13,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "c6cc393365cec631",
+      "isEmpty": false
+    },
+    {
+      "index": 473,
+      "col": 14,
+      "row": 17,
+      "dominantColor": [
+        80,
+        96,
+        112
+      ],
+      "category": "decoration",
+      "phash": "91d93b911bc46e99",
+      "isEmpty": false
+    },
+    {
+      "index": 474,
+      "col": 15,
+      "row": 17,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "9eb472ad31a650ae",
+      "isEmpty": false
+    },
+    {
+      "index": 475,
+      "col": 16,
+      "row": 17,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "cbe126f824c327da",
+      "isEmpty": false
+    },
+    {
+      "index": 476,
+      "col": 17,
+      "row": 17,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "c4c439716fc62c3b",
+      "isEmpty": false
+    },
+    {
+      "index": 477,
+      "col": 18,
+      "row": 17,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "9eb472ac718672aa",
+      "isEmpty": false
+    },
+    {
+      "index": 478,
+      "col": 19,
+      "row": 17,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "cbe124f864d301fb",
+      "isEmpty": false
+    },
+    {
+      "index": 479,
+      "col": 20,
+      "row": 17,
+      "dominantColor": [
+        208,
+        96,
+        80
+      ],
+      "category": "brick",
+      "phash": "c4c439b16ac6ee93",
+      "isEmpty": false
+    },
+    {
+      "index": 480,
+      "col": 21,
+      "row": 17,
+      "dominantColor": [
+        96,
+        96,
+        80
+      ],
+      "category": "wall",
+      "phash": "8e2d73a8718e718e",
+      "isEmpty": false
+    },
+    {
+      "index": 481,
+      "col": 22,
+      "row": 17,
+      "dominantColor": [
+        64,
+        160,
+        112
+      ],
+      "category": "nature",
+      "phash": "c9e0243f26d924bf",
+      "isEmpty": false
+    },
+    {
+      "index": 482,
+      "col": 23,
+      "row": 17,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "c63d306d61f03ee4",
+      "isEmpty": false
+    },
+    {
+      "index": 483,
+      "col": 24,
+      "row": 17,
+      "dominantColor": [
+        48,
+        48,
+        48
+      ],
+      "category": "wall",
+      "phash": "86792eb06a9761cb",
+      "isEmpty": false
+    },
+    {
+      "index": 484,
+      "col": 25,
+      "row": 17,
+      "dominantColor": [
+        96,
+        96,
+        80
+      ],
+      "category": "wall",
+      "phash": "86792fb06a9f60c3",
+      "isEmpty": false
+    },
+    {
+      "index": 485,
+      "col": 26,
+      "row": 17,
+      "dominantColor": [
+        128,
+        80,
+        64
+      ],
+      "category": "wood",
+      "phash": "9368657934a56bb1",
+      "isEmpty": false
+    }
+  ],
+  "duplicates": [
+    [
+      0,
+      3
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      18,
+      126
+    ],
+    [
+      20,
+      128
+    ],
+    [
+      21,
+      129
+    ],
+    [
+      22,
+      130
+    ],
+    [
+      24,
+      25,
+      105,
+      430
+    ],
+    [
+      36,
+      218,
+      360
+    ],
+    [
+      43,
+      151
+    ],
+    [
+      45,
+      153
+    ],
+    [
+      47,
+      155
+    ],
+    [
+      48,
+      156
+    ],
+    [
+      49,
+      157
+    ],
+    [
+      70,
+      178
+    ],
+    [
+      71,
+      179
+    ],
+    [
+      72,
+      180
+    ],
+    [
+      74,
+      182
+    ],
+    [
+      75,
+      183
+    ],
+    [
+      76,
+      184
+    ],
+    [
+      78,
+      159
+    ],
+    [
+      99,
+      207
+    ],
+    [
+      102,
+      210
+    ],
+    [
+      132,
+      133
+    ],
+    [
+      141,
+      149
+    ],
+    [
+      192,
+      196
+    ],
+    [
+      201,
+      226
+    ],
+    [
+      213,
+      214
+    ],
+    [
+      232,
+      313
+    ],
+    [
+      233,
+      314
+    ],
+    [
+      234,
+      315
+    ],
+    [
+      235,
+      316
+    ],
+    [
+      237,
+      318
+    ],
+    [
+      259,
+      340
+    ],
+    [
+      261,
+      342
+    ],
+    [
+      262,
+      343
+    ],
+    [
+      263,
+      344
+    ],
+    [
+      264,
+      345
+    ],
+    [
+      267,
+      268
+    ],
+    [
+      270,
+      271
+    ],
+    [
+      273,
+      284
+    ],
+    [
+      279,
+      280
+    ],
+    [
+      286,
+      367
+    ],
+    [
+      291,
+      372
+    ],
+    [
+      305,
+      306
+    ],
+    [
+      335,
+      416
+    ],
+    [
+      337,
+      417
+    ],
+    [
+      348,
+      349
+    ],
+    [
+      363,
+      444
+    ],
+    [
+      389,
+      470
+    ],
+    [
+      390,
+      471
+    ],
+    [
+      391,
+      472
+    ],
+    [
+      398,
+      452
+    ],
+    [
+      409,
+      410
+    ],
+    [
+      426,
+      476
+    ],
+    [
+      447,
+      450
+    ],
+    [
+      448,
+      451
+    ]
+  ],
+  "categories": {
+    "decoration": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      96,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      135,
+      136,
+      137,
+      138,
+      140,
+      141,
+      142,
+      146,
+      148,
+      149,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      234,
+      236,
+      237,
+      238,
+      243,
+      244,
+      246,
+      247,
+      248,
+      249,
+      252,
+      253,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      263,
+      265,
+      266,
+      268,
+      269,
+      270,
+      273,
+      274,
+      275,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      289,
+      291,
+      292,
+      300,
+      301,
+      302,
+      303,
+      304,
+      307,
+      308,
+      309,
+      310,
+      311,
+      312,
+      324,
+      325,
+      326,
+      327,
+      328,
+      330,
+      331,
+      332,
+      333,
+      334,
+      335,
+      336,
+      337,
+      338,
+      339,
+      351,
+      352,
+      353,
+      354,
+      358,
+      362,
+      363,
+      364,
+      365,
+      366,
+      380,
+      385,
+      389,
+      390,
+      391,
+      392,
+      393,
+      395,
+      397,
+      398,
+      399,
+      400,
+      405,
+      406,
+      407,
+      408,
+      409,
+      410,
+      411,
+      414,
+      415,
+      416,
+      417,
+      418,
+      419,
+      432,
+      433,
+      434,
+      435,
+      436,
+      437,
+      438,
+      439,
+      440,
+      441,
+      442,
+      443,
+      444,
+      445,
+      446,
+      449,
+      452,
+      459,
+      460,
+      461,
+      462,
+      463,
+      464,
+      465,
+      466,
+      467,
+      468,
+      469,
+      470,
+      471,
+      472,
+      473
+    ],
+    "road": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      69,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      143,
+      144,
+      145,
+      150
+    ],
+    "brick": [
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      251,
+      288,
+      290,
+      313,
+      314,
+      315,
+      316,
+      317,
+      318,
+      319,
+      340,
+      341,
+      342,
+      343,
+      344,
+      345,
+      346,
+      367,
+      368,
+      370,
+      372,
+      373,
+      447,
+      448,
+      450,
+      451,
+      474,
+      475,
+      476,
+      477,
+      478,
+      479
+    ],
+    "wood": [
+      23,
+      24,
+      25,
+      26,
+      50,
+      51,
+      52,
+      53,
+      77,
+      78,
+      79,
+      80,
+      104,
+      105,
+      106,
+      107,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      147,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      239,
+      240,
+      241,
+      242,
+      250,
+      267,
+      276,
+      293,
+      294,
+      295,
+      296,
+      320,
+      321,
+      322,
+      323,
+      347,
+      348,
+      349,
+      350,
+      369,
+      371,
+      374,
+      375,
+      376,
+      377,
+      381,
+      382,
+      383,
+      384,
+      394,
+      396,
+      401,
+      402,
+      403,
+      404,
+      420,
+      421,
+      422,
+      423,
+      424,
+      425,
+      455,
+      458,
+      482,
+      485
+    ],
+    "wall": [
+      68,
+      245,
+      254,
+      271,
+      272,
+      297,
+      298,
+      299,
+      355,
+      356,
+      357,
+      427,
+      428,
+      429,
+      430,
+      431,
+      454,
+      456,
+      457,
+      480,
+      483,
+      484
+    ],
+    "water": [
+      139,
+      305,
+      306,
+      378,
+      379
+    ],
+    "nature": [
+      232,
+      233,
+      235,
+      262,
+      264,
+      329,
+      426,
+      453,
+      481
+    ],
+    "light_surface": [
+      359,
+      360,
+      361,
+      386,
+      387,
+      388,
+      412,
+      413
+    ]
+  }
+}

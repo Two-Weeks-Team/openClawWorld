@@ -1,0 +1,76 @@
+{
+  "timestamp": "2026-02-19T15:27:05.241178",
+  "packs": [
+    {
+      "name": "tilemap_packed",
+      "path": "/Users/kimsejun/Documents/GitHub/openClawWorld/docs/reference/Kenney Game Assets All-in-1 3.3.0/2D assets/Roguelike City Pack/Tilemap/tilemap_packed.png",
+      "stats": {
+        "totalOpaquePixels": 210487,
+        "uniqueColors": 132,
+        "luminanceMean": 151.04047405302939,
+        "luminanceStd": 45.508441788586026,
+        "luminanceMin": 60.0,
+        "luminanceMax": 255.0,
+        "hueDistribution": {
+          "0-30deg": 0.34941165029660604,
+          "30-60deg": 0.25556744140814935,
+          "60-90deg": 0.008655061752406885,
+          "90-120deg": 0.0,
+          "120-150deg": 0.1955654964504522,
+          "150-180deg": 0.023047748711465525,
+          "180-210deg": 0.1640571817562968,
+          "210-240deg": 0.0036954196246231645,
+          "240-270deg": 0.0,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.0
+        }
+      }
+    },
+    {
+      "name": "tiny_town_normalized_strong",
+      "path": "tools/analysis/palettes/tiny_town_normalized_strong.png",
+      "stats": {
+        "totalOpaquePixels": 26637,
+        "uniqueColors": 26,
+        "luminanceMean": 123.96631261027893,
+        "luminanceStd": 50.098982586534376,
+        "luminanceMin": 53.022,
+        "luminanceMax": 248.99999999999997,
+        "hueDistribution": {
+          "0-30deg": 0.30828351836037576,
+          "30-60deg": 0.45772843723313406,
+          "60-90deg": 0.0,
+          "90-120deg": 0.0,
+          "120-150deg": 0.059777967549103334,
+          "150-180deg": 0.0,
+          "180-210deg": 0.11016225448334757,
+          "210-240deg": 0.04782237403928266,
+          "240-270deg": 0.0,
+          "270-300deg": 0.0,
+          "300-330deg": 0.0,
+          "330-360deg": 0.016225448334756618
+        }
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "packA": "tilemap_packed",
+      "packB": "tiny_town_normalized_strong",
+      "score": 75.0,
+      "compatible": true,
+      "issues": [
+        "Moderate luminance difference: 27.1",
+        "Large color count difference: 132 vs 26"
+      ],
+      "details": {
+        "luminanceDiff": 27.1,
+        "contrastRangeDiff": 1.0,
+        "colorCountA": 132,
+        "colorCountB": 26
+      }
+    }
+  ],
+  "overallCompatibility": true
+}

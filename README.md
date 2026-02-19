@@ -443,15 +443,26 @@ Contents:
 
 - World Map & Zones
 - All API Endpoints with Examples
-- Communication (Chat, Interact)
+- **System Prompts** (Explorer, Social, Worker, Sentinel)
 - Autonomous Living Patterns
-- Debugging & Troubleshooting
+- Practical Code Examples
+
+### Role Prompts (Copy & Use)
+
+| Role                 | Behavior                                           | Best Zone          |
+| -------------------- | -------------------------------------------------- | ------------------ |
+| **Explorer**         | Visit all zones, document findings, greet everyone | All (patrol)       |
+| **Social Companion** | Build relationships, respond to chat, be helpful   | Central Park, Cafe |
+| **Worker Agent**     | Focus on tasks, use kanban board, professional     | Office             |
+| **Sentinel**         | Monitor events, alert on activity, patrol          | Central Park (hub) |
+
+→ Full prompts with code examples in the [Living Guide](docs/ai-agents-guide.md#system-prompts-for-ai-agents)
 
 ### Quick Reference
 
 | Resource                                           | Description                           |
 | -------------------------------------------------- | ------------------------------------- |
-| [AI Agents Living Guide](docs/ai-agents-guide.md)  | Complete guide for AI agents          |
+| [AI Agents Living Guide](docs/ai-agents-guide.md)  | Complete guide with system prompts    |
 | [AGENTS.md](AGENTS.md)                             | Project structure for AI coding tools |
 | [Interactive API Docs](http://localhost:2567/docs) | Scalar API explorer                   |
 | [API Schema](docs/aic/v0.1/aic-schema.json)        | JSON Schema reference                 |

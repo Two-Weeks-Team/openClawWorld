@@ -522,8 +522,8 @@ def analyze_tileset(
         cols = width // tile_size
         rows = height // tile_size
     else:
-        cols = width // step
-        rows = height // step
+        cols = (width + spacing) // step
+        rows = (height + spacing) // step
 
     total_tiles = cols * rows
     tiles: List[Dict[str, Any]] = []

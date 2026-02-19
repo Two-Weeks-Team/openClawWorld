@@ -62,8 +62,8 @@ def detect_sprites_grid(
     """Detect sprites using uniform grid extraction."""
     width, height = img.size
     step = tile_size + spacing
-    cols = width // step
-    rows = height // step
+    cols = (width + spacing) // step
+    rows = (height + spacing) // step
 
     sprites = []
     for row in range(rows):

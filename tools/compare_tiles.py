@@ -49,9 +49,9 @@ def extract_tiles_from_grid(
 
     step = tile_size + spacing
     if cols == 0:
-        cols = width // step if spacing > 0 else width // tile_size
+        cols = (width + spacing) // step if spacing > 0 else width // tile_size
     if rows == 0:
-        rows = height // step if spacing > 0 else height // tile_size
+        rows = (height + spacing) // step if spacing > 0 else height // tile_size
 
     tiles = []
     for row in range(rows):

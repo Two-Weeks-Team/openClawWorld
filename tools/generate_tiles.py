@@ -318,8 +318,8 @@ def batch_resize_tilemap(
     w, h = img.size
 
     from_step = from_size + spacing
-    cols = w // from_step if spacing > 0 else w // from_size
-    rows = h // from_step if spacing > 0 else h // from_size
+    cols = (w + spacing) // from_step if spacing > 0 else w // from_size
+    rows = (h + spacing) // from_step if spacing > 0 else h // from_size
 
     out_w = cols * to_size
     out_h = rows * to_size
@@ -712,8 +712,8 @@ def generate_autotile47_tile(
         m = mask[:, :, np.newaxis].astype(bool)
         piece = np.where(m, arr_b, arr_c)
         result.paste(Image.fromarray(piece.astype(np.uint8)), (0, 0))
-    elif has_n or has_w:
-        # Edge: dither blend
+    elif (has_n or has_w) and not tl_center:
+        # Edge: dither blend (only when not fully connected)
         direction = "top" if has_n and not has_w else "left" if has_w and not has_n else "corner_tl"
         tl_c = center.crop((0, 0, half_w, half_h))
         tl_b = bg.crop((0, 0, half_w, half_h))
@@ -743,7 +743,7 @@ def generate_autotile47_tile(
         m = mask[:, :, np.newaxis].astype(bool)
         piece = np.where(m, arr_b, arr_c)
         result.paste(Image.fromarray(piece.astype(np.uint8)), (half_w, 0))
-    elif has_n or has_e:
+    elif (has_n or has_e) and not tr_center:
         tr_c = center.crop((half_w, 0, w, half_h))
         tr_b = bg.crop((half_w, 0, w, half_h))
         if has_n and not has_e:
@@ -772,7 +772,7 @@ def generate_autotile47_tile(
         m = mask[:, :, np.newaxis].astype(bool)
         piece = np.where(m, arr_b, arr_c)
         result.paste(Image.fromarray(piece.astype(np.uint8)), (0, half_h))
-    elif has_s or has_w:
+    elif (has_s or has_w) and not bl_center:
         bl_c = center.crop((0, half_h, half_w, h))
         bl_b = bg.crop((0, half_h, half_w, h))
         if has_s and not has_w:
@@ -801,7 +801,7 @@ def generate_autotile47_tile(
         m = mask[:, :, np.newaxis].astype(bool)
         piece = np.where(m, arr_b, arr_c)
         result.paste(Image.fromarray(piece.astype(np.uint8)), (half_w, half_h))
-    elif has_s or has_e:
+    elif (has_s or has_e) and not br_center:
         br_c = center.crop((half_w, half_h, w, h))
         br_b = bg.crop((half_w, half_h, w, h))
         if has_s and not has_e:

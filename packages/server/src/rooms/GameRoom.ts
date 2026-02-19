@@ -41,6 +41,7 @@ import { DEFAULT_SPAWN_POINT } from '@openclawworld/shared';
 import { getMetricsCollector } from '../metrics/MetricsCollector.js';
 import { WorldPackLoader, WorldPackError, type WorldPack } from '../world/WorldPackLoader.js';
 import { SkillService } from '../services/SkillService.js';
+import { registerRoom, unregisterRoom } from '../aic/roomRegistry.js';
 
 const DEFAULT_NPC_SEED = 12345;
 const __filename = fileURLToPath(import.meta.url);
@@ -140,6 +141,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
     this.setMetadata({ roomId });
+    registerRoom(roomId, this.roomId);
     this.facilityService = new FacilityService(this.state);
     registerAllFacilityHandlers(this.facilityService);
     this.loadFacilitiesFromWorldPack();
@@ -724,6 +726,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
 
   override onDispose(): void {
     console.log(`[GameRoom] Disposing room ${this.state.roomId}`);
+    unregisterRoom(this.state.roomId);
     this.clientEntities.clear();
     this.recentProximityEvents = [];
 

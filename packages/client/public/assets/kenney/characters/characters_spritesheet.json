@@ -1,7 +1,10 @@
 {
   "meta": {
-    "image": "characters_spritesheet.png",
-    "size": { "w": 918, "h": 203 },
+    "image": "characters_spritesheet_rgba.png",
+    "size": {
+      "w": 918,
+      "h": 203
+    },
     "scale": 1,
     "format": "RGBA8888",
     "app": "kenney-roguelike-characters",
@@ -11,16 +14,93 @@
     "rows": 12
   },
   "frames": {
-    "player-human": { "frame": { "x": 0, "y": 0, "w": 16, "h": 16 } },
-    "player-agent": { "frame": { "x": 17, "y": 0, "w": 16, "h": 16 } },
-    "npc-greeter": { "frame": { "x": 34, "y": 0, "w": 16, "h": 16 } },
-    "npc-security": { "frame": { "x": 51, "y": 0, "w": 16, "h": 16 } },
-    "npc-office-pm": { "frame": { "x": 68, "y": 0, "w": 16, "h": 16 } },
-    "npc-it-help": { "frame": { "x": 85, "y": 0, "w": 16, "h": 16 } },
-    "npc-meeting-host": { "frame": { "x": 102, "y": 0, "w": 16, "h": 16 } },
-    "npc-barista": { "frame": { "x": 119, "y": 0, "w": 16, "h": 16 } },
-    "npc-arcade-host": { "frame": { "x": 136, "y": 0, "w": 16, "h": 16 } },
-    "npc-ranger": { "frame": { "x": 153, "y": 0, "w": 16, "h": 16 } },
-    "npc-fountain-keeper": { "frame": { "x": 170, "y": 0, "w": 16, "h": 16 } }
+    "player-human": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "player-agent": {
+      "frame": {
+        "x": 17,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-greeter": {
+      "frame": {
+        "x": 34,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-security": {
+      "frame": {
+        "x": 51,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-office-pm": {
+      "frame": {
+        "x": 68,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-it-help": {
+      "frame": {
+        "x": 85,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-meeting-host": {
+      "frame": {
+        "x": 102,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-barista": {
+      "frame": {
+        "x": 119,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-arcade-host": {
+      "frame": {
+        "x": 136,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-ranger": {
+      "frame": {
+        "x": 153,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    },
+    "npc-fountain-keeper": {
+      "frame": {
+        "x": 170,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      }
+    }
   }
 }

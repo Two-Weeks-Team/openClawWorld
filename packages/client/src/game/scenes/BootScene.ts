@@ -43,6 +43,13 @@ export class BootScene extends Phaser.Scene {
     this.load.image('particle-star', 'assets/particles/star.png');
     this.load.image('particle-spark', 'assets/particles/spark.png');
     this.load.image('particle-smoke', 'assets/particles/smoke.png');
+
+    // Kenney roguelike characters spritesheet (RGBA converted)
+    this.load.atlas(
+      'characters',
+      'assets/kenney/characters/characters_spritesheet_rgba.png',
+      'assets/kenney/characters/characters_spritesheet.json'
+    );
   }
 
   create() {

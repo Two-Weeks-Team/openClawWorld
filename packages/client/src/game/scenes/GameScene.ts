@@ -16,6 +16,12 @@ import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
 import { skinTintFromId, createHeadSprite, CHARACTER_PACK_KEY } from '../CharacterPack';
 import { EmoteDisplay } from '../../ui/EmoteDisplay';
+import {
+  createWalkAnimations,
+  updatePlayerAnimation,
+  updateNPCAnimation,
+  getNPCSpriteKey,
+} from '../AnimationManager';
 import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
 import {
   ZONE_BOUNDS,
@@ -124,6 +130,8 @@ export class GameScene extends Phaser.Scene {
   // ChatFocus -> Idle: Chat submitted or ESC
   // Priority: Targeting > ChatFocus > Idle
   private entityEffects: Map<string, Set<string>> = new Map();
+  private entityPrevPos: Map<string, { x: number; y: number }> = new Map();
+  private npcSpriteKeys: Map<string, string> = new Map();
   private builtinSkills: SkillDefinition[] = [];
   private _debugBlockedCount = 0;
   private debugInfoTexts: Phaser.GameObjects.Text[] = [];
@@ -172,6 +180,8 @@ export class GameScene extends Phaser.Scene {
 
     this.setupKeyboardFocusHandling();
     this.setupAudioControls();
+
+    createWalkAnimations(this);
   }
 
   private initializeWorldGrid(): void {
@@ -1528,16 +1538,23 @@ export class GameScene extends Phaser.Scene {
       }
     }
     this.entityData.delete(key);
+    this.entityPrevPos.delete(key);
   }
 
   private addNPC(npc: NPC, key: string) {
     const container = this.add.container(npc.x, npc.y);
     container.setDepth(npc.y);
 
-    // NPC avatars use the character pack with a deterministic tint from the
-    // NPC's definition ID, falling back to the legacy green-tinted sprite.
+    const spriteKey = getNPCSpriteKey(npc.definitionId || '', npc.role);
+    this.npcSpriteKeys.set(key, spriteKey);
+
     let sprite: Phaser.GameObjects.Sprite;
-    if (this.textures.exists(CHARACTER_PACK_KEY)) {
+    if (this.textures.getFrame('npcs', spriteKey)) {
+      sprite = this.add.sprite(0, 0, 'npcs', spriteKey);
+      sprite.setOrigin(0.5, 0.5);
+    } else if (this.textures.exists(CHARACTER_PACK_KEY)) {
+      // NPC avatars fall back to the character pack with a deterministic tint
+      // from the NPC's definition ID.
       const tint = skinTintFromId(npc.definitionId || key);
       sprite = createHeadSprite(this, tint);
     } else {
@@ -1572,6 +1589,7 @@ export class GameScene extends Phaser.Scene {
       this.npcContainers.delete(key);
     }
     this.npcData.delete(key);
+    this.npcSpriteKeys.delete(key);
   }
 
   private updateNPCData(npc: NPC, key: string) {
@@ -1582,10 +1600,19 @@ export class GameScene extends Phaser.Scene {
     this.npcData.forEach((npc, key) => {
       const container = this.npcContainers.get(key);
       if (container) {
+        const prevX = container.x;
+        const prevY = container.y;
         const t = 0.15;
         container.x = Phaser.Math.Linear(container.x, npc.x, t);
         container.y = Phaser.Math.Linear(container.y, npc.y, t);
         container.setDepth(container.y);
+
+        const sprite = container.list[0] as Phaser.GameObjects.Sprite;
+        const dx = Math.abs(container.x - prevX);
+        const dy = Math.abs(container.y - prevY);
+        const isMoving = dx > 0.1 || dy > 0.1;
+        const spriteKey = this.npcSpriteKeys.get(key) ?? 'greeter';
+        updateNPCAnimation(sprite, isMoving, npc.facing, spriteKey);
       }
     });
   }
@@ -1698,11 +1725,15 @@ export class GameScene extends Phaser.Scene {
         container.setDepth(container.y);
 
         const sprite = container.list[0] as Phaser.GameObjects.Sprite;
-        if (entity.facing === 'left') {
-          sprite.setFlipX(true);
-        } else if (entity.facing === 'right') {
-          sprite.setFlipX(false);
-        }
+
+        const prev = this.entityPrevPos.get(key);
+        const isMoving =
+          prev !== undefined &&
+          (Math.abs(entity.pos.x - prev.x) > 0.1 || Math.abs(entity.pos.y - prev.y) > 0.1);
+        this.entityPrevPos.set(key, { x: entity.pos.x, y: entity.pos.y });
+
+        const entityType = entity.kind === 'agent' ? 'agent' : 'human';
+        updatePlayerAnimation(sprite, isMoving, entity.facing, entityType);
 
         if (key === gameClient.entityId) {
           sprite.setTint(0xffff00);

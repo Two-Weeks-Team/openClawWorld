@@ -262,6 +262,7 @@ export type EventEnvelope<T = Record<string, unknown>> = {
 export type PollEventsResponseData = {
   events: EventEnvelope[];
   nextCursor: string;
+  cursorExpired: boolean;
   serverTsMs: number;
 };
 

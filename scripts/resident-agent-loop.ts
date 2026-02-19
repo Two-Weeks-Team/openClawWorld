@@ -1793,39 +1793,47 @@ class IssueDetector {
   }
 
   detectObserveInconsistency(agents: ResidentAgent[]): Issue | null {
-    const positionBuckets: Map<string, { agentId: string; facilityIds: string[] }[]> = new Map();
+    // Use tile-based bucketing (TILE_SIZE=16px) to ensure agents in the same bucket
+    // are within the same tile, making facility visibility comparison accurate.
+    // Previous 100px buckets caused false positives because agents ~140px apart
+    // (same 100px bucket) could have different observe results for boundary facilities.
+    const tileBuckets: Map<
+      string,
+      { agentId: string; position: { x: number; y: number }; facilityIds: string[] }[]
+    > = new Map();
     for (const agent of agents) {
       const state = agent.getState();
-      const bucket = `${Math.floor(state.position.x / 100)}_${Math.floor(state.position.y / 100)}`;
-      if (!positionBuckets.has(bucket)) positionBuckets.set(bucket, []);
-      positionBuckets.get(bucket)!.push({
+      const tileBucket = `${Math.floor(state.position.x / TILE_SIZE)}_${Math.floor(state.position.y / TILE_SIZE)}`;
+      if (!tileBuckets.has(tileBucket)) tileBuckets.set(tileBucket, []);
+      tileBuckets.get(tileBucket)!.push({
         agentId: state.agentId,
+        position: { x: state.position.x, y: state.position.y },
         facilityIds: Array.from(state.observedFacilities.keys()).sort(),
       });
     }
 
-    for (const [bucket, entries] of Array.from(positionBuckets.entries())) {
+    for (const [tileBucket, entries] of tileBuckets) {
       if (entries.length < 2) continue;
       const baseline = entries[0].facilityIds.join(',');
       for (let i = 1; i < entries.length; i++) {
         const current = entries[i].facilityIds.join(',');
-        if (current !== baseline && baseline.length > 0 && current.length > 0) {
+        if (current !== baseline) {
           return {
             area: 'Sync',
-            title: `Observe inconsistency at position bucket ${bucket}`,
-            description: 'Agents at the same position see different facility lists',
-            expectedBehavior: 'Agents at the same position should see the same facilities',
+            title: `Observe inconsistency at tile ${tileBucket}`,
+            description: 'Agents on the same tile see different facility lists',
+            expectedBehavior: 'Agents on the same tile should see the same facilities',
             observedBehavior: `${entries[0].agentId} sees [${baseline}] vs ${entries[i].agentId} sees [${current}]`,
-            reproductionSteps: [
-              'Place multiple agents at same position',
-              'Compare observe results',
-            ],
+            reproductionSteps: ['Place multiple agents on same tile', 'Compare observe results'],
             severity: 'Major',
             frequency: 'sometimes',
             evidence: {
               agentIds: [entries[0].agentId, entries[i].agentId],
               timestamps: [Date.now()],
-              logs: [`${entries[0].agentId}: ${baseline}`, `${entries[i].agentId}: ${current}`],
+              logs: [
+                `${entries[0].agentId} at (${entries[0].position.x.toFixed(0)}, ${entries[0].position.y.toFixed(0)}): ${baseline}`,
+                `${entries[i].agentId} at (${entries[i].position.x.toFixed(0)}, ${entries[i].position.y.toFixed(0)}): ${current}`,
+              ],
             },
           };
         }

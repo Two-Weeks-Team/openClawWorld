@@ -6,6 +6,7 @@ import type { RegisterRequest, RegisterResponseData, AicErrorObject } from '@ope
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { EntitySchema } from '../../schemas/EntitySchema.js';
 import { registerRoom, getColyseusRoomId } from '../roomRegistry.js';
+import { assignChannel, canJoinChannel } from '../channelManager.js';
 import { registerToken } from '../tokenRegistry.js';
 import { DEFAULT_SPAWN_POSITION, DEFAULT_TILE_SIZE } from '../../constants.js';
 
@@ -37,37 +38,51 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
   const { name, roomId } = body;
 
   try {
-    let colyseusRoomId = getColyseusRoomId(roomId);
+    let targetRoomId = roomId;
+    let colyseusRoomId: string | undefined;
 
-    if (!colyseusRoomId) {
-      console.log(
-        `[RegisterHandler] No room found for '${roomId}', creating new room for AIC agents`
-      );
-      try {
-        const roomRef = await matchMaker.createRoom('game', { roomId });
-        colyseusRoomId = roomRef.roomId;
-        registerRoom(roomId, colyseusRoomId);
-        console.log(`[RegisterHandler] Created room ${colyseusRoomId} for AIC agents`);
-      } catch (createError) {
-        console.error(`[RegisterHandler] Failed to create room:`, createError);
+    if (roomId === 'auto') {
+      const assigned = await assignChannel();
+      targetRoomId = assigned.channelId;
+      colyseusRoomId = assigned.colyseusRoomId;
+    } else {
+      if (!canJoinChannel(roomId)) {
         res
-          .status(500)
-          .json(createErrorResponse('internal', `Failed to create room '${roomId}'`, true));
+          .status(409)
+          .json(createErrorResponse('conflict', `Channel '${roomId}' is full`, false));
         return;
+      }
+      colyseusRoomId = getColyseusRoomId(roomId);
+      if (!colyseusRoomId) {
+        console.log(
+          `[RegisterHandler] No room found for '${roomId}', creating new room for AIC agents`
+        );
+        try {
+          const roomRef = await matchMaker.createRoom('game', { roomId });
+          colyseusRoomId = roomRef.roomId;
+          registerRoom(roomId, colyseusRoomId);
+          console.log(`[RegisterHandler] Created room ${colyseusRoomId} for AIC agents`);
+        } catch (createError) {
+          console.error(`[RegisterHandler] Failed to create room:`, createError);
+          res
+            .status(500)
+            .json(createErrorResponse('internal', `Failed to create room '${roomId}'`, true));
+          return;
+        }
       }
     }
 
-    const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId) as GameRoom | undefined;
+    const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId!) as GameRoom | undefined;
 
     if (!gameRoom) {
       res
         .status(503)
-        .json(createErrorResponse('room_not_ready', `Room '${roomId}' is not ready`, true));
+        .json(createErrorResponse('room_not_ready', `Room '${targetRoomId}' is not ready`, true));
       return;
     }
 
     const agentId = generateAgentId();
-    const entity = new EntitySchema(agentId, 'agent', name, roomId);
+    const entity = new EntitySchema(agentId, 'agent', name, targetRoomId);
 
     const roomSpawn = gameRoom.getSpawnPoint();
     const tileSize = gameRoom.state.map?.tileSize ?? DEFAULT_TILE_SIZE;
@@ -84,20 +99,20 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
 
     const zoneSystem = gameRoom.getZoneSystem();
     if (zoneSystem) {
-      zoneSystem.updateEntityZone(agentId, spawnX, spawnY, eventLog, roomId, entity);
+      zoneSystem.updateEntityZone(agentId, spawnX, spawnY, eventLog, targetRoomId, entity);
     }
-    eventLog.append('presence.join', roomId, {
+    eventLog.append('presence.join', targetRoomId, {
       entityId: agentId,
       name,
       kind: 'agent',
     });
 
     const sessionToken = generateSessionToken();
-    registerToken(sessionToken, agentId, roomId);
+    registerToken(sessionToken, agentId, targetRoomId);
 
     const responseData: RegisterResponseData = {
       agentId,
-      roomId,
+      roomId: targetRoomId,
       sessionToken,
     };
 

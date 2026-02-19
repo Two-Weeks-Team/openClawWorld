@@ -1202,6 +1202,12 @@ export class GameScene extends Phaser.Scene {
           this.castBar?.cancelCast();
         }
         this.notificationPanel?.addEvent('skill', `${data.skillId} complete!`, 0x66ff66);
+
+        // Sparkle effect at the caster position on successful cast
+        const casterContainer = this.entities.get(data.casterId);
+        if (casterContainer) {
+          this.showEffect(casterContainer.x, casterContainer.y, 'sparkle');
+        }
       }
     );
 
@@ -1246,6 +1252,67 @@ export class GameScene extends Phaser.Scene {
     if (effectType === 'slowed') {
       sprite.setTint(0x6688ff);
     }
+
+    // Play a particle burst when an effect is applied
+    this.showEffect(container.x, container.y, 'skill_hit');
+  }
+
+  /**
+   * Play a one-shot particle effect at a world position.
+   *
+   * Available presets:
+   * - `sparkle`: golden star particles (interactions, pickups)
+   * - `poof`: smoke puff particles (disappearance, spawn)
+   * - `skill_hit`: blue spark burst (skill impact, effect application)
+   */
+  showEffect(x: number, y: number, type: 'sparkle' | 'poof' | 'skill_hit'): void {
+    let textureKey: string;
+    let tint: number | undefined;
+    let speed: { min: number; max: number };
+    let scaleStart: number;
+    let lifespan: number;
+    let quantity: number;
+
+    switch (type) {
+      case 'sparkle':
+        textureKey = 'particle-star';
+        tint = 0xffee88;
+        speed = { min: 15, max: 60 };
+        scaleStart = 0.08;
+        lifespan = 700;
+        quantity = 5;
+        break;
+      case 'poof':
+        textureKey = 'particle-smoke';
+        tint = 0xcccccc;
+        speed = { min: 10, max: 40 };
+        scaleStart = 0.1;
+        lifespan = 600;
+        quantity = 4;
+        break;
+      case 'skill_hit':
+        textureKey = 'particle-spark';
+        tint = 0x66aaff;
+        speed = { min: 30, max: 100 };
+        scaleStart = 0.06;
+        lifespan = 500;
+        quantity = 8;
+        break;
+    }
+
+    const emitter = this.add.particles(x, y, textureKey, {
+      speed,
+      scale: { start: scaleStart, end: 0 },
+      alpha: { start: 1, end: 0 },
+      lifespan,
+      quantity,
+      tint,
+      emitting: false,
+    });
+    emitter.setDepth(y + 1);
+    emitter.explode();
+
+    this.time.delayedCall(lifespan + 100, () => emitter.destroy());
   }
 
   private removeEffectVisual(entityId: string, effectType: string): void {
@@ -1427,6 +1494,8 @@ export class GameScene extends Phaser.Scene {
   private removeEntity(key: string) {
     const entity = this.entities.get(key);
     if (entity) {
+      // Play a poof effect at the entity's last position before destroying
+      this.showEffect(entity.x, entity.y, 'poof');
       entity.destroy();
       this.entities.delete(key);
       if (key === this.cameraFollowTargetId) {

@@ -719,8 +719,8 @@ def generate_preview(
         draw.rectangle([x1, y1, x2, y2], outline=border_color)
 
         # Connectivity indicator (if deep analysis)
-        if show_connectivity and str(tile["index"]) in connectivity:
-            conn = connectivity[str(tile["index"])]
+        if show_connectivity and tile["index"] in connectivity:
+            conn = connectivity[tile["index"]]
             score = conn.get("score", 0)
             # Green=high connectivity, Red=low
             r_c = int(255 * (1 - score))

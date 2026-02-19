@@ -338,6 +338,7 @@ def batch_resize_tilemap(
             output.paste(scaled, (col * to_size, row * to_size))
             resized_count += 1
 
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     output.save(output_path)
     print(f"Resized {resized_count} tiles: {from_size}x{from_size} -> {to_size}x{to_size}")
     print(f"Output: {output_path} ({out_w}x{out_h})")
@@ -974,7 +975,7 @@ def compare_palettes(
     stats_b = palette_b.get("stats", {})
 
     if not stats_a or not stats_b:
-        return {"score": 0, "issues": ["Missing palette data"]}
+        return {"score": 0, "compatible": False, "issues": ["Missing palette data"]}
 
     issues = []
     score = 100.0

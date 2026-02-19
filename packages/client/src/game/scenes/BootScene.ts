@@ -28,6 +28,12 @@ export class BootScene extends Phaser.Scene {
     for (const entry of AUDIO_MANIFEST) {
       this.load.audio(entry.key, entry.path);
     }
+
+    // Particle textures (Kenney Particle Pack)
+    this.load.image('particle-circle', 'assets/particles/circle.png');
+    this.load.image('particle-star', 'assets/particles/star.png');
+    this.load.image('particle-spark', 'assets/particles/spark.png');
+    this.load.image('particle-smoke', 'assets/particles/smoke.png');
   }
 
   create() {

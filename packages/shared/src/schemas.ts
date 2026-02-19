@@ -337,6 +337,7 @@ export const EventTypeSchema = z.enum([
   'profile.updated',
   'npc.state_change',
   'facility.interacted',
+  'emote.triggered',
 ]);
 
 export const EventEnvelopeSchema = z.object({

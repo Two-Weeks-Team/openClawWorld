@@ -112,6 +112,12 @@ export class ColyseusClient {
     }
   }
 
+  sendEmote(emoteType: string): void {
+    if (this.room) {
+      this.room.send('emote', { emoteType });
+    }
+  }
+
   get sessionId() {
     return this._sessionId;
   }

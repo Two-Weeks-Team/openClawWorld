@@ -691,6 +691,19 @@ export class GameRoom extends Room<{ state: RoomState }> {
     const entityId = this.clientEntities.get(client.sessionId);
     const consented = code === undefined;
 
+    // For non-consented (unexpected) disconnects, wait for reconnection before removing entity
+    if (!consented && entityId) {
+      try {
+        await this.allowReconnection(client, 20);
+        console.log(`[GameRoom] Client ${client.sessionId} reconnected, entity ${entityId} preserved`);
+        return; // Reconnected successfully, keep entity intact
+      } catch {
+        console.log(`[GameRoom] Client ${client.sessionId} did not reconnect in time`);
+        // Fall through to cleanup
+      }
+    }
+
+    // Remove entity on consented leave or failed reconnection
     if (entityId) {
       if (this.zoneSystem) {
         this.zoneSystem.removeEntity(entityId, this.eventLog, this.state.roomId);
@@ -710,15 +723,6 @@ export class GameRoom extends Room<{ state: RoomState }> {
       });
 
       console.log(`[GameRoom] Client ${client.sessionId} left, removed ${entityId}`);
-    }
-
-    if (!consented) {
-      try {
-        await this.allowReconnection(client, 20);
-        console.log(`[GameRoom] Client ${client.sessionId} reconnected`);
-      } catch {
-        console.log(`[GameRoom] Client ${client.sessionId} did not reconnect in time`);
-      }
     }
   }
 

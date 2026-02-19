@@ -427,7 +427,8 @@ export class GameScene extends Phaser.Scene {
     const tileset = this.map.addTilesetImage('tileset', 'tileset');
     const urbanTileset = this.map.addTilesetImage('urban_tileset', 'urban_tileset');
     const tinytownTileset = this.map.addTilesetImage('tinytown_tileset', 'tinytown_tileset');
-    const tilesets = [tileset, urbanTileset, tinytownTileset].filter(
+    const interiorTileset = this.map.addTilesetImage('interior_tileset', 'interior_tileset');
+    const tilesets = [tileset, urbanTileset, tinytownTileset, interiorTileset].filter(
       Boolean
     ) as Phaser.Tilemaps.Tileset[];
 

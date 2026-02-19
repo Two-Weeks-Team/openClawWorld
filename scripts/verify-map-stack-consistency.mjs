@@ -33,6 +33,12 @@ const EXPECTED_TILESETS = [
     tileheight: 16,
     image: 'tinytown_tileset.png',
   },
+  {
+    name: 'interior_tileset',
+    tilewidth: 16,
+    tileheight: 16,
+    image: 'interior_tileset.png',
+  },
 ];
 
 const CONTRACT_PATHS = {

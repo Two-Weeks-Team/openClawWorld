@@ -12,6 +12,7 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 **5개 팩만 수동 좌표 매핑**으로 사용 중이었습니다 (활용률 3.3%).
 
 본 작업에서는 이미지 분석 자동화 도구를 신규 구축하여:
+
 - 타일맵/스프라이트시트 **자동 분석** (카테고리 분류, 중복 탐지, 애니메이션 감지)
 - 프로젝트 타일과 원본 간 **자동 매칭 검증** (pHash 기반)
 - 타일 크기 차이 시 **리사이징** (nearest/Scale2X/HQx)
@@ -26,38 +27,38 @@ openClawWorld 프로젝트는 Kenney Game Assets All-in-1 (266개 팩, 2D 151개
 
 ### 2.1 신규 파일 (5개)
 
-| 파일 | 크기 | 목적 |
-|------|------|------|
-| `tools/analyze_tileset.py` | 12.5 KB | 타일맵 자동 분석기 (그리드 분할, 빈 타일 필터, 색상 히스토그램, pHash, 카테고리 분류) |
-| `tools/analyze_spritesheet.py` | 13.2 KB | 스프라이트시트 분석기 (스프라이트 감지, 유사도 그룹핑, 애니메이션 시퀀스 추정) |
-| `tools/compare_tiles.py` | 9.1 KB | 타일 유사도 비교기 (pHash 교차 비교, confidence 점수, 역추적) |
-| `tools/generate_tiles.py` | 25.5 KB | 타일 리사이징 & 생성기 (9개 서브커맨드: resize, batch-resize, color-shift, seasonal, blend, transitions, edges, autotile, fill-gaps) |
-| `tools/requirements.txt` | 46 B | Python 의존성 정의 (Pillow, imagehash, numpy) |
+| 파일                           | 크기    | 목적                                                                                                                                 |
+| ------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `tools/analyze_tileset.py`     | 12.5 KB | 타일맵 자동 분석기 (그리드 분할, 빈 타일 필터, 색상 히스토그램, pHash, 카테고리 분류)                                                |
+| `tools/analyze_spritesheet.py` | 13.2 KB | 스프라이트시트 분석기 (스프라이트 감지, 유사도 그룹핑, 애니메이션 시퀀스 추정)                                                       |
+| `tools/compare_tiles.py`       | 9.1 KB  | 타일 유사도 비교기 (pHash 교차 비교, confidence 점수, 역추적)                                                                        |
+| `tools/generate_tiles.py`      | 25.5 KB | 타일 리사이징 & 생성기 (9개 서브커맨드: resize, batch-resize, color-shift, seasonal, blend, transitions, edges, autotile, fill-gaps) |
+| `tools/requirements.txt`       | 46 B    | Python 의존성 정의 (Pillow, imagehash, numpy)                                                                                        |
 
 ### 2.2 분석 리포트 (5개, 합계 611 KB)
 
-| 리포트 | 크기 | 소스 | 결과 요약 |
-|--------|------|------|-----------|
-| `roguelike_city_analysis.json` | 244 KB | city_tilemap.png (37x28) | 1035 비공백 타일, 7개 카테고리, 154 중복 그룹 |
-| `roguelike_interior_analysis.json` | 104 KB | interior_tilemap.png (26x17) | 435 비공백 타일, 7개 카테고리, 89 중복 그룹 |
-| `rpg_urban_analysis.json` | 113 KB | urban_tilemap.png (27x18) | 486 비공백 타일, 8개 카테고리, 56 중복 그룹 |
-| `tiny_town_analysis.json` | 31 KB | tinytown_tilemap.png (12x11) | 132 비공백 타일, 7개 카테고리, 20 중복 그룹 |
-| `roguelike_characters_analysis.json` | 118 KB | characters_spritesheet.png | 416 스프라이트, 60 유사도 그룹, 86 애니메이션 시퀀스 |
+| 리포트                               | 크기   | 소스                         | 결과 요약                                            |
+| ------------------------------------ | ------ | ---------------------------- | ---------------------------------------------------- |
+| `roguelike_city_analysis.json`       | 244 KB | city_tilemap.png (37x28)     | 1035 비공백 타일, 7개 카테고리, 154 중복 그룹        |
+| `roguelike_interior_analysis.json`   | 104 KB | interior_tilemap.png (26x17) | 435 비공백 타일, 7개 카테고리, 89 중복 그룹          |
+| `rpg_urban_analysis.json`            | 113 KB | urban_tilemap.png (27x18)    | 486 비공백 타일, 8개 카테고리, 56 중복 그룹          |
+| `tiny_town_analysis.json`            | 31 KB  | tinytown_tilemap.png (12x11) | 132 비공백 타일, 7개 카테고리, 20 중복 그룹          |
+| `roguelike_characters_analysis.json` | 118 KB | characters_spritesheet.png   | 416 스프라이트, 60 유사도 그룹, 86 애니메이션 시퀀스 |
 
 ### 2.3 보강 파일 (5개)
 
-| 파일 | 변경 내용 |
-|------|-----------|
-| `tools/extract_tileset.py` | `--verify` (pHash 정합성 검증), `--preview` (라벨링 미리보기 PNG) 플래그 추가 |
-| `tools/extract_npc_sprites.py` | `--verify`, `--preview` 플래그 추가 |
-| `tools/extract_player_sprites.py` | `--verify`, `--preview` 플래그 추가 |
-| `tools/extract_object_sprites.py` | 하드코딩 → manifest-driven 전환, `--verify`, `--preview` 추가 |
-| `tools/kenney-curation.json` | v1.0.0 → v1.1.0, `analysis` 섹션 추가 (리포트 참조, 도구 경로) |
+| 파일                              | 변경 내용                                                                     |
+| --------------------------------- | ----------------------------------------------------------------------------- |
+| `tools/extract_tileset.py`        | `--verify` (pHash 정합성 검증), `--preview` (라벨링 미리보기 PNG) 플래그 추가 |
+| `tools/extract_npc_sprites.py`    | `--verify`, `--preview` 플래그 추가                                           |
+| `tools/extract_player_sprites.py` | `--verify`, `--preview` 플래그 추가                                           |
+| `tools/extract_object_sprites.py` | 하드코딩 → manifest-driven 전환, `--verify`, `--preview` 추가                 |
+| `tools/kenney-curation.json`      | v1.0.0 → v1.1.0, `analysis` 섹션 추가 (리포트 참조, 도구 경로)                |
 
 ### 2.4 스킬 문서 보정 (1개)
 
-| 파일 | 변경 내용 |
-|------|-----------|
+| 파일                                               | 변경 내용                                                                                              |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `.claude/skills/phaser-asset-integration/SKILL.md` | Phase 0 (자동 분석) 추가, 타일 리사이징 가이드, 부족 타일 생성 방법, generate_tiles.py 레퍼런스 테이블 |
 
 ---
@@ -384,6 +385,7 @@ extract_object_sprites.py 추가 변경:
 ```
 
 **개선 효과:**
+
 - 수동 좌표 확인 → 자동 JSON 리포트로 대체
 - 시각 검증 → pHash 자동 검증 (오류율 0%)
 - 새 팩 탐색 시간: 수십 분 → 30초 (분석 실행만)
@@ -445,14 +447,14 @@ tools/requirements.txt:
 
 ### 9.1 자동 검증
 
-| 검증 항목 | 결과 |
-|-----------|------|
-| `requirements.txt` 의존성 설치 | OK (Pillow, imagehash, numpy 설치 확인) |
-| 5개 분석 리포트 JSON 유효성 | OK (모두 `json.load()` 성공) |
-| 8개 Python 스크립트 구문 검증 | OK (모두 `py_compile` 통과) |
-| `extract_tileset.py --verify` | 32/32 PASS (모든 타일 pHash 일치) |
-| `compare_tiles.py` 교차 비교 | 32/32 EXACT MATCH (거리 0) |
-| `generate_tiles.py batch-resize` | 1036 타일 16→32 변환 성공 |
+| 검증 항목                        | 결과                                    |
+| -------------------------------- | --------------------------------------- |
+| `requirements.txt` 의존성 설치   | OK (Pillow, imagehash, numpy 설치 확인) |
+| 5개 분석 리포트 JSON 유효성      | OK (모두 `json.load()` 성공)            |
+| 8개 Python 스크립트 구문 검증    | OK (모두 `py_compile` 통과)             |
+| `extract_tileset.py --verify`    | 32/32 PASS (모든 타일 pHash 일치)       |
+| `compare_tiles.py` 교차 비교     | 32/32 EXACT MATCH (거리 0)              |
+| `generate_tiles.py batch-resize` | 1036 타일 16→32 변환 성공               |
 
 ### 9.2 수동 검증 항목 (권장)
 
@@ -502,18 +504,18 @@ tools/
 
 ## 11. Quantitative Impact
 
-| 메트릭 | Before | After |
-|--------|--------|-------|
-| 분석된 타일 수 | 0 | 2,088 |
-| 분석된 스프라이트 수 | 0 | 416 |
-| 자동 카테고리 분류 | 불가 | 8개 카테고리 |
-| 중복 타일 그룹 탐지 | 불가 | 319 그룹 |
-| 애니메이션 시퀀스 감지 | 불가 | 86개 |
-| 추출 검증 방법 | 시각적 (수동) | pHash 자동 (100% 정확) |
-| 새 타일 탐색 시간 | 수십 분 | ~30초 |
-| 타일 크기 변환 | 외부 도구 필요 | 내장 (3가지 알고리즘) |
-| 부족 타일 생성 | 수동 드로잉 | 자동 (9가지 방법) |
-| 스킬 문서 커버리지 | 6개 Phase | 7개 Phase + 도구 레퍼런스 |
+| 메트릭                 | Before         | After                     |
+| ---------------------- | -------------- | ------------------------- |
+| 분석된 타일 수         | 0              | 2,088                     |
+| 분석된 스프라이트 수   | 0              | 416                       |
+| 자동 카테고리 분류     | 불가           | 8개 카테고리              |
+| 중복 타일 그룹 탐지    | 불가           | 319 그룹                  |
+| 애니메이션 시퀀스 감지 | 불가           | 86개                      |
+| 추출 검증 방법         | 시각적 (수동)  | pHash 자동 (100% 정확)    |
+| 새 타일 탐색 시간      | 수십 분        | ~30초                     |
+| 타일 크기 변환         | 외부 도구 필요 | 내장 (3가지 알고리즘)     |
+| 부족 타일 생성         | 수동 드로잉    | 자동 (9가지 방법)         |
+| 스킬 문서 커버리지     | 6개 Phase      | 7개 Phase + 도구 레퍼런스 |
 
 ---
 
@@ -523,15 +525,15 @@ tools/
 
 이전 구현에서 수집된 연구 결과를 기반으로 전면 업그레이드:
 
-| 영역 | v1 (기존) | v2 (업그레이드) | 개선 |
-|------|-----------|-----------------|------|
-| Scale2x | 픽셀별 반복 (O(n) 루프) | NumPy 벡터화 (패딩 배열) | ~50x 속도 향상 |
-| Scale3x | 미지원 | AdvMAME3x 벡터화 구현 | 3배 확대 지원 |
-| 타일 전환 | 부드러운 그래디언트 (블러) | Bayer 디더링 (2x2/4x4/8x8) | 픽셀아트 적합 |
-| 색상 변형 | HSV 픽셀별 시프트 | 팔레트 스왑 (이산 리매핑) | 진정한 픽셀아트 |
-| 오토타일 | 9-타일 (4방향 엣지) | 47-타일 비트마스크 블롭 | 업계 표준 |
-| 팔레트 분석 | 미지원 | 추출/비교/정규화 | 크로스팩 호환 |
-| 색상 시프트 | 픽셀별 루프 | NumPy 벡터화 HSV | ~10x 속도 향상 |
+| 영역        | v1 (기존)                  | v2 (업그레이드)            | 개선            |
+| ----------- | -------------------------- | -------------------------- | --------------- |
+| Scale2x     | 픽셀별 반복 (O(n) 루프)    | NumPy 벡터화 (패딩 배열)   | ~50x 속도 향상  |
+| Scale3x     | 미지원                     | AdvMAME3x 벡터화 구현      | 3배 확대 지원   |
+| 타일 전환   | 부드러운 그래디언트 (블러) | Bayer 디더링 (2x2/4x4/8x8) | 픽셀아트 적합   |
+| 색상 변형   | HSV 픽셀별 시프트          | 팔레트 스왑 (이산 리매핑)  | 진정한 픽셀아트 |
+| 오토타일    | 9-타일 (4방향 엣지)        | 47-타일 비트마스크 블롭    | 업계 표준       |
+| 팔레트 분석 | 미지원                     | 추출/비교/정규화           | 크로스팩 호환   |
+| 색상 시프트 | 픽셀별 루프                | NumPy 벡터화 HSV           | ~10x 속도 향상  |
 
 ### 12.2 신규 도구: `asset_pipeline.py`
 
@@ -544,6 +546,7 @@ python tools/asset_pipeline.py full \
 ```
 
 서브커맨드:
+
 - `analyze` — 심층 분석 (에지 연결성, 대칭, 팔레트 복잡도, 패턴 빈도)
 - `compare` — 프로젝트 ↔ 소스 매칭
 - `generate` — 전환 + 오토타일47 + 변형 일괄 생성
@@ -554,17 +557,18 @@ python tools/asset_pipeline.py full \
 
 `analyze_tileset.py`에 추가된 고급 메트릭:
 
-| 메트릭 | 설명 | 용도 |
-|--------|------|------|
-| Edge Connectivity | 각 타일 가장자리가 이웃과 얼마나 잘 연결되는지 (0.0-1.0) | 심리스 타일셋 검증 |
-| Symmetry Detection | 수평/수직/90도/180도 대칭 감지 | 타일 변형 가능성 파악 |
-| Palette Complexity | 고유 색상 수, 엔트로피, 지배색 비율, 색조 범위 | 아트 스타일 일관성 |
-| Pattern Frequency | 2x2 블록 반복 패턴, 카테고리 인접 행렬 | 멀티타일 오브젝트 감지 |
-| Tile Relationships | 유사도 그래프, 애니메이션 후보 | 프레임 자동 감지 |
+| 메트릭             | 설명                                                     | 용도                   |
+| ------------------ | -------------------------------------------------------- | ---------------------- |
+| Edge Connectivity  | 각 타일 가장자리가 이웃과 얼마나 잘 연결되는지 (0.0-1.0) | 심리스 타일셋 검증     |
+| Symmetry Detection | 수평/수직/90도/180도 대칭 감지                           | 타일 변형 가능성 파악  |
+| Palette Complexity | 고유 색상 수, 엔트로피, 지배색 비율, 색조 범위           | 아트 스타일 일관성     |
+| Pattern Frequency  | 2x2 블록 반복 패턴, 카테고리 인접 행렬                   | 멀티타일 오브젝트 감지 |
+| Tile Relationships | 유사도 그래프, 애니메이션 후보                           | 프레임 자동 감지       |
 
 ### 12.4 `generate_tiles.py` 확장 (9 → 18 서브커맨드)
 
 신규 커맨드:
+
 - `palette-extract` — 타일 팔레트 추출 (5비트 양자화)
 - `palette-swap` — 이산 팔레트 리매핑
 - `palette-variants` — 6가지 자동 변형 (spring/summer/autumn/winter/night/desert)
@@ -613,21 +617,21 @@ python tools/asset_pipeline.py full \
 
 ### 12.6 검증 결과
 
-| 검증 항목 | 결과 |
-|-----------|------|
-| `generate_tiles.py` 구문 검증 | OK (`py_compile` 통과) |
-| `analyze_tileset.py` 구문 검증 | OK |
-| `asset_pipeline.py` 구문 검증 | OK |
-| 모든 임포트 검증 | OK (BLOB47=47개, BAYER_4X4=(4,4), BAYER_8X8=(8,8)) |
-| Scale2x 벡터화 테스트 | OK (8→16, 8→32 체인) |
-| Scale3x 벡터화 테스트 | OK (8→24) |
-| Bayer 디더링 테스트 | OK (10방향, 이진 마스크 확인) |
-| 팔레트 추출/스왑 테스트 | OK (3색 추출, 6변형 생성) |
-| 47-타일 비트마스크 테스트 | OK (bitmask 연산, 47개 카테고리) |
-| 팔레트 비교 테스트 | OK (유사 팔레트 > 비유사 점수) |
-| 대칭 감지 테스트 | OK (수평, 수직, 회전 90/180) |
-| 팔레트 복잡도 테스트 | OK (단순 1색 vs 복잡 240색) |
-| 에지 시그니처 테스트 | OK (4방향 해시 생성) |
+| 검증 항목                      | 결과                                               |
+| ------------------------------ | -------------------------------------------------- |
+| `generate_tiles.py` 구문 검증  | OK (`py_compile` 통과)                             |
+| `analyze_tileset.py` 구문 검증 | OK                                                 |
+| `asset_pipeline.py` 구문 검증  | OK                                                 |
+| 모든 임포트 검증               | OK (BLOB47=47개, BAYER_4X4=(4,4), BAYER_8X8=(8,8)) |
+| Scale2x 벡터화 테스트          | OK (8→16, 8→32 체인)                               |
+| Scale3x 벡터화 테스트          | OK (8→24)                                          |
+| Bayer 디더링 테스트            | OK (10방향, 이진 마스크 확인)                      |
+| 팔레트 추출/스왑 테스트        | OK (3색 추출, 6변형 생성)                          |
+| 47-타일 비트마스크 테스트      | OK (bitmask 연산, 47개 카테고리)                   |
+| 팔레트 비교 테스트             | OK (유사 팔레트 > 비유사 점수)                     |
+| 대칭 감지 테스트               | OK (수평, 수직, 회전 90/180)                       |
+| 팔레트 복잡도 테스트           | OK (단순 1색 vs 복잡 240색)                        |
+| 에지 시그니처 테스트           | OK (4방향 해시 생성)                               |
 
 ### 12.7 파일 트리 (v2 최종)
 
@@ -655,14 +659,14 @@ tools/
 
 ### 12.8 정량 임팩트 (v2)
 
-| 메트릭 | v1 | v2 |
-|--------|-----|-----|
-| generate_tiles.py 서브커맨드 | 9개 | 18개 |
-| Scale2x 성능 | 픽셀당 반복 | NumPy 벡터화 (~50x) |
-| 전환 방법 | 부드러운 그래디언트 1종 | Bayer 디더링 3종 + 레거시 |
-| 색상 변형 방법 | HSV 시프트 1종 | 팔레트 스왑 + HSV + 6시즌 |
-| 오토타일 | 9-타일 | 47-타일 비트마스크 |
-| 분석 메트릭 | 기본 5종 | 기본 5 + 심층 5종 |
-| 전환 방향 | 5방향 + 4코너 | 10방향 (radial, corner 포함) |
-| 팔레트 연산 | 미지원 | 추출/스왑/비교/정규화 |
-| 파이프라인 자동화 | 개별 스크립트 | 통합 파이프라인 (5 모드) |
+| 메트릭                       | v1                      | v2                           |
+| ---------------------------- | ----------------------- | ---------------------------- |
+| generate_tiles.py 서브커맨드 | 9개                     | 18개                         |
+| Scale2x 성능                 | 픽셀당 반복             | NumPy 벡터화 (~50x)          |
+| 전환 방법                    | 부드러운 그래디언트 1종 | Bayer 디더링 3종 + 레거시    |
+| 색상 변형 방법               | HSV 시프트 1종          | 팔레트 스왑 + HSV + 6시즌    |
+| 오토타일                     | 9-타일                  | 47-타일 비트마스크           |
+| 분석 메트릭                  | 기본 5종                | 기본 5 + 심층 5종            |
+| 전환 방향                    | 5방향 + 4코너           | 10방향 (radial, corner 포함) |
+| 팔레트 연산                  | 미지원                  | 추출/스왑/비교/정규화        |
+| 파이프라인 자동화            | 개별 스크립트           | 통합 파이프라인 (5 모드)     |

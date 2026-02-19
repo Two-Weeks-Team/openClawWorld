@@ -28,7 +28,13 @@
       "pipeline": "tools/asset_pipeline.py"
     },
     "capabilities": {
-      "deepMetrics": ["edgeConnectivity", "symmetryDetection", "paletteComplexity", "patternFrequency", "tileRelationships"],
+      "deepMetrics": [
+        "edgeConnectivity",
+        "symmetryDetection",
+        "paletteComplexity",
+        "patternFrequency",
+        "tileRelationships"
+      ],
       "scaling": ["nearest", "scale2x", "scale3x", "hqx"],
       "transitions": ["bayerDither2x2", "bayerDither4x4", "bayerDither8x8", "smoothGradient"],
       "colorVariants": ["paletteSwap", "hsvShift", "seasonal6", "custom"],

@@ -251,7 +251,7 @@ def main() -> None:
             )
 
     output_path = output_config["path"]
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     tileset.save(output_path)
 
     print(f"\n{'=' * 60}")

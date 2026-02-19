@@ -154,7 +154,7 @@ def main() -> None:
         zone = npc.get("zone", "Unknown")
         print(f"NPC {npc_id:20s}: ({col:2d},{row:2d}) -> x={out_x:3d} | Zone: {zone}")
 
-    os.makedirs(os.path.dirname(output_config["pngPath"]), exist_ok=True)
+    os.makedirs(os.path.dirname(output_config["pngPath"]) or ".", exist_ok=True)
     output_img.save(output_config["pngPath"])
     print(f"\nSaved NPC spritesheet to {output_config['pngPath']}")
     print(f"Output size: {output_img.size}")

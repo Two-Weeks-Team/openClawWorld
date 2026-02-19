@@ -13,11 +13,7 @@
       "index": 0,
       "col": 0,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8078877c837f7887",
       "isEmpty": false
@@ -26,11 +22,7 @@
       "index": 1,
       "col": 1,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8000800080000080",
       "isEmpty": false
@@ -39,11 +31,7 @@
       "index": 2,
       "col": 2,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d52dd229d22a2bda",
       "isEmpty": false
@@ -52,11 +40,7 @@
       "index": 3,
       "col": 3,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "f34cf37c806078e3",
       "isEmpty": false
@@ -65,11 +49,7 @@
       "index": 4,
       "col": 4,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a619a629f63529b6",
       "isEmpty": false
@@ -78,11 +58,7 @@
       "index": 5,
       "col": 5,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "802a2a2a2a2a2a2a",
       "isEmpty": false
@@ -91,11 +67,7 @@
       "index": 6,
       "col": 6,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a0aaaaa0a0a0a0a0",
       "isEmpty": false
@@ -104,11 +76,7 @@
       "index": 7,
       "col": 7,
       "row": 0,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "aaa0aaa0a0208020",
       "isEmpty": false
@@ -117,11 +85,7 @@
       "index": 8,
       "col": 8,
       "row": 0,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "96dac9b6c925b229",
       "isEmpty": false
@@ -130,11 +94,7 @@
       "index": 9,
       "col": 9,
       "row": 0,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "c38f9cc39c706378",
       "isEmpty": false
@@ -143,11 +103,7 @@
       "index": 10,
       "col": 10,
       "row": 0,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "83f8fcf8f8fc0003",
       "isEmpty": false
@@ -156,11 +112,7 @@
       "index": 11,
       "col": 11,
       "row": 0,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "d6a9a9a9a9aa5552",
       "isEmpty": false
@@ -169,11 +121,7 @@
       "index": 12,
       "col": 12,
       "row": 0,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "96c9e9a92d29c9d2",
       "isEmpty": false
@@ -182,11 +130,7 @@
       "index": 13,
       "col": 13,
       "row": 0,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "c39cbcf8707c8c83",
       "isEmpty": false
@@ -195,11 +139,7 @@
       "index": 14,
       "col": 14,
       "row": 0,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "96c9e9a92d29c9d2",
       "isEmpty": false
@@ -208,11 +148,7 @@
       "index": 15,
       "col": 15,
       "row": 0,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "c39cbcf878788c83",
       "isEmpty": false
@@ -221,11 +157,7 @@
       "index": 16,
       "col": 16,
       "row": 0,
-      "dominantColor": [
-        96,
-        128,
-        48
-      ],
+      "dominantColor": [96, 128, 48],
       "category": "nature",
       "phash": "b46cc7c4c56dcc32",
       "isEmpty": false
@@ -234,11 +166,7 @@
       "index": 17,
       "col": 17,
       "row": 0,
-      "dominantColor": [
-        96,
-        128,
-        48
-      ],
+      "dominantColor": [96, 128, 48],
       "category": "nature",
       "phash": "b48dc3c2c363cd33",
       "isEmpty": false
@@ -247,11 +175,7 @@
       "index": 18,
       "col": 18,
       "row": 0,
-      "dominantColor": [
-        224,
-        224,
-        192
-      ],
+      "dominantColor": [224, 224, 192],
       "category": "decoration",
       "phash": "af6fd03895945ac1",
       "isEmpty": false
@@ -260,11 +184,7 @@
       "index": 19,
       "col": 19,
       "row": 0,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "bfcfd04c42372f02",
       "isEmpty": false
@@ -273,11 +193,7 @@
       "index": 20,
       "col": 20,
       "row": 0,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "afcfd0cc42372f02",
       "isEmpty": false
@@ -286,11 +202,7 @@
       "index": 21,
       "col": 21,
       "row": 0,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "9efee101f0c73f00",
       "isEmpty": false
@@ -299,11 +211,7 @@
       "index": 22,
       "col": 22,
       "row": 0,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "cbabb454a5926a55",
       "isEmpty": false
@@ -312,11 +220,7 @@
       "index": 23,
       "col": 23,
       "row": 0,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "e1c37cc3c3833cf0",
       "isEmpty": false
@@ -325,11 +229,7 @@
       "index": 24,
       "col": 24,
       "row": 0,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -338,11 +238,7 @@
       "index": 25,
       "col": 25,
       "row": 0,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "b496299696d669a5",
       "isEmpty": false
@@ -351,11 +247,7 @@
       "index": 26,
       "col": 0,
       "row": 1,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "80007f40bf738e7f",
       "isEmpty": false
@@ -364,11 +256,7 @@
       "index": 27,
       "col": 1,
       "row": 1,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8080000080008000",
       "isEmpty": false
@@ -377,11 +265,7 @@
       "index": 28,
       "col": 2,
       "row": 1,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d5552a15ea26db2a",
       "isEmpty": false
@@ -390,11 +274,7 @@
       "index": 29,
       "col": 3,
       "row": 1,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "f71cf37ca260b043",
       "isEmpty": false
@@ -403,11 +283,7 @@
       "index": 30,
       "col": 4,
       "row": 1,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a249a629f635e716",
       "isEmpty": false
@@ -416,11 +292,7 @@
       "index": 31,
       "col": 5,
       "row": 1,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8000000000000000",
       "isEmpty": false
@@ -429,11 +301,7 @@
       "index": 32,
       "col": 6,
       "row": 1,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8a008a2a8020aa82",
       "isEmpty": false
@@ -442,11 +310,7 @@
       "index": 33,
       "col": 7,
       "row": 1,
-      "dominantColor": [
-        0,
-        0,
-        0
-      ],
+      "dominantColor": [0, 0, 0],
       "category": "empty",
       "phash": "0000000000000000",
       "isEmpty": true
@@ -455,11 +319,7 @@
       "index": 34,
       "col": 8,
       "row": 1,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "d2dad4b6cb252a29",
       "isEmpty": false
@@ -468,11 +328,7 @@
       "index": 35,
       "col": 9,
       "row": 1,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "878e81c39c707e7c",
       "isEmpty": false
@@ -481,11 +337,7 @@
       "index": 36,
       "col": 10,
       "row": 1,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "83fcfcfc030303f8",
       "isEmpty": false
@@ -494,11 +346,7 @@
       "index": 37,
       "col": 11,
       "row": 1,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "d6a9a9a9525656a9",
       "isEmpty": false
@@ -507,11 +355,7 @@
       "index": 38,
       "col": 12,
       "row": 1,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "9636c936cb2dd229",
       "isEmpty": false
@@ -520,11 +364,7 @@
       "index": 39,
       "col": 13,
       "row": 1,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "c3639c639c78837c",
       "isEmpty": false
@@ -533,11 +373,7 @@
       "index": 40,
       "col": 14,
       "row": 1,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "9636c936cb2dd229",
       "isEmpty": false
@@ -546,11 +382,7 @@
       "index": 41,
       "col": 15,
       "row": 1,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "c3639c639c78837c",
       "isEmpty": false
@@ -559,11 +391,7 @@
       "index": 42,
       "col": 16,
       "row": 1,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "8378f89b8787c478",
       "isEmpty": false
@@ -572,11 +400,7 @@
       "index": 43,
       "col": 17,
       "row": 1,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "8000808080000000",
       "isEmpty": false
@@ -585,11 +409,7 @@
       "index": 44,
       "col": 18,
       "row": 1,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "d629adcad292b12d",
       "isEmpty": false
@@ -598,11 +418,7 @@
       "index": 45,
       "col": 19,
       "row": 1,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "bfcfd00c02372fd0",
       "isEmpty": false
@@ -611,11 +427,7 @@
       "index": 46,
       "col": 20,
       "row": 1,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "bfcfd00c02372fd0",
       "isEmpty": false
@@ -624,11 +436,7 @@
       "index": 47,
       "col": 21,
       "row": 1,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "9efee101f08f3f00",
       "isEmpty": false
@@ -637,11 +445,7 @@
       "index": 48,
       "col": 22,
       "row": 1,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "cbabb454a5526a55",
       "isEmpty": false
@@ -650,11 +454,7 @@
       "index": 49,
       "col": 23,
       "row": 1,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "f883788183877ff0",
       "isEmpty": false
@@ -663,11 +463,7 @@
       "index": 50,
       "col": 24,
       "row": 1,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -676,11 +472,7 @@
       "index": 51,
       "col": 25,
       "row": 1,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "add629d4d4d22aa5",
       "isEmpty": false
@@ -689,11 +481,7 @@
       "index": 52,
       "col": 0,
       "row": 2,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a882808288820822",
       "isEmpty": false
@@ -702,11 +490,7 @@
       "index": 53,
       "col": 1,
       "row": 2,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a82a8028a28820a2",
       "isEmpty": false
@@ -715,11 +499,7 @@
       "index": 54,
       "col": 2,
       "row": 2,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "b893c066cfc39d32",
       "isEmpty": false
@@ -728,11 +508,7 @@
       "index": 55,
       "col": 3,
       "row": 2,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "edc695339892c867",
       "isEmpty": false
@@ -741,11 +517,7 @@
       "index": 56,
       "col": 4,
       "row": 2,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8080aa008a20882a",
       "isEmpty": false
@@ -754,11 +526,7 @@
       "index": 57,
       "col": 5,
       "row": 2,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "80288228822aa082",
       "isEmpty": false
@@ -767,11 +535,7 @@
       "index": 58,
       "col": 6,
       "row": 2,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "aa00aa2a80208a22",
       "isEmpty": false
@@ -780,11 +544,7 @@
       "index": 59,
       "col": 7,
       "row": 2,
-      "dominantColor": [
-        0,
-        0,
-        0
-      ],
+      "dominantColor": [0, 0, 0],
       "category": "empty",
       "phash": "0000000000000000",
       "isEmpty": true
@@ -793,11 +553,7 @@
       "index": 60,
       "col": 8,
       "row": 2,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d6dac996c82db229",
       "isEmpty": false
@@ -806,11 +562,7 @@
       "index": 61,
       "col": 9,
       "row": 2,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "838f9cc39c70e378",
       "isEmpty": false
@@ -819,11 +571,7 @@
       "index": 62,
       "col": 10,
       "row": 2,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "83f00f1f00ff00ff",
       "isEmpty": false
@@ -832,11 +580,7 @@
       "index": 63,
       "col": 11,
       "row": 2,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "d6a54aaa55aa55aa",
       "isEmpty": false
@@ -845,11 +589,7 @@
       "index": 64,
       "col": 12,
       "row": 2,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "d2cced292629d4cb",
       "isEmpty": false
@@ -858,11 +598,7 @@
       "index": 65,
       "col": 13,
       "row": 2,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8799b87c7178819e",
       "isEmpty": false
@@ -871,11 +607,7 @@
       "index": 66,
       "col": 14,
       "row": 2,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d2cced29242dd4cb",
       "isEmpty": false
@@ -884,11 +616,7 @@
       "index": 67,
       "col": 15,
       "row": 2,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8799b87c7178819e",
       "isEmpty": false
@@ -897,11 +625,7 @@
       "index": 68,
       "col": 16,
       "row": 2,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "83d995ea89a6c8f4",
       "isEmpty": false
@@ -910,11 +634,7 @@
       "index": 69,
       "col": 17,
       "row": 2,
-      "dominantColor": [
-        64,
-        176,
-        176
-      ],
+      "dominantColor": [64, 176, 176],
       "category": "decoration",
       "phash": "bccbd2b6cf700609",
       "isEmpty": false
@@ -923,11 +643,7 @@
       "index": 70,
       "col": 18,
       "row": 2,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "d620c1cf7cf2832d",
       "isEmpty": false
@@ -936,11 +652,7 @@
       "index": 71,
       "col": 19,
       "row": 2,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "b3cccc3c332ccb8c",
       "isEmpty": false
@@ -949,11 +661,7 @@
       "index": 72,
       "col": 20,
       "row": 2,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "b3cccc34332ccbcc",
       "isEmpty": false
@@ -962,11 +670,7 @@
       "index": 73,
       "col": 21,
       "row": 2,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "9efee101f0877f00",
       "isEmpty": false
@@ -975,11 +679,7 @@
       "index": 74,
       "col": 22,
       "row": 2,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "cbabb454a5d22a55",
       "isEmpty": false
@@ -988,11 +688,7 @@
       "index": 75,
       "col": 23,
       "row": 2,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "e3c338c3c3c33cf0",
       "isEmpty": false
@@ -1001,11 +697,7 @@
       "index": 76,
       "col": 24,
       "row": 2,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -1014,11 +706,7 @@
       "index": 77,
       "col": 25,
       "row": 2,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "b6964996969669a5",
       "isEmpty": false
@@ -1027,11 +715,7 @@
       "index": 78,
       "col": 0,
       "row": 3,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a8828082082a2820",
       "isEmpty": false
@@ -1040,11 +724,7 @@
       "index": 79,
       "col": 1,
       "row": 3,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a82a822822802822",
       "isEmpty": false
@@ -1053,11 +733,7 @@
       "index": 80,
       "col": 2,
       "row": 3,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "bc92c467c9931c6e",
       "isEmpty": false
@@ -1066,11 +742,7 @@
       "index": 81,
       "col": 3,
       "row": 3,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "e9c791329cc6493b",
       "isEmpty": false
@@ -1079,11 +751,7 @@
       "index": 82,
       "col": 4,
       "row": 3,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "80288228822a2a82",
       "isEmpty": false
@@ -1092,11 +760,7 @@
       "index": 83,
       "col": 5,
       "row": 3,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "80002a00aa228a2a",
       "isEmpty": false
@@ -1105,11 +769,7 @@
       "index": 84,
       "col": 6,
       "row": 3,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "80a00a28822a8228",
       "isEmpty": false
@@ -1118,11 +778,7 @@
       "index": 85,
       "col": 7,
       "row": 3,
-      "dominantColor": [
-        0,
-        0,
-        0
-      ],
+      "dominantColor": [0, 0, 0],
       "category": "empty",
       "phash": "0000000000000000",
       "isEmpty": true
@@ -1131,11 +787,7 @@
       "index": 86,
       "col": 8,
       "row": 3,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d2dad4b6cb252a29",
       "isEmpty": false
@@ -1144,11 +796,7 @@
       "index": 87,
       "col": 9,
       "row": 3,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "878e81c39c707e7c",
       "isEmpty": false
@@ -1157,11 +805,7 @@
       "index": 88,
       "col": 10,
       "row": 3,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "aa2aa0800a28a08a",
       "isEmpty": false
@@ -1170,11 +814,7 @@
       "index": 89,
       "col": 11,
       "row": 3,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "aa2a28a0800a2a20",
       "isEmpty": false
@@ -1183,11 +823,7 @@
       "index": 90,
       "col": 12,
       "row": 3,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "9232d436cb35d669",
       "isEmpty": false
@@ -1196,11 +832,7 @@
       "index": 91,
       "col": 13,
       "row": 3,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "c76781639e71833c",
       "isEmpty": false
@@ -1209,11 +841,7 @@
       "index": 92,
       "col": 14,
       "row": 3,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "9632d436cb25d669",
       "isEmpty": false
@@ -1222,11 +850,7 @@
       "index": 93,
       "col": 15,
       "row": 3,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "c76781639e71833c",
       "isEmpty": false
@@ -1235,11 +859,7 @@
       "index": 94,
       "col": 16,
       "row": 3,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a0288a82202822a2",
       "isEmpty": false
@@ -1248,11 +868,7 @@
       "index": 95,
       "col": 17,
       "row": 3,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a88282288a0a20a0",
       "isEmpty": false
@@ -1261,11 +877,7 @@
       "index": 96,
       "col": 18,
       "row": 3,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a0828a2828822222",
       "isEmpty": false
@@ -1274,11 +886,7 @@
       "index": 97,
       "col": 19,
       "row": 3,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "b3cccc34334cc373",
       "isEmpty": false
@@ -1287,11 +895,7 @@
       "index": 98,
       "col": 20,
       "row": 3,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "b3cccc3433ccc333",
       "isEmpty": false
@@ -1300,11 +904,7 @@
       "index": 99,
       "col": 21,
       "row": 3,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "9efee101f00f7f00",
       "isEmpty": false
@@ -1313,11 +913,7 @@
       "index": 100,
       "col": 22,
       "row": 3,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "cbabb454a55a2a55",
       "isEmpty": false
@@ -1326,11 +922,7 @@
       "index": 101,
       "col": 23,
       "row": 3,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "f0807f808f871ff8",
       "isEmpty": false
@@ -1339,11 +931,7 @@
       "index": 102,
       "col": 24,
       "row": 3,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -1352,11 +940,7 @@
       "index": 103,
       "col": 25,
       "row": 3,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a5d508d5d5d64aa5",
       "isEmpty": false
@@ -1365,11 +949,7 @@
       "index": 104,
       "col": 0,
       "row": 4,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a882808280a28822",
       "isEmpty": false
@@ -1378,11 +958,7 @@
       "index": 105,
       "col": 1,
       "row": 4,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a82a8028a28820a2",
       "isEmpty": false
@@ -1391,11 +967,7 @@
       "index": 106,
       "col": 2,
       "row": 4,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "b893c466c5979867",
       "isEmpty": false
@@ -1404,11 +976,7 @@
       "index": 107,
       "col": 3,
       "row": 4,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "edc6913390c6cd36",
       "isEmpty": false
@@ -1417,11 +985,7 @@
       "index": 108,
       "col": 4,
       "row": 4,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a8007f02fc5f20ff",
       "isEmpty": false
@@ -1430,11 +994,7 @@
       "index": 109,
       "col": 5,
       "row": 4,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a8022802a802208a",
       "isEmpty": false
@@ -1443,11 +1003,7 @@
       "index": 110,
       "col": 6,
       "row": 4,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "fd552a57aa0a25aa",
       "isEmpty": false
@@ -1456,11 +1012,7 @@
       "index": 111,
       "col": 7,
       "row": 4,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a0002a02aa0a20aa",
       "isEmpty": false
@@ -1469,11 +1021,7 @@
       "index": 112,
       "col": 8,
       "row": 4,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "d6d2a9d4aa2daa29",
       "isEmpty": false
@@ -1482,11 +1030,7 @@
       "index": 113,
       "col": 9,
       "row": 4,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "8387f8818378f778",
       "isEmpty": false
@@ -1495,11 +1039,7 @@
       "index": 114,
       "col": 10,
       "row": 4,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "ff7fe0801f78e080",
       "isEmpty": false
@@ -1508,11 +1048,7 @@
       "index": 115,
       "col": 11,
       "row": 4,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "aa2aa5d54a2da5da",
       "isEmpty": false
@@ -1521,11 +1057,7 @@
       "index": 116,
       "col": 12,
       "row": 4,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "d6a9a9a9292953d6",
       "isEmpty": false
@@ -1534,11 +1066,7 @@
       "index": 117,
       "col": 13,
       "row": 4,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "83fcfcf87c780083",
       "isEmpty": false
@@ -1547,11 +1075,7 @@
       "index": 118,
       "col": 14,
       "row": 4,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d6d2a8a92929d6d6",
       "isEmpty": false
@@ -1560,11 +1084,7 @@
       "index": 119,
       "col": 15,
       "row": 4,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8383f8fc7c7c8183",
       "isEmpty": false
@@ -1573,11 +1093,7 @@
       "index": 120,
       "col": 16,
       "row": 4,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "aa2280a00282228a",
       "isEmpty": false
@@ -1586,11 +1102,7 @@
       "index": 121,
       "col": 17,
       "row": 4,
-      "dominantColor": [
-        128,
-        128,
-        144
-      ],
+      "dominantColor": [128, 128, 144],
       "category": "road",
       "phash": "a82880a002822282",
       "isEmpty": false
@@ -1599,11 +1111,7 @@
       "index": 122,
       "col": 18,
       "row": 4,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "a82880a202822282",
       "isEmpty": false
@@ -1612,11 +1120,7 @@
       "index": 123,
       "col": 19,
       "row": 4,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "b3ccd38c2cb3b30c",
       "isEmpty": false
@@ -1625,11 +1129,7 @@
       "index": 124,
       "col": 20,
       "row": 4,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "b38cf38c2cb3b30c",
       "isEmpty": false
@@ -1638,11 +1138,7 @@
       "index": 125,
       "col": 21,
       "row": 4,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a8828228882820a0",
       "isEmpty": false
@@ -1651,11 +1147,7 @@
       "index": 126,
       "col": 22,
       "row": 4,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a88282288a2820a0",
       "isEmpty": false
@@ -1664,11 +1156,7 @@
       "index": 127,
       "col": 23,
       "row": 4,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "e0c37cc3c3833cf8",
       "isEmpty": false
@@ -1677,11 +1165,7 @@
       "index": 128,
       "col": 24,
       "row": 4,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -1690,11 +1174,7 @@
       "index": 129,
       "col": 25,
       "row": 4,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "b596299692d669a5",
       "isEmpty": false
@@ -1703,11 +1183,7 @@
       "index": 130,
       "col": 0,
       "row": 5,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a882808228228820",
       "isEmpty": false
@@ -1716,11 +1192,7 @@
       "index": 131,
       "col": 1,
       "row": 5,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a82a822822802822",
       "isEmpty": false
@@ -1729,11 +1201,7 @@
       "index": 132,
       "col": 2,
       "row": 5,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "bc96c46361b39c66",
       "isEmpty": false
@@ -1742,11 +1210,7 @@
       "index": 133,
       "col": 3,
       "row": 5,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "e9c3913634e6c933",
       "isEmpty": false
@@ -1755,11 +1219,7 @@
       "index": 134,
       "col": 4,
       "row": 5,
-      "dominantColor": [
-        240,
-        240,
-        240
-      ],
+      "dominantColor": [240, 240, 240],
       "category": "light_surface",
       "phash": "eee990ae4b399464",
       "isEmpty": false
@@ -1768,11 +1228,7 @@
       "index": 135,
       "col": 5,
       "row": 5,
-      "dominantColor": [
-        240,
-        240,
-        240
-      ],
+      "dominantColor": [240, 240, 240],
       "category": "light_surface",
       "phash": "ceefd19094b4c469",
       "isEmpty": false
@@ -1781,11 +1237,7 @@
       "index": 136,
       "col": 6,
       "row": 5,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "84e44b5b93393e6c",
       "isEmpty": false
@@ -1794,11 +1246,7 @@
       "index": 137,
       "col": 7,
       "row": 5,
-      "dominantColor": [
-        0,
-        0,
-        0
-      ],
+      "dominantColor": [0, 0, 0],
       "category": "empty",
       "phash": "0000000000000000",
       "isEmpty": true
@@ -1807,11 +1255,7 @@
       "index": 138,
       "col": 8,
       "row": 5,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d6d2d6d4d229aa29",
       "isEmpty": false
@@ -1820,11 +1264,7 @@
       "index": 139,
       "col": 9,
       "row": 5,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "838783818778fe7c",
       "isEmpty": false
@@ -1833,11 +1273,7 @@
       "index": 140,
       "col": 10,
       "row": 5,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "ff7f70c0800e7c70",
       "isEmpty": false
@@ -1846,11 +1282,7 @@
       "index": 141,
       "col": 11,
       "row": 5,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "aa2a2db5d54a2b2d",
       "isEmpty": false
@@ -1859,11 +1291,7 @@
       "index": 142,
       "col": 12,
       "row": 5,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "d6d229d6d22dd229",
       "isEmpty": false
@@ -1872,11 +1300,7 @@
       "index": 143,
       "col": 13,
       "row": 5,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "83877c838f788778",
       "isEmpty": false
@@ -1885,11 +1309,7 @@
       "index": 144,
       "col": 14,
       "row": 5,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d6aad525d22dd229",
       "isEmpty": false
@@ -1898,11 +1318,7 @@
       "index": 145,
       "col": 15,
       "row": 5,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "83ff807887788778",
       "isEmpty": false
@@ -1911,11 +1327,7 @@
       "index": 146,
       "col": 16,
       "row": 5,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "aa2280a00282280a",
       "isEmpty": false
@@ -1924,11 +1336,7 @@
       "index": 147,
       "col": 17,
       "row": 5,
-      "dominantColor": [
-        128,
-        128,
-        144
-      ],
+      "dominantColor": [128, 128, 144],
       "category": "road",
       "phash": "a82a80a00282220a",
       "isEmpty": false
@@ -1937,11 +1345,7 @@
       "index": 148,
       "col": 18,
       "row": 5,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "a82a80a002822a0a",
       "isEmpty": false
@@ -1950,11 +1354,7 @@
       "index": 149,
       "col": 19,
       "row": 5,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "b3d3cd2cd32d8c30",
       "isEmpty": false
@@ -1963,11 +1363,7 @@
       "index": 150,
       "col": 20,
       "row": 5,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "b3d3cd2cd22f8c30",
       "isEmpty": false
@@ -1976,11 +1372,7 @@
       "index": 151,
       "col": 21,
       "row": 5,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a882822822208a28",
       "isEmpty": false
@@ -1989,11 +1381,7 @@
       "index": 152,
       "col": 22,
       "row": 5,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a882822822208a28",
       "isEmpty": false
@@ -2002,11 +1390,7 @@
       "index": 153,
       "col": 23,
       "row": 5,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "f883788183877ff0",
       "isEmpty": false
@@ -2015,11 +1399,7 @@
       "index": 154,
       "col": 24,
       "row": 5,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -2028,11 +1408,7 @@
       "index": 155,
       "col": 25,
       "row": 5,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "add629d4d4d22aa5",
       "isEmpty": false
@@ -2041,11 +1417,7 @@
       "index": 156,
       "col": 0,
       "row": 6,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a8828282808088a2",
       "isEmpty": false
@@ -2054,11 +1426,7 @@
       "index": 157,
       "col": 1,
       "row": 6,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a822822282288288",
       "isEmpty": false
@@ -2067,11 +1435,7 @@
       "index": 158,
       "col": 2,
       "row": 6,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "b890c466c5c3cf67",
       "isEmpty": false
@@ -2080,11 +1444,7 @@
       "index": 159,
       "col": 3,
       "row": 6,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "edc5913390969f32",
       "isEmpty": false
@@ -2093,11 +1453,7 @@
       "index": 160,
       "col": 4,
       "row": 6,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "fc8381838163bd77",
       "isEmpty": false
@@ -2106,11 +1462,7 @@
       "index": 161,
       "col": 5,
       "row": 6,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8080808080008000",
       "isEmpty": false
@@ -2119,11 +1471,7 @@
       "index": 162,
       "col": 6,
       "row": 6,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a2a2a2888808a008",
       "isEmpty": false
@@ -2132,11 +1480,7 @@
       "index": 163,
       "col": 7,
       "row": 6,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a9d6d4d6d436c922",
       "isEmpty": false
@@ -2145,11 +1489,7 @@
       "index": 164,
       "col": 8,
       "row": 6,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aa802a8a80802aa0",
       "isEmpty": false
@@ -2158,11 +1498,7 @@
       "index": 165,
       "col": 9,
       "row": 6,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aa808a8a80a00a82",
       "isEmpty": false
@@ -2171,11 +1507,7 @@
       "index": 166,
       "col": 10,
       "row": 6,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aa0a802a80808080",
       "isEmpty": false
@@ -2184,11 +1516,7 @@
       "index": 167,
       "col": 11,
       "row": 6,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aa8a808a808aa080",
       "isEmpty": false
@@ -2197,11 +1525,7 @@
       "index": 168,
       "col": 12,
       "row": 6,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "bf3f9f808080e3f1",
       "isEmpty": false
@@ -2210,11 +1534,7 @@
       "index": 169,
       "col": 13,
       "row": 6,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "ca2acad5d5d594a4",
       "isEmpty": false
@@ -2223,11 +1543,7 @@
       "index": 170,
       "col": 14,
       "row": 6,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "ff809e9ea0a11e96",
       "isEmpty": false
@@ -2236,11 +1552,7 @@
       "index": 171,
       "col": 15,
       "row": 6,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aad4cbcbf4b402c3",
       "isEmpty": false
@@ -2249,11 +1561,7 @@
       "index": 172,
       "col": 16,
       "row": 6,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "b233cbcb34cccc34",
       "isEmpty": false
@@ -2262,11 +1570,7 @@
       "index": 173,
       "col": 17,
       "row": 6,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "b333cf34cc8c30cb",
       "isEmpty": false
@@ -2275,11 +1579,7 @@
       "index": 174,
       "col": 18,
       "row": 6,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "b233cfcd30cd8c34",
       "isEmpty": false
@@ -2288,11 +1588,7 @@
       "index": 175,
       "col": 19,
       "row": 6,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "b333cf34cc8c30cb",
       "isEmpty": false
@@ -2301,11 +1597,7 @@
       "index": 176,
       "col": 20,
       "row": 6,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "e9ab9154b6569255",
       "isEmpty": false
@@ -2314,11 +1606,7 @@
       "index": 177,
       "col": 21,
       "row": 6,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "e9a99556b6569249",
       "isEmpty": false
@@ -2327,11 +1615,7 @@
       "index": 178,
       "col": 22,
       "row": 6,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "c9b291562e699b55",
       "isEmpty": false
@@ -2340,11 +1624,7 @@
       "index": 179,
       "col": 23,
       "row": 6,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "c3c33cc3c3c33cf0",
       "isEmpty": false
@@ -2353,11 +1633,7 @@
       "index": 180,
       "col": 24,
       "row": 6,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -2366,11 +1642,7 @@
       "index": 181,
       "col": 25,
       "row": 6,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "96966996969669a5",
       "isEmpty": false
@@ -2379,11 +1651,7 @@
       "index": 182,
       "col": 0,
       "row": 7,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a88282a2888888a2",
       "isEmpty": false
@@ -2392,11 +1660,7 @@
       "index": 183,
       "col": 1,
       "row": 7,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "a822822282288288",
       "isEmpty": false
@@ -2405,11 +1669,7 @@
       "index": 184,
       "col": 2,
       "row": 7,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "b890c866cdc3c767",
       "isEmpty": false
@@ -2418,11 +1678,7 @@
       "index": 185,
       "col": 3,
       "row": 7,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "edc59d3398969232",
       "isEmpty": false
@@ -2431,11 +1687,7 @@
       "index": 186,
       "col": 4,
       "row": 7,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "fc8380c381637b77",
       "isEmpty": false
@@ -2444,11 +1696,7 @@
       "index": 187,
       "col": 5,
       "row": 7,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "8080808080000000",
       "isEmpty": false
@@ -2457,11 +1705,7 @@
       "index": 188,
       "col": 6,
       "row": 7,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a2a2a28880082008",
       "isEmpty": false
@@ -2470,11 +1714,7 @@
       "index": 189,
       "col": 7,
       "row": 7,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a9d6d596d4362c26",
       "isEmpty": false
@@ -2483,11 +1723,7 @@
       "index": 190,
       "col": 8,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa800a8a80802aa0",
       "isEmpty": false
@@ -2496,11 +1732,7 @@
       "index": 191,
       "col": 9,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa808a8a80a08a82",
       "isEmpty": false
@@ -2509,11 +1741,7 @@
       "index": 192,
       "col": 10,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa0a800a80808080",
       "isEmpty": false
@@ -2522,11 +1750,7 @@
       "index": 193,
       "col": 11,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa8a808a808aa080",
       "isEmpty": false
@@ -2535,11 +1759,7 @@
       "index": 194,
       "col": 12,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "ff809e9ea0a19696",
       "isEmpty": false
@@ -2548,11 +1768,7 @@
       "index": 195,
       "col": 13,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aad5cbc3f4b402c3",
       "isEmpty": false
@@ -2561,11 +1777,7 @@
       "index": 196,
       "col": 14,
       "row": 7,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "ff9e809ea19ea190",
       "isEmpty": false
@@ -2574,11 +1786,7 @@
       "index": 197,
       "col": 15,
       "row": 7,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aac3d4caf4c3b4c1",
       "isEmpty": false
@@ -2587,11 +1795,7 @@
       "index": 198,
       "col": 16,
       "row": 7,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "bfcfd0b4cb300d22",
       "isEmpty": false
@@ -2600,11 +1804,7 @@
       "index": 199,
       "col": 17,
       "row": 7,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "afcfd0b4c8300f2b",
       "isEmpty": false
@@ -2613,11 +1813,7 @@
       "index": 200,
       "col": 18,
       "row": 7,
-      "dominantColor": [
-        176,
-        160,
-        128
-      ],
+      "dominantColor": [176, 160, 128],
       "category": "decoration",
       "phash": "bfcfd0b4ce300d22",
       "isEmpty": false
@@ -2626,11 +1822,7 @@
       "index": 201,
       "col": 19,
       "row": 7,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "afcfd0b4c8308d2b",
       "isEmpty": false
@@ -2639,11 +1831,7 @@
       "index": 202,
       "col": 20,
       "row": 7,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "bcfec407e323e700",
       "isEmpty": false
@@ -2652,11 +1840,7 @@
       "index": 203,
       "col": 21,
       "row": 7,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "bcfcc403e307c71c",
       "isEmpty": false
@@ -2665,11 +1849,7 @@
       "index": 204,
       "col": 22,
       "row": 7,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "9ce7c4037b3cee08",
       "isEmpty": false
@@ -2678,11 +1858,7 @@
       "index": 205,
       "col": 23,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "e0807f809f871ff8",
       "isEmpty": false
@@ -2691,11 +1867,7 @@
       "index": 206,
       "col": 24,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8080008080800080",
       "isEmpty": false
@@ -2704,11 +1876,7 @@
       "index": 207,
       "col": 25,
       "row": 7,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "b5d508d5d4d64aa5",
       "isEmpty": false
@@ -2717,11 +1885,7 @@
       "index": 208,
       "col": 0,
       "row": 8,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "aa80808280828a22",
       "isEmpty": false
@@ -2730,11 +1894,7 @@
       "index": 209,
       "col": 1,
       "row": 8,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "a82a8028a2082022",
       "isEmpty": false
@@ -2743,11 +1903,7 @@
       "index": 210,
       "col": 2,
       "row": 8,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "b991c4c665e79932",
       "isEmpty": false
@@ -2756,11 +1912,7 @@
       "index": 211,
       "col": 3,
       "row": 8,
-      "dominantColor": [
-        144,
-        144,
-        144
-      ],
+      "dominantColor": [144, 144, 144],
       "category": "road",
       "phash": "edc4919730b2cc67",
       "isEmpty": false
@@ -2769,11 +1921,7 @@
       "index": 212,
       "col": 4,
       "row": 8,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "fc8381c381633d77",
       "isEmpty": false
@@ -2782,11 +1930,7 @@
       "index": 213,
       "col": 5,
       "row": 8,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "8080808080000000",
       "isEmpty": false
@@ -2795,11 +1939,7 @@
       "index": 214,
       "col": 6,
       "row": 8,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a2a2a28888082008",
       "isEmpty": false
@@ -2808,11 +1948,7 @@
       "index": 215,
       "col": 7,
       "row": 8,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a9d6d4d6d4366826",
       "isEmpty": false
@@ -2821,11 +1957,7 @@
       "index": 216,
       "col": 8,
       "row": 8,
-      "dominantColor": [
-        224,
-        208,
-        176
-      ],
+      "dominantColor": [224, 208, 176],
       "category": "decoration",
       "phash": "8a2a8a80808080a0",
       "isEmpty": false
@@ -2834,11 +1966,7 @@
       "index": 217,
       "col": 9,
       "row": 8,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "aa8a8a80808080a0",
       "isEmpty": false
@@ -2847,11 +1975,7 @@
       "index": 218,
       "col": 10,
       "row": 8,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "ff9f8f868680c1e0",
       "isEmpty": false
@@ -2860,11 +1984,7 @@
       "index": 219,
       "col": 11,
       "row": 8,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "aacad2d1d1d59495",
       "isEmpty": false
@@ -2873,11 +1993,7 @@
       "index": 220,
       "col": 12,
       "row": 8,
-      "dominantColor": [
-        0,
-        0,
-        0
-      ],
+      "dominantColor": [0, 0, 0],
       "category": "empty",
       "phash": "0000000000000000",
       "isEmpty": true
@@ -2886,11 +2002,7 @@
       "index": 221,
       "col": 13,
       "row": 8,
-      "dominantColor": [
-        0,
-        0,
-        0
-      ],
+      "dominantColor": [0, 0, 0],
       "category": "empty",
       "phash": "0000000000000000",
       "isEmpty": true
@@ -2899,11 +2011,7 @@
       "index": 222,
       "col": 14,
       "row": 8,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "ff9e809ea19ea190",
       "isEmpty": false
@@ -2912,11 +2020,7 @@
       "index": 223,
       "col": 15,
       "row": 8,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aacbd5caf4c2b481",
       "isEmpty": false
@@ -2925,11 +2029,7 @@
       "index": 224,
       "col": 16,
       "row": 8,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "c178877c86378c67",
       "isEmpty": false
@@ -2938,11 +2038,7 @@
       "index": 225,
       "col": 17,
       "row": 8,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "d52ad52ad52a807f",
       "isEmpty": false
@@ -2951,11 +2047,7 @@
       "index": 226,
       "col": 18,
       "row": 8,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "942dd22dd36ac936",
       "isEmpty": false
@@ -2964,11 +2056,7 @@
       "index": 227,
       "col": 19,
       "row": 8,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "f25cf17c8160ba63",
       "isEmpty": false
@@ -2977,11 +2065,7 @@
       "index": 228,
       "col": 20,
       "row": 8,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a709a429d435ef36",
       "isEmpty": false
@@ -2990,11 +2074,7 @@
       "index": 229,
       "col": 21,
       "row": 8,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "aa80202a8a20880a",
       "isEmpty": false
@@ -3003,11 +2083,7 @@
       "index": 230,
       "col": 22,
       "row": 8,
-      "dominantColor": [
-        128,
-        128,
-        128
-      ],
+      "dominantColor": [128, 128, 128],
       "category": "road",
       "phash": "a80082008a002a00",
       "isEmpty": false
@@ -3016,11 +2092,7 @@
       "index": 231,
       "col": 23,
       "row": 8,
-      "dominantColor": [
-        80,
-        80,
-        80
-      ],
+      "dominantColor": [80, 80, 80],
       "category": "wall",
       "phash": "ff707483707c8370",
       "isEmpty": false
@@ -3029,11 +2101,7 @@
       "index": 232,
       "col": 24,
       "row": 8,
-      "dominantColor": [
-        80,
-        80,
-        80
-      ],
+      "dominantColor": [80, 80, 80],
       "category": "wall",
       "phash": "aa2c29d22d29df2d",
       "isEmpty": false
@@ -3042,11 +2110,7 @@
       "index": 233,
       "col": 25,
       "row": 8,
-      "dominantColor": [
-        112,
-        112,
-        112
-      ],
+      "dominantColor": [112, 112, 112],
       "category": "road",
       "phash": "a192dbede4c4d2c8",
       "isEmpty": false
@@ -3055,11 +2119,7 @@
       "index": 234,
       "col": 0,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "80788f7e87787887",
       "isEmpty": false
@@ -3068,11 +2128,7 @@
       "index": 235,
       "col": 1,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8000800080000080",
       "isEmpty": false
@@ -3081,11 +2137,7 @@
       "index": 236,
       "col": 2,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "d52dda29d22d25d2",
       "isEmpty": false
@@ -3094,11 +2146,7 @@
       "index": 237,
       "col": 3,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "f34cf27ca36061a3",
       "isEmpty": false
@@ -3107,11 +2155,7 @@
       "index": 238,
       "col": 4,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a619a629f63530f6",
       "isEmpty": false
@@ -3120,11 +2164,7 @@
       "index": 239,
       "col": 5,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a08a0a2a28282022",
       "isEmpty": false
@@ -3133,11 +2173,7 @@
       "index": 240,
       "col": 6,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a0aaaaa8a020a0a2",
       "isEmpty": false
@@ -3146,11 +2182,7 @@
       "index": 241,
       "col": 7,
       "row": 9,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "80788f7e87787887",
       "isEmpty": false
@@ -3159,11 +2191,7 @@
       "index": 242,
       "col": 8,
       "row": 9,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8000800080000080",
       "isEmpty": false
@@ -3172,11 +2200,7 @@
       "index": 243,
       "col": 9,
       "row": 9,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d52dda29d22d25d2",
       "isEmpty": false
@@ -3185,11 +2209,7 @@
       "index": 244,
       "col": 10,
       "row": 9,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "f34cf37ca36060a3",
       "isEmpty": false
@@ -3198,11 +2218,7 @@
       "index": 245,
       "col": 11,
       "row": 9,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a619a629f63524f6",
       "isEmpty": false
@@ -3211,11 +2227,7 @@
       "index": 246,
       "col": 12,
       "row": 9,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a08a0a2a28282022",
       "isEmpty": false
@@ -3224,11 +2236,7 @@
       "index": 247,
       "col": 13,
       "row": 9,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a0aaaaa8a020a0a2",
       "isEmpty": false
@@ -3237,11 +2245,7 @@
       "index": 248,
       "col": 14,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "b4cbc3b4423cc32f",
       "isEmpty": false
@@ -3250,11 +2254,7 @@
       "index": 249,
       "col": 15,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "e19e96e11768966a",
       "isEmpty": false
@@ -3263,11 +2263,7 @@
       "index": 250,
       "col": 16,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "d940bf00de338c77",
       "isEmpty": false
@@ -3276,11 +2272,7 @@
       "index": 251,
       "col": 17,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "d52ad52ad52a807f",
       "isEmpty": false
@@ -3289,11 +2281,7 @@
       "index": 252,
       "col": 18,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8c15eb14eb66d923",
       "isEmpty": false
@@ -3302,11 +2290,7 @@
       "index": 253,
       "col": 19,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "f25cf17c8160ba63",
       "isEmpty": false
@@ -3315,11 +2299,7 @@
       "index": 254,
       "col": 20,
       "row": 9,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a709a429d435ef36",
       "isEmpty": false
@@ -3328,11 +2308,7 @@
       "index": 255,
       "col": 21,
       "row": 9,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "aa8080a0a0208a0a",
       "isEmpty": false
@@ -3341,11 +2317,7 @@
       "index": 256,
       "col": 22,
       "row": 9,
-      "dominantColor": [
-        128,
-        128,
-        128
-      ],
+      "dominantColor": [128, 128, 128],
       "category": "road",
       "phash": "a0288a828a822828",
       "isEmpty": false
@@ -3354,11 +2326,7 @@
       "index": 257,
       "col": 23,
       "row": 9,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "ff70608b0e787878",
       "isEmpty": false
@@ -3367,11 +2335,7 @@
       "index": 258,
       "col": 24,
       "row": 9,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "aa252dda7a292d2e",
       "isEmpty": false
@@ -3380,11 +2344,7 @@
       "index": 259,
       "col": 25,
       "row": 9,
-      "dominantColor": [
-        80,
-        80,
-        80
-      ],
+      "dominantColor": [80, 80, 80],
       "category": "wall",
       "phash": "a99bc066e699661d",
       "isEmpty": false
@@ -3393,11 +2353,7 @@
       "index": 260,
       "col": 0,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "e000bf00bf713c7f",
       "isEmpty": false
@@ -3406,11 +2362,7 @@
       "index": 261,
       "col": 1,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "8000800080000000",
       "isEmpty": false
@@ -3419,11 +2371,7 @@
       "index": 262,
       "col": 2,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "b555ea55ea244d2a",
       "isEmpty": false
@@ -3432,11 +2380,7 @@
       "index": 263,
       "col": 3,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "f71cf07ca3603343",
       "isEmpty": false
@@ -3445,11 +2389,7 @@
       "index": 264,
       "col": 4,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a249a729f6356716",
       "isEmpty": false
@@ -3458,11 +2398,7 @@
       "index": 265,
       "col": 5,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a000000000000000",
       "isEmpty": false
@@ -3471,11 +2407,7 @@
       "index": 266,
       "col": 6,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aa208a2a80202a88",
       "isEmpty": false
@@ -3484,11 +2416,7 @@
       "index": 267,
       "col": 7,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8000ff01bf713c7f",
       "isEmpty": false
@@ -3497,11 +2425,7 @@
       "index": 268,
       "col": 8,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8000800080000000",
       "isEmpty": false
@@ -3510,11 +2434,7 @@
       "index": 269,
       "col": 9,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d555aa55eb244d2a",
       "isEmpty": false
@@ -3523,11 +2443,7 @@
       "index": 270,
       "col": 10,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "f71cf17ca3603243",
       "isEmpty": false
@@ -3536,11 +2452,7 @@
       "index": 271,
       "col": 11,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a249a729f6356716",
       "isEmpty": false
@@ -3549,11 +2461,7 @@
       "index": 272,
       "col": 12,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a000000000000000",
       "isEmpty": false
@@ -3562,11 +2470,7 @@
       "index": 273,
       "col": 13,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa008a2a8020aa88",
       "isEmpty": false
@@ -3575,11 +2479,7 @@
       "index": 274,
       "col": 14,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aaa2802228202a28",
       "isEmpty": false
@@ -3588,11 +2488,7 @@
       "index": 275,
       "col": 15,
       "row": 10,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aa2a808028808028",
       "isEmpty": false
@@ -3601,11 +2497,7 @@
       "index": 276,
       "col": 16,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "c178877cc6378c63",
       "isEmpty": false
@@ -3614,11 +2506,7 @@
       "index": 277,
       "col": 17,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d52ad52ad52a807f",
       "isEmpty": false
@@ -3627,11 +2515,7 @@
       "index": 278,
       "col": 18,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "942dd229936ed936",
       "isEmpty": false
@@ -3640,11 +2524,7 @@
       "index": 279,
       "col": 19,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "f25cf17cc160b863",
       "isEmpty": false
@@ -3653,11 +2533,7 @@
       "index": 280,
       "col": 20,
       "row": 10,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a709a429f435ed36",
       "isEmpty": false
@@ -3666,11 +2542,7 @@
       "index": 281,
       "col": 21,
       "row": 10,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "aa208a208a208a88",
       "isEmpty": false
@@ -3679,11 +2551,7 @@
       "index": 282,
       "col": 22,
       "row": 10,
-      "dominantColor": [
-        32,
-        112,
-        112
-      ],
+      "dominantColor": [32, 112, 112],
       "category": "decoration",
       "phash": "b13986c68c9b396d",
       "isEmpty": false
@@ -3692,11 +2560,7 @@
       "index": 283,
       "col": 23,
       "row": 10,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "80f887f887f88778",
       "isEmpty": false
@@ -3705,11 +2569,7 @@
       "index": 284,
       "col": 24,
       "row": 10,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "8080808080008000",
       "isEmpty": false
@@ -3718,11 +2578,7 @@
       "index": 285,
       "col": 25,
       "row": 10,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "d5a9d2a9d2a9d229",
       "isEmpty": false
@@ -3731,11 +2587,7 @@
       "index": 286,
       "col": 0,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a000aa02aa20208a",
       "isEmpty": false
@@ -3744,11 +2596,7 @@
       "index": 287,
       "col": 1,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a840bf16ff50708f",
       "isEmpty": false
@@ -3757,11 +2605,7 @@
       "index": 288,
       "col": 2,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a802a802a802208a",
       "isEmpty": false
@@ -3770,11 +2614,7 @@
       "index": 289,
       "col": 3,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "fd15ea53a80525da",
       "isEmpty": false
@@ -3783,11 +2623,7 @@
       "index": 290,
       "col": 4,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a000aa008a20882a",
       "isEmpty": false
@@ -3796,11 +2632,7 @@
       "index": 291,
       "col": 5,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "802082288228288a",
       "isEmpty": false
@@ -3809,11 +2641,7 @@
       "index": 292,
       "col": 6,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "aa00a8aa80208a20",
       "isEmpty": false
@@ -3822,11 +2650,7 @@
       "index": 293,
       "col": 7,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a000aa02aa20208a",
       "isEmpty": false
@@ -3835,11 +2659,7 @@
       "index": 294,
       "col": 8,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a800bf16ff51708f",
       "isEmpty": false
@@ -3848,11 +2668,7 @@
       "index": 295,
       "col": 9,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a802a802a802208a",
       "isEmpty": false
@@ -3861,11 +2677,7 @@
       "index": 296,
       "col": 10,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "fd55ea43aa0425da",
       "isEmpty": false
@@ -3874,11 +2686,7 @@
       "index": 297,
       "col": 11,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a000aa008a20882a",
       "isEmpty": false
@@ -3887,11 +2695,7 @@
       "index": 298,
       "col": 12,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8020822882282882",
       "isEmpty": false
@@ -3900,11 +2704,7 @@
       "index": 299,
       "col": 13,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa00aaaa80208a20",
       "isEmpty": false
@@ -3913,11 +2713,7 @@
       "index": 300,
       "col": 14,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "b4cbcbb4423c432f",
       "isEmpty": false
@@ -3926,11 +2722,7 @@
       "index": 301,
       "col": 15,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "e19e9ee11768166a",
       "isEmpty": false
@@ -3939,11 +2731,7 @@
       "index": 302,
       "col": 16,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d940bf00de338c77",
       "isEmpty": false
@@ -3952,11 +2740,7 @@
       "index": 303,
       "col": 17,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "d52ad52ad52a807f",
       "isEmpty": false
@@ -3965,11 +2749,7 @@
       "index": 304,
       "col": 18,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "8c15eb14ab66db2a",
       "isEmpty": false
@@ -3978,11 +2758,7 @@
       "index": 305,
       "col": 19,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "f25cf17cc160b863",
       "isEmpty": false
@@ -3991,11 +2767,7 @@
       "index": 306,
       "col": 20,
       "row": 11,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a709a429f435ed36",
       "isEmpty": false
@@ -4004,11 +2776,7 @@
       "index": 307,
       "col": 21,
       "row": 11,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "aa2a80802a20800a",
       "isEmpty": false
@@ -4017,11 +2785,7 @@
       "index": 308,
       "col": 22,
       "row": 11,
-      "dominantColor": [
-        128,
-        128,
-        128
-      ],
+      "dominantColor": [128, 128, 128],
       "category": "road",
       "phash": "bc39966c8393c993",
       "isEmpty": false
@@ -4030,11 +2794,7 @@
       "index": 309,
       "col": 23,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "b0c1a1c2add6adda",
       "isEmpty": false
@@ -4043,11 +2803,7 @@
       "index": 310,
       "col": 24,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "e594f486f883b88b",
       "isEmpty": false
@@ -4056,11 +2812,7 @@
       "index": 311,
       "col": 25,
       "row": 11,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "a5c2938bc9c96d36",
       "isEmpty": false
@@ -4069,11 +2821,7 @@
       "index": 312,
       "col": 0,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "80f88f780776897e",
       "isEmpty": false
@@ -4082,11 +2830,7 @@
       "index": 313,
       "col": 1,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "a08a8a228808aa00",
       "isEmpty": false
@@ -4095,11 +2839,7 @@
       "index": 314,
       "col": 2,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "88a2a2288202a802",
       "isEmpty": false
@@ -4108,11 +2848,7 @@
       "index": 315,
       "col": 3,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "aaa0802a2a80aa2a",
       "isEmpty": false
@@ -4121,11 +2857,7 @@
       "index": 316,
       "col": 4,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "82a8a00a2a208a0a",
       "isEmpty": false
@@ -4134,11 +2866,7 @@
       "index": 317,
       "col": 5,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "9be4e41b1b24c71b",
       "isEmpty": false
@@ -4147,11 +2875,7 @@
       "index": 318,
       "col": 6,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "9bc4a44b5b34c71b",
       "isEmpty": false
@@ -4160,11 +2884,7 @@
       "index": 319,
       "col": 7,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "93ec6c134e6c9347",
       "isEmpty": false
@@ -4173,11 +2893,7 @@
       "index": 320,
       "col": 8,
       "row": 12,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a8aa8a088000a828",
       "isEmpty": false
@@ -4186,11 +2902,7 @@
       "index": 321,
       "col": 9,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "d5a9da2d5221dc2b",
       "isEmpty": false
@@ -4199,11 +2911,7 @@
       "index": 322,
       "col": 10,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "c0b33349365fb649",
       "isEmpty": false
@@ -4212,11 +2920,7 @@
       "index": 323,
       "col": 11,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "95e6661c633ae31c",
       "isEmpty": false
@@ -4225,11 +2929,7 @@
       "index": 324,
       "col": 12,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "80f88f7887788b7c",
       "isEmpty": false
@@ -4238,11 +2938,7 @@
       "index": 325,
       "col": 13,
       "row": 12,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "d5a99a2dd229da29",
       "isEmpty": false
@@ -4251,11 +2947,7 @@
       "index": 326,
       "col": 14,
       "row": 12,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aaa2802228202a28",
       "isEmpty": false
@@ -4264,11 +2956,7 @@
       "index": 327,
       "col": 15,
       "row": 12,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa2a808028808028",
       "isEmpty": false
@@ -4277,11 +2965,7 @@
       "index": 328,
       "col": 16,
       "row": 12,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "c8b3e24c174ee3b1",
       "isEmpty": false
@@ -4290,11 +2974,7 @@
       "index": 329,
       "col": 17,
       "row": 12,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "98b3e24c174ee3b1",
       "isEmpty": false
@@ -4303,11 +2983,7 @@
       "index": 330,
       "col": 18,
       "row": 12,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "98b3e24c164eebb1",
       "isEmpty": false
@@ -4316,11 +2992,7 @@
       "index": 331,
       "col": 19,
       "row": 12,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "ec80923ae6ebba98",
       "isEmpty": false
@@ -4329,11 +3001,7 @@
       "index": 332,
       "col": 20,
       "row": 12,
-      "dominantColor": [
-        208,
-        192,
-        160
-      ],
+      "dominantColor": [208, 192, 160],
       "category": "decoration",
       "phash": "83f880c6d2bbd72c",
       "isEmpty": false
@@ -4342,11 +3010,7 @@
       "index": 333,
       "col": 21,
       "row": 12,
-      "dominantColor": [
-        208,
-        192,
-        160
-      ],
+      "dominantColor": [208, 192, 160],
       "category": "decoration",
       "phash": "d6a9d59381ea8a78",
       "isEmpty": false
@@ -4355,11 +3019,7 @@
       "index": 334,
       "col": 22,
       "row": 12,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "d2a9a5a9a5a9a5a9",
       "isEmpty": false
@@ -4368,11 +3028,7 @@
       "index": 335,
       "col": 23,
       "row": 12,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "ad00000000000000",
       "isEmpty": false
@@ -4381,11 +3037,7 @@
       "index": 336,
       "col": 24,
       "row": 12,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "f800000000000000",
       "isEmpty": false
@@ -4394,11 +3046,7 @@
       "index": 337,
       "col": 25,
       "row": 12,
-      "dominantColor": [
-        192,
-        96,
-        32
-      ],
+      "dominantColor": [192, 96, 32],
       "category": "brick",
       "phash": "ad3acdb00f32c53a",
       "isEmpty": false
@@ -4407,11 +3055,7 @@
       "index": 338,
       "col": 0,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "80f67f7906a87916",
       "isEmpty": false
@@ -4420,11 +3064,7 @@
       "index": 339,
       "col": 1,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "a08a0a2002880822",
       "isEmpty": false
@@ -4433,11 +3073,7 @@
       "index": 340,
       "col": 2,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "88a2222802a82a08",
       "isEmpty": false
@@ -4446,11 +3082,7 @@
       "index": 341,
       "col": 3,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "aa80802a00802a00",
       "isEmpty": false
@@ -4459,11 +3091,7 @@
       "index": 342,
       "col": 4,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "8aa8200a20a82a02",
       "isEmpty": false
@@ -4472,11 +3100,7 @@
       "index": 343,
       "col": 5,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "9be4e41b34c49b3c",
       "isEmpty": false
@@ -4485,11 +3109,7 @@
       "index": 344,
       "col": 6,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "bbc4a44b34c79b2c",
       "isEmpty": false
@@ -4498,11 +3118,7 @@
       "index": 345,
       "col": 7,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "93ec64136cb1d61b",
       "isEmpty": false
@@ -4511,11 +3127,7 @@
       "index": 346,
       "col": 8,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a8aa080800802828",
       "isEmpty": false
@@ -4524,11 +3136,7 @@
       "index": 347,
       "col": 9,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "d5ab2a2c53bc2e0b",
       "isEmpty": false
@@ -4537,11 +3145,7 @@
       "index": 348,
       "col": 10,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "a400000000000000",
       "isEmpty": false
@@ -4550,11 +3154,7 @@
       "index": 349,
       "col": 11,
       "row": 13,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "f100000000000000",
       "isEmpty": false
@@ -4563,11 +3163,7 @@
       "index": 350,
       "col": 12,
       "row": 13,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "801b3b6c743b5b35",
       "isEmpty": false
@@ -4576,11 +3172,7 @@
       "index": 351,
       "col": 13,
       "row": 13,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d54e6e3a232e2e62",
       "isEmpty": false
@@ -4589,11 +3181,7 @@
       "index": 352,
       "col": 14,
       "row": 13,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8f007c7f0f00787f",
       "isEmpty": false
@@ -4602,11 +3190,7 @@
       "index": 353,
       "col": 15,
       "row": 13,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "fa552b2a5a552b2a",
       "isEmpty": false
@@ -4615,11 +3199,7 @@
       "index": 354,
       "col": 16,
       "row": 13,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "994cb3b2eeb2194c",
       "isEmpty": false
@@ -4628,11 +3208,7 @@
       "index": 355,
       "col": 17,
       "row": 13,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "994cb3b3ceb2194c",
       "isEmpty": false
@@ -4641,11 +3217,7 @@
       "index": 356,
       "col": 18,
       "row": 13,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "994cb3b3eeb21944",
       "isEmpty": false
@@ -4654,11 +3226,7 @@
       "index": 357,
       "col": 19,
       "row": 13,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "e484913bb3aeee88",
       "isEmpty": false
@@ -4667,11 +3235,7 @@
       "index": 358,
       "col": 20,
       "row": 13,
-      "dominantColor": [
-        208,
-        192,
-        160
-      ],
+      "dominantColor": [208, 192, 160],
       "category": "decoration",
       "phash": "85d0c09ed4eb9f2a",
       "isEmpty": false
@@ -4680,11 +3244,7 @@
       "index": 359,
       "col": 21,
       "row": 13,
-      "dominantColor": [
-        208,
-        192,
-        160
-      ],
+      "dominantColor": [208, 192, 160],
       "category": "decoration",
       "phash": "d0a595ca81aaaa7f",
       "isEmpty": false
@@ -4693,11 +3253,7 @@
       "index": 360,
       "col": 22,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "87f8e0f8e0f0f0f0",
       "isEmpty": false
@@ -4706,11 +3262,7 @@
       "index": 361,
       "col": 23,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "8038af3ca73ca73c",
       "isEmpty": false
@@ -4719,11 +3271,7 @@
       "index": 362,
       "col": 24,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "d569f269f228f068",
       "isEmpty": false
@@ -4732,11 +3280,7 @@
       "index": 363,
       "col": 25,
       "row": 13,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "a52532da0f2d3bd2",
       "isEmpty": false
@@ -4745,11 +3289,7 @@
       "index": 364,
       "col": 0,
       "row": 14,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "c1bc9e69163cc33a",
       "isEmpty": false
@@ -4758,11 +3298,7 @@
       "index": 365,
       "col": 1,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "80a88a280a288228",
       "isEmpty": false
@@ -4771,11 +3307,7 @@
       "index": 366,
       "col": 2,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "80a80a2802288a2a",
       "isEmpty": false
@@ -4784,11 +3316,7 @@
       "index": 367,
       "col": 3,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "80a8822a0aa0822a",
       "isEmpty": false
@@ -4797,11 +3325,7 @@
       "index": 368,
       "col": 4,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "80a8200a0a20822a",
       "isEmpty": false
@@ -4810,11 +3334,7 @@
       "index": 369,
       "col": 5,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "91ece43b1a24c73b",
       "isEmpty": false
@@ -4823,11 +3343,7 @@
       "index": 370,
       "col": 6,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "91ec842b5b34c73b",
       "isEmpty": false
@@ -4836,11 +3352,7 @@
       "index": 371,
       "col": 7,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "91ec6c1b4e6c932e",
       "isEmpty": false
@@ -4849,11 +3361,7 @@
       "index": 372,
       "col": 8,
       "row": 14,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "80aa8a0082a88828",
       "isEmpty": false
@@ -4862,11 +3370,7 @@
       "index": 373,
       "col": 9,
       "row": 14,
-      "dominantColor": [
-        0,
-        0,
-        0
-      ],
+      "dominantColor": [0, 0, 0],
       "category": "empty",
       "phash": "0000000000000000",
       "isEmpty": true
@@ -4875,11 +3379,7 @@
       "index": 374,
       "col": 10,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "a6d9c73807d8c738",
       "isEmpty": false
@@ -4888,11 +3388,7 @@
       "index": 375,
       "col": 11,
       "row": 14,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "f38c926d528d926d",
       "isEmpty": false
@@ -4901,11 +3397,7 @@
       "index": 376,
       "col": 12,
       "row": 14,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a400000000000000",
       "isEmpty": false
@@ -4914,11 +3406,7 @@
       "index": 377,
       "col": 13,
       "row": 14,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "f100000000000000",
       "isEmpty": false
@@ -4927,11 +3415,7 @@
       "index": 378,
       "col": 14,
       "row": 14,
-      "dominantColor": [
-        112,
-        112,
-        112
-      ],
+      "dominantColor": [112, 112, 112],
       "category": "road",
       "phash": "802882288228822a",
       "isEmpty": false
@@ -4940,11 +3424,7 @@
       "index": 379,
       "col": 15,
       "row": 14,
-      "dominantColor": [
-        80,
-        80,
-        80
-      ],
+      "dominantColor": [80, 80, 80],
       "category": "wall",
       "phash": "c03d926a9768c33f",
       "isEmpty": false
@@ -4953,11 +3433,7 @@
       "index": 380,
       "col": 16,
       "row": 14,
-      "dominantColor": [
-        48,
-        176,
-        160
-      ],
+      "dominantColor": [48, 176, 160],
       "category": "decoration",
       "phash": "ffad805b806f809e",
       "isEmpty": false
@@ -4966,11 +3442,7 @@
       "index": 381,
       "col": 17,
       "row": 14,
-      "dominantColor": [
-        48,
-        160,
-        144
-      ],
+      "dominantColor": [48, 160, 144],
       "category": "decoration",
       "phash": "f8dc8723e49c98e4",
       "isEmpty": false
@@ -4979,11 +3451,7 @@
       "index": 382,
       "col": 18,
       "row": 14,
-      "dominantColor": [
-        48,
-        176,
-        160
-      ],
+      "dominantColor": [48, 176, 160],
       "category": "decoration",
       "phash": "aad0d52dd5cad5c0",
       "isEmpty": false
@@ -4992,11 +3460,7 @@
       "index": 383,
       "col": 19,
       "row": 14,
-      "dominantColor": [
-        160,
-        144,
-        112
-      ],
+      "dominantColor": [160, 144, 112],
       "category": "wood",
       "phash": "b982c42cb3bbaacc",
       "isEmpty": false
@@ -5005,11 +3469,7 @@
       "index": 384,
       "col": 20,
       "row": 14,
-      "dominantColor": [
-        224,
-        224,
-        192
-      ],
+      "dominantColor": [224, 224, 192],
       "category": "decoration",
       "phash": "87e888d6d4aba72a",
       "isEmpty": false
@@ -5018,11 +3478,7 @@
       "index": 385,
       "col": 21,
       "row": 14,
-      "dominantColor": [
-        224,
-        224,
-        192
-      ],
+      "dominantColor": [224, 224, 192],
       "category": "decoration",
       "phash": "d481c5ae80fbe07e",
       "isEmpty": false
@@ -5031,11 +3487,7 @@
       "index": 386,
       "col": 22,
       "row": 14,
-      "dominantColor": [
-        208,
-        208,
-        224
-      ],
+      "dominantColor": [208, 208, 224],
       "category": "light_surface",
       "phash": "9aede9949186c43b",
       "isEmpty": false
@@ -5044,11 +3496,7 @@
       "index": 387,
       "col": 23,
       "row": 14,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "80f887f887f88778",
       "isEmpty": false
@@ -5057,11 +3505,7 @@
       "index": 388,
       "col": 24,
       "row": 14,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "8080808080008000",
       "isEmpty": false
@@ -5070,11 +3514,7 @@
       "index": 389,
       "col": 25,
       "row": 14,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "d5a9d2a9d2a9d229",
       "isEmpty": false
@@ -5083,11 +3523,7 @@
       "index": 390,
       "col": 0,
       "row": 15,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "80008700ff7f0fff",
       "isEmpty": false
@@ -5096,11 +3532,7 @@
       "index": 391,
       "col": 1,
       "row": 15,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "d555d655aa2a54aa",
       "isEmpty": false
@@ -5109,11 +3541,7 @@
       "index": 392,
       "col": 2,
       "row": 15,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8000aa00a82a02aa",
       "isEmpty": false
@@ -5122,11 +3550,7 @@
       "index": 393,
       "col": 3,
       "row": 15,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "80008200aa2a02aa",
       "isEmpty": false
@@ -5135,11 +3559,7 @@
       "index": 394,
       "col": 4,
       "row": 15,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "8000a8208a2a028a",
       "isEmpty": false
@@ -5148,11 +3568,7 @@
       "index": 395,
       "col": 5,
       "row": 15,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "9151e424db3b3ce6",
       "isEmpty": false
@@ -5161,11 +3577,7 @@
       "index": 396,
       "col": 6,
       "row": 15,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "9141e434cb3b3cee",
       "isEmpty": false
@@ -5174,11 +3586,7 @@
       "index": 397,
       "col": 7,
       "row": 15,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "9311ec649b1b29bb",
       "isEmpty": false
@@ -5187,11 +3595,7 @@
       "index": 398,
       "col": 8,
       "row": 15,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "80fc8f780778877c",
       "isEmpty": false
@@ -5200,11 +3604,7 @@
       "index": 399,
       "col": 9,
       "row": 15,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "8080800080008000",
       "isEmpty": false
@@ -5213,11 +3613,7 @@
       "index": 400,
       "col": 10,
       "row": 15,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "d5a9da2d5229d22b",
       "isEmpty": false
@@ -5226,11 +3622,7 @@
       "index": 401,
       "col": 11,
       "row": 15,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "a4f1c41f3be01c1f",
       "isEmpty": false
@@ -5239,11 +3631,7 @@
       "index": 402,
       "col": 12,
       "row": 15,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "a4c1cf3827d8f9c4",
       "isEmpty": false
@@ -5252,11 +3640,7 @@
       "index": 403,
       "col": 13,
       "row": 15,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "f194946d728dac95",
       "isEmpty": false
@@ -5265,11 +3649,7 @@
       "index": 404,
       "col": 14,
       "row": 15,
-      "dominantColor": [
-        80,
-        80,
-        80
-      ],
+      "dominantColor": [80, 80, 80],
       "category": "wall",
       "phash": "802882288228822a",
       "isEmpty": false
@@ -5278,11 +3658,7 @@
       "index": 405,
       "col": 15,
       "row": 15,
-      "dominantColor": [
-        80,
-        80,
-        80
-      ],
+      "dominantColor": [80, 80, 80],
       "category": "wall",
       "phash": "a288288888888888",
       "isEmpty": false
@@ -5291,11 +3667,7 @@
       "index": 406,
       "col": 16,
       "row": 15,
-      "dominantColor": [
-        208,
-        144,
-        48
-      ],
+      "dominantColor": [208, 144, 48],
       "category": "wood",
       "phash": "ffe1803f801e80f7",
       "isEmpty": false
@@ -5304,11 +3676,7 @@
       "index": 407,
       "col": 17,
       "row": 15,
-      "dominantColor": [
-        208,
-        144,
-        48
-      ],
+      "dominantColor": [208, 144, 48],
       "category": "wood",
       "phash": "8a8a8020a2888882",
       "isEmpty": false
@@ -5317,11 +3685,7 @@
       "index": 408,
       "col": 18,
       "row": 15,
-      "dominantColor": [
-        208,
-        144,
-        48
-      ],
+      "dominantColor": [208, 144, 48],
       "category": "wood",
       "phash": "aa94d54ad54bd5b0",
       "isEmpty": false
@@ -5330,11 +3694,7 @@
       "index": 409,
       "col": 19,
       "row": 15,
-      "dominantColor": [
-        80,
-        176,
-        128
-      ],
+      "dominantColor": [80, 176, 128],
       "category": "nature",
       "phash": "a88080a2aaaaaa8a",
       "isEmpty": false
@@ -5343,11 +3703,7 @@
       "index": 410,
       "col": 20,
       "row": 15,
-      "dominantColor": [
-        208,
-        144,
-        48
-      ],
+      "dominantColor": [208, 144, 48],
       "category": "wood",
       "phash": "a88080a2aaaaaa8a",
       "isEmpty": false
@@ -5356,11 +3712,7 @@
       "index": 411,
       "col": 21,
       "row": 15,
-      "dominantColor": [
-        48,
-        176,
-        160
-      ],
+      "dominantColor": [48, 176, 160],
       "category": "decoration",
       "phash": "a88080a2aaaaaa8a",
       "isEmpty": false
@@ -5369,11 +3721,7 @@
       "index": 412,
       "col": 22,
       "row": 15,
-      "dominantColor": [
-        192,
-        192,
-        208
-      ],
+      "dominantColor": [192, 192, 208],
       "category": "light_surface",
       "phash": "cb47ed1a903cd391",
       "isEmpty": false
@@ -5382,11 +3730,7 @@
       "index": 413,
       "col": 23,
       "row": 15,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a0c1a1d2add6adda",
       "isEmpty": false
@@ -5395,11 +3739,7 @@
       "index": 414,
       "col": 24,
       "row": 15,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "f590f082f883f88f",
       "isEmpty": false
@@ -5408,11 +3748,7 @@
       "index": 415,
       "col": 25,
       "row": 15,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a5c2938bc9c96d36",
       "isEmpty": false
@@ -5421,11 +3757,7 @@
       "index": 416,
       "col": 0,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8000ff00f97f06ff",
       "isEmpty": false
@@ -5434,11 +3766,7 @@
       "index": 417,
       "col": 1,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d555aa75ac2a43aa",
       "isEmpty": false
@@ -5447,11 +3775,7 @@
       "index": 418,
       "col": 2,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8802a220a80a0020",
       "isEmpty": false
@@ -5460,11 +3784,7 @@
       "index": 419,
       "col": 3,
       "row": 16,
-      "dominantColor": [
-        128,
-        96,
-        48
-      ],
+      "dominantColor": [128, 96, 48],
       "category": "wood",
       "phash": "8000800080000080",
       "isEmpty": false
@@ -5473,11 +3793,7 @@
       "index": 420,
       "col": 4,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "8202a82882022a8a",
       "isEmpty": false
@@ -5486,11 +3802,7 @@
       "index": 421,
       "col": 5,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "9b5be424c31b3ce4",
       "isEmpty": false
@@ -5499,11 +3811,7 @@
       "index": 422,
       "col": 6,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "9b43e43cc31b3ce4",
       "isEmpty": false
@@ -5512,11 +3820,7 @@
       "index": 423,
       "col": 7,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "9313ec6c931329bb",
       "isEmpty": false
@@ -5525,11 +3829,7 @@
       "index": 424,
       "col": 8,
       "row": 16,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "809f7f7807f07e01",
       "isEmpty": false
@@ -5538,11 +3838,7 @@
       "index": 425,
       "col": 9,
       "row": 16,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "8080000000800000",
       "isEmpty": false
@@ -5551,11 +3847,7 @@
       "index": 426,
       "col": 10,
       "row": 16,
-      "dominantColor": [
-        176,
-        128,
-        80
-      ],
+      "dominantColor": [176, 128, 80],
       "category": "wood",
       "phash": "d5ea2a2b5aab2a2a",
       "isEmpty": false
@@ -5564,11 +3856,7 @@
       "index": 427,
       "col": 11,
       "row": 16,
-      "dominantColor": [
-        192,
-        192,
-        192
-      ],
+      "dominantColor": [192, 192, 192],
       "category": "light_surface",
       "phash": "f1b5914a6eb5494a",
       "isEmpty": false
@@ -5577,11 +3865,7 @@
       "index": 428,
       "col": 12,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "80ce4d6d4f6c6c4d",
       "isEmpty": false
@@ -5590,11 +3874,7 @@
       "index": 429,
       "col": 13,
       "row": 16,
-      "dominantColor": [
-        192,
-        160,
-        128
-      ],
+      "dominantColor": [192, 160, 128],
       "category": "wood",
       "phash": "d59d193d181d3d19",
       "isEmpty": false
@@ -5603,11 +3883,7 @@
       "index": 430,
       "col": 14,
       "row": 16,
-      "dominantColor": [
-        112,
-        112,
-        112
-      ],
+      "dominantColor": [112, 112, 112],
       "category": "road",
       "phash": "ea95b5604a9eb561",
       "isEmpty": false
@@ -5616,11 +3892,7 @@
       "index": 431,
       "col": 15,
       "row": 16,
-      "dominantColor": [
-        112,
-        112,
-        112
-      ],
+      "dominantColor": [112, 112, 112],
       "category": "road",
       "phash": "bfc8e0351fcae034",
       "isEmpty": false
@@ -5629,11 +3901,7 @@
       "index": 432,
       "col": 16,
       "row": 16,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "ff75809b809f807c",
       "isEmpty": false
@@ -5642,11 +3910,7 @@
       "index": 433,
       "col": 17,
       "row": 16,
-      "dominantColor": [
-        80,
-        176,
-        128
-      ],
+      "dominantColor": [80, 176, 128],
       "category": "nature",
       "phash": "a2288882a2a88802",
       "isEmpty": false
@@ -5655,11 +3919,7 @@
       "index": 434,
       "col": 18,
       "row": 16,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "aa21d5ced5c9d521",
       "isEmpty": false
@@ -5668,11 +3928,7 @@
       "index": 435,
       "col": 19,
       "row": 16,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "a8288208aa00aa20",
       "isEmpty": false
@@ -5681,11 +3937,7 @@
       "index": 436,
       "col": 20,
       "row": 16,
-      "dominantColor": [
-        208,
-        128,
-        32
-      ],
+      "dominantColor": [208, 128, 32],
       "category": "wood",
       "phash": "a8288008aa00aa20",
       "isEmpty": false
@@ -5694,11 +3946,7 @@
       "index": 437,
       "col": 21,
       "row": 16,
-      "dominantColor": [
-        48,
-        160,
-        144
-      ],
+      "dominantColor": [48, 160, 144],
       "category": "decoration",
       "phash": "a8288208aa00aa20",
       "isEmpty": false
@@ -5707,11 +3955,7 @@
       "index": 438,
       "col": 22,
       "row": 16,
-      "dominantColor": [
-        208,
-        208,
-        224
-      ],
+      "dominantColor": [208, 208, 224],
       "category": "light_surface",
       "phash": "92e1c1b4b3a6ce99",
       "isEmpty": false
@@ -5720,11 +3964,7 @@
       "index": 439,
       "col": 23,
       "row": 16,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "ad00000000000000",
       "isEmpty": false
@@ -5733,11 +3973,7 @@
       "index": 440,
       "col": 24,
       "row": 16,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "f800000000000000",
       "isEmpty": false
@@ -5746,869 +3982,140 @@
       "index": 441,
       "col": 25,
       "row": 16,
-      "dominantColor": [
-        64,
-        160,
-        96
-      ],
+      "dominantColor": [64, 160, 96],
       "category": "nature",
       "phash": "ad3acdb00f32c53a",
       "isEmpty": false
     }
   ],
   "duplicates": [
-    [
-      1,
-      31,
-      43,
-      187,
-      213,
-      235,
-      242,
-      261,
-      268,
-      399,
-      419
-    ],
-    [
-      6,
-      240,
-      247
-    ],
-    [
-      9,
-      61
-    ],
-    [
-      12,
-      14
-    ],
-    [
-      13,
-      15
-    ],
-    [
-      19,
-      20
-    ],
-    [
-      21,
-      47,
-      73
-    ],
-    [
-      22,
-      48,
-      74
-    ],
-    [
-      23,
-      127
-    ],
-    [
-      24,
-      50,
-      76,
-      102,
-      128,
-      154,
-      180,
-      206,
-      425
-    ],
-    [
-      25,
-      129
-    ],
-    [
-      27,
-      161,
-      284,
-      388
-    ],
-    [
-      30,
-      264,
-      271
-    ],
-    [
-      32,
-      273
-    ],
-    [
-      34,
-      86
-    ],
-    [
-      35,
-      87
-    ],
-    [
-      38,
-      40
-    ],
-    [
-      39,
-      41
-    ],
-    [
-      45,
-      46
-    ],
-    [
-      49,
-      153
-    ],
-    [
-      51,
-      155
-    ],
-    [
-      52,
-      104
-    ],
-    [
-      53,
-      105,
-      209
-    ],
-    [
-      56,
-      290,
-      297
-    ],
-    [
-      57,
-      82
-    ],
-    [
-      58,
-      292,
-      299
-    ],
-    [
-      64,
-      66
-    ],
-    [
-      65,
-      67
-    ],
-    [
-      71,
-      72
-    ],
-    [
-      75,
-      179
-    ],
-    [
-      77,
-      181
-    ],
-    [
-      79,
-      131
-    ],
-    [
-      90,
-      92
-    ],
-    [
-      91,
-      93
-    ],
-    [
-      95,
-      125,
-      126
-    ],
-    [
-      97,
-      98
-    ],
-    [
-      101,
-      205
-    ],
-    [
-      103,
-      207
-    ],
-    [
-      109,
-      288,
-      295
-    ],
-    [
-      120,
-      146,
-      147
-    ],
-    [
-      121,
-      122
-    ],
-    [
-      123,
-      124
-    ],
-    [
-      149,
-      150
-    ],
-    [
-      151,
-      152
-    ],
-    [
-      156,
-      182
-    ],
-    [
-      157,
-      183
-    ],
-    [
-      160,
-      212
-    ],
-    [
-      162,
-      188,
-      214
-    ],
-    [
-      164,
-      190
-    ],
-    [
-      165,
-      191
-    ],
-    [
-      166,
-      192
-    ],
-    [
-      167,
-      193
-    ],
-    [
-      170,
-      194
-    ],
-    [
-      171,
-      195
-    ],
-    [
-      173,
-      175
-    ],
-    [
-      196,
-      222
-    ],
-    [
-      198,
-      200
-    ],
-    [
-      199,
-      201
-    ],
-    [
-      216,
-      217
-    ],
-    [
-      224,
-      276
-    ],
-    [
-      225,
-      251,
-      277,
-      303
-    ],
-    [
-      227,
-      253,
-      279,
-      305
-    ],
-    [
-      228,
-      254,
-      280,
-      306
-    ],
-    [
-      234,
-      241
-    ],
-    [
-      236,
-      243
-    ],
-    [
-      237,
-      244
-    ],
-    [
-      238,
-      245
-    ],
-    [
-      239,
-      246
-    ],
-    [
-      248,
-      300
-    ],
-    [
-      249,
-      301
-    ],
-    [
-      250,
-      302
-    ],
-    [
-      263,
-      270
-    ],
-    [
-      265,
-      272,
-      335,
-      336,
-      348,
-      349,
-      376,
-      377,
-      439,
-      440
-    ],
-    [
-      274,
-      326
-    ],
-    [
-      275,
-      327
-    ],
-    [
-      283,
-      387
-    ],
-    [
-      285,
-      389
-    ],
-    [
-      286,
-      293
-    ],
-    [
-      287,
-      294
-    ],
-    [
-      291,
-      298
-    ],
-    [
-      309,
-      413
-    ],
-    [
-      311,
-      415
-    ],
-    [
-      328,
-      329
-    ],
-    [
-      337,
-      441
-    ],
-    [
-      354,
-      355,
-      356
-    ],
-    [
-      378,
-      404
-    ],
-    [
-      392,
-      393
-    ],
-    [
-      409,
-      410,
-      411
-    ],
-    [
-      435,
-      436,
-      437
-    ]
+    [1, 31, 43, 187, 213, 235, 242, 261, 268, 399, 419],
+    [6, 240, 247],
+    [9, 61],
+    [12, 14],
+    [13, 15],
+    [19, 20],
+    [21, 47, 73],
+    [22, 48, 74],
+    [23, 127],
+    [24, 50, 76, 102, 128, 154, 180, 206, 425],
+    [25, 129],
+    [27, 161, 284, 388],
+    [30, 264, 271],
+    [32, 273],
+    [34, 86],
+    [35, 87],
+    [38, 40],
+    [39, 41],
+    [45, 46],
+    [49, 153],
+    [51, 155],
+    [52, 104],
+    [53, 105, 209],
+    [56, 290, 297],
+    [57, 82],
+    [58, 292, 299],
+    [64, 66],
+    [65, 67],
+    [71, 72],
+    [75, 179],
+    [77, 181],
+    [79, 131],
+    [90, 92],
+    [91, 93],
+    [95, 125, 126],
+    [97, 98],
+    [101, 205],
+    [103, 207],
+    [109, 288, 295],
+    [120, 146, 147],
+    [121, 122],
+    [123, 124],
+    [149, 150],
+    [151, 152],
+    [156, 182],
+    [157, 183],
+    [160, 212],
+    [162, 188, 214],
+    [164, 190],
+    [165, 191],
+    [166, 192],
+    [167, 193],
+    [170, 194],
+    [171, 195],
+    [173, 175],
+    [196, 222],
+    [198, 200],
+    [199, 201],
+    [216, 217],
+    [224, 276],
+    [225, 251, 277, 303],
+    [227, 253, 279, 305],
+    [228, 254, 280, 306],
+    [234, 241],
+    [236, 243],
+    [237, 244],
+    [238, 245],
+    [239, 246],
+    [248, 300],
+    [249, 301],
+    [250, 302],
+    [263, 270],
+    [265, 272, 335, 336, 348, 349, 376, 377, 439, 440],
+    [274, 326],
+    [275, 327],
+    [283, 387],
+    [285, 389],
+    [286, 293],
+    [287, 294],
+    [291, 298],
+    [309, 413],
+    [311, 415],
+    [328, 329],
+    [337, 441],
+    [354, 355, 356],
+    [378, 404],
+    [392, 393],
+    [409, 410, 411],
+    [435, 436, 437]
   ],
   "categories": {
     "wood": [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      10,
-      11,
-      20,
-      26,
-      27,
-      28,
-      29,
-      30,
-      31,
-      32,
-      36,
-      37,
-      46,
-      52,
-      53,
-      54,
-      55,
-      56,
-      57,
-      58,
-      62,
-      63,
-      68,
-      70,
-      78,
-      79,
-      80,
-      81,
-      82,
-      83,
-      84,
-      88,
-      89,
-      94,
-      95,
-      96,
-      104,
-      105,
-      106,
-      107,
-      108,
-      109,
-      110,
-      111,
-      114,
-      115,
-      118,
-      119,
-      120,
-      122,
-      124,
-      125,
-      126,
-      130,
-      131,
-      132,
-      133,
-      136,
-      138,
-      139,
-      140,
-      141,
-      144,
-      145,
-      146,
-      148,
-      150,
-      151,
-      152,
-      156,
-      157,
-      158,
-      159,
-      160,
-      161,
-      162,
-      163,
-      172,
-      173,
-      176,
-      177,
-      178,
-      182,
-      183,
-      184,
-      185,
-      186,
-      187,
-      188,
-      189,
-      199,
-      202,
-      203,
-      204,
-      212,
-      213,
-      214,
-      215,
-      217,
-      218,
-      219,
-      229,
-      255,
-      257,
-      258,
-      281,
-      283,
-      284,
-      285,
-      307,
-      320,
-      328,
-      329,
-      330,
-      331,
-      334,
-      338,
-      340,
-      346,
-      347,
-      350,
-      351,
-      352,
-      353,
-      354,
-      355,
-      356,
-      357,
-      360,
-      361,
-      362,
-      363,
-      364,
-      372,
-      376,
-      377,
-      383,
-      387,
-      388,
-      389,
-      390,
-      391,
-      392,
-      393,
-      394,
-      395,
-      396,
-      397,
-      398,
-      400,
-      402,
-      403,
-      406,
-      407,
-      408,
-      410,
-      416,
-      417,
-      418,
-      419,
-      420,
-      421,
-      422,
-      423,
-      424,
-      425,
-      426,
-      428,
-      429,
-      436
+      0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 20, 26, 27, 28, 29, 30, 31, 32, 36, 37, 46, 52, 53, 54, 55,
+      56, 57, 58, 62, 63, 68, 70, 78, 79, 80, 81, 82, 83, 84, 88, 89, 94, 95, 96, 104, 105, 106,
+      107, 108, 109, 110, 111, 114, 115, 118, 119, 120, 122, 124, 125, 126, 130, 131, 132, 133, 136,
+      138, 139, 140, 141, 144, 145, 146, 148, 150, 151, 152, 156, 157, 158, 159, 160, 161, 162, 163,
+      172, 173, 176, 177, 178, 182, 183, 184, 185, 186, 187, 188, 189, 199, 202, 203, 204, 212, 213,
+      214, 215, 217, 218, 219, 229, 255, 257, 258, 281, 283, 284, 285, 307, 320, 328, 329, 330, 331,
+      334, 338, 340, 346, 347, 350, 351, 352, 353, 354, 355, 356, 357, 360, 361, 362, 363, 364, 372,
+      376, 377, 383, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 400, 402, 403, 406,
+      407, 408, 410, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 428, 429, 436
     ],
     "brick": [
-      8,
-      9,
-      12,
-      13,
-      23,
-      24,
-      25,
-      34,
-      35,
-      38,
-      39,
-      49,
-      50,
-      51,
-      64,
-      65,
-      75,
-      76,
-      77,
-      90,
-      91,
-      101,
-      102,
-      103,
-      164,
-      165,
-      166,
-      167,
-      170,
-      171,
-      196,
-      197,
-      224,
-      225,
-      226,
-      227,
-      228,
-      234,
-      235,
-      236,
-      237,
-      238,
-      239,
-      240,
-      248,
-      249,
-      250,
-      251,
-      252,
-      253,
-      254,
-      260,
-      261,
-      262,
-      263,
-      264,
-      265,
-      266,
-      274,
-      275,
-      286,
-      287,
-      288,
-      289,
-      290,
-      291,
-      292,
-      309,
-      310,
-      311,
-      335,
-      336,
-      337
+      8, 9, 12, 13, 23, 24, 25, 34, 35, 38, 39, 49, 50, 51, 64, 65, 75, 76, 77, 90, 91, 101, 102,
+      103, 164, 165, 166, 167, 170, 171, 196, 197, 224, 225, 226, 227, 228, 234, 235, 236, 237, 238,
+      239, 240, 248, 249, 250, 251, 252, 253, 254, 260, 261, 262, 263, 264, 265, 266, 274, 275, 286,
+      287, 288, 289, 290, 291, 292, 309, 310, 311, 335, 336, 337
     ],
     "nature": [
-      14,
-      15,
-      16,
-      17,
-      40,
-      41,
-      60,
-      61,
-      66,
-      67,
-      86,
-      87,
-      92,
-      93,
-      127,
-      128,
-      129,
-      153,
-      154,
-      155,
-      179,
-      180,
-      181,
-      190,
-      191,
-      192,
-      193,
-      194,
-      195,
-      205,
-      206,
-      207,
-      222,
-      223,
-      241,
-      242,
-      243,
-      244,
-      245,
-      246,
-      247,
-      267,
-      268,
-      269,
-      270,
-      271,
-      272,
-      273,
-      276,
-      277,
-      278,
-      279,
-      280,
-      293,
-      294,
-      295,
-      296,
-      297,
-      298,
-      299,
-      300,
-      301,
-      302,
-      303,
-      304,
-      305,
-      306,
-      326,
-      327,
-      409,
-      413,
-      414,
-      415,
-      432,
-      433,
-      434,
-      435,
-      439,
-      440,
-      441
+      14, 15, 16, 17, 40, 41, 60, 61, 66, 67, 86, 87, 92, 93, 127, 128, 129, 153, 154, 155, 179,
+      180, 181, 190, 191, 192, 193, 194, 195, 205, 206, 207, 222, 223, 241, 242, 243, 244, 245, 246,
+      247, 267, 268, 269, 270, 271, 272, 273, 276, 277, 278, 279, 280, 293, 294, 295, 296, 297, 298,
+      299, 300, 301, 302, 303, 304, 305, 306, 326, 327, 409, 413, 414, 415, 432, 433, 434, 435, 439,
+      440, 441
     ],
     "decoration": [
-      18,
-      21,
-      22,
-      42,
-      43,
-      44,
-      47,
-      48,
-      69,
-      71,
-      72,
-      73,
-      74,
-      97,
-      98,
-      99,
-      100,
-      112,
-      113,
-      116,
-      117,
-      142,
-      143,
-      168,
-      169,
-      198,
-      200,
-      216,
-      282,
-      332,
-      333,
-      358,
-      359,
-      380,
-      381,
-      382,
-      384,
-      385,
-      411,
-      437
+      18, 21, 22, 42, 43, 44, 47, 48, 69, 71, 72, 73, 74, 97, 98, 99, 100, 112, 113, 116, 117, 142,
+      143, 168, 169, 198, 200, 216, 282, 332, 333, 358, 359, 380, 381, 382, 384, 385, 411, 437
     ],
     "road": [
-      19,
-      45,
-      121,
-      123,
-      147,
-      149,
-      174,
-      175,
-      201,
-      210,
-      211,
-      230,
-      233,
-      256,
-      308,
-      378,
-      430,
-      431
+      19, 45, 121, 123, 147, 149, 174, 175, 201, 210, 211, 230, 233, 256, 308, 378, 430, 431
     ],
     "light_surface": [
-      134,
-      135,
-      208,
-      209,
-      312,
-      313,
-      314,
-      315,
-      316,
-      317,
-      318,
-      319,
-      321,
-      322,
-      323,
-      324,
-      325,
-      339,
-      341,
-      342,
-      343,
-      344,
-      345,
-      348,
-      349,
-      365,
-      366,
-      367,
-      368,
-      369,
-      370,
-      371,
-      374,
-      375,
-      386,
-      399,
-      401,
-      412,
-      427,
-      438
+      134, 135, 208, 209, 312, 313, 314, 315, 316, 317, 318, 319, 321, 322, 323, 324, 325, 339, 341,
+      342, 343, 344, 345, 348, 349, 365, 366, 367, 368, 369, 370, 371, 374, 375, 386, 399, 401, 412,
+      427, 438
     ],
-    "wall": [
-      231,
-      232,
-      259,
-      379,
-      404,
-      405
-    ]
+    "wall": [231, 232, 259, 379, 404, 405]
   }
 }

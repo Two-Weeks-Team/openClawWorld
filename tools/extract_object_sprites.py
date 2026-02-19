@@ -27,12 +27,20 @@ def load_manifest() -> dict:
 
 
 def get_tile(
-    img: Image.Image, col: int, row: int, tile_size: int = 16, spacing: int = 0
+    img: Image.Image, col: int, row: int, tile_size: int = 16, spacing: int = 0,
+    width: int = 1, height: int = 1,
 ) -> Image.Image:
-    """Extract a single tile from a spritesheet at the given grid position."""
+    """Extract tile(s) from a spritesheet at the given grid position.
+
+    Args:
+        width: Number of tiles wide (default 1).
+        height: Number of tiles tall (default 1).
+    """
     x = col * (tile_size + spacing)
     y = row * (tile_size + spacing)
-    return img.crop((x, y, x + tile_size, y + tile_size))
+    w = width * tile_size + (width - 1) * spacing
+    h = height * tile_size + (height - 1) * spacing
+    return img.crop((x, y, x + w, y + h))
 
 
 def verify_extraction(
@@ -65,11 +73,14 @@ def verify_extraction(
         source_name = entry["source"]
         if source_name in source_images:
             src = source_images[source_name]
+            obj_tw = w // src["tileSize"] if w > src["tileSize"] else 1
+            obj_th = h // src["tileSize"] if h > src["tileSize"] else 1
             original = get_tile(
                 src["image"],
                 entry["col"], entry["row"],
                 tile_size=src["tileSize"],
                 spacing=src["spacing"],
+                width=obj_tw, height=obj_th,
             )
             h_orig = imagehash.phash(original)
             dist = h_ext - h_orig
@@ -95,9 +106,9 @@ def generate_preview(
 
     scale = 4
     label_h = 14
-    n = len(objects_extracted)
-    pw = n * tile_size * scale
-    ph = tile_size * scale + label_h
+    max_h = max((e.get("h", tile_size) for e in objects_extracted), default=tile_size)
+    pw = sum(e.get("w", tile_size) * scale for e in objects_extracted)
+    ph = max_h * scale + label_h
 
     preview = Image.new("RGBA", (pw, ph), (40, 40, 40, 255))
     draw = ImageDraw.Draw(preview)
@@ -107,19 +118,22 @@ def generate_preview(
     except (OSError, IOError):
         font = ImageFont.load_default()
 
-    for i, entry in enumerate(objects_extracted):
+    px = 0
+    for entry in objects_extracted:
         out_x = entry["out_x"]
-        tile = output_img.crop((out_x, 0, out_x + tile_size, tile_size))
-        scaled = tile.resize((tile_size * scale, tile_size * scale), Image.Resampling.NEAREST)
+        w = entry.get("w", tile_size)
+        h = entry.get("h", tile_size)
+        sprite = output_img.crop((out_x, 0, out_x + w, h))
+        scaled = sprite.resize((w * scale, h * scale), Image.Resampling.NEAREST)
 
-        px = i * tile_size * scale
         preview.paste(scaled, (px, 0), scaled)
 
         label = entry["id"]
         if len(label) > 10:
             label = label[:9] + ".."
-        draw.text((px + 2, tile_size * scale + 1), label, fill=(200, 200, 200, 255), font=font)
-        draw.rectangle([px, 0, px + tile_size * scale, tile_size * scale], outline=(80, 80, 80, 200))
+        draw.text((px + 2, h * scale + 1), label, fill=(200, 200, 200, 255), font=font)
+        draw.rectangle([px, 0, px + w * scale, h * scale], outline=(80, 80, 80, 200))
+        px += w * scale
 
     preview.save(preview_path)
     print(f"Preview saved to {preview_path}")
@@ -151,19 +165,31 @@ def main():
             print(f"Loaded {source_name}: {path} ({source_images[source_name]['image'].size})")
 
     tile_size = 16
-    num_objects = len(objects_config)
-    output_width = num_objects * tile_size
-    output_height = tile_size
+
+    # Pre-compute output dimensions accounting for multi-tile objects
+    total_width = 0
+    max_height = tile_size
+    for obj in objects_config:
+        obj_w = obj.get("width", 1) * tile_size
+        obj_h = obj.get("height", 1) * tile_size
+        total_width += obj_w
+        max_height = max(max_height, obj_h)
+
+    output_width = total_width
+    output_height = max_height
 
     output_img = Image.new("RGBA", (output_width, output_height), (0, 0, 0, 0))
     frames = {}
     objects_extracted = []
+    out_x = 0
 
-    for idx, obj in enumerate(objects_config):
+    for obj in objects_config:
         obj_id = obj["id"]
         source_name = obj["source"]
         col = obj["col"]
         row = obj["row"]
+        obj_tw = obj.get("width", 1)
+        obj_th = obj.get("height", 1)
         desc = obj.get("description", "")
 
         if source_name not in source_images:
@@ -172,14 +198,18 @@ def main():
 
         src = source_images[source_name]
         try:
-            tile = get_tile(src["image"], col, row, src["tileSize"], src["spacing"])
-            out_x = idx * tile_size
-            output_img.paste(tile, (out_x, 0))
+            sprite = get_tile(
+                src["image"], col, row, src["tileSize"], src["spacing"],
+                width=obj_tw, height=obj_th,
+            )
+            w = sprite.width
+            h = sprite.height
+            output_img.paste(sprite, (out_x, 0))
 
             frames[obj_id] = {
-                "frame": {"x": out_x, "y": 0, "w": tile_size, "h": tile_size},
-                "sourceSize": {"w": tile_size, "h": tile_size},
-                "spriteSourceSize": {"x": 0, "y": 0, "w": tile_size, "h": tile_size},
+                "frame": {"x": out_x, "y": 0, "w": w, "h": h},
+                "sourceSize": {"w": w, "h": h},
+                "spriteSourceSize": {"x": 0, "y": 0, "w": w, "h": h},
             }
 
             objects_extracted.append({
@@ -188,14 +218,18 @@ def main():
                 "col": col,
                 "row": row,
                 "out_x": out_x,
+                "w": w,
+                "h": h,
             })
 
-            print(f"  {obj_id:15s}: ({col:2d},{row:2d}) from {source_name:10s} -> x={out_x} | {desc}")
+            size_str = f"{obj_tw}x{obj_th}" if obj_tw > 1 or obj_th > 1 else "1x1"
+            print(f"  {obj_id:15s}: ({col:2d},{row:2d}) {size_str:>3s} from {source_name:10s} -> x={out_x} | {desc}")
+            out_x += w
         except Exception as e:
             print(f"  WARNING: Failed to extract {obj_id}: {e}")
 
     # Save output
-    os.makedirs(os.path.dirname(output_config["pngPath"]), exist_ok=True)
+    os.makedirs(os.path.dirname(output_config["pngPath"]) or ".", exist_ok=True)
     output_img.save(output_config["pngPath"])
     print(f"\nSaved object spritesheet to {output_config['pngPath']}")
     print(f"Output size: {output_img.size} ({len(frames)} objects)")

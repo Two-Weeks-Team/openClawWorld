@@ -5590,89 +5590,19 @@
       "sprite_4_26",
       "sprite_8_22"
     ],
-    [
-      "sprite_0_33",
-      "sprite_0_37",
-      "sprite_3_33",
-      "sprite_6_37"
-    ],
-    [
-      "sprite_0_34",
-      "sprite_0_38",
-      "sprite_3_34",
-      "sprite_6_38"
-    ],
-    [
-      "sprite_0_35",
-      "sprite_0_39",
-      "sprite_3_35",
-      "sprite_3_36",
-      "sprite_6_39"
-    ],
-    [
-      "sprite_0_36",
-      "sprite_3_40",
-      "sprite_6_36",
-      "sprite_6_40"
-    ],
-    [
-      "sprite_0_42",
-      "sprite_1_42",
-      "sprite_2_42",
-      "sprite_2_45",
-      "sprite_3_42",
-      "sprite_3_45"
-    ],
-    [
-      "sprite_0_43",
-      "sprite_1_43",
-      "sprite_2_43",
-      "sprite_3_43"
-    ],
-    [
-      "sprite_0_44",
-      "sprite_1_44",
-      "sprite_2_44",
-      "sprite_3_44",
-      "sprite_4_44"
-    ],
-    [
-      "sprite_0_45",
-      "sprite_1_45"
-    ],
-    [
-      "sprite_0_46",
-      "sprite_1_46",
-      "sprite_2_46",
-      "sprite_3_46",
-      "sprite_4_49"
-    ],
-    [
-      "sprite_0_47",
-      "sprite_2_47",
-      "sprite_4_42",
-      "sprite_4_47",
-      "sprite_6_47",
-      "sprite_8_47"
-    ],
-    [
-      "sprite_0_48",
-      "sprite_2_48",
-      "sprite_4_43",
-      "sprite_4_48",
-      "sprite_6_48",
-      "sprite_8_48"
-    ],
-    [
-      "sprite_0_49",
-      "sprite_2_49"
-    ],
-    [
-      "sprite_0_50",
-      "sprite_2_50",
-      "sprite_4_45",
-      "sprite_4_50"
-    ],
+    ["sprite_0_33", "sprite_0_37", "sprite_3_33", "sprite_6_37"],
+    ["sprite_0_34", "sprite_0_38", "sprite_3_34", "sprite_6_38"],
+    ["sprite_0_35", "sprite_0_39", "sprite_3_35", "sprite_3_36", "sprite_6_39"],
+    ["sprite_0_36", "sprite_3_40", "sprite_6_36", "sprite_6_40"],
+    ["sprite_0_42", "sprite_1_42", "sprite_2_42", "sprite_2_45", "sprite_3_42", "sprite_3_45"],
+    ["sprite_0_43", "sprite_1_43", "sprite_2_43", "sprite_3_43"],
+    ["sprite_0_44", "sprite_1_44", "sprite_2_44", "sprite_3_44", "sprite_4_44"],
+    ["sprite_0_45", "sprite_1_45"],
+    ["sprite_0_46", "sprite_1_46", "sprite_2_46", "sprite_3_46", "sprite_4_49"],
+    ["sprite_0_47", "sprite_2_47", "sprite_4_42", "sprite_4_47", "sprite_6_47", "sprite_8_47"],
+    ["sprite_0_48", "sprite_2_48", "sprite_4_43", "sprite_4_48", "sprite_6_48", "sprite_8_48"],
+    ["sprite_0_49", "sprite_2_49"],
+    ["sprite_0_50", "sprite_2_50", "sprite_4_45", "sprite_4_50"],
     [
       "sprite_0_51",
       "sprite_1_51",
@@ -5687,73 +5617,16 @@
       "sprite_8_51",
       "sprite_9_51"
     ],
-    [
-      "sprite_0_52",
-      "sprite_1_52",
-      "sprite_1_53",
-      "sprite_2_53",
-      "sprite_3_52",
-      "sprite_4_52"
-    ],
-    [
-      "sprite_0_53",
-      "sprite_3_53",
-      "sprite_4_53"
-    ],
-    [
-      "sprite_1_6",
-      "sprite_1_10",
-      "sprite_1_14",
-      "sprite_6_6",
-      "sprite_6_10",
-      "sprite_6_14"
-    ],
-    [
-      "sprite_1_7",
-      "sprite_1_11",
-      "sprite_1_15",
-      "sprite_5_17",
-      "sprite_6_15",
-      "sprite_9_14"
-    ],
-    [
-      "sprite_1_20",
-      "sprite_1_24",
-      "sprite_5_20",
-      "sprite_5_24",
-      "sprite_9_20"
-    ],
-    [
-      "sprite_1_21",
-      "sprite_1_25",
-      "sprite_5_21",
-      "sprite_5_25",
-      "sprite_9_21"
-    ],
-    [
-      "sprite_1_33",
-      "sprite_1_34",
-      "sprite_4_33",
-      "sprite_4_38",
-      "sprite_7_37",
-      "sprite_7_38"
-    ],
-    [
-      "sprite_1_35",
-      "sprite_1_39",
-      "sprite_4_35"
-    ],
-    [
-      "sprite_1_36",
-      "sprite_4_36",
-      "sprite_7_40"
-    ],
-    [
-      "sprite_1_37",
-      "sprite_4_34",
-      "sprite_7_33",
-      "sprite_7_34"
-    ],
+    ["sprite_0_52", "sprite_1_52", "sprite_1_53", "sprite_2_53", "sprite_3_52", "sprite_4_52"],
+    ["sprite_0_53", "sprite_3_53", "sprite_4_53"],
+    ["sprite_1_6", "sprite_1_10", "sprite_1_14", "sprite_6_6", "sprite_6_10", "sprite_6_14"],
+    ["sprite_1_7", "sprite_1_11", "sprite_1_15", "sprite_5_17", "sprite_6_15", "sprite_9_14"],
+    ["sprite_1_20", "sprite_1_24", "sprite_5_20", "sprite_5_24", "sprite_9_20"],
+    ["sprite_1_21", "sprite_1_25", "sprite_5_21", "sprite_5_25", "sprite_9_21"],
+    ["sprite_1_33", "sprite_1_34", "sprite_4_33", "sprite_4_38", "sprite_7_37", "sprite_7_38"],
+    ["sprite_1_35", "sprite_1_39", "sprite_4_35"],
+    ["sprite_1_36", "sprite_4_36", "sprite_7_40"],
+    ["sprite_1_37", "sprite_4_34", "sprite_7_33", "sprite_7_34"],
     [
       "sprite_1_47",
       "sprite_1_48",
@@ -5763,20 +5636,8 @@
       "sprite_5_47",
       "sprite_9_47"
     ],
-    [
-      "sprite_1_49",
-      "sprite_3_49",
-      "sprite_5_44",
-      "sprite_9_49"
-    ],
-    [
-      "sprite_1_50",
-      "sprite_3_50",
-      "sprite_5_45",
-      "sprite_5_50",
-      "sprite_7_50",
-      "sprite_9_50"
-    ],
+    ["sprite_1_49", "sprite_3_49", "sprite_5_44", "sprite_9_49"],
+    ["sprite_1_50", "sprite_3_50", "sprite_5_45", "sprite_5_50", "sprite_7_50", "sprite_9_50"],
     [
       "sprite_2_6",
       "sprite_2_10",
@@ -5788,35 +5649,11 @@
       "sprite_7_14",
       "sprite_9_6"
     ],
-    [
-      "sprite_2_7",
-      "sprite_2_11",
-      "sprite_7_15"
-    ],
-    [
-      "sprite_2_15",
-      "sprite_7_7",
-      "sprite_7_11"
-    ],
-    [
-      "sprite_2_33",
-      "sprite_2_37",
-      "sprite_5_33",
-      "sprite_8_37"
-    ],
-    [
-      "sprite_2_34",
-      "sprite_2_38",
-      "sprite_5_34"
-    ],
-    [
-      "sprite_3_6",
-      "sprite_3_10",
-      "sprite_3_14",
-      "sprite_8_6",
-      "sprite_8_10",
-      "sprite_8_14"
-    ],
+    ["sprite_2_7", "sprite_2_11", "sprite_7_15"],
+    ["sprite_2_15", "sprite_7_7", "sprite_7_11"],
+    ["sprite_2_33", "sprite_2_37", "sprite_5_33", "sprite_8_37"],
+    ["sprite_2_34", "sprite_2_38", "sprite_5_34"],
+    ["sprite_3_6", "sprite_3_10", "sprite_3_14", "sprite_8_6", "sprite_8_10", "sprite_8_14"],
     [
       "sprite_3_7",
       "sprite_3_11",
@@ -5830,16 +5667,8 @@
       "sprite_9_10",
       "sprite_9_13"
     ],
-    [
-      "sprite_3_8",
-      "sprite_3_16",
-      "sprite_8_12"
-    ],
-    [
-      "sprite_3_12",
-      "sprite_8_8",
-      "sprite_8_16"
-    ],
+    ["sprite_3_8", "sprite_3_16", "sprite_8_12"],
+    ["sprite_3_12", "sprite_8_8", "sprite_8_16"],
     [
       "sprite_3_19",
       "sprite_3_21",
@@ -5854,53 +5683,17 @@
       "sprite_7_25",
       "sprite_7_26"
     ],
-    [
-      "sprite_3_37",
-      "sprite_6_33"
-    ],
-    [
-      "sprite_3_38",
-      "sprite_6_34"
-    ],
-    [
-      "sprite_3_39",
-      "sprite_6_35"
-    ],
-    [
-      "sprite_3_48",
-      "sprite_5_48",
-      "sprite_7_48",
-      "sprite_9_48"
-    ],
-    [
-      "sprite_4_39",
-      "sprite_7_35",
-      "sprite_7_39"
-    ],
-    [
-      "sprite_4_40",
-      "sprite_7_36"
-    ],
-    [
-      "sprite_5_37",
-      "sprite_8_33"
-    ],
-    [
-      "sprite_5_38",
-      "sprite_8_34"
-    ],
-    [
-      "sprite_6_16",
-      "sprite_6_17"
-    ],
-    [
-      "sprite_6_28",
-      "sprite_6_29"
-    ],
-    [
-      "sprite_6_30",
-      "sprite_6_31"
-    ],
+    ["sprite_3_37", "sprite_6_33"],
+    ["sprite_3_38", "sprite_6_34"],
+    ["sprite_3_39", "sprite_6_35"],
+    ["sprite_3_48", "sprite_5_48", "sprite_7_48", "sprite_9_48"],
+    ["sprite_4_39", "sprite_7_35", "sprite_7_39"],
+    ["sprite_4_40", "sprite_7_36"],
+    ["sprite_5_37", "sprite_8_33"],
+    ["sprite_5_38", "sprite_8_34"],
+    ["sprite_6_16", "sprite_6_17"],
+    ["sprite_6_28", "sprite_6_29"],
+    ["sprite_6_30", "sprite_6_31"],
     [
       "sprite_6_42",
       "sprite_6_43",
@@ -5913,41 +5706,15 @@
       "sprite_8_45",
       "sprite_8_46"
     ],
-    [
-      "sprite_6_49",
-      "sprite_8_49"
-    ],
-    [
-      "sprite_6_50",
-      "sprite_8_50"
-    ],
-    [
-      "sprite_7_28",
-      "sprite_7_29",
-      "sprite_7_31"
-    ],
-    [
-      "sprite_7_42",
-      "sprite_7_43",
-      "sprite_7_44",
-      "sprite_7_46"
-    ],
-    [
-      "sprite_9_42",
-      "sprite_9_43",
-      "sprite_9_44",
-      "sprite_9_45",
-      "sprite_9_46"
-    ]
+    ["sprite_6_49", "sprite_8_49"],
+    ["sprite_6_50", "sprite_8_50"],
+    ["sprite_7_28", "sprite_7_29", "sprite_7_31"],
+    ["sprite_7_42", "sprite_7_43", "sprite_7_44", "sprite_7_46"],
+    ["sprite_9_42", "sprite_9_43", "sprite_9_44", "sprite_9_45", "sprite_9_46"]
   ],
   "animationSequences": [
     {
-      "frames": [
-        "sprite_0_0",
-        "sprite_0_1",
-        "sprite_1_0",
-        "sprite_1_1"
-      ],
+      "frames": ["sprite_0_0", "sprite_0_1", "sprite_1_0", "sprite_1_1"],
       "frameCount": 4,
       "direction": "horizontal",
       "startPos": {
@@ -5956,12 +5723,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_0",
-        "sprite_2_1",
-        "sprite_3_0",
-        "sprite_3_1"
-      ],
+      "frames": ["sprite_2_0", "sprite_2_1", "sprite_3_0", "sprite_3_1"],
       "frameCount": 4,
       "direction": "horizontal",
       "startPos": {
@@ -5970,10 +5732,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_9",
-        "sprite_5_1"
-      ],
+      "frames": ["sprite_4_9", "sprite_5_1"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -5982,12 +5741,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_8_0",
-        "sprite_8_1",
-        "sprite_9_0",
-        "sprite_9_1"
-      ],
+      "frames": ["sprite_8_0", "sprite_8_1", "sprite_9_0", "sprite_9_1"],
       "frameCount": 4,
       "direction": "horizontal",
       "startPos": {
@@ -5996,10 +5750,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_3",
-        "sprite_1_3"
-      ],
+      "frames": ["sprite_0_3", "sprite_1_3"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6008,10 +5759,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_3",
-        "sprite_3_3"
-      ],
+      "frames": ["sprite_2_3", "sprite_3_3"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6020,10 +5768,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_3",
-        "sprite_7_3"
-      ],
+      "frames": ["sprite_6_3", "sprite_7_3"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6207,10 +5952,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_19",
-        "sprite_6_23"
-      ],
+      "frames": ["sprite_6_19", "sprite_6_23"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6254,12 +5996,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_28",
-        "sprite_4_29",
-        "sprite_5_28",
-        "sprite_5_29"
-      ],
+      "frames": ["sprite_4_28", "sprite_4_29", "sprite_5_28", "sprite_5_29"],
       "frameCount": 4,
       "direction": "horizontal",
       "startPos": {
@@ -6268,10 +6005,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_21",
-        "sprite_6_25"
-      ],
+      "frames": ["sprite_6_21", "sprite_6_25"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6300,10 +6034,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_22",
-        "sprite_4_26"
-      ],
+      "frames": ["sprite_4_22", "sprite_4_26"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6312,10 +6043,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_33",
-        "sprite_0_37"
-      ],
+      "frames": ["sprite_0_33", "sprite_0_37"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6324,10 +6052,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_34",
-        "sprite_0_38"
-      ],
+      "frames": ["sprite_0_34", "sprite_0_38"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6336,10 +6061,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_35",
-        "sprite_0_39"
-      ],
+      "frames": ["sprite_0_35", "sprite_0_39"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6348,10 +6070,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_3_35",
-        "sprite_3_36"
-      ],
+      "frames": ["sprite_3_35", "sprite_3_36"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6360,10 +6079,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_36",
-        "sprite_6_40"
-      ],
+      "frames": ["sprite_6_36", "sprite_6_40"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6372,10 +6088,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_42",
-        "sprite_1_42"
-      ],
+      "frames": ["sprite_0_42", "sprite_1_42"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6384,12 +6097,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_42",
-        "sprite_2_45",
-        "sprite_3_42",
-        "sprite_3_45"
-      ],
+      "frames": ["sprite_2_42", "sprite_2_45", "sprite_3_42", "sprite_3_45"],
       "frameCount": 4,
       "direction": "horizontal",
       "startPos": {
@@ -6398,10 +6106,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_43",
-        "sprite_1_43"
-      ],
+      "frames": ["sprite_0_43", "sprite_1_43"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6410,10 +6115,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_43",
-        "sprite_3_43"
-      ],
+      "frames": ["sprite_2_43", "sprite_3_43"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6422,10 +6124,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_44",
-        "sprite_1_44"
-      ],
+      "frames": ["sprite_0_44", "sprite_1_44"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6434,10 +6133,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_44",
-        "sprite_3_44"
-      ],
+      "frames": ["sprite_2_44", "sprite_3_44"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6446,10 +6142,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_45",
-        "sprite_1_45"
-      ],
+      "frames": ["sprite_0_45", "sprite_1_45"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6458,10 +6151,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_46",
-        "sprite_1_46"
-      ],
+      "frames": ["sprite_0_46", "sprite_1_46"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6470,10 +6160,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_46",
-        "sprite_3_46"
-      ],
+      "frames": ["sprite_2_46", "sprite_3_46"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6482,10 +6169,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_42",
-        "sprite_4_47"
-      ],
+      "frames": ["sprite_4_42", "sprite_4_47"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6494,10 +6178,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_43",
-        "sprite_4_48"
-      ],
+      "frames": ["sprite_4_43", "sprite_4_48"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6506,10 +6187,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_45",
-        "sprite_4_50"
-      ],
+      "frames": ["sprite_4_45", "sprite_4_50"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6518,10 +6196,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_51",
-        "sprite_1_51"
-      ],
+      "frames": ["sprite_0_51", "sprite_1_51"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6530,10 +6205,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_51",
-        "sprite_3_51"
-      ],
+      "frames": ["sprite_2_51", "sprite_3_51"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6542,12 +6214,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_46",
-        "sprite_4_51",
-        "sprite_5_46",
-        "sprite_5_51"
-      ],
+      "frames": ["sprite_4_46", "sprite_4_51", "sprite_5_46", "sprite_5_51"],
       "frameCount": 4,
       "direction": "horizontal",
       "startPos": {
@@ -6556,10 +6223,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_51",
-        "sprite_7_51"
-      ],
+      "frames": ["sprite_6_51", "sprite_7_51"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6568,10 +6232,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_8_51",
-        "sprite_9_51"
-      ],
+      "frames": ["sprite_8_51", "sprite_9_51"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6580,11 +6241,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_0_52",
-        "sprite_1_52",
-        "sprite_1_53"
-      ],
+      "frames": ["sprite_0_52", "sprite_1_52", "sprite_1_53"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6593,10 +6250,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_53",
-        "sprite_3_52"
-      ],
+      "frames": ["sprite_2_53", "sprite_3_52"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6605,11 +6259,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_1_6",
-        "sprite_1_10",
-        "sprite_1_14"
-      ],
+      "frames": ["sprite_1_6", "sprite_1_10", "sprite_1_14"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6618,11 +6268,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_6",
-        "sprite_6_10",
-        "sprite_6_14"
-      ],
+      "frames": ["sprite_6_6", "sprite_6_10", "sprite_6_14"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6631,11 +6277,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_1_7",
-        "sprite_1_11",
-        "sprite_1_15"
-      ],
+      "frames": ["sprite_1_7", "sprite_1_11", "sprite_1_15"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6644,10 +6286,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_1_20",
-        "sprite_1_24"
-      ],
+      "frames": ["sprite_1_20", "sprite_1_24"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6656,10 +6295,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_5_20",
-        "sprite_5_24"
-      ],
+      "frames": ["sprite_5_20", "sprite_5_24"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6668,10 +6304,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_1_21",
-        "sprite_1_25"
-      ],
+      "frames": ["sprite_1_21", "sprite_1_25"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6680,10 +6313,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_5_21",
-        "sprite_5_25"
-      ],
+      "frames": ["sprite_5_21", "sprite_5_25"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6692,10 +6322,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_1_33",
-        "sprite_1_34"
-      ],
+      "frames": ["sprite_1_33", "sprite_1_34"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6704,10 +6331,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_33",
-        "sprite_4_38"
-      ],
+      "frames": ["sprite_4_33", "sprite_4_38"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6716,10 +6340,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_7_37",
-        "sprite_7_38"
-      ],
+      "frames": ["sprite_7_37", "sprite_7_38"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6728,10 +6349,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_1_35",
-        "sprite_1_39"
-      ],
+      "frames": ["sprite_1_35", "sprite_1_39"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6740,10 +6358,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_7_33",
-        "sprite_7_34"
-      ],
+      "frames": ["sprite_7_33", "sprite_7_34"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6752,10 +6367,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_1_47",
-        "sprite_1_48"
-      ],
+      "frames": ["sprite_1_47", "sprite_1_48"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6764,11 +6376,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_5_42",
-        "sprite_5_43",
-        "sprite_5_47"
-      ],
+      "frames": ["sprite_5_42", "sprite_5_43", "sprite_5_47"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6777,10 +6385,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_5_45",
-        "sprite_5_50"
-      ],
+      "frames": ["sprite_5_45", "sprite_5_50"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6789,11 +6394,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_6",
-        "sprite_2_10",
-        "sprite_2_14"
-      ],
+      "frames": ["sprite_2_6", "sprite_2_10", "sprite_2_14"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6802,10 +6403,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_10",
-        "sprite_4_14"
-      ],
+      "frames": ["sprite_4_10", "sprite_4_14"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6814,11 +6412,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_7_6",
-        "sprite_7_10",
-        "sprite_7_14"
-      ],
+      "frames": ["sprite_7_6", "sprite_7_10", "sprite_7_14"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6827,10 +6421,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_7",
-        "sprite_2_11"
-      ],
+      "frames": ["sprite_2_7", "sprite_2_11"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6839,10 +6430,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_7_7",
-        "sprite_7_11"
-      ],
+      "frames": ["sprite_7_7", "sprite_7_11"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6851,10 +6439,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_33",
-        "sprite_2_37"
-      ],
+      "frames": ["sprite_2_33", "sprite_2_37"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6863,10 +6448,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_2_34",
-        "sprite_2_38"
-      ],
+      "frames": ["sprite_2_34", "sprite_2_38"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6875,11 +6457,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_3_6",
-        "sprite_3_10",
-        "sprite_3_14"
-      ],
+      "frames": ["sprite_3_6", "sprite_3_10", "sprite_3_14"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6888,11 +6466,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_8_6",
-        "sprite_8_10",
-        "sprite_8_14"
-      ],
+      "frames": ["sprite_8_6", "sprite_8_10", "sprite_8_14"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6901,11 +6475,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_3_7",
-        "sprite_3_11",
-        "sprite_3_15"
-      ],
+      "frames": ["sprite_3_7", "sprite_3_11", "sprite_3_15"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -6914,10 +6484,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_4_13",
-        "sprite_4_17"
-      ],
+      "frames": ["sprite_4_13", "sprite_4_17"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6942,10 +6509,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_3_8",
-        "sprite_3_16"
-      ],
+      "frames": ["sprite_3_8", "sprite_3_16"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6954,10 +6518,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_8_8",
-        "sprite_8_16"
-      ],
+      "frames": ["sprite_8_8", "sprite_8_16"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -6998,10 +6559,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_7_35",
-        "sprite_7_39"
-      ],
+      "frames": ["sprite_7_35", "sprite_7_39"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -7010,10 +6568,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_16",
-        "sprite_6_17"
-      ],
+      "frames": ["sprite_6_16", "sprite_6_17"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -7022,10 +6577,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_28",
-        "sprite_6_29"
-      ],
+      "frames": ["sprite_6_28", "sprite_6_29"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -7034,10 +6586,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_30",
-        "sprite_6_31"
-      ],
+      "frames": ["sprite_6_30", "sprite_6_31"],
       "frameCount": 2,
       "direction": "horizontal",
       "startPos": {
@@ -7046,13 +6595,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_6_42",
-        "sprite_6_43",
-        "sprite_6_44",
-        "sprite_6_45",
-        "sprite_6_46"
-      ],
+      "frames": ["sprite_6_42", "sprite_6_43", "sprite_6_44", "sprite_6_45", "sprite_6_46"],
       "frameCount": 5,
       "direction": "horizontal",
       "startPos": {
@@ -7061,13 +6604,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_8_42",
-        "sprite_8_43",
-        "sprite_8_44",
-        "sprite_8_45",
-        "sprite_8_46"
-      ],
+      "frames": ["sprite_8_42", "sprite_8_43", "sprite_8_44", "sprite_8_45", "sprite_8_46"],
       "frameCount": 5,
       "direction": "horizontal",
       "startPos": {
@@ -7076,11 +6613,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_7_28",
-        "sprite_7_29",
-        "sprite_7_31"
-      ],
+      "frames": ["sprite_7_28", "sprite_7_29", "sprite_7_31"],
       "frameCount": 3,
       "direction": "horizontal",
       "startPos": {
@@ -7089,12 +6622,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_7_42",
-        "sprite_7_43",
-        "sprite_7_44",
-        "sprite_7_46"
-      ],
+      "frames": ["sprite_7_42", "sprite_7_43", "sprite_7_44", "sprite_7_46"],
       "frameCount": 4,
       "direction": "horizontal",
       "startPos": {
@@ -7103,13 +6631,7 @@
       }
     },
     {
-      "frames": [
-        "sprite_9_42",
-        "sprite_9_43",
-        "sprite_9_44",
-        "sprite_9_45",
-        "sprite_9_46"
-      ],
+      "frames": ["sprite_9_42", "sprite_9_43", "sprite_9_44", "sprite_9_45", "sprite_9_46"],
       "frameCount": 5,
       "direction": "horizontal",
       "startPos": {

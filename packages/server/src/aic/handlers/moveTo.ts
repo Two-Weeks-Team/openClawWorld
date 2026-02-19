@@ -129,11 +129,27 @@ export async function handleMoveTo(req: Request, res: Response): Promise<void> {
 
     const result = movementSystem.setDestination(agentId, tx, ty);
 
+    const currentPos = { x: agentEntity.pos.x, y: agentEntity.pos.y };
+    const destWorld = collisionSystem.tileToWorld(tx, ty);
+    const destPos = { x: destWorld.x, y: destWorld.y };
+
+    let estimatedArrivalMs: number | undefined;
+    if (result === 'accepted') {
+      const dx = destPos.x - currentPos.x;
+      const dy = destPos.y - currentPos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const speed = agentEntity.getEffectiveSpeed();
+      estimatedArrivalMs = speed > 0 ? Math.ceil((distance / speed) * 1000) : undefined;
+    }
+
     const responseData: MoveToResponseData = {
       txId,
       applied: result === 'accepted',
       serverTsMs: Date.now(),
       result,
+      currentPos,
+      destPos: result === 'accepted' ? destPos : undefined,
+      estimatedArrivalMs,
     };
 
     moveToIdempotencyStore.save(agentId, roomId, txId, body, responseData);

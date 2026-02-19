@@ -275,6 +275,9 @@ export const MoveToResponseDataSchema = z.object({
   applied: z.boolean(),
   serverTsMs: TsMsSchema,
   result: MoveToResultSchema,
+  currentPos: Vec2Schema.optional(),
+  destPos: Vec2Schema.optional(),
+  estimatedArrivalMs: z.number().optional(),
 });
 
 export const InteractOutcomeTypeSchema = z.enum(['ok', 'no_effect', 'invalid_action', 'too_far']);

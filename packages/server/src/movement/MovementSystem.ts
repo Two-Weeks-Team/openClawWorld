@@ -72,7 +72,7 @@ export class MovementSystem {
         continue;
       }
 
-      const speed = Math.min(entity.speed || this.baseSpeed, MAX_MOVE_SPEED);
+      const speed = Math.min(entity.getEffectiveSpeed() || this.baseSpeed, MAX_MOVE_SPEED);
       const maxMoveDistance = speed * deltaSeconds;
 
       const moveDistance = Math.min(distance, maxMoveDistance);

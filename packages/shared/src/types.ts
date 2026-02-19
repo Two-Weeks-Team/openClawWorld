@@ -176,6 +176,9 @@ export type MoveToResponseData = {
   applied: boolean;
   serverTsMs: number;
   result: MoveToResult;
+  currentPos?: Vec2;
+  destPos?: Vec2;
+  estimatedArrivalMs?: number;
 };
 
 export type InteractOutcomeType = 'ok' | 'no_effect' | 'invalid_action' | 'too_far';

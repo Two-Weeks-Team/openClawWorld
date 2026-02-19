@@ -21,3 +21,10 @@ export function unregisterRoom(customRoomId: string): void {
 export function hasRoom(customRoomId: string): boolean {
   return roomIdMapping.has(customRoomId);
 }
+
+export function listRooms(): Array<{ customRoomId: string; colyseusRoomId: string }> {
+  return Array.from(roomIdMapping.entries()).map(([customRoomId, colyseusRoomId]) => ({
+    customRoomId,
+    colyseusRoomId,
+  }));
+}

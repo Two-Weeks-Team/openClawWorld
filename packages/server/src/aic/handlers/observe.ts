@@ -106,7 +106,8 @@ const AFFORDANCE_MAP: Record<string, Array<{ action: string; label: string }>> =
 };
 
 function getAffordancesForObject(entity: EntitySchema): Array<{ action: string; label: string }> {
-  const objectType = entity.meta.get('objectType') || entity.name.split('_')[0].toLowerCase();
+  const objectType =
+    entity.meta.get('objectType') || (entity.name?.split('_')[0] ?? '').toLowerCase();
 
   return Object.prototype.hasOwnProperty.call(AFFORDANCE_MAP, objectType)
     ? AFFORDANCE_MAP[objectType]

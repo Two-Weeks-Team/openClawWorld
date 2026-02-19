@@ -103,7 +103,16 @@ joinBtn.addEventListener('click', async () => {
     console.error('Failed to connect:', error);
     joinBtn.disabled = false;
     joinBtn.textContent = 'Join World';
-    alert('Failed to connect to server');
+    const msg = error instanceof Error ? error.message : String(error);
+    if (msg.includes('full') || msg.includes('Channel is full')) {
+      alert('선택한 채널이 가득 찼습니다. 다시 채널을 선택해 주세요.');
+      nameInputDiv.style.display = 'none';
+      channelSelectDiv.style.display = 'block';
+      selectedChannelId = null;
+      void loadChannels();
+    } else {
+      alert('연결에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
   }
 });
 

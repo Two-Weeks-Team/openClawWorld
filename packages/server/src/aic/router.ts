@@ -39,6 +39,7 @@ import { handleProfileUpdate } from './handlers/profileUpdate.js';
 import { handleSkillList } from './handlers/skillList.js';
 import { handleSkillInstall } from './handlers/skillInstall.js';
 import { handleSkillInvoke } from './handlers/skillInvoke.js';
+import { handleHeartbeat } from './handlers/heartbeat.js';
 
 const router: Router = Router();
 
@@ -53,6 +54,8 @@ router.post(
 // All routes below require authentication
 router.use(authMiddleware);
 router.use(activityTrackerMiddleware);
+
+router.post('/heartbeat', handleHeartbeat);
 
 router.post(
   '/unregister',

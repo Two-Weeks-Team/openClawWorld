@@ -99,6 +99,8 @@ export type ObserveRequest = {
   radius: number;
   detail: ObserveDetail;
   includeSelf?: boolean;
+  /** When true, includes collisionGrid in mapMetadata. Agents should cache this (grid is static). */
+  includeGrid?: boolean;
 };
 
 export type MoveToRequest = {
@@ -756,6 +758,8 @@ export type MapMetadata = {
   currentZone: ZoneId | null;
   zones: ZoneInfo[];
   mapSize: { width: number; height: number; tileSize: number };
+  /** Collision grid (row-major: grid[y][x], true=blocked). Included when includeGrid=true in observe request. */
+  collisionGrid?: boolean[][];
 };
 
 // Meetings

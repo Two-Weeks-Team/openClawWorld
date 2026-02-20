@@ -5,7 +5,7 @@
  * Supports retrieval scored by recency + importance + relevance.
  */
 
-import { existsSync, mkdirSync, appendFileSync, readFileSync } from 'fs';
+import { chmodSync, existsSync, mkdirSync, appendFileSync, readFileSync } from 'fs';
 import { dirname } from 'path';
 import type {
   EpisodicRecord,
@@ -122,6 +122,8 @@ export class EpisodicMemory {
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
+    chmodSync(dir, 0o700);
     appendFileSync(this.filePath, JSON.stringify(record) + '\n', { mode: 0o600 });
+    chmodSync(this.filePath, 0o600);
   }
 }

@@ -6,6 +6,7 @@
  */
 
 import { OpenClawWorldClient } from '@openclawworld/plugin';
+import { join } from 'path';
 import type { EcosystemConfig } from '../config/ecosystem.config.js';
 import type {
   AgentConfig,
@@ -61,8 +62,8 @@ export class AgentRuntime {
     this.roomId = ecosystemConfig.defaultRoomId;
 
     // Sanitize agentConfig.id to prevent path traversal (allow only alphanumeric, dash, underscore)
-    const safeId = agentConfig.id.replace(/[^a-zA-Z0-9_-]/g, '_');
-    const dataDir = `${ecosystemConfig.dataDir}/${safeId}`;
+    const safeId = agentConfig.id.replace(/[^a-zA-Z0-9_-]/g, '_') || 'agent_unknown';
+    const dataDir = join(ecosystemConfig.dataDir, safeId);
 
     this.client = new OpenClawWorldClient({
       baseUrl: ecosystemConfig.serverBaseUrl,

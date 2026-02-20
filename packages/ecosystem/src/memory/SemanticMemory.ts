@@ -5,7 +5,7 @@
  * Updated during reflection cycles.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname } from 'path';
 import type { SemanticEntry, SemanticCategory } from '../types/memory.types.js';
 import { randomUUID } from 'crypto';
@@ -86,6 +86,10 @@ export class SemanticMemory {
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
-    writeFileSync(this.filePath, JSON.stringify([...this.entries.values()], null, 2), { mode: 0o600 });
+    chmodSync(dir, 0o700);
+    writeFileSync(this.filePath, JSON.stringify([...this.entries.values()], null, 2), {
+      mode: 0o600,
+    });
+    chmodSync(this.filePath, 0o600);
   }
 }

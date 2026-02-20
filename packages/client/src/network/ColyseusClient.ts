@@ -27,8 +27,18 @@ export type InstalledSkill = {
   enabled: boolean;
 };
 
+export interface ChannelInfo {
+  channelId: string;
+  occupancy: number;
+  maxOccupancy: number;
+}
+
+function getServerHostname(): string {
+  return typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+}
+
 function getServerEndpoint(): string {
-  const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const hostname = getServerHostname();
   const protocol =
     typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${protocol}//${hostname}:2567`;
@@ -44,9 +54,18 @@ export class ColyseusClient {
     this.client = new Client<typeof appConfig>(endpoint);
   }
 
-  async connect(name: string): Promise<Room<GameRoom>> {
+  async fetchChannels(): Promise<ChannelInfo[]> {
+    const hostname = getServerHostname();
+    const protocol =
+      typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
+    const resp = await fetch(`${protocol}//${hostname}:2567/aic/v0.1/channels`);
+    const json = await resp.json();
+    return json.data.channels;
+  }
+
+  async connect(name: string, roomId: string): Promise<Room<GameRoom>> {
     try {
-      this.room = await this.client.joinOrCreate('game', { name });
+      this.room = await this.client.joinOrCreate('game', { name, roomId });
       this._sessionId = this.room.sessionId;
 
       this.room.onMessage('assignedEntityId', (data: { entityId: string }) => {

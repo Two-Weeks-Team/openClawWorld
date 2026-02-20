@@ -1,0 +1,553 @@
+{
+  "frames": {
+    "bear": {
+      "frame": {
+        "x": 184,
+        "y": 162,
+        "w": 154,
+        "h": 132
+      },
+      "sourceSize": {
+        "w": 154,
+        "h": 132
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 154,
+        "h": 132
+      }
+    },
+    "buffalo": {
+      "frame": {
+        "x": 0,
+        "y": 487,
+        "w": 183,
+        "h": 152
+      },
+      "sourceSize": {
+        "w": 183,
+        "h": 152
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 183,
+        "h": 152
+      }
+    },
+    "chick": {
+      "frame": {
+        "x": 615,
+        "y": 304,
+        "w": 129,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 128
+      }
+    },
+    "chicken": {
+      "frame": {
+        "x": 740,
+        "y": 141,
+        "w": 128,
+        "h": 145
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 145
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 145
+      }
+    },
+    "cow": {
+      "frame": {
+        "x": 337,
+        "y": 294,
+        "w": 145,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 145,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 145,
+        "h": 128
+      }
+    },
+    "crocodile": {
+      "frame": {
+        "x": 486,
+        "y": 698,
+        "w": 129,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 128
+      }
+    },
+    "dog": {
+      "frame": {
+        "x": 482,
+        "y": 272,
+        "w": 129,
+        "h": 157
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 157
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 157
+      }
+    },
+    "duck": {
+      "frame": {
+        "x": 615,
+        "y": 432,
+        "w": 129,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 128
+      }
+    },
+    "elephant": {
+      "frame": {
+        "x": 0,
+        "y": 333,
+        "w": 183,
+        "h": 154
+      },
+      "sourceSize": {
+        "w": 183,
+        "h": 154
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 183,
+        "h": 154
+      }
+    },
+    "frog": {
+      "frame": {
+        "x": 478,
+        "y": 0,
+        "w": 130,
+        "h": 144
+      },
+      "sourceSize": {
+        "w": 130,
+        "h": 144
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 130,
+        "h": 144
+      }
+    },
+    "giraffe": {
+      "frame": {
+        "x": 183,
+        "y": 333,
+        "w": 154,
+        "h": 162
+      },
+      "sourceSize": {
+        "w": 154,
+        "h": 162
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 154,
+        "h": 162
+      }
+    },
+    "goat": {
+      "frame": {
+        "x": 0,
+        "y": 162,
+        "w": 184,
+        "h": 171
+      },
+      "sourceSize": {
+        "w": 184,
+        "h": 171
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 184,
+        "h": 171
+      }
+    },
+    "gorilla": {
+      "frame": {
+        "x": 611,
+        "y": 176,
+        "w": 129,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 128
+      }
+    },
+    "hippo": {
+      "frame": {
+        "x": 183,
+        "y": 495,
+        "w": 154,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 154,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 154,
+        "h": 128
+      }
+    },
+    "horse": {
+      "frame": {
+        "x": 486,
+        "y": 429,
+        "w": 129,
+        "h": 141
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 141
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 141
+      }
+    },
+    "monkey": {
+      "frame": {
+        "x": 174,
+        "y": 639,
+        "w": 174,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 174,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 174,
+        "h": 128
+      }
+    },
+    "moose": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 269,
+        "h": 162
+      },
+      "sourceSize": {
+        "w": 269,
+        "h": 162
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 269,
+        "h": 162
+      }
+    },
+    "narwhal": {
+      "frame": {
+        "x": 348,
+        "y": 550,
+        "w": 138,
+        "h": 155
+      },
+      "sourceSize": {
+        "w": 138,
+        "h": 155
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 138,
+        "h": 155
+      }
+    },
+    "owl": {
+      "frame": {
+        "x": 743,
+        "y": 560,
+        "w": 128,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      }
+    },
+    "panda": {
+      "frame": {
+        "x": 0,
+        "y": 639,
+        "w": 174,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 174,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 174,
+        "h": 128
+      }
+    },
+    "parrot": {
+      "frame": {
+        "x": 478,
+        "y": 144,
+        "w": 129,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 128
+      }
+    },
+    "penguin": {
+      "frame": {
+        "x": 338,
+        "y": 128,
+        "w": 140,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 140,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 140,
+        "h": 128
+      }
+    },
+    "pig": {
+      "frame": {
+        "x": 337,
+        "y": 422,
+        "w": 144,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 144,
+        "h": 128
+      }
+    },
+    "rabbit": {
+      "frame": {
+        "x": 608,
+        "y": 0,
+        "w": 129,
+        "h": 176
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 176
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 176
+      }
+    },
+    "rhino": {
+      "frame": {
+        "x": 269,
+        "y": 0,
+        "w": 154,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 154,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 154,
+        "h": 128
+      }
+    },
+    "sloth": {
+      "frame": {
+        "x": 486,
+        "y": 570,
+        "w": 129,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 129,
+        "h": 128
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 129,
+        "h": 128
+      }
+    },
+    "snake": {
+      "frame": {
+        "x": 615,
+        "y": 698,
+        "w": 128,
+        "h": 142
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 142
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 142
+      }
+    },
+    "walrus": {
+      "frame": {
+        "x": 615,
+        "y": 560,
+        "w": 128,
+        "h": 138
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 138
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 138
+      }
+    },
+    "whale": {
+      "frame": {
+        "x": 348,
+        "y": 705,
+        "w": 138,
+        "h": 154
+      },
+      "sourceSize": {
+        "w": 138,
+        "h": 154
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 138,
+        "h": 154
+      }
+    },
+    "zebra": {
+      "frame": {
+        "x": 737,
+        "y": 0,
+        "w": 128,
+        "h": 141
+      },
+      "sourceSize": {
+        "w": 128,
+        "h": 141
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 141
+      }
+    }
+  },
+  "meta": {
+    "image": "animals.png",
+    "size": {
+      "w": 871,
+      "h": 859
+    },
+    "scale": 1,
+    "format": "RGBA8888"
+  }
+}

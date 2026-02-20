@@ -409,9 +409,12 @@ export class GameScene extends Phaser.Scene {
     this.map = this.make.tilemap({ key: 'village' });
 
     const tileset = this.map.addTilesetImage('tileset', 'tileset');
-    if (tileset) {
-      this.map.createLayer('ground', tileset, 0, 0);
-      const collisionLayer = this.map.createLayer('collision', tileset, 0, 0);
+    const urbanTileset = this.map.addTilesetImage('urban_tileset', 'urban_tileset');
+    const tilesets = [tileset, urbanTileset].filter(Boolean) as Phaser.Tilemaps.Tileset[];
+
+    if (tilesets.length > 0) {
+      this.map.createLayer('ground', tilesets, 0, 0);
+      const collisionLayer = this.map.createLayer('collision', tilesets, 0, 0);
       if (collisionLayer) {
         collisionLayer.setAlpha(0);
       }

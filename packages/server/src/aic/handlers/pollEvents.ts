@@ -31,26 +31,34 @@ function createErrorResponse(
 }
 
 /**
- * Wait for new events with a timeout.
- * Polls the event log periodically until events are available or timeout occurs.
+ * Wait for new events with a timeout and client disconnect detection.
+ * Polls the event log periodically until events are available, timeout occurs,
+ * or the client disconnects early.
  *
  * @param gameRoom - The game room to poll for events
  * @param cursor - The cursor to start from
  * @param limit - Maximum number of events to return
  * @param waitMs - Maximum time to wait for new events
+ * @param isCancelled - Callback returning true if the client has disconnected
  * @returns Object containing events and next cursor
  */
 async function waitForEvents(
   gameRoom: GameRoom,
   cursor: string,
   limit: number,
-  waitMs: number
+  waitMs: number,
+  isCancelled: () => boolean
 ): Promise<{ events: EventEnvelope[]; nextCursor: string; cursorExpired: boolean }> {
   const eventLog = gameRoom.getEventLog();
   const startTime = Date.now();
   const effectiveWaitMs = Math.min(waitMs, MAX_WAIT_MS);
 
   while (true) {
+    // Exit early if client disconnected
+    if (isCancelled()) {
+      return { events: [], nextCursor: cursor, cursorExpired: false };
+    }
+
     const result = eventLog.getSince(cursor, limit);
 
     // If cursor expired, return immediately with the flag so client can reset
@@ -146,8 +154,18 @@ export async function handlePollEvents(req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Long-polling: wait for events or timeout
-    const result = await waitForEvents(gameRoom, effectiveCursor, limit, waitMs);
+    // Long-polling: set up disconnect detection, then wait for events or timeout
+    let cancelled = false;
+    req.on('close', () => {
+      cancelled = true;
+    });
+
+    const result = await waitForEvents(gameRoom, effectiveCursor, limit, waitMs, () => cancelled);
+
+    // If client disconnected during the wait, skip sending a response
+    if (cancelled) {
+      return;
+    }
 
     const responseData: PollEventsResponseData = {
       events: result.events,

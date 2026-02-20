@@ -844,7 +844,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
     }
 
     if (this.skillService) {
-      this.skillService.processPendingCasts();
+      void this.skillService.processPendingCasts().catch(error => {
+        console.error('[GameRoom] Error processing pending casts:', error);
+      });
       this.skillService.processEffectExpirations();
     }
 

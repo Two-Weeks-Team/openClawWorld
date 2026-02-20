@@ -695,7 +695,9 @@ export class GameRoom extends Room<{ state: RoomState }> {
     if (!consented && entityId) {
       try {
         await this.allowReconnection(client, 20);
-        console.log(`[GameRoom] Client ${client.sessionId} reconnected, entity ${entityId} preserved`);
+        console.log(
+          `[GameRoom] Client ${client.sessionId} reconnected, entity ${entityId} preserved`
+        );
         return; // Reconnected successfully, keep entity intact
       } catch {
         console.log(`[GameRoom] Client ${client.sessionId} did not reconnect in time`);

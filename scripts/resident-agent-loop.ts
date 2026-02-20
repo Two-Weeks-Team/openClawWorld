@@ -2816,16 +2816,7 @@ class ResidentAgent {
       this.recordApiCall('observe', startMs, true);
       this.state.lastAction = 'observe';
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      this.recordApiCall('observe', startMs, false, {
-        httpStatusCode: httpStatus,
-        errorMessage: errMsg,
-        errorCode: httpStatus
-          ? httpStatus >= 500
-            ? 'server_error'
-            : 'client_error'
-          : 'network_error',
-      });
+      this.recordApiCall('observe', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }
@@ -2853,16 +2844,7 @@ class ResidentAgent {
       this.recordApiCall('moveTo', startMs, true);
       this.state.lastAction = `moveTo(${tx}, ${ty})`;
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      this.recordApiCall('moveTo', startMs, false, {
-        httpStatusCode: httpStatus,
-        errorMessage: errMsg,
-        errorCode: httpStatus
-          ? httpStatus >= 500
-            ? 'server_error'
-            : 'client_error'
-          : 'network_error',
-      });
+      this.recordApiCall('moveTo', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }
@@ -2891,16 +2873,7 @@ class ResidentAgent {
       this.recordApiCall('chatSend', startMs, true);
       this.state.lastAction = `chat("${message.substring(0, 20)}...")`;
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      this.recordApiCall('chatSend', startMs, false, {
-        httpStatusCode: httpStatus,
-        errorMessage: errMsg,
-        errorCode: httpStatus
-          ? httpStatus >= 500
-            ? 'server_error'
-            : 'client_error'
-          : 'network_error',
-      });
+      this.recordApiCall('chatSend', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }
@@ -2944,16 +2917,7 @@ class ResidentAgent {
       }
       this.recordApiCall('chatObserve', startMs, true);
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      this.recordApiCall('chatObserve', startMs, false, {
-        httpStatusCode: httpStatus,
-        errorMessage: errMsg,
-        errorCode: httpStatus
-          ? httpStatus >= 500
-            ? 'server_error'
-            : 'client_error'
-          : 'network_error',
-      });
+      this.recordApiCall('chatObserve', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }
@@ -2995,16 +2959,7 @@ class ResidentAgent {
       this.state.lastAction = `interact(${targetId}, ${action})`;
       return outcome;
     } catch (error) {
-      const errMsg = error instanceof Error ? error.message : String(error);
-      this.recordApiCall('interact', startMs, false, {
-        httpStatusCode: httpStatus,
-        errorMessage: errMsg,
-        errorCode: httpStatus
-          ? httpStatus >= 500
-            ? 'server_error'
-            : 'client_error'
-          : 'network_error',
-      });
+      this.recordApiCall('interact', startMs, false, this.buildErrorDetails(httpStatus, error));
       throw error;
     }
   }

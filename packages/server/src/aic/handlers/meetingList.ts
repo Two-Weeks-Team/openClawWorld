@@ -16,7 +16,6 @@ function createErrorResponse(
 }
 
 export async function handleMeetingList(_req: Request, res: Response): Promise<void> {
-
   try {
     const meetingIds = getAllMeetingIds();
     const meetings: MeetingListResponseData['meetings'] = [];

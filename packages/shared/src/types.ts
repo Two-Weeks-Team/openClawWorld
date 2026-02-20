@@ -449,6 +449,19 @@ export type UnregisterResponseData = {
   unregisteredAt: number;
 };
 
+export type ReconnectRequest = {
+  agentId: string;
+  sessionToken: string;
+};
+
+export type ReconnectResponseData = {
+  agentId: string;
+  roomId: string;
+  sessionToken: string;
+  pos: Vec2;
+  tile?: TileCoord;
+};
+
 // ============================================================================
 // Status Tool Types
 // ============================================================================

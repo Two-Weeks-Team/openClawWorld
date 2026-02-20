@@ -8,6 +8,7 @@ import {
   PollEventsRequestSchema,
   RegisterRequestSchema,
   UnregisterRequestSchema,
+  ReconnectRequestSchema,
   ProfileUpdateRequestSchema,
   SkillListRequestSchema,
   SkillInstallRequestSchema,
@@ -48,6 +49,7 @@ import { handleMeetingList } from './handlers/meetingList.js';
 import { handleMeetingJoin } from './handlers/meetingJoin.js';
 import { handleMeetingLeave } from './handlers/meetingLeave.js';
 import { handleHeartbeat } from './handlers/heartbeat.js';
+import { handleReconnect } from './handlers/reconnect.js';
 
 const router: Router = Router();
 
@@ -60,6 +62,14 @@ router.post(
   interactRateLimiter,
   validateRequest(RegisterRequestSchema),
   handleRegister
+);
+
+// Reconnect endpoint is UNAUTHENTICATED - validates old token manually
+router.post(
+  '/reconnect',
+  interactRateLimiter,
+  validateRequest(ReconnectRequestSchema),
+  handleReconnect
 );
 
 // All routes below require authentication

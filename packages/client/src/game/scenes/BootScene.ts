@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { AUDIO_MANIFEST } from '../../systems/AudioManager';
 
 // Single unified map for the entire world
 const ZONE_IDS = ['village'] as const;
@@ -22,6 +23,11 @@ export class BootScene extends Phaser.Scene {
     this.load.atlas('foliage', 'assets/sprites/foliage.png', 'assets/sprites/foliage.json');
     this.load.atlas('animals', 'assets/sprites/animals.png', 'assets/sprites/animals.json');
     this.load.atlas('items', 'assets/sprites/items.png', 'assets/sprites/items.json');
+
+    // Audio assets (Interface Sounds + RPG Audio + Music Loops)
+    for (const entry of AUDIO_MANIFEST) {
+      this.load.audio(entry.key, entry.path);
+    }
   }
 
   create() {

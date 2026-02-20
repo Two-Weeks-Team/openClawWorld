@@ -1,6 +1,10 @@
 import type { Request, Response } from 'express';
 import { matchMaker } from 'colyseus';
-import type { MeetingListRequest, MeetingListResponseData, AicErrorObject } from '@openclawworld/shared';
+import type {
+  MeetingListRequest,
+  MeetingListResponseData,
+  AicErrorObject,
+} from '@openclawworld/shared';
 import { getAllMeetingIds, getColyseusRoomIdForMeeting } from '../meetingRegistry.js';
 import type { MeetingRoom } from '../../rooms/MeetingRoom.js';
 

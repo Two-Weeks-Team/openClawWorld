@@ -84,9 +84,7 @@ export async function handleMeetingJoin(req: Request, res: Response): Promise<vo
     }
 
     if (meetingRoom.state.isFull()) {
-      res
-        .status(409)
-        .json(createErrorResponse('conflict', 'Meeting is at capacity', false));
+      res.status(409).json(createErrorResponse('conflict', 'Meeting is at capacity', false));
       return;
     }
 
@@ -96,9 +94,7 @@ export async function handleMeetingJoin(req: Request, res: Response): Promise<vo
     const added = meetingRoom.state.addParticipant(agentId, agentEntity.name, role);
 
     if (!added) {
-      res
-        .status(500)
-        .json(createErrorResponse('internal', 'Failed to join meeting', true));
+      res.status(500).json(createErrorResponse('internal', 'Failed to join meeting', true));
       return;
     }
 
@@ -133,9 +129,7 @@ export async function handleMeetingJoin(req: Request, res: Response): Promise<vo
       participants,
     };
 
-    console.log(
-      `[MeetingJoinHandler] Agent '${agentId}' joined meeting '${meetingId}' as ${role}`
-    );
+    console.log(`[MeetingJoinHandler] Agent '${agentId}' joined meeting '${meetingId}' as ${role}`);
 
     res.status(200).json({
       status: 'ok',

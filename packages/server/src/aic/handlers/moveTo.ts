@@ -4,6 +4,7 @@ import type { MoveToRequest, MoveToResponseData, AicErrorObject } from '@opencla
 import type { GameRoom } from '../../rooms/GameRoom.js';
 import { moveToIdempotencyStore } from '../idempotency.js';
 import { getColyseusRoomId } from '../roomRegistry.js';
+import { findPath } from '../../movement/AStar.js';
 
 function createErrorResponse(
   code: AicErrorObject['code'],
@@ -127,10 +128,18 @@ export async function handleMoveTo(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const result = movementSystem.setDestination(agentId, tx, ty, {
-      x: agentEntity.pos.x,
-      y: agentEntity.pos.y,
-    });
+    // Compute A* path from agent's current tile to destination
+    const startTile = collisionSystem.worldToTile(agentEntity.pos.x, agentEntity.pos.y);
+    const path = findPath(collisionSystem, startTile, { tx, ty });
+
+    let result: MoveToResponseData['result'];
+    if (!path) {
+      result = 'no_path';
+    } else if (path.length === 0) {
+      result = 'no_op';
+    } else {
+      result = movementSystem.setPath(agentId, path);
+    }
 
     const responseData: MoveToResponseData = {
       txId,

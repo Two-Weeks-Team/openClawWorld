@@ -272,7 +272,7 @@ export const ObserveResponseDataSchema = z.object({
   mapMetadata: MapMetadataSchema.optional(),
 });
 
-export const MoveToResultSchema = z.enum(['accepted', 'rejected', 'no_op']);
+export const MoveToResultSchema = z.enum(['accepted', 'rejected', 'no_op', 'no_path']);
 
 export const MoveToResponseDataSchema = z.object({
   txId: IdTxSchema,

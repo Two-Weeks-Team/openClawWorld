@@ -475,6 +475,17 @@ export const UnregisterResponseDataSchema = z.object({
 });
 
 // ============================================================================
+// Heartbeat Schema
+// ============================================================================
+
+export const HeartbeatRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+});
+
+export type HeartbeatRequest = z.infer<typeof HeartbeatRequestSchema>;
+
+// ============================================================================
 // Status Tool Schemas
 // ============================================================================
 

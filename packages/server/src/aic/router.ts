@@ -15,6 +15,7 @@ import {
   MeetingListRequestSchema,
   MeetingJoinRequestSchema,
   MeetingLeaveRequestSchema,
+  HeartbeatRequestSchema,
 } from '@openclawworld/shared';
 import {
   authMiddleware,
@@ -46,6 +47,7 @@ import { handleChannels } from './handlers/channels.js';
 import { handleMeetingList } from './handlers/meetingList.js';
 import { handleMeetingJoin } from './handlers/meetingJoin.js';
 import { handleMeetingLeave } from './handlers/meetingLeave.js';
+import { handleHeartbeat } from './handlers/heartbeat.js';
 
 const router: Router = Router();
 
@@ -70,6 +72,8 @@ router.post(
   validateRequest(UnregisterRequestSchema),
   handleUnregister
 );
+
+router.post('/heartbeat', validateRequest(HeartbeatRequestSchema), handleHeartbeat);
 
 router.post('/observe', observeRateLimiter, validateRequest(ObserveRequestSchema), handleObserve);
 

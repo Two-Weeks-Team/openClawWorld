@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { SafetyReport, MutedUser } from '@openclawworld/shared';
 import type { AuditLog } from '../audit/AuditLog.js';
 
@@ -35,7 +36,7 @@ export class SafetyService {
    */
   reportUser(reporterId: string, targetId: string, reason: string, roomId?: string): SafetyReport {
     const report: SafetyReport = {
-      id: `report_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      id: `report_${randomUUID()}`,
       reporterId,
       targetId,
       reason,

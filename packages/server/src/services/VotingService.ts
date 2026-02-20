@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { VoteSchema, VoteCastSchema } from '../schemas/VoteSchema.js';
 
 export class VotingService {
@@ -74,7 +75,7 @@ export class VotingService {
       return null;
     }
 
-    const castId = `cast_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const castId = `cast_${randomUUID()}`;
     const cast = new VoteCastSchema({
       id: castId,
       optionId,

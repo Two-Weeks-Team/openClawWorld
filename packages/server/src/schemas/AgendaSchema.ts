@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Schema, type, MapSchema } from '@colyseus/schema';
 
 export interface AgendaItemData {
@@ -188,7 +189,7 @@ export class AgendaSchema extends Schema {
   }
 
   private generateId(): string {
-    return `agenda_item_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    return `agenda_item_${randomUUID()}`;
   }
 
   private reorderAllItems(): void {

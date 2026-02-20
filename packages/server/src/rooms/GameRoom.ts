@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Room, type Client } from 'colyseus';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -224,7 +225,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
         const entity = this.state.getEntity(entityId);
         if (!entity) return;
 
-        const txId = `ws_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const txId = `ws_${randomUUID()}`;
         void this.skillService
           .invokeAction(
             entityId,
@@ -278,7 +279,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
         const entity = this.state.getEntity(entityId);
         if (!entity) return;
 
-        const txId = `ws_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const txId = `ws_${randomUUID()}`;
         const outcome = this.handleInteraction(
           entityId,
           data.targetId,

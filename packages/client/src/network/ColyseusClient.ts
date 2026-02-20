@@ -37,11 +37,22 @@ function getServerHostname(): string {
   return typeof window !== 'undefined' ? window.location.hostname : 'localhost';
 }
 
+function getServerPort(): string {
+  return import.meta.env.VITE_SERVER_PORT ?? '2567';
+}
+
 function getServerEndpoint(): string {
   const hostname = getServerHostname();
   const protocol =
     typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${hostname}:2567`;
+  return `${protocol}//${hostname}:${getServerPort()}`;
+}
+
+function getHttpEndpoint(): string {
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const protocol =
+    typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
+  return `${protocol}//${hostname}:${getServerPort()}`;
 }
 
 export class ColyseusClient {
@@ -55,12 +66,19 @@ export class ColyseusClient {
   }
 
   async fetchChannels(): Promise<ChannelInfo[]> {
-    const hostname = getServerHostname();
-    const protocol =
-      typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
-    const resp = await fetch(`${protocol}//${hostname}:2567/aic/v0.1/channels`);
-    const json = await resp.json();
-    return json.data.channels;
+    const url = `${getHttpEndpoint()}/aic/v0.1/channels`;
+    try {
+      const resp = await fetch(url);
+      if (!resp.ok) {
+        console.error(`[ColyseusClient] fetchChannels failed: status=${resp.status} url="${url}"`);
+        return [];
+      }
+      const json = await resp.json();
+      return json.data?.channels ?? [];
+    } catch (error) {
+      console.error('[ColyseusClient] fetchChannels failed:', `url="${url}"`, error);
+      return [];
+    }
   }
 
   async connect(name: string, roomId: string): Promise<Room<GameRoom>> {

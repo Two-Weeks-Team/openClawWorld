@@ -5,10 +5,10 @@ import { gameConfig } from './game/config';
 import { gameClient, type GameRoom, type ChannelInfo } from './network/ColyseusClient';
 
 const loginScreen = document.getElementById('login-screen') as HTMLDivElement;
-const channelSelect = document.getElementById('channel-select') as HTMLDivElement;
+const channelSelectDiv = document.getElementById('channel-select') as HTMLDivElement;
 const channelListEl = document.getElementById('channel-list') as HTMLDivElement;
 const refreshBtn = document.getElementById('refresh-btn') as HTMLButtonElement;
-const nameInputArea = document.getElementById('name-input-area') as HTMLDivElement;
+const nameInputDiv = document.getElementById('name-input') as HTMLDivElement;
 const selectedChannelLabel = document.getElementById(
   'selected-channel-label'
 ) as HTMLParagraphElement;
@@ -23,95 +23,54 @@ const gameContainer = document.getElementById('game-container') as HTMLDivElemen
 let game: Phaser.Game | null = null;
 let selectedChannelId: string | null = null;
 
-async function loadChannels(): Promise<void> {
+async function loadChannels() {
   channelListEl.textContent = 'Loading...';
-  try {
-    const channels = await gameClient.fetchChannels();
+  const channels: ChannelInfo[] = await gameClient.fetchChannels();
 
-    channelListEl.innerHTML = '';
+  if (channels.length === 0) {
+    channelListEl.textContent = 'No channels available. Server may be offline.';
+    return;
+  }
 
-    if (channels.length === 0) {
-      // No channels yet — show default option to create channel-1
-      const btn = document.createElement('button');
-      btn.className = 'channel-btn';
-      const labelSpan = document.createElement('span');
-      labelSpan.textContent = 'Channel 1';
-      const occupancySpan = document.createElement('span');
-      occupancySpan.className = 'occupancy';
-      occupancySpan.textContent = '0/30';
-      btn.appendChild(labelSpan);
-      btn.appendChild(occupancySpan);
-      btn.addEventListener('click', () => selectChannel('channel-1', 0, 30));
-      channelListEl.appendChild(btn);
-      return;
-    }
-
-    const allFull = channels.every((ch: ChannelInfo) => ch.occupancy >= ch.maxOccupancy);
-    if (allFull) {
-      // All channels full — show message and auto-retry
-      const msg = document.createElement('p');
-      msg.textContent = 'All channels are full. Retrying in 5 seconds...';
-      channelListEl.appendChild(msg);
-      setTimeout(() => loadChannels(), 5000);
-      return;
-    }
-
-    channels.forEach((ch: ChannelInfo) => {
-      const btn = document.createElement('button');
-      const isFull = ch.occupancy >= ch.maxOccupancy;
-      btn.className = `channel-btn${isFull ? ' full' : ''}`;
-      btn.disabled = isFull;
-
-      // Use textContent to avoid XSS from server-provided channelId
-      const label = ch.channelId.replace('channel-', 'Channel ');
-      const labelSpan = document.createElement('span');
-      labelSpan.textContent = label;
-      const occupancySpan = document.createElement('span');
-      occupancySpan.className = 'occupancy';
-      occupancySpan.textContent = `${ch.occupancy}/${ch.maxOccupancy}`;
-      btn.appendChild(labelSpan);
-      btn.appendChild(occupancySpan);
-
-      if (!isFull) {
-        btn.addEventListener('click', () =>
-          selectChannel(ch.channelId, ch.occupancy, ch.maxOccupancy)
-        );
-      }
-      channelListEl.appendChild(btn);
-    });
-  } catch (err) {
-    console.error('[loadChannels] Failed to fetch channels:', err);
-    channelListEl.textContent = 'Failed to load channels';
+  channelListEl.innerHTML = '';
+  for (const ch of channels) {
+    const btn = document.createElement('button');
+    btn.className = 'channel-btn';
+    btn.textContent = `${ch.channelId}  (${ch.occupancy}/${ch.maxOccupancy})`;
+    const full = ch.occupancy >= ch.maxOccupancy;
+    btn.disabled = full;
+    btn.addEventListener('click', () =>
+      selectChannel(ch.channelId, btn.textContent ?? ch.channelId)
+    );
+    channelListEl.appendChild(btn);
   }
 }
 
-function selectChannel(channelId: string, occupancy: number, maxOccupancy: number): void {
+function selectChannel(channelId: string, label: string) {
   selectedChannelId = channelId;
-  const label = channelId.replace('channel-', 'Channel ');
-  selectedChannelLabel.textContent = `${label} (${occupancy}/${maxOccupancy})`;
-  channelSelect.style.display = 'none';
-  nameInputArea.style.display = 'block';
+  selectedChannelLabel.textContent = label;
+  channelSelectDiv.style.display = 'none';
+  nameInputDiv.style.display = 'block';
   usernameInput.focus();
 }
 
-backBtn.addEventListener('click', () => {
-  nameInputArea.style.display = 'none';
-  channelSelect.style.display = 'block';
-  selectedChannelId = null;
-  loadChannels();
-});
+refreshBtn.addEventListener('click', () => void loadChannels());
 
-refreshBtn.addEventListener('click', () => loadChannels());
+backBtn.addEventListener('click', () => {
+  selectedChannelId = null;
+  nameInputDiv.style.display = 'none';
+  channelSelectDiv.style.display = 'block';
+});
 
 joinBtn.addEventListener('click', async () => {
   const name = usernameInput.value.trim();
-  if (!name || !selectedChannelId) return;
+  if (!name) return;
 
   try {
     joinBtn.disabled = true;
     joinBtn.textContent = 'Connecting...';
 
-    const room = await gameClient.connect(name, selectedChannelId);
+    const room = await gameClient.connect(name, selectedChannelId ?? undefined);
 
     loginScreen.style.display = 'none';
     chatContainer.style.display = 'flex';
@@ -144,7 +103,7 @@ joinBtn.addEventListener('click', async () => {
     console.error('Failed to connect:', error);
     joinBtn.disabled = false;
     joinBtn.textContent = 'Join World';
-    alert('Failed to connect to server. The channel may be full.');
+    alert('Failed to connect to server');
   }
 });
 
@@ -167,5 +126,4 @@ function setupChat(room: Room<GameRoom>) {
   });
 }
 
-// Load channels on page load
-loadChannels();
+void loadChannels();

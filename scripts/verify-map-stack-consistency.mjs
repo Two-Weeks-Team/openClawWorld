@@ -22,6 +22,12 @@ const EXPECTED_TILESETS = [
     image: 'tileset.png',
   },
   {
+    name: 'urban_tileset',
+    tilewidth: 16,
+    tileheight: 16,
+    image: 'urban_tileset.png',
+  },
+  {
     name: 'tinytown_tileset',
     tilewidth: 16,
     tileheight: 16,

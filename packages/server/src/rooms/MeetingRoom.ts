@@ -5,6 +5,7 @@ import { EventLog } from '../events/EventLog.js';
 import { EVENT_RETENTION_MS, EVENT_LOG_MAX_SIZE } from '../constants.js';
 import type { MeetingRoomOptions, MeetingEventType } from '@openclawworld/shared';
 import type { AgendaItemData } from '../schemas/AgendaSchema.js';
+import { registerMeeting, unregisterMeeting } from '../aic/meetingRegistry.js';
 
 const EMPTY_ROOM_TIMEOUT_MS = 30000;
 const RECONNECTION_TIMEOUT_SEC = 20;
@@ -146,6 +147,8 @@ export class MeetingRoom extends Room<{ state: MeetingRoomState }> {
       capacity: this.state.capacity,
     });
 
+    registerMeeting(meetingId, this.roomId);
+
     console.log(`[MeetingRoom] Created meeting "${name}" (${meetingId}) for org ${orgId}`);
   }
 
@@ -245,6 +248,7 @@ export class MeetingRoom extends Room<{ state: MeetingRoomState }> {
       duration: Date.now() - this.state.startedAt,
     });
 
+    unregisterMeeting(this.state.meetingId);
     this.cancelEmptyRoomTimer();
     this.clientEntities.clear();
 

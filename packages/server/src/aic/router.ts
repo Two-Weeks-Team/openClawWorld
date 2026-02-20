@@ -12,6 +12,9 @@ import {
   SkillListRequestSchema,
   SkillInstallRequestSchema,
   SkillInvokeRequestSchema,
+  MeetingListRequestSchema,
+  MeetingJoinRequestSchema,
+  MeetingLeaveRequestSchema,
 } from '@openclawworld/shared';
 import {
   authMiddleware,
@@ -40,6 +43,9 @@ import { handleSkillList } from './handlers/skillList.js';
 import { handleSkillInstall } from './handlers/skillInstall.js';
 import { handleSkillInvoke } from './handlers/skillInvoke.js';
 import { handleChannels } from './handlers/channels.js';
+import { handleMeetingList } from './handlers/meetingList.js';
+import { handleMeetingJoin } from './handlers/meetingJoin.js';
+import { handleMeetingLeave } from './handlers/meetingLeave.js';
 
 const router: Router = Router();
 
@@ -123,6 +129,27 @@ router.post(
   skillInvokeRateLimiter,
   validateRequest(SkillInvokeRequestSchema),
   handleSkillInvoke
+);
+
+router.post(
+  '/meeting/list',
+  interactRateLimiter,
+  validateRequest(MeetingListRequestSchema),
+  handleMeetingList
+);
+
+router.post(
+  '/meeting/join',
+  interactRateLimiter,
+  validateRequest(MeetingJoinRequestSchema),
+  handleMeetingJoin
+);
+
+router.post(
+  '/meeting/leave',
+  interactRateLimiter,
+  validateRequest(MeetingLeaveRequestSchema),
+  handleMeetingLeave
 );
 
 export default router;

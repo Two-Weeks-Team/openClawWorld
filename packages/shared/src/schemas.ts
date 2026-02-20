@@ -492,6 +492,27 @@ export const StatusResponseDataSchema = z.object({
 });
 
 // ============================================================================
+// Meeting API Schemas
+// ============================================================================
+
+export const MeetingListRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+});
+
+export const MeetingJoinRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+  meetingId: z.string().min(1).max(128),
+});
+
+export const MeetingLeaveRequestSchema = z.object({
+  agentId: IdAgentSchema,
+  roomId: IdRoomSchema,
+  meetingId: z.string().min(1).max(128),
+});
+
+// ============================================================================
 // Work-Life World Schemas
 // ============================================================================
 

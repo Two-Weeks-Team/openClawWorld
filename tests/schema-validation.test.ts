@@ -314,6 +314,7 @@ describe('Schema Validation', () => {
         },
       ],
       nextCursor: 'c_3',
+      cursorExpired: false,
       serverTsMs: 1707523200500,
     };
 

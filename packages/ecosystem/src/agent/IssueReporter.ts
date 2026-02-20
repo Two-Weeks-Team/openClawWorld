@@ -6,7 +6,6 @@
  */
 
 import { execFileSync } from 'child_process';
-import { writeFileSync, unlinkSync } from 'fs';
 
 export type WorldIssue = {
   agentName: string;
@@ -51,21 +50,12 @@ export class IssueReporter {
     const body = this.formatBody(issue);
 
     try {
-      const bodyFile = `/tmp/ecosystem-issue-${Date.now()}.md`;
-      writeFileSync(bodyFile, body);
-
       const labels = ['ecosystem-agent', issue.area.toLowerCase(), issue.severity];
       const result = execFileSync(
         'gh',
-        ['issue', 'create', '--title', title, '--body-file', bodyFile, '--label', labels.join(',')],
+        ['issue', 'create', '--title', title, '--body', body, '--label', labels.join(',')],
         { encoding: 'utf-8' }
       );
-
-      try {
-        unlinkSync(bodyFile);
-      } catch {
-        /* ignore */
-      }
 
       const issueUrl = result.trim();
       console.log(`[IssueReporter] Created: ${issueUrl}`);

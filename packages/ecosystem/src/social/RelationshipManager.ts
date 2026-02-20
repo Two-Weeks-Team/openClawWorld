@@ -158,9 +158,9 @@ export class RelationshipManager {
 
   save(): void {
     const dir = dirname(this.filePath);
-    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
     const data = [...this.relationships.values()];
-    writeFileSync(this.filePath, JSON.stringify(data, null, 2));
+    writeFileSync(this.filePath, JSON.stringify(data, null, 2), { mode: 0o600 });
   }
 
   private load(): void {

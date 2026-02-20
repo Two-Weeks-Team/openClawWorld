@@ -107,8 +107,8 @@ export class NeedsSystem {
   save(): void {
     if (!this.persistPath) return;
     const dir = dirname(this.persistPath);
-    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    writeFileSync(this.persistPath, JSON.stringify(this.state, null, 2));
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
+    writeFileSync(this.persistPath, JSON.stringify(this.state, null, 2), { mode: 0o600 });
   }
 
   private load(): void {

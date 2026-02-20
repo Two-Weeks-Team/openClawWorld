@@ -120,8 +120,8 @@ export class EpisodicMemory {
   private persist(record: EpisodicRecord): void {
     const dir = dirname(this.filePath);
     if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
+      mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
-    appendFileSync(this.filePath, JSON.stringify(record) + '\n');
+    appendFileSync(this.filePath, JSON.stringify(record) + '\n', { mode: 0o600 });
   }
 }

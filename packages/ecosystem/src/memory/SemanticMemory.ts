@@ -84,8 +84,8 @@ export class SemanticMemory {
   private save(): void {
     const dir = dirname(this.filePath);
     if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
+      mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
-    writeFileSync(this.filePath, JSON.stringify([...this.entries.values()], null, 2));
+    writeFileSync(this.filePath, JSON.stringify([...this.entries.values()], null, 2), { mode: 0o600 });
   }
 }

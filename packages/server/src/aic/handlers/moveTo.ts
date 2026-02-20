@@ -127,7 +127,10 @@ export async function handleMoveTo(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const result = movementSystem.setDestination(agentId, tx, ty);
+    const result = movementSystem.setDestination(agentId, tx, ty, {
+      x: agentEntity.pos.x,
+      y: agentEntity.pos.y,
+    });
 
     const responseData: MoveToResponseData = {
       txId,

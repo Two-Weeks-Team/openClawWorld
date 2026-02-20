@@ -76,7 +76,11 @@ export class EventLog {
         // Decode sequences to determine if cursor is ahead of (bootstrap) or behind (expired) events
         const givenSeq = this.decodeCursorSequence(cursor);
         const newestSeq = this.decodeCursorSequence(this.events[this.events.length - 1].cursor);
-        if (givenSeq !== null && newestSeq !== null && givenSeq > newestSeq) {
+        if (givenSeq === null) {
+          // Cannot decode cursor - treat as a synthetic/bootstrap cursor, return from beginning
+          startIndex = 0;
+          cursorExpired = false;
+        } else if (newestSeq !== null && givenSeq > newestSeq) {
           // Cursor is newer than all events - bootstrap cursor that hasn't seen any events yet
           startIndex = this.events.length;
           cursorExpired = false;

@@ -668,11 +668,20 @@ describe('VotingService', () => {
       expect(result).toBe(false);
     });
 
-    it('returns false for anonymous votes', () => {
+    it('returns true for anonymous votes after casting (duplicate prevention)', () => {
       const vote = service.createVote('m1', 'Q?', ['A', 'B'], true, 'u1');
       service.startVote(vote.id);
       const options = vote.getSortedOptions();
       service.castVote(vote.id, options[0].id, 'voter_001');
+
+      const result = service.hasVoted(vote.id, 'voter_001');
+
+      expect(result).toBe(true);
+    });
+
+    it('returns false for anonymous votes before casting', () => {
+      const vote = service.createVote('m1', 'Q?', ['A', 'B'], true, 'u1');
+      service.startVote(vote.id);
 
       const result = service.hasVoted(vote.id, 'voter_001');
 

@@ -15,6 +15,7 @@ import { AudioManager, AudioKeys } from '../../systems/AudioManager';
 import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
 import { skinTintFromId, createHeadSprite, CHARACTER_PACK_KEY } from '../CharacterPack';
+import { EmoteDisplay } from '../../ui/EmoteDisplay';
 import type { ZoneId, SkillDefinition } from '@openclawworld/shared';
 import {
   ZONE_BOUNDS,
@@ -111,6 +112,7 @@ export class GameScene extends Phaser.Scene {
   private skillBar?: SkillBar;
   private castBar?: CastBar;
   private audioManager?: AudioManager;
+  private emoteDisplay?: EmoteDisplay;
   private skillKeys?: Phaser.Input.Keyboard.Key[];
   private targetingMode = false;
   private selectedSkillSlot: number | null = null;
@@ -159,6 +161,7 @@ export class GameScene extends Phaser.Scene {
     this.skillBar = new SkillBar(this);
     this.castBar = new CastBar(this);
     this.audioManager = new AudioManager(this);
+    this.emoteDisplay = new EmoteDisplay(this);
 
     this.tileInterpreter = new TileInterpreter(16);
     this.clientCollision = new ClientCollisionSystem();
@@ -1106,6 +1109,7 @@ export class GameScene extends Phaser.Scene {
     this.skillBar?.destroy();
     this.castBar?.destroy();
     this.audioManager?.destroy();
+    this.emoteDisplay?.destroy();
   }
 
   private setupRoomListeners() {
@@ -1167,6 +1171,13 @@ export class GameScene extends Phaser.Scene {
     room.onMessage('chat', (data: { from: string; message: string; entityId: string }) => {
       this.showChatBubble(data.entityId, data.message);
       this.notificationPanel?.addEvent('chat', `${data.from}: ${data.message}`, EVENT_COLORS.chat);
+    });
+
+    room.onMessage('emote', (data: { entityId: string; emoteType: string }) => {
+      const entityContainer = this.entities.get(data.entityId);
+      if (entityContainer && this.emoteDisplay) {
+        this.emoteDisplay.showEmote(data.entityId, entityContainer, data.emoteType);
+      }
     });
 
     room.onMessage('interact.result', (result: InteractResult) => {

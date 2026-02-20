@@ -189,6 +189,18 @@ export class GameRoom extends Room<{ state: RoomState }> {
       });
     });
 
+    this.onMessage('emote', (client, message: { emoteType: string }) => {
+      const entityId = this.clientEntities.get(client.sessionId);
+      if (!entityId) return;
+      const entity = this.state.getEntity(entityId);
+      if (!entity) return;
+      this.broadcast('emote', { entityId, emoteType: message.emoteType });
+      this.eventLog.append('emote.triggered', this.state.roomId, {
+        entityId,
+        emoteType: message.emoteType,
+      });
+    });
+
     this.onMessage(
       'profile_update',
       (client, data: { status?: UserStatus; statusMessage?: string }) => {

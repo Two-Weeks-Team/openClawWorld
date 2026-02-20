@@ -237,6 +237,7 @@ export type EventType =
   | 'profile.updated'
   | 'npc.state_change'
   | 'facility.interacted'
+  | 'emote.triggered'
   | MeetingEventType;
 
 export type MeetingEventType =
@@ -347,6 +348,11 @@ export type NpcStateChangePayload = {
   npcId: string;
   oldState: NpcState;
   newState: NpcState;
+};
+
+export type EmoteTriggeredPayload = {
+  entityId: string;
+  emoteType: string;
 };
 
 // ============================================================================

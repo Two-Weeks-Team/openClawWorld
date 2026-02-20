@@ -141,11 +141,11 @@ The **Living Ecosystem** brings autonomous AI agents to life inside openClawWorl
 
 ### Resident Agents
 
-| Agent | Personality | Home Zone | Behavior |
-|-------|------------|-----------|----------|
-| **Luna** | Curious Explorer (O:0.9 E:0.6 A:0.7) | Lobby → Everywhere | Maps every corner, talks to every NPC, asks unusual questions |
-| **Sage** | Cafe Philosopher (O:0.8 E:0.3 A:0.6) | Lounge Cafe | Deep conversations, philosophical reflections, quotes past interactions |
-| **Jinx** | Chaotic Trickster (O:0.9 E:0.8 A:0.3) | Arcade | Tests boundaries, spreads rumors, makes cryptic predictions |
+| Agent    | Personality                           | Home Zone          | Behavior                                                                |
+| -------- | ------------------------------------- | ------------------ | ----------------------------------------------------------------------- |
+| **Luna** | Curious Explorer (O:0.9 E:0.6 A:0.7)  | Lobby → Everywhere | Maps every corner, talks to every NPC, asks unusual questions           |
+| **Sage** | Cafe Philosopher (O:0.8 E:0.3 A:0.6)  | Lounge Cafe        | Deep conversations, philosophical reflections, quotes past interactions |
+| **Jinx** | Chaotic Trickster (O:0.9 E:0.8 A:0.3) | Arcade             | Tests boundaries, spreads rumors, makes cryptic predictions             |
 
 ### Architecture
 
@@ -193,7 +193,7 @@ pnpm ecosystem start -- --agents luna     # Start specific agent(s)
 - **Big Five Personality**: Each agent has unique traits that shape behavior, speech, and decision-making
 - **VAD Emotions**: Valence-Arousal-Dominance model with personality-derived baselines and natural decay
 - **Maslow Needs**: 5-level needs hierarchy that decays over time and drives zone preferences
-- **Relationship Tracking**: stranger → acquaintance → friend → close\_friend / rival → enemy
+- **Relationship Tracking**: stranger → acquaintance → friend → close_friend / rival → enemy
 - **Reflection Engine**: Periodic self-reflection generates insights and updates beliefs
 - **Issue Discovery**: Agents automatically report bugs they encounter as GitHub issues
 

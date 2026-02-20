@@ -230,7 +230,7 @@ describe('SkillService', () => {
       const originalDate = Date.now;
       Date.now = () => pendingCast!.completionTime + 100;
 
-      const castResults = skillService.processPendingCasts();
+      const castResults = await skillService.processPendingCasts();
 
       Date.now = originalDate;
 
@@ -257,7 +257,7 @@ describe('SkillService', () => {
       const originalDate = Date.now;
       Date.now = () => pendingCast!.completionTime + 100;
 
-      const castResults = skillService.processPendingCasts();
+      const castResults = await skillService.processPendingCasts();
 
       Date.now = originalDate;
 
@@ -285,7 +285,7 @@ describe('SkillService', () => {
       const originalDate = Date.now;
       Date.now = () => pendingCast!.completionTime + 100;
 
-      const castResults = skillService.processPendingCasts();
+      const castResults = await skillService.processPendingCasts();
 
       Date.now = originalDate;
 
@@ -385,7 +385,7 @@ describe('SkillService', () => {
       const originalDate = Date.now;
       Date.now = () => completionTime + 100;
 
-      const castResults = skillService.processPendingCasts();
+      const castResults = await skillService.processPendingCasts();
 
       Date.now = originalDate;
 
@@ -431,7 +431,7 @@ describe('SkillService', () => {
       const originalDate = Date.now;
       Date.now = () => targetTime;
 
-      const castResults = skillService.processPendingCasts();
+      const castResults = await skillService.processPendingCasts();
 
       Date.now = originalDate;
 

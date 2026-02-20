@@ -827,6 +827,17 @@
       "image": "tinytown_tileset.png",
       "imagewidth": 192,
       "imageheight": 176
+    },
+    {
+      "firstgid": 699,
+      "name": "interior_tileset",
+      "tilewidth": 16,
+      "tileheight": 16,
+      "tilecount": 486,
+      "columns": 27,
+      "image": "interior_tileset.png",
+      "imagewidth": 432,
+      "imageheight": 288
     }
   ]
 }

@@ -62,17 +62,20 @@ test_register() {
     echo "[4/7] Testing POST /aic/v0.1/register..."
     RESPONSE=$(curl -s -X POST "${SERVER_URL}/aic/v0.1/register" \
         -H "Content-Type: application/json" \
-        -d '{"name": "TestAgent", "roomId": "default"}')
+        -d '{"name": "TestAgent", "roomId": "auto"}')
     
     STATUS=$(echo "$RESPONSE" | jq -r '.status')
     AGENT_ID=$(echo "$RESPONSE" | jq -r '.data.agentId')
     SESSION_TOKEN=$(echo "$RESPONSE" | jq -r '.data.sessionToken')
-    
+    ROOM_ID=$(echo "$RESPONSE" | jq -r '.data.roomId // "channel-1"')
+
     if [ "$STATUS" = "ok" ] && [ -n "$AGENT_ID" ] && [ "$AGENT_ID" != "null" ] && [ -n "$SESSION_TOKEN" ] && [ "$SESSION_TOKEN" != "null" ]; then
         echo "  PASS: Agent registered successfully"
         echo "  Agent ID: $AGENT_ID"
+        echo "  Room ID: $ROOM_ID"
         export AGENT_ID
         export SESSION_TOKEN
+        export ROOM_ID
     else
         echo "  FAIL: Agent registration failed"
         echo "  Response: $RESPONSE"
@@ -85,7 +88,7 @@ test_observe() {
     RESPONSE=$(curl -s -X POST "${SERVER_URL}/aic/v0.1/observe" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${SESSION_TOKEN}" \
-        -d "{\"agentId\": \"${AGENT_ID}\", \"roomId\": \"default\"}")
+        -d "{\"agentId\": \"${AGENT_ID}\", \"roomId\": \"${ROOM_ID}\"}")
     
     STATUS=$(echo "$RESPONSE" | jq -r '.status')
     
@@ -105,7 +108,7 @@ test_moveto() {
     RESPONSE=$(curl -s -X POST "${SERVER_URL}/aic/v0.1/moveTo" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${SESSION_TOKEN}" \
-        -d "{\"agentId\": \"${AGENT_ID}\", \"roomId\": \"default\", \"destination\": {\"x\": 5, \"y\": 5}}")
+        -d "{\"agentId\": \"${AGENT_ID}\", \"roomId\": \"${ROOM_ID}\", \"destination\": {\"x\": 5, \"y\": 5}}")
     
     STATUS=$(echo "$RESPONSE" | jq -r '.status')
     
@@ -123,7 +126,7 @@ test_chat() {
     RESPONSE=$(curl -s -X POST "${SERVER_URL}/aic/v0.1/chatSend" \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${SESSION_TOKEN}" \
-        -d "{\"agentId\": \"${AGENT_ID}\", \"roomId\": \"default\", \"message\": \"Hello from test!\"}")
+        -d "{\"agentId\": \"${AGENT_ID}\", \"roomId\": \"${ROOM_ID}\", \"message\": \"Hello from test!\"}")
     
     STATUS=$(echo "$RESPONSE" | jq -r '.status')
     

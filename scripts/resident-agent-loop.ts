@@ -2345,7 +2345,7 @@ class ResidentAgent {
             `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
           );
           try {
-            await this.reregister('default');
+            await this.reregister('auto');
             console.log(`[${this.state.agentId}] Re-registration successful after auth error`);
             this.state.consecutiveAuthErrors = 0;
           } catch (reregisterError) {
@@ -2397,7 +2397,7 @@ class ResidentAgent {
   }
 
   private async performRoleBehavior(): Promise<void> {
-    await this.ensureRegistered('default');
+    await this.ensureRegistered('auto');
 
     const lastObserveIdx = this.state.actionLog.lastIndexOf('observe');
     if (
@@ -2701,7 +2701,7 @@ class ResidentAgent {
 
     if (role === 'chaos') {
       candidates.push({
-        action: async () => this.reregister('default'),
+        action: async () => this.reregister('auto'),
         weight: 0.08 * this.computeNoveltyMultiplier('chaos:reregister'),
         label: 'chaos:reregister',
         category: 'lifecycle',

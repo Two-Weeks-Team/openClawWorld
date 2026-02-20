@@ -23,22 +23,42 @@ export function getChannelList(): ChannelInfo[] {
     });
 }
 
+/**
+ * Mutex for channel creation to prevent TOCTOU race conditions.
+ * Multiple concurrent requests checking "all channels full" simultaneously
+ * would otherwise all try to create the same new channel ID.
+ */
+let channelCreationLock: Promise<void> = Promise.resolve();
+
 export async function assignChannel(): Promise<{ channelId: string; colyseusRoomId: string }> {
-  const channels = getChannelList();
-  const available = channels
-    .filter(c => c.occupancy < c.maxOccupancy)
-    .sort((a, b) => a.occupancy - b.occupancy);
+  // Serialize channel creation through a promise-chain mutex so only one
+  // request at a time can check occupancy and potentially create a new channel.
+  let releaseLock!: () => void;
+  const previousLock = channelCreationLock;
+  channelCreationLock = new Promise<void>(resolve => {
+    releaseLock = resolve;
+  });
 
-  if (available.length > 0) {
-    const ch = available[0];
-    return { channelId: ch.channelId, colyseusRoomId: getColyseusRoomId(ch.channelId)! };
+  await previousLock;
+  try {
+    const channels = getChannelList();
+    const available = channels
+      .filter(c => c.occupancy < c.maxOccupancy)
+      .sort((a, b) => a.occupancy - b.occupancy);
+
+    if (available.length > 0) {
+      const ch = available[0];
+      return { channelId: ch.channelId, colyseusRoomId: getColyseusRoomId(ch.channelId)! };
+    }
+
+    // All channels full — create next one
+    const nextNum = channels.length + 1;
+    const newChannelId = `${CHANNEL_PREFIX}-${nextNum}`;
+    const roomRef = await matchMaker.createRoom('game', { roomId: newChannelId });
+    return { channelId: newChannelId, colyseusRoomId: roomRef.roomId };
+  } finally {
+    releaseLock();
   }
-
-  // All channels full — create next one
-  const nextNum = channels.length + 1;
-  const newChannelId = `${CHANNEL_PREFIX}-${nextNum}`;
-  const roomRef = await matchMaker.createRoom('game', { roomId: newChannelId });
-  return { channelId: newChannelId, colyseusRoomId: roomRef.roomId };
 }
 
 export function canJoinChannel(channelId: string): boolean {

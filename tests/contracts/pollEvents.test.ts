@@ -32,6 +32,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         events: [],
         nextCursor: TestData.cursor(1),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -54,6 +55,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         events: [],
         nextCursor: TestData.cursor(1),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -73,6 +75,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         events: [],
         nextCursor: TestData.cursor(1),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -108,6 +111,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -138,6 +142,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -166,6 +171,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -194,6 +200,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -227,6 +234,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -260,6 +268,7 @@ describe('PollEvents Endpoint Contract Tests', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));

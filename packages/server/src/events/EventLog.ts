@@ -58,14 +58,38 @@ export class EventLog {
    * @param limit - Maximum number of events to return
    * @returns Object containing events and the next cursor
    */
-  getSince(cursor: string, limit: number): { events: EventEnvelope[]; nextCursor: string } {
+  getSince(
+    cursor: string,
+    limit: number
+  ): { events: EventEnvelope[]; nextCursor: string; cursorExpired: boolean } {
     // Find the index of the event with the given cursor
     const index = this.events.findIndex(e => e.cursor === cursor);
 
     let startIndex: number;
+    let cursorExpired = false;
     if (index === -1) {
-      // Cursor not found - return events from beginning (cursor expired or invalid)
-      startIndex = 0;
+      if (this.events.length === 0) {
+        // Event log is empty - cursor is a synthetic bootstrap cursor, not expired
+        startIndex = 0;
+        cursorExpired = false;
+      } else {
+        // Decode sequences to determine if cursor is ahead of (bootstrap) or behind (expired) events
+        const givenSeq = this.decodeCursorSequence(cursor);
+        const newestSeq = this.decodeCursorSequence(this.events[this.events.length - 1].cursor);
+        if (givenSeq === null) {
+          // Cannot decode cursor - treat as a synthetic/bootstrap cursor, return from beginning
+          startIndex = 0;
+          cursorExpired = false;
+        } else if (newestSeq !== null && givenSeq > newestSeq) {
+          // Cursor is newer than all events - bootstrap cursor that hasn't seen any events yet
+          startIndex = this.events.length;
+          cursorExpired = false;
+        } else {
+          // Cursor was evicted from ring buffer - genuine expiry
+          startIndex = this.events.length;
+          cursorExpired = true;
+        }
+      }
     } else {
       // Start after the found cursor
       startIndex = index + 1;
@@ -73,9 +97,33 @@ export class EventLog {
 
     const endIndex = Math.min(startIndex + limit, this.events.length);
     const events = this.events.slice(startIndex, endIndex);
-    const nextCursor = events.length > 0 ? events[events.length - 1].cursor : cursor;
+    // When cursorExpired, return getCurrentCursor() so clients get a usable cursor even
+    // without reading the cursorExpired flag (prevents infinite stale-cursor loops)
+    const nextCursor =
+      events.length > 0
+        ? events[events.length - 1].cursor
+        : cursorExpired
+          ? this.getCurrentCursor()
+          : cursor;
 
-    return { events, nextCursor };
+    return { events, nextCursor, cursorExpired };
+  }
+
+  /**
+   * Decode the sequence number from a cursor string.
+   * Returns null if the cursor cannot be decoded.
+   */
+  private decodeCursorSequence(cursor: string): number | null {
+    try {
+      // Convert base64url back to standard base64
+      const base64 = cursor.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = Buffer.from(base64, 'base64').toString('utf8');
+      const parts = decoded.split('_');
+      if (parts.length !== 2) return null;
+      return parseInt(parts[1], 36);
+    } catch {
+      return null;
+    }
   }
 
   /**

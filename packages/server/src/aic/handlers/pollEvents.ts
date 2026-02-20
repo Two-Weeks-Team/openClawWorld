@@ -45,13 +45,18 @@ async function waitForEvents(
   cursor: string,
   limit: number,
   waitMs: number
-): Promise<{ events: EventEnvelope[]; nextCursor: string }> {
+): Promise<{ events: EventEnvelope[]; nextCursor: string; cursorExpired: boolean }> {
   const eventLog = gameRoom.getEventLog();
   const startTime = Date.now();
   const effectiveWaitMs = Math.min(waitMs, MAX_WAIT_MS);
 
   while (true) {
     const result = eventLog.getSince(cursor, limit);
+
+    // If cursor expired, return immediately with the flag so client can reset
+    if (result.cursorExpired) {
+      return result;
+    }
 
     // If we have events, return immediately
     if (result.events.length > 0) {
@@ -62,7 +67,7 @@ async function waitForEvents(
     const elapsedMs = Date.now() - startTime;
     if (elapsedMs >= effectiveWaitMs) {
       // Timeout - return empty result with current cursor
-      return { events: [], nextCursor: cursor };
+      return { events: [], nextCursor: cursor, cursorExpired: false };
     }
 
     // Wait a bit before polling again
@@ -130,6 +135,7 @@ export async function handlePollEvents(req: Request, res: Response): Promise<voi
       const responseData: PollEventsResponseData = {
         events: result.events,
         nextCursor: result.nextCursor,
+        cursorExpired: result.cursorExpired,
         serverTsMs: Date.now(),
       };
 
@@ -146,6 +152,7 @@ export async function handlePollEvents(req: Request, res: Response): Promise<voi
     const responseData: PollEventsResponseData = {
       events: result.events,
       nextCursor: result.nextCursor,
+      cursorExpired: result.cursorExpired,
       serverTsMs: Date.now(),
     };
 

@@ -349,6 +349,7 @@ export const EventEnvelopeSchema = z.object({
 export const PollEventsResponseDataSchema = z.object({
   events: z.array(EventEnvelopeSchema).max(200),
   nextCursor: CursorSchema,
+  cursorExpired: z.boolean(),
   serverTsMs: TsMsSchema,
 });
 

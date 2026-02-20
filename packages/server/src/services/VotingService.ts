@@ -2,6 +2,7 @@ import { VoteSchema, VoteCastSchema } from '../schemas/VoteSchema.js';
 
 export class VotingService {
   private votes: Map<string, VoteSchema> = new Map();
+  private anonymousVoterTracker: Map<string, Set<string>> = new Map();
   private voteCounter = 0;
 
   createVote(
@@ -82,6 +83,16 @@ export class VotingService {
     });
 
     vote.casts.set(castId, cast);
+
+    if (vote.anonymous) {
+      let voters = this.anonymousVoterTracker.get(voteId);
+      if (!voters) {
+        voters = new Set();
+        this.anonymousVoterTracker.set(voteId, voters);
+      }
+      voters.add(voterId);
+    }
+
     return cast;
   }
 
@@ -155,7 +166,7 @@ export class VotingService {
     }
 
     if (vote.anonymous) {
-      return false;
+      return this.anonymousVoterTracker.get(voteId)?.has(voterId) ?? false;
     }
 
     let found = false;
@@ -169,6 +180,7 @@ export class VotingService {
   }
 
   deleteVote(voteId: string): boolean {
+    this.anonymousVoterTracker.delete(voteId);
     return this.votes.delete(voteId);
   }
 

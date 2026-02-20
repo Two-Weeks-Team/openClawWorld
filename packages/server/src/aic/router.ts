@@ -39,8 +39,12 @@ import { handleProfileUpdate } from './handlers/profileUpdate.js';
 import { handleSkillList } from './handlers/skillList.js';
 import { handleSkillInstall } from './handlers/skillInstall.js';
 import { handleSkillInvoke } from './handlers/skillInvoke.js';
+import { handleChannels } from './handlers/channels.js';
 
 const router: Router = Router();
+
+// Channel list endpoint is UNAUTHENTICATED - clients call this before login
+router.get('/channels', handleChannels);
 
 // Register endpoint is UNAUTHENTICATED - agents call this to get their first token
 router.post(

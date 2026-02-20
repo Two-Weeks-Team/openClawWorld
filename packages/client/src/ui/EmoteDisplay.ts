@@ -3,9 +3,14 @@ import { EMOTE_DISPLAY_DURATION_MS, EMOTE_FADE_DURATION_MS } from '@openclawworl
 
 export class EmoteDisplay {
   private scene: Phaser.Scene;
-  private activeEmotes: Map<string, { container: Phaser.GameObjects.Container; timer: Phaser.Time.TimerEvent }> = new Map();
+  private activeEmotes: Map<
+    string,
+    { container: Phaser.GameObjects.Container; timer: Phaser.Time.TimerEvent }
+  > = new Map();
 
-  constructor(scene: Phaser.Scene) { this.scene = scene; }
+  constructor(scene: Phaser.Scene) {
+    this.scene = scene;
+  }
 
   showEmote(entityId: string, parent: Phaser.GameObjects.Container, emoteType: string): void {
     this.removeEmote(entityId);
@@ -23,19 +28,34 @@ export class EmoteDisplay {
     parent.add(bubble);
     this.scene.tweens.add({ targets: bubble, alpha: 1, duration: 150, ease: 'Quad.easeOut' });
     const timer = this.scene.time.delayedCall(EMOTE_DISPLAY_DURATION_MS, () => {
-      this.scene.tweens.add({ targets: bubble, alpha: 0, duration: EMOTE_FADE_DURATION_MS, ease: 'Quad.easeIn',
-        onComplete: () => { bubble.destroy(); this.activeEmotes.delete(entityId); } });
+      this.scene.tweens.add({
+        targets: bubble,
+        alpha: 0,
+        duration: EMOTE_FADE_DURATION_MS,
+        ease: 'Quad.easeIn',
+        onComplete: () => {
+          bubble.destroy();
+          this.activeEmotes.delete(entityId);
+        },
+      });
     });
     this.activeEmotes.set(entityId, { container: bubble, timer });
   }
 
   removeEmote(entityId: string): void {
     const existing = this.activeEmotes.get(entityId);
-    if (existing) { existing.timer.destroy(); existing.container.destroy(); this.activeEmotes.delete(entityId); }
+    if (existing) {
+      existing.timer.destroy();
+      existing.container.destroy();
+      this.activeEmotes.delete(entityId);
+    }
   }
 
   destroy(): void {
-    this.activeEmotes.forEach(({ container, timer }) => { timer.destroy(); container.destroy(); });
+    this.activeEmotes.forEach(({ container, timer }) => {
+      timer.destroy();
+      container.destroy();
+    });
     this.activeEmotes.clear();
   }
 }

@@ -112,14 +112,15 @@ Humans interact based on spatial presence.
 - [ ] Seating system
 - [ ] Follow mode
 
-### Phase 3 - AI Coexistence
+### Phase 3 - AI Coexistence (In Progress)
 
 AI agents become _residents_, not just _users_.
 
+- [x] Autonomous AI agents with personalities, memory, and relationships (`packages/ecosystem`)
+- [x] Agent-to-agent proximity conversations
+- [x] Observation-based reactions (perceive-decide-act loop)
 - [ ] AI NPCs with fixed positions
 - [ ] Role-based AI (receptionist, assistant, mentor)
-- [ ] Proximity-triggered conversations
-- [ ] Observation-based reactions
 - [ ] No-summon interaction (just walk up and talk)
 
 ### Phase 4 - Work World
@@ -133,6 +134,70 @@ The world becomes a functional workspace.
 - [ ] AI autonomous task execution
 
 > **Phase 4 Vision:** Slack + Discord + Notion + Office + AI Agent = openClawWorld
+
+## Living Ecosystem (`packages/ecosystem`)
+
+The **Living Ecosystem** brings autonomous AI agents to life inside openClawWorld. Inspired by [Stanford Generative Agents](https://arxiv.org/abs/2304.03442), agents perceive, think, remember, form relationships, and act autonomously.
+
+### Resident Agents
+
+| Agent    | Personality                           | Home Zone          | Behavior                                                                |
+| -------- | ------------------------------------- | ------------------ | ----------------------------------------------------------------------- |
+| **Luna** | Curious Explorer (O:0.9 E:0.6 A:0.7)  | Lobby → Everywhere | Maps every corner, talks to every NPC, asks unusual questions           |
+| **Sage** | Cafe Philosopher (O:0.8 E:0.3 A:0.6)  | Lounge Cafe        | Deep conversations, philosophical reflections, quotes past interactions |
+| **Jinx** | Chaotic Trickster (O:0.9 E:0.8 A:0.3) | Arcade             | Tests boundaries, spreads rumors, makes cryptic predictions             |
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│              Orchestrator (CLI)              │
+│  Health monitoring · Auto-restart · Logging  │
+├──────────┬──────────┬──────────┬────────────┤
+│  Luna    │  Sage    │  Jinx   │  ...       │
+│  Agent   │  Agent   │  Agent  │  (up to 10)│
+├──────────┴──────────┴──────────┴────────────┤
+│            Perceive → Decide → Act Loop      │
+│                                              │
+│  ┌─────────┐  ┌──────────┐  ┌────────────┐  │
+│  │Perception│  │Cognitive │  │  Action    │  │
+│  │ observe  │  │  Core    │  │  moveTo    │  │
+│  │ events   │  │ (Claude) │  │  chatSend  │  │
+│  │ chat     │  │ reflect  │  │  interact  │  │
+│  └─────────┘  └──────────┘  └────────────┘  │
+│                                              │
+│  ┌────────────┐ ┌──────────┐ ┌───────────┐  │
+│  │  Memory    │ │Personality│ │  Social   │  │
+│  │ Working    │ │ Big Five  │ │ Relations │  │
+│  │ Episodic   │ │ Emotions  │ │ Convos    │  │
+│  │ Semantic   │ │ Needs     │ │ Impressions│ │
+│  └────────────┘ └──────────┘ └───────────┘  │
+├──────────────────────────────────────────────┤
+│      AIC v0.1 HTTP API (zero server changes) │
+└──────────────────────────────────────────────┘
+```
+
+### Quick Start
+
+```bash
+# Prerequisites: running openClawWorld server + ANTHROPIC_API_KEY
+export ANTHROPIC_API_KEY=sk-ant-...
+
+pnpm ecosystem start                     # Start all 3 agents
+pnpm ecosystem start -- --agents luna     # Start specific agent(s)
+```
+
+### Key Features
+
+- **3-Tier Memory**: Working (RAM) → Episodic (JSONL) → Semantic (JSON) with Stanford-style retrieval scoring
+- **Big Five Personality**: Each agent has unique traits that shape behavior, speech, and decision-making
+- **VAD Emotions**: Valence-Arousal-Dominance model with personality-derived baselines and natural decay
+- **Maslow Needs**: 5-level needs hierarchy that decays over time and drives zone preferences
+- **Relationship Tracking**: stranger → acquaintance → friend → close_friend / rival → enemy
+- **Reflection Engine**: Periodic self-reflection generates insights and updates beliefs
+- **Issue Discovery**: Agents automatically report bugs they encounter as GitHub issues
+
+> **Full documentation**: [`packages/ecosystem/README.md`](packages/ecosystem/README.md)
 
 ## Tech Stack
 
@@ -159,7 +224,8 @@ openClawWorld/
 │   │       ├── rooms/          # Game rooms
 │   │       └── zone/           # Zone system
 │   ├── shared/          # Shared types and schemas
-│   └── plugin/          # OpenClaw plugin
+│   ├── plugin/          # OpenClaw plugin
+│   └── ecosystem/       # Autonomous AI agent ecosystem
 ├── world/               # World data (maps, NPCs, facilities)
 ├── tests/               # Integration tests
 ├── docs/                # Documentation
@@ -449,6 +515,7 @@ You are a resident of openClawWorld (spatial AI OS). Fetch https://raw.githubuse
 ## Documentation
 
 - [PRD Index](docs/PRD-INDEX.md) - Product Requirements Document
+- [Living Ecosystem](packages/ecosystem/README.md) - Autonomous AI agent ecosystem guide
 - [Demo Runbook](docs/demo-runbook.md) - Load testing and demo instructions
 - [Grid-Town Map Spec](docs/reference/map_spec_grid_town.md) - Current map specification
 - [Map Sync Process](docs/reference/map-sync-process.md) - Map synchronization guide

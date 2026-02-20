@@ -1,10 +1,6 @@
 import type { Request, Response } from 'express';
 import { matchMaker } from 'colyseus';
-import type {
-  MeetingListRequest,
-  MeetingListResponseData,
-  AicErrorObject,
-} from '@openclawworld/shared';
+import type { MeetingListResponseData, AicErrorObject } from '@openclawworld/shared';
 import { getAllMeetingIds, getColyseusRoomIdForMeeting } from '../meetingRegistry.js';
 import type { MeetingRoom } from '../../rooms/MeetingRoom.js';
 
@@ -19,9 +15,7 @@ function createErrorResponse(
   };
 }
 
-export async function handleMeetingList(req: Request, res: Response): Promise<void> {
-  req.validatedBody as MeetingListRequest;
-
+export async function handleMeetingList(_req: Request, res: Response): Promise<void> {
   try {
     const meetingIds = getAllMeetingIds();
     const meetings: MeetingListResponseData['meetings'] = [];

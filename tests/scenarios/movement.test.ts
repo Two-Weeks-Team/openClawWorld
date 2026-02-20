@@ -160,6 +160,7 @@ describe('Scenario C: Movement', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));

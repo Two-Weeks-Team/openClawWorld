@@ -43,6 +43,7 @@ describe('Scenario B: Proximity Chat', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -79,6 +80,7 @@ describe('Scenario B: Proximity Chat', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -120,6 +122,7 @@ describe('Scenario B: Proximity Chat', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));
@@ -159,6 +162,7 @@ describe('Scenario B: Proximity Chat', () => {
         ],
         nextCursor: TestData.cursor(2),
         serverTsMs: TestData.timestamp(),
+        cursorExpired: false,
       };
 
       mockServer.setHandler('/pollEvents', () => jsonResponse(createOkResult(responseData)));

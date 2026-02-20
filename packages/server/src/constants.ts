@@ -77,10 +77,12 @@ export const AGENT_CLEANUP_INTERVAL_MS = parseEnvInt(process.env.AGENT_CLEANUP_I
 /**
  * Maximum number of entities (humans + agents) per channel.
  * When exceeded, new players are directed to the next channel.
+ * Override with MAX_CHANNEL_OCCUPANCY environment variable.
  */
-export const MAX_CHANNEL_OCCUPANCY = 30;
+export const MAX_CHANNEL_OCCUPANCY = parseEnvInt(process.env.MAX_CHANNEL_OCCUPANCY, 30);
 
 /**
  * Prefix for auto-created channel room IDs (e.g., "channel-1", "channel-2").
+ * Override with CHANNEL_PREFIX environment variable.
  */
-export const CHANNEL_PREFIX = 'channel';
+export const CHANNEL_PREFIX = process.env.CHANNEL_PREFIX ?? 'channel';

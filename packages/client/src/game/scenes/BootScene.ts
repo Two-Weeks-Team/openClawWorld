@@ -16,6 +16,7 @@ export class BootScene extends Phaser.Scene {
 
     this.load.image('tileset', 'assets/maps/tileset.png');
     this.load.image('urban_tileset', 'assets/maps/urban_tileset.png');
+    this.load.image('tinytown_tileset', 'assets/maps/tinytown_tileset.png');
 
     this.load.atlas('players', 'assets/sprites/players.png', 'assets/sprites/players.json');
     this.load.atlas('objects', 'assets/sprites/objects.png', 'assets/sprites/objects.json');

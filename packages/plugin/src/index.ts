@@ -164,6 +164,7 @@ export const manifest: PluginManifest = {
 };
 
 export { OpenClawWorldClient } from './client.js';
+export type { HeartbeatResponseData, ChannelInfo, ChannelsResponseData } from './client.js';
 export {
   PluginConfigSchema,
   validateConfig,

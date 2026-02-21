@@ -54,11 +54,39 @@ def setup() -> None:
         print(f"[hooks] WARNING: Agent registration failed: {exc}", file=sys.stderr)
 
 
+def _is_safe_header_value(value: str) -> bool:
+    """Return True if the header value contains no HTTP-invalid control characters.
+
+    The Node.js HTTP parser (llhttp) rejects any request header whose name or
+    value contains a byte < 0x20, except for horizontal-tab (0x09 / '\\t').
+    When schemathesis fuzzes header values it sometimes generates such bytes
+    (e.g. ESC 0x1b).  Those requests never reach Express – Node drops the
+    connection before it can write a response – which schemathesis then reports
+    as a "JSON deserialization error" (empty / non-JSON response body).
+
+    Filtering them out in before_call lets all requests reach the application
+    layer so that response_schema_conformance and status_code_conformance checks
+    actually exercise the server logic.
+    """
+    return all(ord(c) >= 0x20 or c == '\t' for c in str(value))
+
+
 @schemathesis.hook
 def before_call(context, case, kwargs):
     """Inject auth credentials and valid agent/room IDs before each request."""
     if _session_token is None:
         setup()
+
+    # ── Sanitize fuzz-generated headers ──
+    # Remove any header whose name or value contains control characters that
+    # llhttp (Node.js HTTP parser) would reject at the TCP level, producing an
+    # empty response that schemathesis misreports as "JSON deserialization error".
+    if case.headers:
+        case.headers = {
+            name: value
+            for name, value in case.headers.items()
+            if _is_safe_header_value(str(name)) and _is_safe_header_value(str(value))
+        }
 
     # ── Auth header injection ──
     path = case.path or ""

@@ -766,7 +766,7 @@ The same \`txId\` will return the same result without re-executing the action.
         type: 'object',
         required: ['agentId', 'roomId', 'sessionToken', 'pos'],
         properties: {
-          agentId: { $ref: '#/components/schemas/IdEntity' },
+          agentId: { $ref: '#/components/schemas/IdAgent' },
           roomId: { $ref: '#/components/schemas/IdRoom' },
           sessionToken: { type: 'string' },
           pos: { $ref: '#/components/schemas/Vec2' },
@@ -836,7 +836,7 @@ The same \`txId\` will return the same result without re-executing the action.
         required: ['meetingId', 'role', 'participants'],
         properties: {
           meetingId: { type: 'string', minLength: 1, maxLength: 128 },
-          role: { type: 'string', example: 'participant' },
+          role: { type: 'string', enum: ['host', 'participant'] },
           participants: {
             type: 'array',
             items: {
@@ -845,7 +845,7 @@ The same \`txId\` will return the same result without re-executing the action.
               properties: {
                 entityId: { $ref: '#/components/schemas/IdEntity' },
                 name: { type: 'string', minLength: 1, maxLength: 64 },
-                role: { type: 'string', example: 'participant' },
+                role: { type: 'string', enum: ['host', 'participant'] },
               },
             },
           },

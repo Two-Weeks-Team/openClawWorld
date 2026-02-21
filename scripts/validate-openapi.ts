@@ -54,7 +54,7 @@ function collectRefs(obj: unknown, path: string): string[] {
 
 /** Extract schema name from a local $ref like '#/components/schemas/Foo' */
 function extractSchemaName(ref: string): string | null {
-  const match = ref.match(/^#\/components\/schemas\/(\w+)$/);
+  const match = ref.match(/^#\/components\/schemas\/([\w.-]+)$/);
   return match ? match[1] : null;
 }
 

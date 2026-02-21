@@ -194,7 +194,9 @@ describe('MeetingList Endpoint Contract Tests', () => {
         buildMeeting({ meetingId: 'mtg_002', participantCount: 10, capacity: 10 }),
       ];
 
-      mockServer.setHandler('/meeting/list', () => jsonResponse(createOkResult({ meetings, serverTsMs: Date.now() })));
+      mockServer.setHandler('/meeting/list', () =>
+        jsonResponse(createOkResult({ meetings, serverTsMs: Date.now() }))
+      );
 
       const result = await client.meetingList({
         agentId: 'agt_0001',

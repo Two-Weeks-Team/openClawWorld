@@ -106,7 +106,7 @@ export async function handleMeetingLeave(req: Request, res: Response): Promise<v
     const responseData: MeetingLeaveResponseData = {
       meetingId,
       leftAt,
-      serverTsMs: Date.now(),
+      serverTsMs: leftAt,
     };
 
     console.log(`[MeetingLeaveHandler] Agent '${agentId}' left meeting '${meetingId}'`);

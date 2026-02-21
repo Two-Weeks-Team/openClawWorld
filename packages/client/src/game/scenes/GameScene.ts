@@ -440,9 +440,11 @@ export class GameScene extends Phaser.Scene {
   private createMap() {
     this.map = this.make.tilemap({ key: 'village' });
 
-    const tilesets = MAP_TILESETS
-      .map(name => this.map!.addTilesetImage(name, name))
-      .filter(Boolean) as Phaser.Tilemaps.Tileset[];
+    const tilesets = MAP_TILESETS.map(name => {
+      const ts = this.map!.addTilesetImage(name, name);
+      if (!ts) console.warn(`Tileset not found in map: ${name}`);
+      return ts;
+    }).filter(Boolean) as Phaser.Tilemaps.Tileset[];
 
     if (tilesets.length > 0) {
       this.map.createLayer(MAP_LAYERS.GROUND, tilesets, 0, 0);

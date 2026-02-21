@@ -14,6 +14,11 @@ export type MapLayerName = (typeof MAP_LAYERS)[keyof typeof MAP_LAYERS];
  * Tileset names as used in Tiled JSON map files.
  * Must match the tileset names embedded in the .json map file.
  */
-export const MAP_TILESETS = ['tileset', 'urban_tileset', 'tinytown_tileset', 'interior_tileset'] as const;
+export const MAP_TILESETS = [
+  'tileset',
+  'urban_tileset',
+  'tinytown_tileset',
+  'interior_tileset',
+] as const;
 
 export type MapTilesetName = (typeof MAP_TILESETS)[number];

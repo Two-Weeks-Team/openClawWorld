@@ -171,7 +171,11 @@ class ValidationResult {
     this.warnings = [];
   }
 
-  addError(code: ValidationErrorCode, message: string, context: Record<string, unknown> = {}): void {
+  addError(
+    code: ValidationErrorCode,
+    message: string,
+    context: Record<string, unknown> = {}
+  ): void {
     this.errors.push({
       severity: Severity.ERROR,
       code: code.code,
@@ -181,7 +185,11 @@ class ValidationResult {
     });
   }
 
-  addWarning(code: ValidationErrorCode, message: string, context: Record<string, unknown> = {}): void {
+  addWarning(
+    code: ValidationErrorCode,
+    message: string,
+    context: Record<string, unknown> = {}
+  ): void {
     this.warnings.push({
       severity: Severity.WARN,
       code: code.code,
@@ -267,7 +275,9 @@ function validateMapDimensions(map: LoadedMap, name: string): string[] {
 
   for (const [key, expected] of Object.entries(dimensions)) {
     if ((map.json as unknown as Record<string, unknown>)[key] !== expected) {
-      errors.push(`${name}: ${key}=${(map.json as unknown as Record<string, unknown>)[key]}, expected=${expected}`);
+      errors.push(
+        `${name}: ${key}=${(map.json as unknown as Record<string, unknown>)[key]}, expected=${expected}`
+      );
     }
   }
 
@@ -303,11 +313,11 @@ function validateTileset(map: LoadedMap, name: string): string[] {
 }
 
 function isNonNegativeInt(value: unknown): value is number {
-  return Number.isInteger(value) && (value as number) >= 0;
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
 }
 
 function isPositiveInt(value: unknown): value is number {
-  return Number.isInteger(value) && (value as number) > 0;
+  return typeof value === 'number' && Number.isInteger(value) && value > 0;
 }
 
 function collectUsedTileIds(mapJson: TiledMap): Set<number> {
@@ -422,7 +432,10 @@ interface FacilityValidationResult {
   aliasCount: number;
 }
 
-function validateFacilityZoneContracts(mapJson: TiledMap, validZones: Set<string>): FacilityValidationResult {
+function validateFacilityZoneContracts(
+  mapJson: TiledMap,
+  validZones: Set<string>
+): FacilityValidationResult {
   const result = new ValidationResult();
   const facilities = extractFacilityObjects(mapJson);
   const mappedFacilityIds = new Map<string, string>();
@@ -483,7 +496,9 @@ function validateFacilityZoneContracts(mapJson: TiledMap, validZones: Set<string
   }
 
   const mapJsonAny = mapJson as unknown as Record<string, unknown>;
-  const listedFacilities: unknown[] = Array.isArray(mapJsonAny.facilities) ? mapJsonAny.facilities as unknown[] : [];
+  const listedFacilities: unknown[] = Array.isArray(mapJsonAny.facilities)
+    ? (mapJsonAny.facilities as unknown[])
+    : [];
   for (const listedFacility of listedFacilities) {
     if (typeof listedFacility !== 'string') {
       result.addError(
@@ -555,7 +570,10 @@ interface SpawnValidationResult {
   errors: string[];
 }
 
-function validateSpawnPoint(mapJson: TiledMap, collisionData: number[] | undefined): SpawnValidationResult {
+function validateSpawnPoint(
+  mapJson: TiledMap,
+  collisionData: number[] | undefined
+): SpawnValidationResult {
   const errors: string[] = [];
   const { tx, ty } = DEFAULT_SPAWN_POINT;
   const width = mapJson.width || 0;
@@ -584,11 +602,13 @@ interface EntranceValidationResult {
 
 function validateEntrances(mapJson: TiledMap): EntranceValidationResult {
   const result = new ValidationResult();
-  const objectsLayer = (mapJson.layers || []).find(
-    (l: AnyLayer) => l.name === MAP_LAYERS.OBJECTS
-  );
+  const objectsLayer = (mapJson.layers || []).find((l: AnyLayer) => l.name === MAP_LAYERS.OBJECTS);
 
-  if (!objectsLayer || !('objects' in objectsLayer) || !Array.isArray((objectsLayer as ObjectGroup).objects)) {
+  if (
+    !objectsLayer ||
+    !('objects' in objectsLayer) ||
+    !Array.isArray((objectsLayer as ObjectGroup).objects)
+  ) {
     return { result, entranceCount: 0 };
   }
 
@@ -668,13 +688,18 @@ interface ZoneEntranceValidationResult {
  * Validates that building_entrance objects have passable collision tiles (value=0)
  * at their entrance tile coordinates.
  */
-function validateZoneEntrances(mapJson: TiledMap, collisionData: number[] | undefined): ZoneEntranceValidationResult {
+function validateZoneEntrances(
+  mapJson: TiledMap,
+  collisionData: number[] | undefined
+): ZoneEntranceValidationResult {
   const result = new ValidationResult();
-  const objectsLayer = (mapJson.layers || []).find(
-    (l: AnyLayer) => l.name === MAP_LAYERS.OBJECTS
-  );
+  const objectsLayer = (mapJson.layers || []).find((l: AnyLayer) => l.name === MAP_LAYERS.OBJECTS);
 
-  if (!objectsLayer || !('objects' in objectsLayer) || !Array.isArray((objectsLayer as ObjectGroup).objects)) {
+  if (
+    !objectsLayer ||
+    !('objects' in objectsLayer) ||
+    !Array.isArray((objectsLayer as ObjectGroup).objects)
+  ) {
     return { result, blockedEntrances: 0, entranceCount: 0 };
   }
 
@@ -806,8 +831,9 @@ function validateSpawnReachability(mapJson: TiledMap, collisionData: number[]): 
     { dx: 1, dy: 0 }, // east
   ];
 
-  while (queue.length > 0) {
-    const current = queue.shift()!;
+  let queueHead = 0;
+  while (queueHead < queue.length) {
+    const current = queue[queueHead++];
     const ctx = current.tx;
     const cty = current.ty;
 
@@ -907,7 +933,10 @@ interface ZoneBlockStatsResult {
  * Reports total tiles, blocked tiles, and block percentage.
  * Warns if any zone has >80% blocked tiles.
  */
-function generateZoneBlockStats(mapJson: TiledMap, collisionData: number[] | undefined): ZoneBlockStatsResult {
+function generateZoneBlockStats(
+  mapJson: TiledMap,
+  collisionData: number[] | undefined
+): ZoneBlockStatsResult {
   const result = new ValidationResult();
   const stats: ZoneStat[] = [];
   const BLOCK_PERCENTAGE_WARNING_THRESHOLD = 80;
@@ -1039,7 +1068,9 @@ function validateCurationStructure(curation: unknown): CurationStructure {
   };
 }
 
-function validateSources(sources: Record<string, CurationSource> | undefined): { errors: string[] } {
+function validateSources(sources: Record<string, CurationSource> | undefined): {
+  errors: string[];
+} {
   const errors: string[] = [];
 
   if (!sources || typeof sources !== 'object' || Array.isArray(sources)) {
@@ -1079,14 +1110,22 @@ function validateSources(sources: Record<string, CurationSource> | undefined): {
   return { errors };
 }
 
-function validateTilesetOutput(tilesetOutput: CurationTilesetOutput | undefined): { errors: string[] } {
+function validateTilesetOutput(tilesetOutput: CurationTilesetOutput | undefined): {
+  errors: string[];
+} {
   const errors: string[] = [];
 
   if (!tilesetOutput || typeof tilesetOutput !== 'object' || Array.isArray(tilesetOutput)) {
     return { errors };
   }
 
-  const requiredIntFields: Array<keyof CurationTilesetOutput> = ['width', 'height', 'tileSize', 'columns', 'rows'];
+  const requiredIntFields: Array<keyof CurationTilesetOutput> = [
+    'width',
+    'height',
+    'tileSize',
+    'columns',
+    'rows',
+  ];
   for (const field of requiredIntFields) {
     if (!isPositiveInt(tilesetOutput[field])) {
       errors.push(
@@ -1311,7 +1350,12 @@ interface CurationContractInput {
   tileIdContract: TileIdContract;
 }
 
-function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }: CurationContractInput): {
+function validateCurationContract({
+  map,
+  curation,
+  tilesetMeta,
+  tileIdContract,
+}: CurationContractInput): {
   errors: string[];
   usedTileIds: number[];
 } {
@@ -1350,9 +1394,13 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
 }
 
 function main(): void {
-  console.log('\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557');
+  console.log(
+    '\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557'
+  );
   console.log('\u2551     Map Stack Consistency Verification                       \u2551');
-  console.log('\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D\n');
+  console.log(
+    '\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D\n'
+  );
 
   const maps: Record<string, LoadedMap | null> = {};
   const missingFiles: string[] = [];
@@ -1407,8 +1455,14 @@ function main(): void {
   console.log('Validating Kenney curation contract...');
   const curation = loadRequiredJson(CONTRACT_PATHS.curation, 'kenney-curation');
   const tilesetMeta = loadRequiredJson<TilesetMeta>(CONTRACT_PATHS.tilesetMeta, 'tileset-meta');
-  const tileIdContract = loadRequiredJson<TileIdContract>(CONTRACT_PATHS.tileIdContract, 'tile-id-contract');
-  const manifest = loadRequiredJson<{ zones?: string[] }>(CONTRACT_PATHS.manifest, 'world-manifest');
+  const tileIdContract = loadRequiredJson<TileIdContract>(
+    CONTRACT_PATHS.tileIdContract,
+    'tile-id-contract'
+  );
+  const manifest = loadRequiredJson<{ zones?: string[] }>(
+    CONTRACT_PATHS.manifest,
+    'world-manifest'
+  );
   const validZones = new Set<string>(Array.isArray(manifest.zones) ? manifest.zones : []);
 
   const { errors: curationErrors, usedTileIds } = validateCurationContract({
@@ -1514,9 +1568,13 @@ function main(): void {
   );
 
   console.log('Validating spawn reachability (BFS)...');
+  if (!collisionValidation.collisionData) {
+    console.log('\n❌ COLLISION DATA MISSING\n');
+    process.exit(1);
+  }
   const reachabilityValidation = validateSpawnReachability(
     sourceMap.json,
-    collisionValidation.collisionData!
+    collisionValidation.collisionData
   );
   if (reachabilityValidation.errors.length > 0) {
     console.log('\u274C SPAWN REACHABILITY VALIDATION FAILED\n');
@@ -1558,9 +1616,13 @@ function main(): void {
   }
   console.log();
 
-  console.log('\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550');
+  console.log(
+    '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550'
+  );
   console.log('\u2705 MAP STACK CONSISTENCY VERIFIED');
-  console.log('\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n');
+  console.log(
+    '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n'
+  );
 
   process.exit(0);
 }

@@ -62,7 +62,8 @@ The same \`txId\` will return the same result without re-executing the action.
       bearerAuth: {
         type: 'http',
         scheme: 'bearer',
-        description: 'JWT token obtained from /register endpoint',
+        description:
+          'Session token (opaque, format: tok_*) obtained from /register or /reconnect endpoint. Not a JWT.',
       },
     },
     schemas: {
@@ -80,6 +81,13 @@ The same \`txId\` will return the same result without re-executing the action.
         type: 'string',
         pattern: '^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$',
         example: 'agt_agent_helper',
+      },
+      IdTarget: {
+        type: 'string',
+        pattern: '^[a-zA-Z][a-zA-Z0-9._-]{0,127}$',
+        description:
+          'Target ID for interact — supports entity IDs (hum_*, agt_*, obj_*), NPC IDs (npc_*), and facility IDs',
+        example: 'obj_sign_welcome',
       },
       IdTx: {
         type: 'string',
@@ -116,7 +124,7 @@ The same \`txId\` will return the same result without re-executing the action.
       },
       EntityKind: {
         type: 'string',
-        enum: ['human', 'agent', 'object'],
+        enum: ['human', 'agent', 'object', 'npc'],
       },
       Facing: {
         type: 'string',
@@ -203,20 +211,22 @@ The same \`txId\` will return the same result without re-executing the action.
 
       RegisterRequest: {
         type: 'object',
-        required: ['agentId', 'roomId', 'name'],
+        required: ['roomId', 'name'],
         properties: {
-          agentId: { $ref: '#/components/schemas/IdAgent' },
           roomId: { $ref: '#/components/schemas/IdRoom' },
           name: { type: 'string', minLength: 1, maxLength: 64, example: 'Helper Bot' },
         },
       },
       RegisterResponseData: {
         type: 'object',
-        required: ['token', 'entityId', 'expiresAt'],
+        required: ['agentId', 'roomId', 'sessionToken'],
         properties: {
-          token: { type: 'string', description: 'Bearer token for authentication' },
-          entityId: { $ref: '#/components/schemas/IdEntity' },
-          expiresAt: { $ref: '#/components/schemas/TsMs' },
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+          sessionToken: {
+            type: 'string',
+            description: 'Session token for subsequent authenticated requests',
+          },
         },
       },
 
@@ -239,18 +249,23 @@ The same \`txId\` will return the same result without re-executing the action.
 
       ObserveRequest: {
         type: 'object',
-        required: ['agentId', 'roomId', 'radius', 'detail'],
+        required: ['agentId', 'roomId', 'radius'],
         properties: {
           agentId: { $ref: '#/components/schemas/IdAgent' },
           roomId: { $ref: '#/components/schemas/IdRoom' },
           radius: { type: 'number', minimum: 1, maximum: 2000, example: 100 },
           detail: { type: 'string', enum: ['lite', 'full'], example: 'full' },
           includeSelf: { type: 'boolean', default: true },
+          includeGrid: {
+            type: 'boolean',
+            default: false,
+            description: 'If true, include grid/tile data in the response',
+          },
         },
       },
       ObserveResponseData: {
         type: 'object',
-        required: ['self', 'nearby', 'serverTsMs', 'room'],
+        required: ['self', 'nearby', 'serverTsMs', 'room', 'facilities'],
         properties: {
           self: { $ref: '#/components/schemas/EntityBase' },
           nearby: {
@@ -266,6 +281,42 @@ The same \`txId\` will return the same result without re-executing the action.
               mapId: { type: 'string' },
               tickRate: { type: 'integer', minimum: 1, maximum: 60 },
             },
+          },
+          facilities: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/ObservedFacility' },
+            description: 'Facilities visible within the observation radius',
+          },
+          mapMetadata: { $ref: '#/components/schemas/MapMetadata' },
+        },
+      },
+
+      ObservedFacility: {
+        type: 'object',
+        required: ['id', 'type', 'pos'],
+        properties: {
+          id: { type: 'string', description: 'Unique facility identifier' },
+          type: {
+            type: 'string',
+            description: 'Facility type (e.g., door, terminal, vending_machine)',
+          },
+          pos: { $ref: '#/components/schemas/TileCoord' },
+          label: { type: 'string', maxLength: 128 },
+          interactable: { type: 'boolean' },
+          meta: { type: 'object', additionalProperties: true },
+        },
+      },
+      MapMetadata: {
+        type: 'object',
+        required: ['mapId', 'width', 'height'],
+        properties: {
+          mapId: { type: 'string' },
+          width: { type: 'integer', minimum: 1 },
+          height: { type: 'integer', minimum: 1 },
+          tileSize: { type: 'integer', minimum: 1 },
+          layers: {
+            type: 'array',
+            items: { type: 'string' },
           },
         },
       },
@@ -288,7 +339,7 @@ The same \`txId\` will return the same result without re-executing the action.
           txId: { $ref: '#/components/schemas/IdTx' },
           applied: { type: 'boolean' },
           serverTsMs: { $ref: '#/components/schemas/TsMs' },
-          result: { type: 'string', enum: ['accepted', 'rejected', 'no_op'] },
+          result: { type: 'string', enum: ['accepted', 'rejected', 'no_op', 'no_path'] },
         },
       },
 
@@ -299,7 +350,7 @@ The same \`txId\` will return the same result without re-executing the action.
           agentId: { $ref: '#/components/schemas/IdAgent' },
           roomId: { $ref: '#/components/schemas/IdRoom' },
           txId: { $ref: '#/components/schemas/IdTx' },
-          targetId: { $ref: '#/components/schemas/IdEntity' },
+          targetId: { $ref: '#/components/schemas/IdTarget' },
           action: { type: 'string', minLength: 1, maxLength: 64, example: 'read' },
           params: { type: 'object', additionalProperties: true },
         },
@@ -381,7 +432,7 @@ The same \`txId\` will return the same result without re-executing the action.
 
       PollEventsRequest: {
         type: 'object',
-        required: ['agentId', 'roomId', 'sinceCursor'],
+        required: ['agentId', 'roomId'],
         properties: {
           agentId: { $ref: '#/components/schemas/IdAgent' },
           roomId: { $ref: '#/components/schemas/IdRoom' },
@@ -401,6 +452,23 @@ The same \`txId\` will return the same result without re-executing the action.
           'zone.exit',
           'chat.message',
           'object.state_changed',
+          'profile.updated',
+          'npc.state_change',
+          'facility.interacted',
+          'emote.triggered',
+          'meeting.started',
+          'meeting.ended',
+          'meeting.participant.joined',
+          'meeting.participant.left',
+          'meeting.chat.message',
+          'meeting.chat.history_response',
+          'meeting.state_changed',
+          'meeting.agenda.started',
+          'meeting.agenda.completed',
+          'meeting.agenda.reordered',
+          'meeting.host_transferred',
+          'meeting.recording_started',
+          'meeting.recording_stopped',
         ],
       },
       EventEnvelope: {
@@ -416,7 +484,7 @@ The same \`txId\` will return the same result without re-executing the action.
       },
       PollEventsResponseData: {
         type: 'object',
-        required: ['events', 'nextCursor', 'serverTsMs'],
+        required: ['events', 'nextCursor', 'serverTsMs', 'cursorExpired'],
         properties: {
           events: {
             type: 'array',
@@ -424,6 +492,11 @@ The same \`txId\` will return the same result without re-executing the action.
           },
           nextCursor: { $ref: '#/components/schemas/Cursor' },
           serverTsMs: { $ref: '#/components/schemas/TsMs' },
+          cursorExpired: {
+            type: 'boolean',
+            description:
+              'True if the provided sinceCursor was expired and events may have been missed',
+          },
         },
       },
 
@@ -433,16 +506,38 @@ The same \`txId\` will return the same result without re-executing the action.
         properties: {
           agentId: { $ref: '#/components/schemas/IdAgent' },
           roomId: { $ref: '#/components/schemas/IdRoom' },
-          name: { type: 'string', minLength: 1, maxLength: 64 },
-          meta: { type: 'object', additionalProperties: true },
+          status: { $ref: '#/components/schemas/UserStatus' },
+          statusMessage: { type: 'string', maxLength: 200 },
+          title: { type: 'string', maxLength: 128 },
+          department: { type: 'string', maxLength: 128 },
         },
       },
       ProfileUpdateResponseData: {
         type: 'object',
-        required: ['updated', 'serverTsMs'],
+        required: ['applied', 'profile', 'serverTsMs'],
         properties: {
-          updated: { type: 'boolean' },
+          applied: { type: 'boolean', enum: [true] },
+          profile: { $ref: '#/components/schemas/AgentProfile' },
           serverTsMs: { $ref: '#/components/schemas/TsMs' },
+        },
+      },
+
+      UserStatus: {
+        type: 'string',
+        enum: ['online', 'away', 'focus', 'offline'],
+        description: 'User presence/availability status',
+      },
+      AgentProfile: {
+        type: 'object',
+        required: ['agentId', 'name'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          name: { type: 'string', minLength: 1, maxLength: 64 },
+          status: { $ref: '#/components/schemas/UserStatus' },
+          statusMessage: { type: 'string', maxLength: 200 },
+          title: { type: 'string', maxLength: 128 },
+          department: { type: 'string', maxLength: 128 },
+          updatedAt: { $ref: '#/components/schemas/TsMs' },
         },
       },
 
@@ -660,7 +755,6 @@ The same \`txId\` will return the same result without re-executing the action.
             'application/json': {
               schema: { $ref: '#/components/schemas/RegisterRequest' },
               example: {
-                agentId: 'agent_helper',
                 roomId: 'auto',
                 name: 'Helper Bot',
               },
@@ -682,9 +776,9 @@ The same \`txId\` will return the same result without re-executing the action.
                 example: {
                   status: 'ok',
                   data: {
-                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-                    entityId: 'agt_agent_helper',
-                    expiresAt: 1707609600000,
+                    agentId: 'agt_4bf4ddd29644',
+                    roomId: 'channel-1',
+                    sessionToken: 'tok_kynDU8nVAcixuMrPVI8k07b2AvmS-s6Y',
                   },
                 },
               },
@@ -1207,6 +1301,204 @@ The same \`txId\` will return the same result without re-executing the action.
           '403': { description: 'Forbidden - skill not installed for this agent' },
           '404': { description: 'Skill or action not found' },
           '429': { description: 'Rate limited or skill on cooldown' },
+        },
+      },
+    },
+    '/channels': {
+      get: {
+        summary: 'List available channels',
+        description: 'Returns all available game channels/rooms that agents can join.',
+        tags: ['Connection'],
+        security: [],
+        responses: {
+          '200': {
+            description: 'Channel list',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: {
+                      type: 'object',
+                      required: ['channels'],
+                      properties: {
+                        channels: {
+                          type: 'array',
+                          items: { $ref: '#/components/schemas/ChannelInfo' },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/reconnect': {
+      post: {
+        summary: 'Reconnect an agent to an existing session',
+        description: 'Allows an agent to reconnect using a previously issued session token.',
+        tags: ['Connection'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ReconnectRequest' },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Reconnected successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/ReconnectResponseData' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Invalid or expired session token' },
+          '404': { description: 'Agent not found' },
+        },
+      },
+    },
+    '/heartbeat': {
+      post: {
+        summary: 'Send a heartbeat to maintain session',
+        description: 'Keeps the agent session alive and returns server timing information.',
+        tags: ['Session Management'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/HeartbeatRequest' },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Heartbeat acknowledged',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/HeartbeatResponseData' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '404': { description: 'Agent session not found' },
+        },
+      },
+    },
+    '/meeting/list': {
+      post: {
+        summary: 'List available meetings in the room',
+        description: 'Returns all active meetings in the specified room.',
+        tags: ['Meeting'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/MeetingListRequest' },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Meeting list',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/MeetingListResponseData' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+        },
+      },
+    },
+    '/meeting/join': {
+      post: {
+        summary: 'Join a meeting',
+        description: 'Joins the specified meeting as a participant or host.',
+        tags: ['Meeting'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/MeetingJoinRequest' },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Joined meeting successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/MeetingJoinResponseData' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '404': { description: 'Meeting not found' },
+          '409': { description: 'Already in a meeting' },
+        },
+      },
+    },
+    '/meeting/leave': {
+      post: {
+        summary: 'Leave a meeting',
+        description: 'Leaves the specified meeting.',
+        tags: ['Meeting'],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/MeetingLeaveRequest' },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Left meeting successfully',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', const: 'ok' },
+                    data: { $ref: '#/components/schemas/MeetingLeaveResponseData' },
+                  },
+                },
+              },
+            },
+          },
+          '401': { description: 'Unauthorized' },
+          '404': { description: 'Meeting not found or not a participant' },
         },
       },
     },

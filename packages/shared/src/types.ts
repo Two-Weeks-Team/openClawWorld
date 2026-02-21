@@ -8,12 +8,18 @@
 
 import type {
   Affordance,
+  AicErrorObject,
   EntityBase,
   FacilityType,
   KanbanColumn,
   MeetingStatus,
+  ObjectStateChangedPayload,
   ObservedEntity,
   OrgRole,
+  PresenceJoinPayload,
+  PresenceLeavePayload,
+  ProximityEnterPayload,
+  ProximityExitPayload,
   RoomInfo,
   SkillCategory,
   SkillEffectDefinition,
@@ -29,9 +35,9 @@ import type {
 // Generic Result Type (no Zod schema equivalent - generic)
 // ============================================================================
 
-export type { AicErrorCode, AicErrorObject } from './schemas.js';
+export type { AicErrorCode, AicErrorObject, FacilityType, ZoneId } from './schemas.js';
 
-export type AicResult<T> = { status: 'ok'; data: T } | { status: 'error'; error: import('./schemas.js').AicErrorObject };
+export type AicResult<T> = { status: 'ok'; data: T } | { status: 'error'; error: AicErrorObject };
 
 // ============================================================================
 // Chat Types (types.ts ChatChannel has 5 values vs schema's 2)
@@ -246,22 +252,22 @@ export type EmoteTriggeredPayload = {
 // Typed Event Envelopes (depend on generic EventEnvelope and payload types)
 // ============================================================================
 
-export type PresenceJoinEvent = EventEnvelope<import('./schemas.js').PresenceJoinPayload> & {
+export type PresenceJoinEvent = EventEnvelope<PresenceJoinPayload> & {
   type: 'presence.join';
 };
-export type PresenceLeaveEvent = EventEnvelope<import('./schemas.js').PresenceLeavePayload> & {
+export type PresenceLeaveEvent = EventEnvelope<PresenceLeavePayload> & {
   type: 'presence.leave';
 };
-export type ProximityEnterEvent = EventEnvelope<import('./schemas.js').ProximityEnterPayload> & {
+export type ProximityEnterEvent = EventEnvelope<ProximityEnterPayload> & {
   type: 'proximity.enter';
 };
-export type ProximityExitEvent = EventEnvelope<import('./schemas.js').ProximityExitPayload> & {
+export type ProximityExitEvent = EventEnvelope<ProximityExitPayload> & {
   type: 'proximity.exit';
 };
 export type ChatMessageEvent = EventEnvelope<ChatMessagePayload> & {
   type: 'chat.message';
 };
-export type ObjectStateChangedEvent = EventEnvelope<import('./schemas.js').ObjectStateChangedPayload> & {
+export type ObjectStateChangedEvent = EventEnvelope<ObjectStateChangedPayload> & {
   type: 'object.state_changed';
 };
 export type ProfileUpdatedEvent = EventEnvelope<ProfileUpdatedPayload> & {

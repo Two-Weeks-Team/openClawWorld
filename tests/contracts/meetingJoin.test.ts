@@ -42,6 +42,7 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
           { entityId: 'agt_host', name: 'Host Agent', role: 'host' },
           { entityId: 'agt_0001', name: 'Test Agent', role: 'participant' },
         ],
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/join', () => jsonResponse(createOkResult(responseData)));
@@ -63,6 +64,7 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
         meetingId: 'mtg_001',
         role: 'participant',
         participants: [{ entityId: 'agt_host', name: 'Host', role: 'host' }],
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/join', () => jsonResponse(createOkResult(responseData)));
@@ -85,6 +87,7 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
         meetingId: 'mtg_001',
         role: 'host',
         participants: [{ entityId: 'agt_host', name: 'Host Agent', role: 'host' }],
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/join', () => jsonResponse(createOkResult(responseData)));
@@ -191,6 +194,7 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
         meetingId: 'mtg_001',
         role: 'participant',
         participants: [],
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/join', () => jsonResponse(createOkResult(responseData)));
@@ -208,6 +212,8 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
         expect(result.data).toHaveProperty('role');
         expect(result.data).toHaveProperty('participants');
         expect(Array.isArray(result.data.participants)).toBe(true);
+        expect(result.data).toHaveProperty('serverTsMs');
+        expect(typeof result.data.serverTsMs).toBe('number');
       }
     });
   });

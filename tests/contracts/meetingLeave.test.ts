@@ -39,6 +39,7 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
       const responseData: MeetingLeaveResponseData = {
         meetingId: 'mtg_001',
         leftAt,
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -58,6 +59,7 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
       const responseData: MeetingLeaveResponseData = {
         meetingId: 'mtg_001',
         leftAt: Date.now(),
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -79,6 +81,7 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
       const responseData: MeetingLeaveResponseData = {
         meetingId,
         leftAt: Date.now(),
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -184,6 +187,7 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
       const responseData: MeetingLeaveResponseData = {
         meetingId: 'mtg_001',
         leftAt: Date.now(),
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -199,6 +203,8 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
       if (result.status === 'ok') {
         expect(result.data).toHaveProperty('meetingId');
         expect(result.data).toHaveProperty('leftAt');
+        expect(result.data).toHaveProperty('serverTsMs');
+        expect(typeof result.data.serverTsMs).toBe('number');
       }
     });
 

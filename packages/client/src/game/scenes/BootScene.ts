@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { MAP_TILESETS } from '@openclawworld/shared';
 import { AUDIO_MANIFEST } from '../../systems/AudioManager';
 
 // Single unified map for the entire world
@@ -14,11 +15,9 @@ export class BootScene extends Phaser.Scene {
       this.load.tilemapTiledJSON(zoneId, `assets/maps/${zoneId}.json`);
     }
 
-    this.load.image('tileset', 'assets/maps/tileset.png');
-    this.load.image('urban_tileset', 'assets/maps/urban_tileset.png');
-    this.load.image('tinytown_tileset', 'assets/maps/tinytown_tileset.png');
-
-    this.load.image('interior_tileset', 'assets/maps/interior_tileset.png');
+    for (const name of MAP_TILESETS) {
+      this.load.image(name, `assets/maps/${name}.png`);
+    }
 
     this.load.atlas('players', 'assets/sprites/players.png', 'assets/sprites/players.json');
     this.load.atlas('objects', 'assets/sprites/objects.png', 'assets/sprites/objects.json');

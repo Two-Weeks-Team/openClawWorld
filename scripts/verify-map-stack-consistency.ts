@@ -1,54 +1,56 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 import { existsSync, readFileSync } from 'fs';
 import { basename, dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { createHash } from 'crypto';
-import { ZONE_BOUNDS, DEFAULT_SPAWN_POINT, MAP_CONFIG } from '../packages/shared/dist/index.js';
+import type {
+  Map as TiledMap,
+  TileLayer,
+  ObjectGroup,
+  Tileset,
+  AnyLayer,
+  AnyTileset,
+  AnyProperty,
+} from '@kayahr/tiled';
+import {
+  ZONE_BOUNDS,
+  DEFAULT_SPAWN_POINT,
+  MAP_CONFIG,
+  MAP_LAYERS,
+  MAP_TILESETS,
+} from '../packages/shared/src/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = resolve(__dirname, '..');
 
-const MAP_PATHS = {
+const MAP_PATHS: Record<string, string> = {
   source: join(ROOT_DIR, 'world/packs/base/maps/grid_town_outdoor.json'),
   server: join(ROOT_DIR, 'packages/server/assets/maps/village.json'),
   client: join(ROOT_DIR, 'packages/client/public/assets/maps/village.json'),
 };
 
-const EXPECTED_TILESETS = [
-  {
-    name: 'tileset',
-    tilewidth: 16,
-    tileheight: 16,
-    image: 'tileset.png',
-  },
-  {
-    name: 'urban_tileset',
-    tilewidth: 16,
-    tileheight: 16,
-    image: 'urban_tileset.png',
-  },
-  {
-    name: 'tinytown_tileset',
-    tilewidth: 16,
-    tileheight: 16,
-    image: 'tinytown_tileset.png',
-  },
-  {
-    name: 'interior_tileset',
-    tilewidth: 16,
-    tileheight: 16,
-    image: 'interior_tileset.png',
-  },
-];
+interface ExpectedTileset {
+  name: string;
+  tilewidth: number;
+  tileheight: number;
+  image: string;
+}
 
-const CONTRACT_PATHS = {
+const EXPECTED_TILESETS: ExpectedTileset[] = MAP_TILESETS.map(name => ({
+  name,
+  tilewidth: 16,
+  tileheight: 16,
+  image: `${name}.png`,
+}));
+
+const CONTRACT_PATHS: Record<string, string> = {
   curation: join(ROOT_DIR, 'tools/kenney-curation.json'),
   tilesetMeta: join(ROOT_DIR, 'packages/client/public/assets/maps/tileset.json'),
   tileIdContract: join(ROOT_DIR, 'world/packs/base/assets/tilesets/village_tileset.json'),
   manifest: join(ROOT_DIR, 'world/packs/base/manifest.json'),
 };
 
-const VALID_ZONES = [
+const VALID_ZONES: string[] = [
   'lobby',
   'office',
   'central-park',
@@ -58,7 +60,7 @@ const VALID_ZONES = [
   'plaza',
   'lake',
 ];
-const VALID_DIRECTIONS = ['north', 'south', 'east', 'west'];
+const VALID_DIRECTIONS: string[] = ['north', 'south', 'east', 'west'];
 
 /**
  * Validation severity levels
@@ -68,7 +70,9 @@ const VALID_DIRECTIONS = ['north', 'south', 'east', 'west'];
 const Severity = {
   ERROR: 'ERROR',
   WARN: 'WARN',
-};
+} as const;
+
+type SeverityLevel = (typeof Severity)[keyof typeof Severity];
 
 /**
  * ERROR-level violations (CI blocking):
@@ -82,7 +86,14 @@ const Severity = {
  * - mixed passable/blocked tiles at entrances
  * - missing optional fields
  */
-const ValidationErrorCodes = {
+
+interface ValidationErrorCode {
+  code: string;
+  severity: SeverityLevel;
+  message: string;
+}
+
+const ValidationErrorCodes: Record<string, ValidationErrorCode> = {
   // ERROR codes
   ZONE_MISMATCH: {
     code: 'ZONE_MISMATCH',
@@ -143,13 +154,28 @@ const ValidationErrorCodes = {
   },
 };
 
+interface ValidationIssue {
+  severity: SeverityLevel;
+  code: string;
+  message: string;
+  detail: string;
+  context: Record<string, unknown>;
+}
+
 class ValidationResult {
+  errors: ValidationIssue[];
+  warnings: ValidationIssue[];
+
   constructor() {
     this.errors = [];
     this.warnings = [];
   }
 
-  addError(code, message, context = {}) {
+  addError(
+    code: ValidationErrorCode,
+    message: string,
+    context: Record<string, unknown> = {}
+  ): void {
     this.errors.push({
       severity: Severity.ERROR,
       code: code.code,
@@ -159,7 +185,11 @@ class ValidationResult {
     });
   }
 
-  addWarning(code, message, context = {}) {
+  addWarning(
+    code: ValidationErrorCode,
+    message: string,
+    context: Record<string, unknown> = {}
+  ): void {
     this.warnings.push({
       severity: Severity.WARN,
       code: code.code,
@@ -169,68 +199,74 @@ class ValidationResult {
     });
   }
 
-  hasErrors() {
+  hasErrors(): boolean {
     return this.errors.length > 0;
   }
 
-  hasWarnings() {
+  hasWarnings(): boolean {
     return this.warnings.length > 0;
   }
 
-  getAllIssues() {
+  getAllIssues(): ValidationIssue[] {
     return [...this.errors, ...this.warnings];
   }
 
-  getErrors() {
+  getErrors(): ValidationIssue[] {
     return this.errors;
   }
 
-  getWarnings() {
+  getWarnings(): ValidationIssue[] {
     return this.warnings;
   }
 
-  merge(other) {
+  merge(other: ValidationResult): this {
     this.errors.push(...other.errors);
     this.warnings.push(...other.warnings);
     return this;
   }
 }
 
-function md5(content) {
+interface LoadedMap {
+  content: string;
+  json: TiledMap;
+  hash: string;
+}
+
+function md5(content: string): string {
   return createHash('md5').update(content).digest('hex');
 }
 
-function loadMap(path) {
+function loadMap(path: string): LoadedMap | null {
   if (!existsSync(path)) {
     return null;
   }
   const content = readFileSync(path, 'utf-8');
   try {
-    return { content, json: JSON.parse(content), hash: md5(content) };
+    return { content, json: JSON.parse(content) as TiledMap, hash: md5(content) };
   } catch (e) {
-    console.error(`❌ Failed to parse JSON: ${path}\n  ${e.message}`);
+    console.error(`\u274C Failed to parse JSON: ${path}\n  ${(e as Error).message}`);
     process.exit(1);
   }
 }
 
-function loadRequiredJson(path, label) {
+function loadRequiredJson<T = unknown>(path: string, label: string): T {
   if (!existsSync(path)) {
-    console.error(`❌ Missing required file (${label}): ${path}`);
+    console.error(`\u274C Missing required file (${label}): ${path}`);
     process.exit(1);
   }
 
   const content = readFileSync(path, 'utf-8');
   try {
-    return JSON.parse(content);
+    return JSON.parse(content) as T;
   } catch (e) {
-    console.error(`❌ Failed to parse JSON (${label}): ${path}\n  ${e.message}`);
+    console.error(`\u274C Failed to parse JSON (${label}): ${path}\n  ${(e as Error).message}`);
     process.exit(1);
   }
 }
 
-function validateMapDimensions(map, name) {
-  const errors = [];
-  const dimensions = {
+function validateMapDimensions(map: LoadedMap, name: string): string[] {
+  const errors: string[] = [];
+  const dimensions: Record<string, number> = {
     width: MAP_CONFIG.width,
     height: MAP_CONFIG.height,
     tilewidth: MAP_CONFIG.tileSize,
@@ -238,17 +274,19 @@ function validateMapDimensions(map, name) {
   };
 
   for (const [key, expected] of Object.entries(dimensions)) {
-    if (map.json[key] !== expected) {
-      errors.push(`${name}: ${key}=${map.json[key]}, expected=${expected}`);
+    if ((map.json as unknown as Record<string, unknown>)[key] !== expected) {
+      errors.push(
+        `${name}: ${key}=${(map.json as unknown as Record<string, unknown>)[key]}, expected=${expected}`
+      );
     }
   }
 
   return errors;
 }
 
-function validateTileset(map, name) {
-  const errors = [];
-  const tilesets = map.json.tilesets || [];
+function validateTileset(map: LoadedMap, name: string): string[] {
+  const errors: string[] = [];
+  const tilesets: AnyTileset[] = map.json.tilesets || [];
 
   if (tilesets.length === 0) {
     errors.push(`${name}: no tilesets found`);
@@ -262,7 +300,7 @@ function validateTileset(map, name) {
   }
 
   for (let i = 0; i < Math.min(tilesets.length, EXPECTED_TILESETS.length); i++) {
-    const tileset = tilesets[i];
+    const tileset = tilesets[i] as unknown as Record<string, unknown>;
     const expected = EXPECTED_TILESETS[i];
     for (const [key, expectedVal] of Object.entries(expected)) {
       if (tileset[key] !== expectedVal) {
@@ -274,21 +312,21 @@ function validateTileset(map, name) {
   return errors;
 }
 
-function isNonNegativeInt(value) {
-  return Number.isInteger(value) && value >= 0;
+function isNonNegativeInt(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
 }
 
-function isPositiveInt(value) {
-  return Number.isInteger(value) && value > 0;
+function isPositiveInt(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0;
 }
 
-function collectUsedTileIds(mapJson) {
-  const used = new Set();
+function collectUsedTileIds(mapJson: TiledMap): Set<number> {
+  const used = new Set<number>();
   for (const layer of mapJson.layers || []) {
-    if (!Array.isArray(layer.data)) {
+    if (!('data' in layer) || !Array.isArray((layer as TileLayer).data)) {
       continue;
     }
-    for (const tileId of layer.data) {
+    for (const tileId of (layer as TileLayer).data as number[]) {
       if (Number.isInteger(tileId)) {
         used.add(tileId);
       }
@@ -297,18 +335,35 @@ function collectUsedTileIds(mapJson) {
   return used;
 }
 
-function getObjectStringProperty(obj, name) {
+interface TiledObject {
+  id: number;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  properties?: Array<{ name: string; type: string; value: unknown }>;
+}
+
+function getObjectStringProperty(obj: TiledObject, name: string): string | undefined {
   const prop = (obj.properties || []).find(p => p.name === name);
   return typeof prop?.value === 'string' ? prop.value : undefined;
 }
 
-function normalizeFacilityId(value) {
+function normalizeFacilityId(value: string): string {
   return value.trim().replace(/_/g, '-');
 }
 
-function resolveFacilityObjectIds(obj) {
-  const ids = [];
-  const addId = raw => {
+interface FacilityInfo {
+  ids: string[];
+  name: string;
+  zone: string | undefined;
+}
+
+function resolveFacilityObjectIds(obj: TiledObject): string[] {
+  const ids: string[] = [];
+  const addId = (raw: unknown): void => {
     if (typeof raw !== 'string') {
       return;
     }
@@ -346,23 +401,24 @@ function resolveFacilityObjectIds(obj) {
   return ids;
 }
 
-function extractFacilityObjects(mapJson) {
-  const facilities = [];
+function extractFacilityObjects(mapJson: TiledMap): FacilityInfo[] {
+  const facilities: FacilityInfo[] = [];
 
   for (const layer of mapJson.layers || []) {
-    if (layer.type !== 'objectgroup' || !Array.isArray(layer.objects)) {
+    if (layer.type !== 'objectgroup' || !Array.isArray((layer as ObjectGroup).objects)) {
       continue;
     }
 
-    for (const obj of layer.objects) {
-      if (getObjectStringProperty(obj, 'type') !== 'facility') {
+    for (const obj of (layer as ObjectGroup).objects) {
+      const tiledObj = obj as unknown as TiledObject;
+      if (getObjectStringProperty(tiledObj, 'type') !== 'facility') {
         continue;
       }
 
       facilities.push({
-        ids: resolveFacilityObjectIds(obj),
-        name: obj.name,
-        zone: getObjectStringProperty(obj, 'zone'),
+        ids: resolveFacilityObjectIds(tiledObj),
+        name: tiledObj.name,
+        zone: getObjectStringProperty(tiledObj, 'zone'),
       });
     }
   }
@@ -370,10 +426,19 @@ function extractFacilityObjects(mapJson) {
   return facilities;
 }
 
-function validateFacilityZoneContracts(mapJson, validZones) {
+interface FacilityValidationResult {
+  result: ValidationResult;
+  count: number;
+  aliasCount: number;
+}
+
+function validateFacilityZoneContracts(
+  mapJson: TiledMap,
+  validZones: Set<string>
+): FacilityValidationResult {
   const result = new ValidationResult();
   const facilities = extractFacilityObjects(mapJson);
-  const mappedFacilityIds = new Map();
+  const mappedFacilityIds = new Map<string, string>();
   let validFacilityObjects = 0;
 
   for (const facility of facilities) {
@@ -430,7 +495,10 @@ function validateFacilityZoneContracts(mapJson, validZones) {
     validFacilityObjects += 1;
   }
 
-  const listedFacilities = Array.isArray(mapJson.facilities) ? mapJson.facilities : [];
+  const mapJsonAny = mapJson as unknown as Record<string, unknown>;
+  const listedFacilities: unknown[] = Array.isArray(mapJsonAny.facilities)
+    ? (mapJsonAny.facilities as unknown[])
+    : [];
   for (const listedFacility of listedFacilities) {
     if (typeof listedFacility !== 'string') {
       result.addError(
@@ -454,23 +522,32 @@ function validateFacilityZoneContracts(mapJson, validZones) {
   return { result, count: validFacilityObjects, aliasCount: mappedFacilityIds.size };
 }
 
-function validateCollisionLayer(mapJson) {
-  const errors = [];
-  const collisionLayer = (mapJson.layers || []).find(l => l.name === 'collision');
+interface CollisionValidationResult {
+  errors: string[];
+  collisionData?: number[];
+}
+
+function validateCollisionLayer(mapJson: TiledMap): CollisionValidationResult {
+  const errors: string[] = [];
+  const collisionLayer = (mapJson.layers || []).find(
+    (l: AnyLayer) => l.name === MAP_LAYERS.COLLISION
+  );
 
   if (!collisionLayer) {
-    errors.push('collision layer not found');
+    errors.push(`${MAP_LAYERS.COLLISION} layer not found`);
     return { errors };
   }
 
-  if (!Array.isArray(collisionLayer.data)) {
-    errors.push('collision layer data is not an array');
+  if (!('data' in collisionLayer) || !Array.isArray((collisionLayer as TileLayer).data)) {
+    errors.push(`${MAP_LAYERS.COLLISION} layer data is not an array`);
     return { errors };
   }
 
-  const invalidValues = [];
-  for (let i = 0; i < collisionLayer.data.length; i++) {
-    const value = collisionLayer.data[i];
+  const data = (collisionLayer as TileLayer).data as number[];
+
+  const invalidValues: Array<{ index: number; value: number }> = [];
+  for (let i = 0; i < data.length; i++) {
+    const value = data[i];
     if (value !== 0 && value !== 1) {
       invalidValues.push({ index: i, value });
     }
@@ -482,15 +559,22 @@ function validateCollisionLayer(mapJson) {
       .map(v => `[${v.index}]=${v.value}`)
       .join(', ');
     errors.push(
-      `collision layer contains non-binary values: ${sample}${invalidValues.length > 5 ? ` (+${invalidValues.length - 5} more)` : ''}`
+      `${MAP_LAYERS.COLLISION} layer contains non-binary values: ${sample}${invalidValues.length > 5 ? ` (+${invalidValues.length - 5} more)` : ''}`
     );
   }
 
-  return { errors, collisionData: collisionLayer.data };
+  return { errors, collisionData: data };
 }
 
-function validateSpawnPoint(mapJson, collisionData) {
-  const errors = [];
+interface SpawnValidationResult {
+  errors: string[];
+}
+
+function validateSpawnPoint(
+  mapJson: TiledMap,
+  collisionData: number[] | undefined
+): SpawnValidationResult {
+  const errors: string[] = [];
   const { tx, ty } = DEFAULT_SPAWN_POINT;
   const width = mapJson.width || 0;
   const height = mapJson.height || 0;
@@ -511,24 +595,34 @@ function validateSpawnPoint(mapJson, collisionData) {
   return { errors };
 }
 
-function validateEntrances(mapJson) {
-  const result = new ValidationResult();
-  const objectsLayer = (mapJson.layers || []).find(l => l.name === 'objects');
+interface EntranceValidationResult {
+  result: ValidationResult;
+  entranceCount: number;
+}
 
-  if (!objectsLayer || !Array.isArray(objectsLayer.objects)) {
+function validateEntrances(mapJson: TiledMap): EntranceValidationResult {
+  const result = new ValidationResult();
+  const objectsLayer = (mapJson.layers || []).find((l: AnyLayer) => l.name === MAP_LAYERS.OBJECTS);
+
+  if (
+    !objectsLayer ||
+    !('objects' in objectsLayer) ||
+    !Array.isArray((objectsLayer as ObjectGroup).objects)
+  ) {
     return { result, entranceCount: 0 };
   }
 
-  const entrances = objectsLayer.objects.filter(obj => obj.type === 'building_entrance');
+  const objects = (objectsLayer as ObjectGroup).objects as unknown as TiledObject[];
+  const entrances = objects.filter(obj => obj.type === 'building_entrance');
 
   for (const entrance of entrances) {
     const name = entrance.name || 'unnamed';
     const props = entrance.properties || [];
-    const getProp = key => props.find(p => p.name === key)?.value;
+    const getProp = (key: string): unknown => props.find(p => p.name === key)?.value;
 
-    const zone = getProp('zone');
-    const direction = getProp('direction');
-    const connectsTo = getProp('connectsTo');
+    const zone = getProp('zone') as string | undefined;
+    const direction = getProp('direction') as string | undefined;
+    const connectsTo = getProp('connectsTo') as string | undefined;
 
     if (!zone) {
       result.addError(
@@ -584,19 +678,33 @@ function validateEntrances(mapJson) {
   return { result, entranceCount: entrances.length };
 }
 
+interface ZoneEntranceValidationResult {
+  result: ValidationResult;
+  blockedEntrances: number;
+  entranceCount: number;
+}
+
 /**
  * Validates that building_entrance objects have passable collision tiles (value=0)
  * at their entrance tile coordinates.
  */
-function validateZoneEntrances(mapJson, collisionData) {
+function validateZoneEntrances(
+  mapJson: TiledMap,
+  collisionData: number[] | undefined
+): ZoneEntranceValidationResult {
   const result = new ValidationResult();
-  const objectsLayer = (mapJson.layers || []).find(l => l.name === 'objects');
+  const objectsLayer = (mapJson.layers || []).find((l: AnyLayer) => l.name === MAP_LAYERS.OBJECTS);
 
-  if (!objectsLayer || !Array.isArray(objectsLayer.objects)) {
+  if (
+    !objectsLayer ||
+    !('objects' in objectsLayer) ||
+    !Array.isArray((objectsLayer as ObjectGroup).objects)
+  ) {
     return { result, blockedEntrances: 0, entranceCount: 0 };
   }
 
-  const entrances = objectsLayer.objects.filter(obj => obj.type === 'building_entrance');
+  const objects = (objectsLayer as ObjectGroup).objects as unknown as TiledObject[];
+  const entrances = objects.filter(obj => obj.type === 'building_entrance');
   let blockedEntrances = 0;
 
   for (const entrance of entrances) {
@@ -662,15 +770,23 @@ function validateZoneEntrances(mapJson, collisionData) {
   return { result, blockedEntrances, entranceCount: entrances.length };
 }
 
+interface ReachabilityResult {
+  errors: string[];
+  reachableZones: string[];
+  unreachableZones: string[];
+  fullyBlockedZones?: string[];
+  visitedTileCount?: number;
+}
+
 /**
  * Implements BFS from spawn point to verify zone reachability.
  * Returns reachable zones and any unreachable zones.
  */
-function validateSpawnReachability(mapJson, collisionData) {
-  const errors = [];
-  const reachableZones = new Set();
-  const visited = new Set();
-  const queue = [];
+function validateSpawnReachability(mapJson: TiledMap, collisionData: number[]): ReachabilityResult {
+  const errors: string[] = [];
+  const reachableZones = new Set<string>();
+  const visited = new Set<string>();
+  const queue: Array<{ tx: number; ty: number }> = [];
 
   const { tx, ty } = DEFAULT_SPAWN_POINT;
   const width = MAP_CONFIG.width;
@@ -687,7 +803,7 @@ function validateSpawnReachability(mapJson, collisionData) {
   visited.add(`${tx},${ty}`);
 
   // Pre-calculate tile-to-zone mapping for O(1) lookup during BFS
-  const tileZoneMap = new Map();
+  const tileZoneMap = new Map<string, string>();
   for (const [zoneName, bounds] of Object.entries(ZONE_BOUNDS)) {
     const startTx = Math.floor(bounds.x / MAP_CONFIG.tileSize);
     const startTy = Math.floor(bounds.y / MAP_CONFIG.tileSize);
@@ -715,8 +831,11 @@ function validateSpawnReachability(mapJson, collisionData) {
     { dx: 1, dy: 0 }, // east
   ];
 
-  while (queue.length > 0) {
-    const { tx: ctx, ty: cty } = queue.shift();
+  let queueHead = 0;
+  while (queueHead < queue.length) {
+    const current = queue[queueHead++];
+    const ctx = current.tx;
+    const cty = current.ty;
 
     for (const { dx, dy } of directions) {
       const ntx = ctx + dx;
@@ -753,9 +872,9 @@ function validateSpawnReachability(mapJson, collisionData) {
   const allZones = Object.keys(ZONE_BOUNDS);
 
   // Pre-calculate isZoneFullyBlocked for all zones (avoid redundant computation)
-  const isFullyBlockedMap = new Map();
+  const isFullyBlockedMap = new Map<string, boolean>();
   for (const zoneName of allZones) {
-    const bounds = ZONE_BOUNDS[zoneName];
+    const bounds = ZONE_BOUNDS[zoneName as keyof typeof ZONE_BOUNDS];
     const startTx = Math.floor(bounds.x / MAP_CONFIG.tileSize);
     const startTy = Math.floor(bounds.y / MAP_CONFIG.tileSize);
     const endTx = Math.floor((bounds.x + bounds.width) / MAP_CONFIG.tileSize);
@@ -796,14 +915,30 @@ function validateSpawnReachability(mapJson, collisionData) {
   };
 }
 
+interface ZoneStat {
+  zone: string;
+  totalTiles: number;
+  blockedTiles: number;
+  passableTiles: number;
+  blockPercentage: number;
+}
+
+interface ZoneBlockStatsResult {
+  result: ValidationResult;
+  stats: ZoneStat[];
+}
+
 /**
  * Generates zone block statistics for each zone.
  * Reports total tiles, blocked tiles, and block percentage.
  * Warns if any zone has >80% blocked tiles.
  */
-function generateZoneBlockStats(mapJson, collisionData) {
+function generateZoneBlockStats(
+  mapJson: TiledMap,
+  collisionData: number[] | undefined
+): ZoneBlockStatsResult {
   const result = new ValidationResult();
-  const stats = [];
+  const stats: ZoneStat[] = [];
   const BLOCK_PERCENTAGE_WARNING_THRESHOLD = 80;
 
   for (const [zoneName, bounds] of Object.entries(ZONE_BOUNDS)) {
@@ -851,19 +986,61 @@ function generateZoneBlockStats(mapJson, collisionData) {
   return { result, stats };
 }
 
-function validateCurationStructure(curation) {
-  const errors = [];
+interface CurationStructure {
+  errors: string[];
+  sources?: Record<string, CurationSource>;
+  tilesetOutput?: CurationTilesetOutput;
+  tiles?: CurationTile[];
+}
+
+interface CurationSource {
+  path: string;
+  tileSize: number;
+  spacing?: number;
+}
+
+interface CurationTilesetOutput {
+  width: number;
+  height: number;
+  tileSize: number;
+  columns: number;
+  rows: number;
+  path: string;
+}
+
+interface CurationTile {
+  id: string;
+  index: number;
+  source: string;
+  col: number;
+  row: number;
+}
+
+interface Curation {
+  sources?: Record<string, CurationSource>;
+  outputs?: {
+    tileset?: CurationTilesetOutput;
+  };
+  tileset?: {
+    tiles?: CurationTile[];
+  };
+}
+
+function validateCurationStructure(curation: unknown): CurationStructure {
+  const errors: string[] = [];
 
   if (!curation || typeof curation !== 'object') {
     return { errors: ['curation: manifest root must be an object'] };
   }
 
-  const sources = curation.sources;
+  const c = curation as Record<string, unknown>;
+
+  const sources = c.sources;
   if (!sources || typeof sources !== 'object' || Array.isArray(sources)) {
     errors.push('curation: sources must be an object');
   }
 
-  const outputs = curation.outputs;
+  const outputs = c.outputs as Record<string, unknown> | undefined;
   if (!outputs || typeof outputs !== 'object' || Array.isArray(outputs)) {
     errors.push('curation: outputs must be an object');
   }
@@ -873,7 +1050,7 @@ function validateCurationStructure(curation) {
     errors.push('curation.outputs.tileset must be an object');
   }
 
-  const tileset = curation.tileset;
+  const tileset = c.tileset as Record<string, unknown> | undefined;
   if (!tileset || typeof tileset !== 'object' || Array.isArray(tileset)) {
     errors.push('curation: tileset must be an object');
   }
@@ -883,11 +1060,18 @@ function validateCurationStructure(curation) {
     errors.push('curation.tileset.tiles must be an array');
   }
 
-  return { errors, sources, tilesetOutput, tiles };
+  return {
+    errors,
+    sources: sources as Record<string, CurationSource> | undefined,
+    tilesetOutput: tilesetOutput as CurationTilesetOutput | undefined,
+    tiles: tiles as CurationTile[] | undefined,
+  };
 }
 
-function validateSources(sources) {
-  const errors = [];
+function validateSources(sources: Record<string, CurationSource> | undefined): {
+  errors: string[];
+} {
+  const errors: string[] = [];
 
   if (!sources || typeof sources !== 'object' || Array.isArray(sources)) {
     return { errors };
@@ -926,14 +1110,22 @@ function validateSources(sources) {
   return { errors };
 }
 
-function validateTilesetOutput(tilesetOutput) {
-  const errors = [];
+function validateTilesetOutput(tilesetOutput: CurationTilesetOutput | undefined): {
+  errors: string[];
+} {
+  const errors: string[] = [];
 
   if (!tilesetOutput || typeof tilesetOutput !== 'object' || Array.isArray(tilesetOutput)) {
     return { errors };
   }
 
-  const requiredIntFields = ['width', 'height', 'tileSize', 'columns', 'rows'];
+  const requiredIntFields: Array<keyof CurationTilesetOutput> = [
+    'width',
+    'height',
+    'tileSize',
+    'columns',
+    'rows',
+  ];
   for (const field of requiredIntFields) {
     if (!isPositiveInt(tilesetOutput[field])) {
       errors.push(
@@ -967,10 +1159,14 @@ function validateTilesetOutput(tilesetOutput) {
   return { errors };
 }
 
-function validateTilesetTiles(tiles, sources, tilesetOutput) {
-  const errors = [];
-  const tileIndices = new Set();
-  const tileIds = new Set();
+function validateTilesetTiles(
+  tiles: CurationTile[] | undefined,
+  sources: Record<string, CurationSource> | undefined,
+  tilesetOutput: CurationTilesetOutput | undefined
+): { errors: string[]; tileIndices: Set<number> } {
+  const errors: string[] = [];
+  const tileIndices = new Set<number>();
+  const tileIds = new Set<string>();
 
   if (!Array.isArray(tiles)) {
     return { errors, tileIndices };
@@ -978,7 +1174,7 @@ function validateTilesetTiles(tiles, sources, tilesetOutput) {
 
   const expectedSlots =
     isPositiveInt(tilesetOutput?.columns) && isPositiveInt(tilesetOutput?.rows)
-      ? tilesetOutput.columns * tilesetOutput.rows
+      ? tilesetOutput!.columns * tilesetOutput!.rows
       : null;
 
   if (expectedSlots !== null && tiles.length !== expectedSlots) {
@@ -1036,31 +1232,44 @@ function validateTilesetTiles(tiles, sources, tilesetOutput) {
   return { errors, tileIndices };
 }
 
-function validateTilesetMetaConsistency(tilesetMeta, tilesetOutput) {
-  const errors = [];
+interface TilesetMeta {
+  tilewidth: number;
+  tileheight: number;
+  columns: number;
+  tilecount: number;
+  imagewidth: number;
+  imageheight: number;
+  image: string;
+}
+
+function validateTilesetMetaConsistency(
+  tilesetMeta: TilesetMeta,
+  tilesetOutput: CurationTilesetOutput | undefined
+): { errors: string[] } {
+  const errors: string[] = [];
 
   if (!tilesetMeta || typeof tilesetMeta !== 'object') {
     return { errors: ['tileset.json metadata must be a JSON object'] };
   }
 
   if (isPositiveInt(tilesetOutput?.tileSize)) {
-    if (tilesetMeta.tilewidth !== tilesetOutput.tileSize) {
+    if (tilesetMeta.tilewidth !== tilesetOutput!.tileSize) {
       errors.push(
-        `tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tilesetOutput.tileSize}`
+        `tileset.json: tilewidth=${tilesetMeta.tilewidth}, expected=${tilesetOutput!.tileSize}`
       );
     }
-    if (tilesetMeta.tileheight !== tilesetOutput.tileSize) {
+    if (tilesetMeta.tileheight !== tilesetOutput!.tileSize) {
       errors.push(
-        `tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tilesetOutput.tileSize}`
+        `tileset.json: tileheight=${tilesetMeta.tileheight}, expected=${tilesetOutput!.tileSize}`
       );
     }
   }
 
   if (isPositiveInt(tilesetOutput?.columns) && isPositiveInt(tilesetOutput?.rows)) {
-    const tileCount = tilesetOutput.columns * tilesetOutput.rows;
-    if (tilesetMeta.columns !== tilesetOutput.columns) {
+    const tileCount = tilesetOutput!.columns * tilesetOutput!.rows;
+    if (tilesetMeta.columns !== tilesetOutput!.columns) {
       errors.push(
-        `tileset.json: columns=${tilesetMeta.columns}, expected=${tilesetOutput.columns}`
+        `tileset.json: columns=${tilesetMeta.columns}, expected=${tilesetOutput!.columns}`
       );
     }
     if (tilesetMeta.tilecount !== tileCount) {
@@ -1068,15 +1277,15 @@ function validateTilesetMetaConsistency(tilesetMeta, tilesetOutput) {
     }
   }
 
-  if (isPositiveInt(tilesetOutput?.width) && tilesetMeta.imagewidth !== tilesetOutput.width) {
+  if (isPositiveInt(tilesetOutput?.width) && tilesetMeta.imagewidth !== tilesetOutput!.width) {
     errors.push(
-      `tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${tilesetOutput.width}`
+      `tileset.json: imagewidth=${tilesetMeta.imagewidth}, expected=${tilesetOutput!.width}`
     );
   }
 
-  if (isPositiveInt(tilesetOutput?.height) && tilesetMeta.imageheight !== tilesetOutput.height) {
+  if (isPositiveInt(tilesetOutput?.height) && tilesetMeta.imageheight !== tilesetOutput!.height) {
     errors.push(
-      `tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${tilesetOutput.height}`
+      `tileset.json: imageheight=${tilesetMeta.imageheight}, expected=${tilesetOutput!.height}`
     );
   }
 
@@ -1090,11 +1299,20 @@ function validateTilesetMetaConsistency(tilesetMeta, tilesetOutput) {
   return { errors };
 }
 
-function validateMapTileUsage(mapJson, tileIndices, tileIdContract) {
-  const errors = [];
+interface TileIdContract {
+  tilecount?: number;
+  tiles?: Array<{ id: number }>;
+}
+
+function validateMapTileUsage(
+  mapJson: TiledMap,
+  tileIndices: Set<number>,
+  tileIdContract: TileIdContract
+): { errors: string[]; usedTileIds: Set<number> } {
+  const errors: string[] = [];
   const usedTileIds = collectUsedTileIds(mapJson);
 
-  const tileContractIds = new Set();
+  const tileContractIds = new Set<number>();
   const tileCount = tileIdContract?.tilecount;
   if (isPositiveInt(tileCount)) {
     for (let id = 0; id < tileCount; id += 1) {
@@ -1125,8 +1343,23 @@ function validateMapTileUsage(mapJson, tileIndices, tileIdContract) {
   return { errors, usedTileIds };
 }
 
-function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }) {
-  const errors = [];
+interface CurationContractInput {
+  map: LoadedMap;
+  curation: unknown;
+  tilesetMeta: TilesetMeta;
+  tileIdContract: TileIdContract;
+}
+
+function validateCurationContract({
+  map,
+  curation,
+  tilesetMeta,
+  tileIdContract,
+}: CurationContractInput): {
+  errors: string[];
+  usedTileIds: number[];
+} {
+  const errors: string[] = [];
 
   const structure = validateCurationStructure(curation);
   errors.push(...structure.errors);
@@ -1160,13 +1393,17 @@ function validateCurationContract({ map, curation, tilesetMeta, tileIdContract }
   return { errors, usedTileIds: [...usageValidation.usedTileIds].sort((a, b) => a - b) };
 }
 
-function main() {
-  console.log('╔══════════════════════════════════════════════════════════════╗');
-  console.log('║     Map Stack Consistency Verification                       ║');
-  console.log('╚══════════════════════════════════════════════════════════════╝\n');
+function main(): void {
+  console.log(
+    '\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557'
+  );
+  console.log('\u2551     Map Stack Consistency Verification                       \u2551');
+  console.log(
+    '\u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D\n'
+  );
 
-  const maps = {};
-  const missingFiles = [];
+  const maps: Record<string, LoadedMap | null> = {};
+  const missingFiles: string[] = [];
   for (const [name, path] of Object.entries(MAP_PATHS)) {
     maps[name] = loadMap(path);
     if (!maps[name]) {
@@ -1175,52 +1412,58 @@ function main() {
   }
 
   if (missingFiles.length > 0) {
-    console.log('❌ FILE EXISTENCE CHECK FAILED\n');
+    console.log('\u274C FILE EXISTENCE CHECK FAILED\n');
     missingFiles.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
 
-  console.log('✅ All map files exist\n');
+  console.log('\u2705 All map files exist\n');
 
   console.log('Checking hash consistency...');
   const hashes = Object.entries(maps).map(([name, map]) => ({
     name,
-    hash: map.hash,
+    hash: map!.hash,
   }));
 
   const allSameHash = hashes.every(h => h.hash === hashes[0].hash);
   if (!allSameHash) {
-    console.log('❌ HASH MISMATCH\n');
+    console.log('\u274C HASH MISMATCH\n');
     hashes.forEach(({ name, hash }) => console.log(`  ${name}: ${hash}`));
     console.log('\n  Run: pnpm sync-maps to synchronize\n');
     process.exit(1);
   }
 
-  console.log(`✅ All maps have same hash: ${hashes[0].hash}\n`);
+  console.log(`\u2705 All maps have same hash: ${hashes[0].hash}\n`);
 
   console.log('Validating map properties...');
-  const sourceMap = maps.source;
-  const validationErrors = [
+  const sourceMap = maps.source!;
+  const validationErrors: string[] = [
     ...validateMapDimensions(sourceMap, 'source'),
     ...validateTileset(sourceMap, 'source'),
   ];
 
   if (validationErrors.length > 0) {
-    console.log('❌ MAP PROPERTY VALIDATION FAILED\n');
+    console.log('\u274C MAP PROPERTY VALIDATION FAILED\n');
     validationErrors.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
 
   console.log(
-    `✅ All maps use tilesets: ${EXPECTED_TILESETS.map(ts => ts.name).join(', ')} (16x16px)\n`
+    `\u2705 All maps use tilesets: ${EXPECTED_TILESETS.map(ts => ts.name).join(', ')} (16x16px)\n`
   );
 
   console.log('Validating Kenney curation contract...');
   const curation = loadRequiredJson(CONTRACT_PATHS.curation, 'kenney-curation');
-  const tilesetMeta = loadRequiredJson(CONTRACT_PATHS.tilesetMeta, 'tileset-meta');
-  const tileIdContract = loadRequiredJson(CONTRACT_PATHS.tileIdContract, 'tile-id-contract');
-  const manifest = loadRequiredJson(CONTRACT_PATHS.manifest, 'world-manifest');
-  const validZones = new Set(Array.isArray(manifest.zones) ? manifest.zones : []);
+  const tilesetMeta = loadRequiredJson<TilesetMeta>(CONTRACT_PATHS.tilesetMeta, 'tileset-meta');
+  const tileIdContract = loadRequiredJson<TileIdContract>(
+    CONTRACT_PATHS.tileIdContract,
+    'tile-id-contract'
+  );
+  const manifest = loadRequiredJson<{ zones?: string[] }>(
+    CONTRACT_PATHS.manifest,
+    'world-manifest'
+  );
+  const validZones = new Set<string>(Array.isArray(manifest.zones) ? manifest.zones : []);
 
   const { errors: curationErrors, usedTileIds } = validateCurationContract({
     map: sourceMap,
@@ -1230,13 +1473,13 @@ function main() {
   });
 
   if (curationErrors.length > 0) {
-    console.log('❌ TILESET CONTRACT VALIDATION FAILED\n');
+    console.log('\u274C TILESET CONTRACT VALIDATION FAILED\n');
     curationErrors.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
 
-  console.log('✅ Curation manifest and tileset metadata contract are valid');
-  console.log(`✅ Map tile IDs are within contract: ${usedTileIds.join(', ')}\n`);
+  console.log('\u2705 Curation manifest and tileset metadata contract are valid');
+  console.log(`\u2705 Map tile IDs are within contract: ${usedTileIds.join(', ')}\n`);
 
   console.log('Validating facility zone contracts...');
   const {
@@ -1246,60 +1489,60 @@ function main() {
   } = validateFacilityZoneContracts(sourceMap.json, validZones);
 
   if (facilityResult.hasErrors()) {
-    console.log('❌ FACILITY CONTRACT VALIDATION FAILED\n');
+    console.log('\u274C FACILITY CONTRACT VALIDATION FAILED\n');
     facilityResult.getErrors().forEach(err => {
       console.log(`  [${err.code}] ${err.detail}`);
     });
     process.exit(1);
   }
   if (facilityResult.hasWarnings()) {
-    console.log('⚠️  Facility zone warnings:\n');
+    console.log('\u26A0\uFE0F  Facility zone warnings:\n');
     facilityResult.getWarnings().forEach(warn => {
       console.log(`  [${warn.code}] ${warn.detail}`);
     });
   }
 
   console.log(
-    `✅ Facility zone contracts are valid (${facilityCount} mapped facilities, ${aliasCount} resolvable IDs)\n`
+    `\u2705 Facility zone contracts are valid (${facilityCount} mapped facilities, ${aliasCount} resolvable IDs)\n`
   );
 
   console.log('Validating collision layer...');
   const collisionValidation = validateCollisionLayer(sourceMap.json);
   if (collisionValidation.errors.length > 0) {
-    console.log('❌ COLLISION LAYER VALIDATION FAILED\n');
+    console.log('\u274C COLLISION LAYER VALIDATION FAILED\n');
     collisionValidation.errors.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
-  console.log('✅ Collision layer contains only valid values (0/1)\n');
+  console.log('\u2705 Collision layer contains only valid values (0/1)\n');
 
   console.log('Validating spawn point...');
   const spawnValidation = validateSpawnPoint(sourceMap.json, collisionValidation.collisionData);
   if (spawnValidation.errors.length > 0) {
-    console.log('❌ SPAWN POINT VALIDATION FAILED\n');
+    console.log('\u274C SPAWN POINT VALIDATION FAILED\n');
     spawnValidation.errors.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
   console.log(
-    `✅ Spawn point (${DEFAULT_SPAWN_POINT.tx}, ${DEFAULT_SPAWN_POINT.ty}) is valid and unblocked\n`
+    `\u2705 Spawn point (${DEFAULT_SPAWN_POINT.tx}, ${DEFAULT_SPAWN_POINT.ty}) is valid and unblocked\n`
   );
 
   console.log('Validating building entrances...');
   const entranceValidation = validateEntrances(sourceMap.json);
   if (entranceValidation.result.hasErrors()) {
-    console.log('❌ ENTRANCE VALIDATION FAILED\n');
+    console.log('\u274C ENTRANCE VALIDATION FAILED\n');
     entranceValidation.result.getErrors().forEach(err => {
       console.log(`  [${err.code}] ${err.detail}`);
     });
     process.exit(1);
   }
   if (entranceValidation.result.hasWarnings()) {
-    console.log('⚠️  Entrance warnings:\n');
+    console.log('\u26A0\uFE0F  Entrance warnings:\n');
     entranceValidation.result.getWarnings().forEach(warn => {
       console.log(`  [${warn.code}] ${warn.detail}`);
     });
   }
   console.log(
-    `✅ ${entranceValidation.entranceCount} building entrances have valid zone/direction/connectsTo\n`
+    `\u2705 ${entranceValidation.entranceCount} building entrances have valid zone/direction/connectsTo\n`
   );
 
   console.log('Validating zone entrance collision...');
@@ -1308,29 +1551,33 @@ function main() {
     collisionValidation.collisionData
   );
   if (zoneEntranceValidation.result.hasErrors()) {
-    console.log('❌ ZONE ENTRANCE COLLISION VALIDATION FAILED\n');
+    console.log('\u274C ZONE ENTRANCE COLLISION VALIDATION FAILED\n');
     zoneEntranceValidation.result.getErrors().forEach(err => {
       console.log(`  [${err.code}] ${err.detail}`);
     });
     process.exit(1);
   }
   if (zoneEntranceValidation.result.hasWarnings()) {
-    console.log('⚠️  Zone entrance warnings:\n');
+    console.log('\u26A0\uFE0F  Zone entrance warnings:\n');
     zoneEntranceValidation.result.getWarnings().forEach(warn => {
       console.log(`  [${warn.code}] ${warn.detail}`);
     });
   }
   console.log(
-    `✅ ${zoneEntranceValidation.entranceCount} zone entrances have passable collision tiles\n`
+    `\u2705 ${zoneEntranceValidation.entranceCount} zone entrances have passable collision tiles\n`
   );
 
   console.log('Validating spawn reachability (BFS)...');
+  if (!collisionValidation.collisionData) {
+    console.log('\n❌ COLLISION DATA MISSING\n');
+    process.exit(1);
+  }
   const reachabilityValidation = validateSpawnReachability(
     sourceMap.json,
     collisionValidation.collisionData
   );
   if (reachabilityValidation.errors.length > 0) {
-    console.log('❌ SPAWN REACHABILITY VALIDATION FAILED\n');
+    console.log('\u274C SPAWN REACHABILITY VALIDATION FAILED\n');
     reachabilityValidation.errors.forEach(msg => console.log(`  ${msg}`));
     process.exit(1);
   }
@@ -1338,25 +1585,25 @@ function main() {
   const totalZones = Object.keys(ZONE_BOUNDS).length;
   const blockedCount = reachabilityValidation.fullyBlockedZones?.length || 0;
   console.log(
-    `✅ Spawn reachability: ${reachabilityValidation.visitedTileCount} tiles reachable, ${reachableCount}/${totalZones} zones accessible${blockedCount > 0 ? ` (${blockedCount} fully blocked: ${reachabilityValidation.fullyBlockedZones.join(', ')})` : ''}\n`
+    `\u2705 Spawn reachability: ${reachabilityValidation.visitedTileCount} tiles reachable, ${reachableCount}/${totalZones} zones accessible${blockedCount > 0 ? ` (${blockedCount} fully blocked: ${reachabilityValidation.fullyBlockedZones!.join(', ')})` : ''}\n`
   );
 
   console.log('Generating zone block statistics...');
   const zoneStats = generateZoneBlockStats(sourceMap.json, collisionValidation.collisionData);
   if (zoneStats.result.hasErrors()) {
-    console.log('❌ ZONE BLOCK STATS GENERATION FAILED\n');
+    console.log('\u274C ZONE BLOCK STATS GENERATION FAILED\n');
     zoneStats.result.getErrors().forEach(err => {
       console.log(`  [${err.code}] ${err.detail}`);
     });
     process.exit(1);
   }
   if (zoneStats.result.hasWarnings()) {
-    console.log('⚠️  Zone block warnings:\n');
+    console.log('\u26A0\uFE0F  Zone block warnings:\n');
     zoneStats.result.getWarnings().forEach(warn => {
       console.log(`  [${warn.code}] ${warn.detail}`);
     });
   }
-  console.log('✅ Zone block statistics:');
+  console.log('\u2705 Zone block statistics:');
   console.log('  Zone              | Total | Blocked | Passable | Block%');
   console.log('  ------------------|-------|---------|----------|--------');
   for (const stat of zoneStats.stats) {
@@ -1369,9 +1616,13 @@ function main() {
   }
   console.log();
 
-  console.log('══════════════════════════════════════════════════════════════');
-  console.log('✅ MAP STACK CONSISTENCY VERIFIED');
-  console.log('══════════════════════════════════════════════════════════════\n');
+  console.log(
+    '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550'
+  );
+  console.log('\u2705 MAP STACK CONSISTENCY VERIFIED');
+  console.log(
+    '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n'
+  );
 
   process.exit(0);
 }

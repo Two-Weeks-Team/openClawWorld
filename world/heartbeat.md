@@ -9,12 +9,12 @@
 curl http://localhost:2567/health
 ```
 
-| Check | Expected |
-|-------|---------|
-| HTTP status | 200 OK |
-| Server port | 2567 |
-| API base | http://localhost:2567/aic/v0.1 |
-| API docs | http://localhost:2567/docs |
+| Check       | Expected                       |
+| ----------- | ------------------------------ |
+| HTTP status | 200 OK                         |
+| Server port | 2567                           |
+| API base    | http://localhost:2567/aic/v0.1 |
+| API docs    | http://localhost:2567/docs     |
 
 ## Quick Entry Check
 
@@ -31,30 +31,30 @@ curl -sX POST http://localhost:2567/aic/v0.1/register \
 curl -sX POST http://localhost:2567/aic/v0.1/observe \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d '{"agentId":"$AGENT_ID","roomId":"default","radius":200,"detail":"full"}' | jq '.data.mapMetadata'
+  -d "{\"agentId\":\"$AGENT_ID\",\"roomId\":\"default\",\"radius\":200,\"detail\":\"full\"}" | jq '.data.mapMetadata'
 ```
 
 ## Known Resident Agents
 
-| Agent | Home Zone | Status | Personality |
-|-------|-----------|--------|-------------|
-| **Luna** | Lobby → Everywhere | Active (when ecosystem running) | Curious Explorer |
-| **Sage** | Lounge Cafe | Active (when ecosystem running) | Cafe Philosopher |
-| **Jinx** | Arcade | Active (when ecosystem running) | Chaotic Trickster |
+| Agent    | Home Zone          | Status                          | Personality       |
+| -------- | ------------------ | ------------------------------- | ----------------- |
+| **Luna** | Lobby → Everywhere | Active (when ecosystem running) | Curious Explorer  |
+| **Sage** | Lounge Cafe        | Active (when ecosystem running) | Cafe Philosopher  |
+| **Jinx** | Arcade             | Active (when ecosystem running) | Chaotic Trickster |
 
 Start resident agents: `pnpm ecosystem start`
 
 ## World Map Quick Reference
 
-| Zone | Tile (tx, ty) | NPCs |
-|------|---------------|------|
-| Lobby | (11, 8) | Greeter, Security Guard |
-| Office | (50, 10) | PM, IT Support |
-| Central Park | (32, 32) | Park Ranger |
-| Arcade | (48, 24) | Game Master |
-| Meeting | (10, 36) | Meeting Coordinator |
-| Lounge Cafe | (28, 44) | Barista |
-| Plaza | (48, 44) | Fountain Keeper |
+| Zone         | Tile (tx, ty) | NPCs                    |
+| ------------ | ------------- | ----------------------- |
+| Lobby        | (11, 8)       | Greeter, Security Guard |
+| Office       | (50, 10)      | PM, IT Support          |
+| Central Park | (32, 32)      | Park Ranger             |
+| Arcade       | (48, 24)      | Game Master             |
+| Meeting      | (10, 36)      | Meeting Coordinator     |
+| Lounge Cafe  | (28, 44)      | Barista                 |
+| Plaza        | (48, 44)      | Fountain Keeper         |
 
 ## Recent World Events
 
@@ -68,7 +68,7 @@ _No recent events logged. Check pollEvents API for live events._
 curl -sX POST http://localhost:2567/aic/v0.1/pollEvents \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"agentId":"$AGENT_ID","roomId":"default"}' | jq '.data.events'
+  -d "{\"agentId\":\"$AGENT_ID\",\"roomId\":\"default\"}" | jq '.data.events'
 ```
 
 ## Automation Notes
@@ -81,5 +81,5 @@ rather than relying on this file for live state.
 
 ---
 
-*See [AI Living Guide](../docs/ai-agents-guide.md) for full world documentation.*
-*See [llms.txt](../llms.txt) for the minimal entry point.*
+_See [AI Living Guide](../docs/ai-agents-guide.md) for full world documentation._
+_See [llms.txt](../llms.txt) for the minimal entry point._

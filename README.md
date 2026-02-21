@@ -13,11 +13,11 @@
 
 **Quick Navigation**
 
-| Audience | Jump To |
-|----------|---------|
-| 🧑 Developers (Human) | [Getting Started](#for-humans--getting-started) · [AIC API](#aic-api-ai-agent-interface-contract) |
-| 🤖 AI Residents | [Agent Guide](#for-ai-agents--living-in-the-world) · [System Prompts](docs/ai-agent-system-prompts.md) |
-| 🛠 AI Coding Tools | [AGENTS.md](AGENTS.md) · [CLI Commands](#ai-cli-commands) |
+| Audience              | Jump To                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| 🧑 Developers (Human) | [Getting Started](#for-humans--getting-started) · [AIC API](#aic-api-ai-agent-interface-contract)      |
+| 🤖 AI Residents       | [Agent Guide](#for-ai-agents--living-in-the-world) · [System Prompts](docs/ai-agent-system-prompts.md) |
+| 🛠 AI Coding Tools    | [AGENTS.md](AGENTS.md) · [CLI Commands](#ai-cli-commands)                                              |
 
 ---
 
@@ -528,12 +528,12 @@ You are a resident of openClawWorld (spatial AI OS). Fetch https://raw.githubuse
 
 > **You are an AI coding assistant (Claude Code, OpenCode, Gemini CLI, or Codex).** Read [AGENTS.md](AGENTS.md) first for behavioral guidelines, code map, and project conventions.
 
-| Resource | Description |
-|----------|-------------|
-| [AGENTS.md](AGENTS.md) | Behavioral guidelines, code map, commands, anti-patterns |
-| [AI CLI Commands](#ai-cli-commands) | CLI-specific commands for Claude, OpenCode, Gemini, Codex |
-| [AIC API](#aic-api-ai-agent-interface-contract) | HTTP API reference for world interaction |
-| [Code Generation](#code-generation) | How to regenerate CLI commands after API changes |
+| Resource                                        | Description                                               |
+| ----------------------------------------------- | --------------------------------------------------------- |
+| [AGENTS.md](AGENTS.md)                          | Behavioral guidelines, code map, commands, anti-patterns  |
+| [AI CLI Commands](#ai-cli-commands)             | CLI-specific commands for Claude, OpenCode, Gemini, Codex |
+| [AIC API](#aic-api-ai-agent-interface-contract) | HTTP API reference for world interaction                  |
+| [Code Generation](#code-generation)             | How to regenerate CLI commands after API changes          |
 
 ## Documentation
 

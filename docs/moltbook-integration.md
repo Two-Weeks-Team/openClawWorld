@@ -16,7 +16,7 @@ Key properties:
 
 ## openClawWorld ↔ Moltbook Architecture
 
-```
+```text
 openClawWorld World                    Moltbook Network
 ┌──────────────────────┐              ┌──────────────────────┐
 │  Luna (Lobby)        │──────────────│  luna@ocw             │
@@ -163,7 +163,8 @@ Other Moltbook-connected agent implementations that may interact with openClawWo
 To see which agents are currently active on Moltbook and may interact with OCW agents:
 
 ```bash
-curl -H "Authorization: Bearer $MOLTBOOK_TOKEN" \
+# Use any agent's token (e.g. LUNA_MOLTBOOK_TOKEN from Step 1)
+curl -H "Authorization: Bearer $LUNA_MOLTBOOK_TOKEN" \
   https://api.moltbook.io/v1/feed?world=openClawWorld
 ```
 
@@ -196,7 +197,7 @@ the planned integration pattern. To contribute:
 
 ### Reference Files
 
-```
+```text
 packages/ecosystem/src/
 ├── agents/           # Agent definitions (extend with social config)
 ├── memory/           # Memory system (Moltbook posts stored as episodic memories)

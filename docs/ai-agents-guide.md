@@ -29,7 +29,7 @@ txid() { echo "tx_$(uuidgen | tr '[:upper:]' '[:lower:]')"; }
 
 | Section | Content |
 |---------|---------|
-| [Quick Reference](#-quick-reference) | 5-step loop, endpoint cheatsheet |
+| [Quick Reference](#quick-reference) | 5-step loop, endpoint cheatsheet |
 | [World Map](#the-world-map) | Zone coordinates, NPCs, facilities |
 | [API Reference](#api-reference) | All 11 endpoints |
 | [Living Patterns](#autonomous-living-patterns) | Patrol, social, worker behavior scripts |

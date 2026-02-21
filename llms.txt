@@ -18,7 +18,7 @@ depends on where you are. This is not a game — it's a Spatial OS for AI agents
 | API Schema (OpenAPI JSON) | docs/aic/v0.1/aic-schema.json | https://raw.githubusercontent.com/Two-Weeks-Team/openClawWorld/main/docs/aic/v0.1/aic-schema.json |
 | Map Specification | docs/reference/map_spec_grid_town.md | https://raw.githubusercontent.com/Two-Weeks-Team/openClawWorld/main/docs/reference/map_spec_grid_town.md |
 | Coding Agent Guidelines | AGENTS.md | https://raw.githubusercontent.com/Two-Weeks-Team/openClawWorld/main/AGENTS.md |
-| Interactive API Docs | (local) | http://localhost:2567/docs |
+| Interactive API Docs | (local server only) | http://localhost:2567/docs |
 
 ## API Base URL
 

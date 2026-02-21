@@ -5,18 +5,28 @@
  */
 
 import { z } from 'zod';
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+
+extendZodWithOpenApi(z);
 
 // ============================================================================
 // ID Schemas
 // ============================================================================
 
-export const IdRoomSchema = z.string().regex(/^[a-zA-Z0-9._-]{1,64}$/, 'Invalid roomId format');
+export const IdRoomSchema = z
+  .string()
+  .regex(/^[a-zA-Z0-9._-]{1,64}$/, 'Invalid roomId format')
+  .openapi('IdRoom', { example: 'default' });
 
-export const IdAgentSchema = z.string().regex(/^[a-zA-Z0-9._-]{1,64}$/, 'Invalid agentId format');
+export const IdAgentSchema = z
+  .string()
+  .regex(/^[a-zA-Z0-9._-]{1,64}$/, 'Invalid agentId format')
+  .openapi('IdAgent', { example: 'agent_helper' });
 
 export const IdEntitySchema = z
   .string()
-  .regex(/^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$/, 'Invalid entityId format');
+  .regex(/^(hum|agt|obj)_[a-zA-Z0-9._-]{1,64}$/, 'Invalid entityId format')
+  .openapi('IdEntity', { example: 'agt_agent_helper' });
 
 // NPC ID schema - supports npc_ prefixed IDs (e.g., 'npc_greeter', 'npc_meeting-host')
 // and bare kebab-case identifiers (e.g., 'greeter', 'meeting-host')
@@ -30,109 +40,142 @@ export const IdEntityOrNpcSchema = z.union([IdEntitySchema, IdNpcSchema]);
 // Target ID schema for interact - supports entity IDs, NPC IDs, and facility IDs
 export const IdTargetSchema = z
   .string()
-  .regex(/^[a-zA-Z][a-zA-Z0-9._-]{0,127}$/, 'Invalid targetId format');
+  .regex(/^[a-zA-Z][a-zA-Z0-9._-]{0,127}$/, 'Invalid targetId format')
+  .openapi('IdTarget', {
+    description:
+      'Target ID for interact — supports entity IDs (hum_*, agt_*, obj_*), NPC IDs (npc_*), and facility IDs',
+    example: 'obj_sign_welcome',
+  });
 
-export const IdTxSchema = z.string().regex(/^tx_[a-zA-Z0-9._-]{8,128}$/, 'Invalid txId format');
+export const IdTxSchema = z
+  .string()
+  .regex(/^tx_[a-zA-Z0-9._-]{8,128}$/, 'Invalid txId format')
+  .openapi('IdTx', { example: 'tx_abc123def456' });
 
 export const IdMessageSchema = z
   .string()
   .regex(/^msg_[A-Za-z0-9._-]{8,128}$/, 'Invalid messageId format');
 
-export const CursorSchema = z.union([
-  z.string().regex(/^[A-Za-z0-9=_-]{1,256}$/, 'Invalid cursor format'),
-  z.string().regex(/^\d+$/, 'Invalid numeric cursor format'),
-]);
+export const CursorSchema = z
+  .union([
+    z.string().regex(/^[A-Za-z0-9=_-]{1,256}$/, 'Invalid cursor format'),
+    z.string().regex(/^\d+$/, 'Invalid numeric cursor format'),
+  ])
+  .openapi('Cursor', { example: 'YWJjMTIz' });
 
-export const TsMsSchema = z.int().min(0);
+export const TsMsSchema = z
+  .int()
+  .min(0)
+  .openapi('TsMs', { description: 'Unix timestamp in milliseconds', example: 1707523200000 });
 
 // ============================================================================
 // Core Schemas
 // ============================================================================
 
-export const Vec2Schema = z.object({
-  x: z.number(),
-  y: z.number(),
-});
+export const Vec2Schema = z
+  .object({
+    x: z.number(),
+    y: z.number(),
+  })
+  .openapi('Vec2');
 
-export const TileCoordSchema = z.object({
-  tx: z.int().min(0).max(100000),
-  ty: z.int().min(0).max(100000),
-});
+export const TileCoordSchema = z
+  .object({
+    tx: z.int().min(0).max(100000),
+    ty: z.int().min(0).max(100000),
+  })
+  .openapi('TileCoord');
 
-export const EntityKindSchema = z.enum(['human', 'agent', 'object', 'npc']);
+export const EntityKindSchema = z.enum(['human', 'agent', 'object', 'npc']).openapi('EntityKind');
 
-export const FacingSchema = z.enum(['up', 'down', 'left', 'right']);
+export const FacingSchema = z.enum(['up', 'down', 'left', 'right']).openapi('Facing');
 
-export const ChatChannelSchema = z.enum(['proximity', 'global']);
+export const ChatChannelSchema = z.enum(['proximity', 'global']).openapi('ChatChannel');
 
-export const ObserveDetailSchema = z.enum(['lite', 'full']);
+export const ObserveDetailSchema = z.enum(['lite', 'full']).openapi('ObserveDetailLevel');
 
-export const UserStatusSchema = z.enum(['online', 'focus', 'dnd', 'afk', 'offline']);
+export const UserStatusSchema = z
+  .enum(['online', 'focus', 'dnd', 'afk', 'offline'])
+  .openapi('UserStatus');
 
-export const EntityBaseSchema = z.object({
-  id: IdEntityOrNpcSchema,
-  kind: EntityKindSchema,
-  name: z.string().min(1).max(64),
-  roomId: IdRoomSchema,
-  pos: Vec2Schema,
-  tile: TileCoordSchema.optional(),
-  facing: FacingSchema.optional(),
-  speed: z.number().min(0).max(1000).optional(),
-  meta: z.record(z.string(), z.unknown()).optional(),
-});
+export const EntityBaseSchema = z
+  .object({
+    id: IdEntityOrNpcSchema,
+    kind: EntityKindSchema,
+    name: z.string().min(1).max(64),
+    roomId: IdRoomSchema,
+    pos: Vec2Schema,
+    tile: TileCoordSchema.optional(),
+    facing: FacingSchema.optional(),
+    speed: z.number().min(0).max(1000).optional(),
+    meta: z.record(z.string(), z.unknown()).optional(),
+  })
+  .openapi('EntityBase');
 
-export const AffordanceSchema = z.object({
-  action: z.string().min(1).max(64),
-  label: z.string().min(1).max(128),
-  paramsSchema: z.record(z.string(), z.unknown()).optional(),
-});
+export const AffordanceSchema = z
+  .object({
+    action: z.string().min(1).max(64),
+    label: z.string().min(1).max(128),
+    paramsSchema: z.record(z.string(), z.unknown()).optional(),
+  })
+  .openapi('Affordance');
 
-export const ObjectStateSchema = z.object({
-  objectType: z.string().min(1).max(64),
-  state: z.record(z.string(), z.unknown()),
-});
+export const ObjectStateSchema = z
+  .object({
+    objectType: z.string().min(1).max(64),
+    state: z.record(z.string(), z.unknown()),
+  })
+  .openapi('ObjectState');
 
-export const ObservedEntitySchema = z.object({
-  entity: EntityBaseSchema,
-  distance: z.number().min(0).max(1000000),
-  affords: z.array(AffordanceSchema).max(50),
-  object: ObjectStateSchema.optional(),
-});
+export const ObservedEntitySchema = z
+  .object({
+    entity: EntityBaseSchema,
+    distance: z.number().min(0).max(1000000),
+    affords: z.array(AffordanceSchema).max(50),
+    object: ObjectStateSchema.optional(),
+  })
+  .openapi('ObservedEntity');
 
-export const ObservedFacilitySchema = z.object({
-  id: z.string().min(1).max(64),
-  type: z.string().min(1).max(64),
-  name: z.string().min(1).max(64),
-  position: Vec2Schema,
-  distance: z.number().min(0).max(1000000),
-  affords: z.array(AffordanceSchema).max(50),
-});
+export const ObservedFacilitySchema = z
+  .object({
+    id: z.string().min(1).max(64),
+    type: z.string().min(1).max(64),
+    name: z.string().min(1).max(64),
+    position: Vec2Schema,
+    distance: z.number().min(0).max(1000000),
+    affords: z.array(AffordanceSchema).max(50),
+  })
+  .openapi('ObservedFacility');
 
 // ============================================================================
 // Error Schemas
 // ============================================================================
 
-export const AicErrorCodeSchema = z.enum([
-  'bad_request',
-  'unauthorized',
-  'forbidden',
-  'not_found',
-  'room_not_ready',
-  'agent_not_in_room',
-  'invalid_destination',
-  'collision_blocked',
-  'rate_limited',
-  'conflict',
-  'timeout',
-  'internal',
-]);
+export const AicErrorCodeSchema = z
+  .enum([
+    'bad_request',
+    'unauthorized',
+    'forbidden',
+    'not_found',
+    'room_not_ready',
+    'agent_not_in_room',
+    'invalid_destination',
+    'collision_blocked',
+    'rate_limited',
+    'conflict',
+    'timeout',
+    'internal',
+  ])
+  .openapi('ErrorCode');
 
-export const AicErrorObjectSchema = z.object({
-  code: AicErrorCodeSchema,
-  message: z.string().min(1).max(2000),
-  retryable: z.boolean(),
-  details: z.record(z.string(), z.unknown()).optional(),
-});
+export const AicErrorObjectSchema = z
+  .object({
+    code: AicErrorCodeSchema,
+    message: z.string().min(1).max(2000),
+    retryable: z.boolean(),
+    details: z.record(z.string(), z.unknown()).optional(),
+  })
+  .openapi('ErrorObject');
 
 export function createResultSchema<T extends z.ZodType>(dataSchema: T) {
   return z.union([
@@ -151,73 +194,89 @@ export function createResultSchema<T extends z.ZodType>(dataSchema: T) {
 // Request Schemas
 // ============================================================================
 
-export const ObserveRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  radius: z.number().min(1).max(2000),
-  detail: ObserveDetailSchema.optional(),
-  includeSelf: z.boolean().optional(),
-  includeGrid: z.boolean().optional(),
-});
+export const ObserveRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    radius: z.number().min(1).max(2000),
+    detail: ObserveDetailSchema.optional(),
+    includeSelf: z.boolean().optional(),
+    includeGrid: z.boolean().optional(),
+  })
+  .openapi('ObserveRequest');
 
-export const MoveToRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  txId: IdTxSchema,
-  dest: TileCoordSchema,
-  mode: z.literal('walk').optional(),
-});
+export const MoveToRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    txId: IdTxSchema,
+    dest: TileCoordSchema,
+    mode: z.literal('walk').optional(),
+  })
+  .openapi('MoveToRequest');
 
-export const InteractRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  txId: IdTxSchema,
-  targetId: IdTargetSchema,
-  action: z.string().min(1).max(64),
-  params: z.record(z.string(), z.unknown()).optional(),
-});
+export const InteractRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    txId: IdTxSchema,
+    targetId: IdTargetSchema,
+    action: z.string().min(1).max(64),
+    params: z.record(z.string(), z.unknown()).optional(),
+  })
+  .openapi('InteractRequest');
 
-export const ChatSendRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  txId: IdTxSchema,
-  channel: ChatChannelSchema,
-  message: z.string().min(1).max(500),
-});
+export const ChatSendRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    txId: IdTxSchema,
+    channel: ChatChannelSchema,
+    message: z.string().min(1).max(500),
+  })
+  .openapi('ChatSendRequest');
 
-export const ChatObserveRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  windowSec: z.int().min(1).max(300),
-  channel: ChatChannelSchema.optional(),
-});
+export const ChatObserveRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    windowSec: z.int().min(1).max(300),
+    channel: ChatChannelSchema.optional(),
+  })
+  .openapi('ChatObserveRequest');
 
-export const PollEventsRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  sinceCursor: CursorSchema.optional(),
-  limit: z.int().min(1).max(200).optional(),
-  waitMs: z.int().min(0).max(25000).optional(),
-});
+export const PollEventsRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    sinceCursor: CursorSchema.optional(),
+    limit: z.int().min(1).max(200).optional(),
+    waitMs: z.int().min(0).max(25000).optional(),
+  })
+  .openapi('PollEventsRequest');
 
-export const ProfileUpdateRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  status: UserStatusSchema.optional(),
-  statusMessage: z.string().max(100).optional(),
-  title: z.string().max(50).optional(),
-  department: z.string().max(50).optional(),
-});
+export const ProfileUpdateRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    status: UserStatusSchema.optional(),
+    statusMessage: z.string().max(100).optional(),
+    title: z.string().max(50).optional(),
+    department: z.string().max(50).optional(),
+  })
+  .openapi('ProfileUpdateRequest');
 
 // ============================================================================
 // Response Data Schemas
 // ============================================================================
 
-export const RoomInfoSchema = z.object({
-  roomId: IdRoomSchema,
-  mapId: z.string().min(1).max(64),
-  tickRate: z.int().min(1).max(60),
-});
+export const RoomInfoSchema = z
+  .object({
+    roomId: IdRoomSchema,
+    mapId: z.string().min(1).max(64),
+    tickRate: z.int().min(1).max(60),
+  })
+  .openapi('RoomInfo');
 
 export const ZoneIdSchema = z.enum([
   'lobby',
@@ -232,142 +291,174 @@ export const ZoneIdSchema = z.enum([
 
 export const EntranceDirectionSchema = z.enum(['north', 'south', 'east', 'west']);
 
-export const BuildingEntranceSchema = z.object({
-  id: z.string().min(1).max(128),
-  name: z.string().min(1).max(128),
-  position: Vec2Schema,
-  size: z.object({ width: z.number(), height: z.number() }),
-  zone: ZoneIdSchema,
-  direction: EntranceDirectionSchema,
-  connectsTo: ZoneIdSchema,
-});
+export const BuildingEntranceSchema = z
+  .object({
+    id: z.string().min(1).max(128),
+    name: z.string().min(1).max(128),
+    position: Vec2Schema,
+    size: z.object({ width: z.number(), height: z.number() }),
+    zone: ZoneIdSchema,
+    direction: EntranceDirectionSchema,
+    connectsTo: ZoneIdSchema,
+  })
+  .openapi('BuildingEntrance');
 
-export const ZoneInfoSchema = z.object({
-  id: ZoneIdSchema,
-  bounds: z.object({
-    x: z.number(),
-    y: z.number(),
-    width: z.number(),
-    height: z.number(),
-  }),
-  entrances: z.array(BuildingEntranceSchema),
-});
+export const ZoneInfoSchema = z
+  .object({
+    id: ZoneIdSchema,
+    bounds: z.object({
+      x: z.number(),
+      y: z.number(),
+      width: z.number(),
+      height: z.number(),
+    }),
+    entrances: z.array(BuildingEntranceSchema),
+  })
+  .openapi('ZoneInfo');
 
-export const MapMetadataSchema = z.object({
-  currentZone: ZoneIdSchema.nullable(),
-  zones: z.array(ZoneInfoSchema),
-  mapSize: z.object({
-    width: z.number().int().min(1),
-    height: z.number().int().min(1),
-    tileSize: z.number().int().min(1),
-  }),
-});
+export const MapMetadataSchema = z
+  .object({
+    currentZone: ZoneIdSchema.nullable(),
+    zones: z.array(ZoneInfoSchema),
+    mapSize: z.object({
+      width: z.number().int().min(1),
+      height: z.number().int().min(1),
+      tileSize: z.number().int().min(1),
+    }),
+  })
+  .openapi('MapMetadata');
 
-export const ObserveResponseDataSchema = z.object({
-  self: EntityBaseSchema,
-  nearby: z.array(ObservedEntitySchema).max(500),
-  facilities: z.array(ObservedFacilitySchema).max(100),
-  serverTsMs: TsMsSchema,
-  room: RoomInfoSchema,
-  mapMetadata: MapMetadataSchema.optional(),
-});
+export const ObserveResponseDataSchema = z
+  .object({
+    self: EntityBaseSchema,
+    nearby: z.array(ObservedEntitySchema).max(500),
+    facilities: z.array(ObservedFacilitySchema).max(100),
+    serverTsMs: TsMsSchema,
+    room: RoomInfoSchema,
+    mapMetadata: MapMetadataSchema.optional(),
+  })
+  .openapi('ObserveResponseData');
 
-export const MoveToResultSchema = z.enum(['accepted', 'rejected', 'no_op', 'no_path']);
+export const MoveToResultSchema = z
+  .enum(['accepted', 'rejected', 'no_op', 'no_path'])
+  .openapi('MoveToResult');
 
-export const MoveToResponseDataSchema = z.object({
-  txId: IdTxSchema,
-  applied: z.boolean(),
-  serverTsMs: TsMsSchema,
-  result: MoveToResultSchema,
-});
+export const MoveToResponseDataSchema = z
+  .object({
+    txId: IdTxSchema,
+    applied: z.boolean(),
+    serverTsMs: TsMsSchema,
+    result: MoveToResultSchema,
+  })
+  .openapi('MoveToResponseData');
 
-export const InteractOutcomeTypeSchema = z.enum(['ok', 'no_effect', 'invalid_action', 'too_far']);
+export const InteractOutcomeTypeSchema = z
+  .enum(['ok', 'no_effect', 'invalid_action', 'too_far'])
+  .openapi('InteractOutcomeType');
 
-export const InteractOutcomeSchema = z.object({
-  type: InteractOutcomeTypeSchema,
-  message: z.string().max(2000).optional(),
-});
+export const InteractOutcomeSchema = z
+  .object({
+    type: InteractOutcomeTypeSchema,
+    message: z.string().max(2000).optional(),
+  })
+  .openapi('InteractOutcome');
 
-export const InteractResponseDataSchema = z.object({
-  txId: IdTxSchema,
-  applied: z.boolean(),
-  serverTsMs: TsMsSchema,
-  outcome: InteractOutcomeSchema,
-});
+export const InteractResponseDataSchema = z
+  .object({
+    txId: IdTxSchema,
+    applied: z.boolean(),
+    serverTsMs: TsMsSchema,
+    outcome: InteractOutcomeSchema,
+  })
+  .openapi('InteractResponseData');
 
-export const ChatSendResponseDataSchema = z.object({
-  txId: IdTxSchema,
-  applied: z.boolean(),
-  serverTsMs: TsMsSchema,
-  chatMessageId: IdMessageSchema,
-});
+export const ChatSendResponseDataSchema = z
+  .object({
+    txId: IdTxSchema,
+    applied: z.boolean(),
+    serverTsMs: TsMsSchema,
+    chatMessageId: IdMessageSchema,
+  })
+  .openapi('ChatSendResponseData');
 
-export const ChatMessageSchema = z.object({
-  id: IdMessageSchema,
-  roomId: IdRoomSchema,
-  channel: ChatChannelSchema,
-  fromEntityId: IdEntitySchema,
-  fromName: z.string().min(1).max(64),
-  message: z.string().min(1).max(500),
-  tsMs: TsMsSchema,
-  targetEntityId: IdEntitySchema.optional(),
-  teamId: z.string().min(1).max(64).optional(),
-  meetingRoomId: z.string().min(1).max(64).optional(),
-  emotes: z.array(z.string().min(1).max(32)).optional(),
-});
+export const ChatMessageSchema = z
+  .object({
+    id: IdMessageSchema,
+    roomId: IdRoomSchema,
+    channel: ChatChannelSchema,
+    fromEntityId: IdEntitySchema,
+    fromName: z.string().min(1).max(64),
+    message: z.string().min(1).max(500),
+    tsMs: TsMsSchema,
+    targetEntityId: IdEntitySchema.optional(),
+    teamId: z.string().min(1).max(64).optional(),
+    meetingRoomId: z.string().min(1).max(64).optional(),
+    emotes: z.array(z.string().min(1).max(32)).optional(),
+  })
+  .openapi('ChatMessage');
 
-export const ChatObserveResponseDataSchema = z.object({
-  messages: z.array(ChatMessageSchema).max(500),
-  serverTsMs: TsMsSchema,
-});
+export const ChatObserveResponseDataSchema = z
+  .object({
+    messages: z.array(ChatMessageSchema).max(500),
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('ChatObserveResponseData');
 
 // ============================================================================
 // Event Schemas
 // ============================================================================
 
-export const EventTypeSchema = z.enum([
-  'presence.join',
-  'presence.leave',
-  'proximity.enter',
-  'proximity.exit',
-  'zone.enter',
-  'zone.exit',
-  'chat.message',
-  'object.state_changed',
-  'profile.updated',
-  'npc.state_change',
-  'facility.interacted',
-  'emote.triggered',
-]);
+export const EventTypeSchema = z
+  .enum([
+    'presence.join',
+    'presence.leave',
+    'proximity.enter',
+    'proximity.exit',
+    'zone.enter',
+    'zone.exit',
+    'chat.message',
+    'object.state_changed',
+    'profile.updated',
+    'npc.state_change',
+    'facility.interacted',
+    'emote.triggered',
+  ])
+  .openapi('EventType');
 
-export const EventEnvelopeSchema = z.object({
-  cursor: CursorSchema,
-  type: EventTypeSchema,
-  roomId: IdRoomSchema,
-  tsMs: TsMsSchema,
-  payload: z.record(z.string(), z.unknown()),
-});
+export const EventEnvelopeSchema = z
+  .object({
+    cursor: CursorSchema,
+    type: EventTypeSchema,
+    roomId: IdRoomSchema,
+    tsMs: TsMsSchema,
+    payload: z.record(z.string(), z.unknown()),
+  })
+  .openapi('EventEnvelope');
 
-export const PollEventsResponseDataSchema = z.object({
-  events: z.array(EventEnvelopeSchema).max(200),
-  nextCursor: CursorSchema,
-  cursorExpired: z.boolean(),
-  serverTsMs: TsMsSchema,
-});
+export const PollEventsResponseDataSchema = z
+  .object({
+    events: z.array(EventEnvelopeSchema).max(200),
+    nextCursor: CursorSchema,
+    cursorExpired: z.boolean(),
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('PollEventsResponseData');
 
-export const ProfileUpdateResponseDataSchema = z.object({
-  applied: z.boolean(),
-  profile: z.object({
-    entityId: IdEntitySchema,
-    displayName: z.string(),
-    status: UserStatusSchema,
-    statusMessage: z.string().optional(),
-    avatarUrl: z.string().optional(),
-    title: z.string().optional(),
-    department: z.string().optional(),
-  }),
-  serverTsMs: TsMsSchema,
-});
+export const ProfileUpdateResponseDataSchema = z
+  .object({
+    applied: z.boolean(),
+    profile: z.object({
+      entityId: IdEntitySchema,
+      displayName: z.string(),
+      status: UserStatusSchema,
+      statusMessage: z.string().optional(),
+      avatarUrl: z.string().optional(),
+      title: z.string().optional(),
+      department: z.string().optional(),
+    }),
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('ProfileUpdateResponseData');
 
 // ============================================================================
 // Event Payload Schemas
@@ -454,48 +545,62 @@ export const PluginManifestSchema = z.object({
 // Agent Registration Schemas
 // ============================================================================
 
-export const RegisterRequestSchema = z.object({
-  name: z.string().min(1).max(64),
-  roomId: IdRoomSchema,
-});
+export const RegisterRequestSchema = z
+  .object({
+    name: z.string().min(1).max(64),
+    roomId: IdRoomSchema,
+  })
+  .openapi('RegisterRequest');
 
-export const RegisterResponseDataSchema = z.object({
-  agentId: IdEntitySchema,
-  roomId: IdRoomSchema,
-  sessionToken: z.string().regex(/^[a-zA-Z0-9._-]{8,256}$/, 'Invalid sessionToken format'),
-});
+export const RegisterResponseDataSchema = z
+  .object({
+    agentId: IdEntitySchema,
+    roomId: IdRoomSchema,
+    sessionToken: z.string().regex(/^[a-zA-Z0-9._-]{8,256}$/, 'Invalid sessionToken format'),
+  })
+  .openapi('RegisterResponseData');
 
-export const UnregisterRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-});
+export const UnregisterRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+  })
+  .openapi('UnregisterRequest');
 
-export const UnregisterResponseDataSchema = z.object({
-  agentId: IdEntitySchema,
-  unregisteredAt: TsMsSchema,
-});
+export const UnregisterResponseDataSchema = z
+  .object({
+    agentId: IdEntitySchema,
+    unregisteredAt: TsMsSchema,
+  })
+  .openapi('UnregisterResponseData');
 
-export const ReconnectRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  sessionToken: z.string().min(8),
-});
+export const ReconnectRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    sessionToken: z.string().min(8),
+  })
+  .openapi('ReconnectRequest');
 
-export const ReconnectResponseDataSchema = z.object({
-  agentId: IdEntitySchema,
-  roomId: IdRoomSchema,
-  sessionToken: z.string(),
-  pos: z.object({ x: z.number(), y: z.number() }),
-  tile: z.object({ tx: z.number(), ty: z.number() }).optional(),
-});
+export const ReconnectResponseDataSchema = z
+  .object({
+    agentId: IdEntitySchema,
+    roomId: IdRoomSchema,
+    sessionToken: z.string(),
+    pos: z.object({ x: z.number(), y: z.number() }),
+    tile: z.object({ tx: z.number(), ty: z.number() }).optional(),
+  })
+  .openapi('ReconnectResponseData');
 
 // ============================================================================
 // Heartbeat Schema
 // ============================================================================
 
-export const HeartbeatRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-});
+export const HeartbeatRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+  })
+  .openapi('HeartbeatRequest');
 
 export type HeartbeatRequest = z.infer<typeof HeartbeatRequestSchema>;
 
@@ -520,22 +625,28 @@ export const StatusResponseDataSchema = z.object({
 // Meeting API Schemas
 // ============================================================================
 
-export const MeetingListRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-});
+export const MeetingListRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+  })
+  .openapi('MeetingListRequest');
 
-export const MeetingJoinRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  meetingId: z.string().min(1).max(128),
-});
+export const MeetingJoinRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    meetingId: z.string().min(1).max(128),
+  })
+  .openapi('MeetingJoinRequest');
 
-export const MeetingLeaveRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  meetingId: z.string().min(1).max(128),
-});
+export const MeetingLeaveRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    meetingId: z.string().min(1).max(128),
+  })
+  .openapi('MeetingLeaveRequest');
 
 // ============================================================================
 // Work-Life World Schemas
@@ -602,56 +713,70 @@ export const VoteStatusSchema = z.enum(['open', 'closed']);
 // Skill System Schemas
 // ============================================================================
 
-export const SkillCategorySchema = z.enum(['movement', 'combat', 'social', 'utility']);
+export const SkillCategorySchema = z
+  .enum(['movement', 'combat', 'social', 'utility'])
+  .openapi('SkillCategory');
 
-export const SkillEffectDefinitionSchema = z.object({
-  id: z.string().min(1).max(64),
-  durationMs: z.number().int().min(0).max(3600000),
-  statModifiers: z
-    .object({
-      speedMultiplier: z.number().min(0).max(10).optional(),
-    })
-    .optional(),
-});
+export const SkillEffectDefinitionSchema = z
+  .object({
+    id: z.string().min(1).max(64),
+    durationMs: z.number().int().min(0).max(3600000),
+    statModifiers: z
+      .object({
+        speedMultiplier: z.number().min(0).max(10).optional(),
+      })
+      .optional(),
+  })
+  .openapi('SkillEffectDefinition');
 
-export const SkillActionSchema = z.object({
-  id: z.string().min(1).max(64),
-  name: z.string().min(1).max(128),
-  description: z.string().min(1).max(500),
-  cooldownMs: z.number().int().min(0).max(3600000).optional(),
-  castTimeMs: z.number().int().min(0).max(60000).optional(),
-  rangeUnits: z.number().min(0).max(10000).optional(),
-  manaCost: z.number().int().min(0).max(10000).optional(),
-  params: z.record(z.string(), z.unknown()).optional(),
-  effect: SkillEffectDefinitionSchema.optional(),
-});
+export const SkillActionSchema = z
+  .object({
+    id: z.string().min(1).max(64),
+    name: z.string().min(1).max(128),
+    description: z.string().min(1).max(500),
+    cooldownMs: z.number().int().min(0).max(3600000).optional(),
+    castTimeMs: z.number().int().min(0).max(60000).optional(),
+    rangeUnits: z.number().min(0).max(10000).optional(),
+    manaCost: z.number().int().min(0).max(10000).optional(),
+    params: z.record(z.string(), z.unknown()).optional(),
+    effect: SkillEffectDefinitionSchema.optional(),
+  })
+  .openapi('SkillAction');
 
-export const SkillDefinitionSchema = z.object({
-  id: z.string().min(1).max(64),
-  name: z.string().min(1).max(64),
-  description: z.string().min(1).max(500),
-  category: SkillCategorySchema,
-  icon: z.string().max(256).optional(),
-  actions: z.array(SkillActionSchema).min(1).max(20),
-  passive: z.boolean().optional(),
-  prerequisites: z.array(z.string().min(1).max(64)).max(10).optional(),
-});
+export const SkillDefinitionSchema = z
+  .object({
+    id: z.string().min(1).max(64),
+    name: z.string().min(1).max(64),
+    description: z.string().min(1).max(500),
+    category: SkillCategorySchema,
+    icon: z.string().max(256).optional(),
+    actions: z.array(SkillActionSchema).min(1).max(20),
+    passive: z.boolean().optional(),
+    prerequisites: z.array(z.string().min(1).max(64)).max(10).optional(),
+  })
+  .openapi('SkillDefinition');
 
-export const SkillInvokeOutcomeTypeSchema = z.enum(['ok', 'pending', 'cancelled', 'error']);
+export const SkillInvokeOutcomeTypeSchema = z
+  .enum(['ok', 'pending', 'cancelled', 'error'])
+  .openapi('SkillInvokeOutcomeType');
 
-export const SkillInvokeOutcomeSchema = z.object({
-  type: SkillInvokeOutcomeTypeSchema,
-  message: z.string().max(500).optional(),
-  data: z.record(z.string(), z.unknown()).optional(),
-  completionTime: TsMsSchema.optional(),
-});
+export const SkillInvokeOutcomeSchema = z
+  .object({
+    type: SkillInvokeOutcomeTypeSchema,
+    message: z.string().max(500).optional(),
+    data: z.record(z.string(), z.unknown()).optional(),
+    completionTime: TsMsSchema.optional(),
+  })
+  .openapi('SkillInvokeOutcome');
 
-export const AgentSkillStateSchema = z.object({
-  skillId: z.string().min(1).max(64),
-  installedAt: TsMsSchema,
-  enabled: z.boolean(),
-  credentials: z.record(z.string(), z.string()).optional(),
-});
+export const AgentSkillStateSchema = z
+  .object({
+    skillId: z.string().min(1).max(64),
+    installedAt: TsMsSchema,
+    enabled: z.boolean(),
+    credentials: z.record(z.string(), z.string()).optional(),
+  })
+  .openapi('AgentSkillState');
 
 export const PendingCastSchema = z.object({
   txId: IdTxSchema,
@@ -678,52 +803,64 @@ export const ActiveEffectSchema = z.object({
 // Skill System Request Schemas
 // ============================================================================
 
-export const SkillListRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  category: SkillCategorySchema.optional(),
-  installed: z.boolean().optional(),
-});
+export const SkillListRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    category: SkillCategorySchema.optional(),
+    installed: z.boolean().optional(),
+  })
+  .openapi('SkillListRequest');
 
-export const SkillInstallRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  txId: IdTxSchema,
-  skillId: z.string().min(1).max(64),
-  credentials: z.record(z.string(), z.string()).optional(),
-});
+export const SkillInstallRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    txId: IdTxSchema,
+    skillId: z.string().min(1).max(64),
+    credentials: z.record(z.string(), z.string()).optional(),
+  })
+  .openapi('SkillInstallRequest');
 
-export const SkillInvokeRequestSchema = z.object({
-  agentId: IdAgentSchema,
-  roomId: IdRoomSchema,
-  txId: IdTxSchema,
-  skillId: z.string().min(1).max(64),
-  actionId: z.string().min(1).max(64),
-  targetId: IdEntitySchema.optional(),
-  params: z.record(z.string(), z.unknown()).optional(),
-});
+export const SkillInvokeRequestSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    roomId: IdRoomSchema,
+    txId: IdTxSchema,
+    skillId: z.string().min(1).max(64),
+    actionId: z.string().min(1).max(64),
+    targetId: IdEntitySchema.optional(),
+    params: z.record(z.string(), z.unknown()).optional(),
+  })
+  .openapi('SkillInvokeRequest');
 
 // ============================================================================
 // Skill System Response Schemas
 // ============================================================================
 
-export const SkillListResponseDataSchema = z.object({
-  skills: z.array(SkillDefinitionSchema).max(100),
-  serverTsMs: TsMsSchema,
-});
+export const SkillListResponseDataSchema = z
+  .object({
+    skills: z.array(SkillDefinitionSchema).max(100),
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('SkillListResponseData');
 
-export const SkillInstallResponseDataSchema = z.object({
-  skillId: z.string().min(1).max(64),
-  installed: z.boolean(),
-  alreadyInstalled: z.boolean(),
-  serverTsMs: TsMsSchema,
-});
+export const SkillInstallResponseDataSchema = z
+  .object({
+    skillId: z.string().min(1).max(64),
+    installed: z.boolean(),
+    alreadyInstalled: z.boolean(),
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('SkillInstallResponseData');
 
-export const SkillInvokeResponseDataSchema = z.object({
-  txId: IdTxSchema,
-  outcome: SkillInvokeOutcomeSchema,
-  serverTsMs: TsMsSchema,
-});
+export const SkillInvokeResponseDataSchema = z
+  .object({
+    txId: IdTxSchema,
+    outcome: SkillInvokeOutcomeSchema,
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('SkillInvokeResponseData');
 
 export const WorkLifeEventTypeSchema = z.enum([
   'org.created',

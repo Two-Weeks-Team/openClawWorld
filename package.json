@@ -34,12 +34,14 @@
     "generate:tools": "pnpm --filter @openclawworld/plugin generate",
     "generate:commands": "pnpm --filter @openclawworld/plugin generate:commands",
     "generate": "pnpm generate:tools && pnpm generate:commands",
+    "generate:openapi": "tsx scripts/generate-openapi.ts",
     "validate:openapi": "tsx scripts/validate-openapi.ts",
     "ecosystem": "tsx packages/ecosystem/src/index.ts",
     "ecosystem:start": "tsx packages/ecosystem/src/index.ts start",
     "ecosystem:status": "tsx packages/ecosystem/src/index.ts status"
   },
   "devDependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.4.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.2.3",
@@ -50,6 +52,7 @@
     "tsx": "^4.7.0",
     "typescript": "~5.9.0",
     "typescript-eslint": "^8.55.0",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "zod": "^4.3.6"
   }
 }

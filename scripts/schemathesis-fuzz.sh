@@ -72,7 +72,7 @@ export PYTHONPATH="${HOOKS_DIR}:${PYTHONPATH:-}"
 FUZZ_EXIT=0
 schemathesis run "${BASE_URL}/openapi.json" \
   --checks all \
-  --url "${BASE_URL}" \
+  --url "${BASE_URL}/aic/v0.1" \
   --max-examples "${MAX_EXAMPLES}" \
   --request-timeout 10000 \
   --workers 1 \

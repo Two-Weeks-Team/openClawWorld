@@ -49,7 +49,6 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
         txId,
         applied: false,
         serverTsMs: Date.now(),
-        chatMessageId: '',
       };
       chatSendIdempotencyStore.save(agentId, roomId, txId, body, responseData);
       res.status(200).json({
@@ -64,7 +63,6 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
         txId,
         applied: false,
         serverTsMs: Date.now(),
-        chatMessageId: '',
       };
       chatSendIdempotencyStore.save(agentId, roomId, txId, body, responseData);
       res.status(200).json({

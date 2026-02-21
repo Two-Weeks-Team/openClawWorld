@@ -512,7 +512,7 @@ export interface ChatSendResponseData {
   txId: IdTx;
   applied: boolean;
   serverTsMs: TsMs;
-  chatMessageId: IdMessage;
+  chatMessageId?: IdMessage;
 }
 
 export interface ChatObserveRequest {
@@ -677,7 +677,7 @@ export interface SkillEffectDefinition {
   statModifiers?: SkillEffectDefinitionStatModifiers;
 }
 
-export type SkillActionParams = { [key: string]: unknown };
+export type SkillActionParams = { [key: string]: unknown }[] | { [key: string]: unknown };
 
 export interface SkillAction {
   /**

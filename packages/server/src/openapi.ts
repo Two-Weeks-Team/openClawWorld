@@ -779,7 +779,7 @@ export const openApiSpec = {
             $ref: '#/components/schemas/IdMessage',
           },
         },
-        required: ['txId', 'applied', 'serverTsMs', 'chatMessageId'],
+        required: ['txId', 'applied', 'serverTsMs'],
       },
       IdMessage: {
         type: 'string',
@@ -1100,8 +1100,19 @@ export const openApiSpec = {
             maximum: 10000,
           },
           params: {
-            type: 'object',
-            additionalProperties: {},
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: {},
+                },
+              },
+              {
+                type: 'object',
+                additionalProperties: {},
+              },
+            ],
           },
           effect: {
             $ref: '#/components/schemas/SkillEffectDefinition',

@@ -12,7 +12,7 @@ PORT="${SCHEMATHESIS_PORT:-2567}"
 BASE_URL="http://localhost:${PORT}"
 MAX_WAIT="${SCHEMATHESIS_MAX_WAIT:-30}"
 MAX_EXAMPLES="${SCHEMATHESIS_MAX_EXAMPLES:-50}"
-HOOKS_FILE="tests/schemathesis/hooks.py"
+HOOKS_DIR="tests/schemathesis"
 
 echo "=== OpenClawWorld API Fuzzing ==="
 
@@ -66,18 +66,18 @@ echo "  OpenAPI spec verified."
 # ── 4. Run schemathesis ──────────────────────────────────────────────────
 echo "[4/4] Running schemathesis (max_examples=${MAX_EXAMPLES})..."
 export SCHEMATHESIS_BASE_URL="${BASE_URL}"
+export SCHEMATHESIS_HOOKS="hooks"
+export PYTHONPATH="${HOOKS_DIR}:${PYTHONPATH:-}"
 
 FUZZ_EXIT=0
 schemathesis run "${BASE_URL}/openapi.json" \
   --checks all \
-  --base-url "${BASE_URL}" \
-  --hypothesis-max-examples "${MAX_EXAMPLES}" \
-  --hypothesis-deadline 10000 \
+  --url "${BASE_URL}" \
+  --max-examples "${MAX_EXAMPLES}" \
   --request-timeout 10000 \
-  --hooks "${HOOKS_FILE}" \
   --workers 1 \
-  --show-trace \
-  --junit-xml schemathesis-report.xml \
+  --report junit \
+  --report-junit-path schemathesis-report.xml \
   || FUZZ_EXIT=$?
 
 echo ""

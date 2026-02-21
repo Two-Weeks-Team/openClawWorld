@@ -2,6 +2,8 @@
 
 Handles authentication and agent registration so that schemathesis can
 exercise authenticated endpoints with valid credentials.
+
+Compatible with schemathesis v4.x.
 """
 
 import os
@@ -13,7 +15,7 @@ import schemathesis
 BASE_URL = os.environ.get("SCHEMATHESIS_BASE_URL", "http://localhost:2567")
 AIC_BASE = f"{BASE_URL}/aic/v0.1"
 
-# Fallback: unauthenticated endpoint suffixes (used if endpoint security is unavailable)
+# Unauthenticated endpoint suffixes (fallback when OpenAPI security metadata unavailable)
 _UNAUTHENTICATED_SUFFIXES = ("/channels", "/register", "/reconnect")
 
 # Global credential state populated by setup()
@@ -47,43 +49,22 @@ def setup() -> None:
 
 @schemathesis.hook
 def before_call(context, case):
-    """Inject the Bearer token for authenticated endpoints."""
+    """Inject auth credentials and valid agent/room IDs before each request."""
     if _session_token is None:
         setup()
 
-    # Skip auth injection for unauthenticated endpoints
-    # Prefer OpenAPI security definition; fall back to suffix matching
-    endpoint_security = getattr(case, "endpoint", None)
-    if endpoint_security is not None:
-        security = getattr(endpoint_security, "security", None)
-        if security is not None and len(security) == 0:
-            return
-    else:
-        path = case.path or ""
-        if any(path.endswith(suffix) for suffix in _UNAUTHENTICATED_SUFFIXES):
-            return
+    # ── Auth header injection ──
+    path = case.path or ""
+    needs_auth = not any(path.endswith(s) for s in _UNAUTHENTICATED_SUFFIXES)
 
-    if _session_token is None:
-        return  # setup failed; let the test run without auth
+    if needs_auth and _session_token is not None:
+        if case.headers is None:
+            case.headers = {}
+        case.headers["Authorization"] = f"Bearer {_session_token}"
 
-    if case.headers is None:
-        case.headers = {}
-    case.headers["Authorization"] = f"Bearer {_session_token}"
-
-
-@schemathesis.hook
-def before_generate_body(context, case):
-    """Inject valid agentId / roomId into request bodies that require them."""
-    if _agent_id is None:
-        setup()
-
-    if not (case.body and isinstance(case.body, dict)):
-        return
-
-    # Replace fuzzed agentId with our registered one so auth checks pass
-    if "agentId" in case.body:
-        case.body["agentId"] = _agent_id
-
-    # Replace placeholder roomId with the real room
-    if "roomId" in case.body and _room_id is not None:
-        case.body["roomId"] = _room_id
+    # ── Body: replace fuzzed agentId/roomId with registered values ──
+    if case.body and isinstance(case.body, dict):
+        if "agentId" in case.body and _agent_id is not None:
+            case.body["agentId"] = _agent_id
+        if "roomId" in case.body and _room_id is not None:
+            case.body["roomId"] = _room_id

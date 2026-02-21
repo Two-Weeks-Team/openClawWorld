@@ -25,6 +25,11 @@ export async function handleMeetingLeave(req: Request, res: Response): Promise<v
   const body = req.validatedBody as MeetingLeaveRequest;
   const { agentId, roomId, meetingId } = body;
 
+  if (req.authAgentId !== agentId) {
+    res.status(403).json(createErrorResponse('forbidden', 'Token does not match agentId', false));
+    return;
+  }
+
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);
     if (!colyseusRoomId) {

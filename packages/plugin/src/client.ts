@@ -87,11 +87,6 @@ import {
   meetingJoin as generatedMeetingJoin,
   meetingLeave as generatedMeetingLeave,
 } from './generated/endpoints.js';
-import type {
-  ChatSendRequest as GeneratedChatSendRequest,
-  ChatObserveRequest as GeneratedChatObserveRequest,
-  ProfileUpdateRequest as GeneratedProfileUpdateRequest,
-} from './generated/endpoints.js';
 
 /**
  * Unwrap orval response envelope to AicResult.
@@ -207,17 +202,11 @@ export class OpenClawWorldClient {
   }
 
   async chatSend(params: ChatSendRequest): Promise<AicResult<ChatSendResponseData>> {
-    // Cast needed: shared ChatChannel may include values not yet in the OpenAPI spec
-    return unwrap<ChatSendResponseData>(
-      await generatedChatSend(params as unknown as GeneratedChatSendRequest)
-    );
+    return unwrap<ChatSendResponseData>(await generatedChatSend(params));
   }
 
   async chatObserve(params: ChatObserveRequest): Promise<AicResult<ChatObserveResponseData>> {
-    // Cast needed: shared ChatChannel may include values not yet in the OpenAPI spec
-    return unwrap<ChatObserveResponseData>(
-      await generatedChatObserve(params as unknown as GeneratedChatObserveRequest)
-    );
+    return unwrap<ChatObserveResponseData>(await generatedChatObserve(params));
   }
 
   async channels(): Promise<AicResult<ChannelsResponseData>> {
@@ -233,10 +222,7 @@ export class OpenClawWorldClient {
   }
 
   async profileUpdate(params: ProfileUpdateRequest): Promise<AicResult<ProfileUpdateResponseData>> {
-    // Cast needed: shared UserStatus may include values not yet in the OpenAPI spec
-    return unwrap<ProfileUpdateResponseData>(
-      await generatedProfileUpdate(params as unknown as GeneratedProfileUpdateRequest)
-    );
+    return unwrap<ProfileUpdateResponseData>(await generatedProfileUpdate(params));
   }
 
   async skillList(params: SkillListRequest): Promise<AicResult<SkillListResponseData>> {

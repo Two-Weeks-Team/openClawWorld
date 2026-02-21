@@ -271,6 +271,7 @@ registry.registerPath({
       },
     },
     '400': errorResponse('Invalid request'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -314,8 +315,10 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized - missing or invalid token'),
     '404': errorResponse('Agent or room not found'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -355,8 +358,10 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
     '404': errorResponse('Agent or room not found'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -397,6 +402,7 @@ registry.registerPath({
     },
     '400': errorResponse('Invalid destination'),
     '401': errorResponse('Unauthorized'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -439,6 +445,7 @@ registry.registerPath({
     },
     '400': errorResponse('Invalid action or target'),
     '401': errorResponse('Unauthorized'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -478,6 +485,7 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
     '429': errorResponse('Rate limited'),
   },
@@ -517,7 +525,9 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -557,7 +567,9 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -596,7 +608,9 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -658,8 +672,10 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
     '404': errorResponse('Agent or room not found'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -710,6 +726,7 @@ registry.registerPath({
     '400': errorResponse('Invalid request parameters'),
     '401': errorResponse('Unauthorized - missing or invalid token'),
     '404': errorResponse('Agent, room, or skill not found'),
+    '429': errorResponse('Too many requests'),
     '503': errorResponse('Room or skill service not ready'),
   },
 });
@@ -822,8 +839,10 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Invalid or expired session token'),
     '404': errorResponse('Agent not found'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -855,6 +874,7 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
     '404': errorResponse('Agent session not found'),
   },
@@ -888,7 +908,9 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -920,9 +942,11 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
     '404': errorResponse('Meeting not found'),
     '409': errorResponse('Already in a meeting'),
+    '429': errorResponse('Too many requests'),
   },
 });
 
@@ -954,8 +978,10 @@ registry.registerPath({
         },
       },
     },
+    '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
     '404': errorResponse('Meeting not found or not a participant'),
+    '429': errorResponse('Too many requests'),
   },
 });
 

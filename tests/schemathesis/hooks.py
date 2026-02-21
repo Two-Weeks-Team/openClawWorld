@@ -20,6 +20,11 @@ AIC_BASE = f"{BASE_URL}/aic/v0.1"
 # Unauthenticated endpoint suffixes (fallback when OpenAPI security metadata unavailable)
 _UNAUTHENTICATED_SUFFIXES = ("/channels", "/register", "/reconnect")
 
+# Endpoints where we intentionally use an invalid token to prevent destructive side-effects.
+# /unregister would permanently remove the test agent if called with a real token.
+_FAKE_TOKEN_SUFFIXES = ("/unregister",)
+_FAKE_TOKEN = "tok_fuzz_test_invalid_do_not_use"
+
 # Global credential state populated by setup()
 _session_token: str | None = None
 _agent_id: str | None = None
@@ -58,14 +63,23 @@ def before_call(context, case, kwargs):
     # ── Auth header injection ──
     path = case.path or ""
     needs_auth = not any(path.endswith(s) for s in _UNAUTHENTICATED_SUFFIXES)
+    use_fake_token = any(path.endswith(s) for s in _FAKE_TOKEN_SUFFIXES)
 
-    if needs_auth and _session_token is not None:
+    if needs_auth:
         if case.headers is None:
             case.headers = {}
-        case.headers["Authorization"] = f"Bearer {_session_token}"
+        if use_fake_token:
+            # Use an invalid token so destructive endpoints (e.g. /unregister) cannot
+            # affect the real test agent.  Server will respond with 401, which is
+            # documented in the spec.
+            case.headers["Authorization"] = f"Bearer {_FAKE_TOKEN}"
+        elif _session_token is not None:
+            case.headers["Authorization"] = f"Bearer {_session_token}"
 
     # ── Body: replace fuzzed agentId/roomId with registered values ──
-    if case.body and isinstance(case.body, dict):
+    # Skip for endpoints using the fake token — the body values are irrelevant
+    # because the request will be rejected at auth before reaching business logic.
+    if case.body and isinstance(case.body, dict) and not use_fake_token:
         if "agentId" in case.body and _agent_id is not None:
             case.body["agentId"] = _agent_id
         if "roomId" in case.body and _room_id is not None:

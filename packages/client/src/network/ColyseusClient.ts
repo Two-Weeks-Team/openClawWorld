@@ -28,8 +28,9 @@ export type InstalledSkill = {
 
 export interface ChannelInfo {
   channelId: string;
-  occupancy: number;
-  maxOccupancy: number;
+  currentAgents: number;
+  maxAgents: number;
+  status: 'open' | 'full';
 }
 
 function getServerHostname(): string {

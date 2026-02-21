@@ -43,6 +43,23 @@
     {
       "name": "Skills",
       "description": "Skill system (install, invoke, list skills)"
+    },
+    {
+      "name": "Connection",
+      "description": "Channel listing and reconnection"
+    },
+    {
+      "name": "Session Management",
+      "description": "Heartbeat and session maintenance"
+    },
+    {
+      "name": "Meeting",
+      "description": "Meeting room management"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
     }
   ],
   "components": {
@@ -81,8 +98,16 @@
         "example": "tx_abc123def456"
       },
       "Cursor": {
-        "type": "string",
-        "pattern": "^[A-Za-z0-9=_-]{1,256}$",
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9=_-]{1,256}$"
+          },
+          {
+            "type": "string",
+            "pattern": "^\\d+$"
+          }
+        ],
         "example": "YWJjMTIz"
       },
       "TsMs": {
@@ -93,35 +118,31 @@
       },
       "Vec2": {
         "type": "object",
-        "required": ["x", "y"],
         "properties": {
           "x": {
-            "type": "number",
-            "example": 120.5
+            "type": "number"
           },
           "y": {
-            "type": "number",
-            "example": 80
+            "type": "number"
           }
-        }
+        },
+        "required": ["x", "y"]
       },
       "TileCoord": {
         "type": "object",
-        "required": ["tx", "ty"],
         "properties": {
           "tx": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 100000,
-            "example": 12
+            "maximum": 100000
           },
           "ty": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 100000,
-            "example": 8
+            "maximum": 100000
           }
-        }
+        },
+        "required": ["tx", "ty"]
       },
       "EntityKind": {
         "type": "string",
@@ -133,51 +154,29 @@
       },
       "ChatChannel": {
         "type": "string",
-        "enum": ["proximity", "global"]
+        "enum": ["proximity", "global", "team", "meeting", "dm"]
       },
-      "ErrorCode": {
+      "ObserveDetailLevel": {
         "type": "string",
-        "enum": [
-          "bad_request",
-          "unauthorized",
-          "forbidden",
-          "not_found",
-          "room_not_ready",
-          "agent_not_in_room",
-          "invalid_destination",
-          "collision_blocked",
-          "rate_limited",
-          "conflict",
-          "timeout",
-          "internal"
-        ]
+        "enum": ["lite", "full"]
       },
-      "ErrorObject": {
-        "type": "object",
-        "required": ["code", "message", "retryable"],
-        "properties": {
-          "code": {
-            "$ref": "#/components/schemas/ErrorCode"
-          },
-          "message": {
-            "type": "string",
-            "maxLength": 2000
-          },
-          "retryable": {
-            "type": "boolean"
-          },
-          "details": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        }
+      "UserStatus": {
+        "type": "string",
+        "enum": ["online", "focus", "dnd", "afk", "offline"]
       },
       "EntityBase": {
         "type": "object",
-        "required": ["id", "kind", "name", "pos", "roomId"],
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/IdEntity"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IdEntity"
+              },
+              {
+                "type": "string",
+                "pattern": "^(npc_)?[a-z][a-z0-9-]{0,63}$"
+              }
+            ]
           },
           "kind": {
             "$ref": "#/components/schemas/EntityKind"
@@ -206,35 +205,33 @@
           },
           "meta": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {}
           }
-        }
+        },
+        "required": ["id", "kind", "name", "roomId", "pos"]
       },
       "Affordance": {
         "type": "object",
-        "required": ["action", "label"],
         "properties": {
           "action": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "read"
+            "maxLength": 64
           },
           "label": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 128,
-            "example": "Read Sign"
+            "maxLength": 128
           },
           "paramsSchema": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {}
           }
-        }
+        },
+        "required": ["action", "label"]
       },
       "ObjectState": {
         "type": "object",
-        "required": ["objectType", "state"],
         "properties": {
           "objectType": {
             "type": "string",
@@ -243,13 +240,13 @@
           },
           "state": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {}
           }
-        }
+        },
+        "required": ["objectType", "state"]
       },
       "ObservedEntity": {
         "type": "object",
-        "required": ["entity", "distance", "affords"],
         "properties": {
           "entity": {
             "$ref": "#/components/schemas/EntityBase"
@@ -263,47 +260,312 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Affordance"
-            }
+            },
+            "maxItems": 50
           },
           "object": {
             "$ref": "#/components/schemas/ObjectState"
           }
-        }
+        },
+        "required": ["entity", "distance", "affords"]
       },
-      "RegisterRequest": {
+      "ObservedFacility": {
         "type": "object",
-        "required": ["roomId", "name"],
         "properties": {
-          "roomId": {
-            "$ref": "#/components/schemas/IdRoom"
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
           },
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "Helper Bot"
+            "maxLength": 64
+          },
+          "position": {
+            "$ref": "#/components/schemas/Vec2"
+          },
+          "distance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "affords": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Affordance"
+            },
+            "maxItems": 50
           }
-        }
+        },
+        "required": ["id", "type", "name", "position", "distance", "affords"]
+      },
+      "ErrorCode": {
+        "type": "string",
+        "enum": [
+          "bad_request",
+          "unauthorized",
+          "forbidden",
+          "not_found",
+          "room_not_ready",
+          "agent_not_in_room",
+          "invalid_destination",
+          "collision_blocked",
+          "rate_limited",
+          "conflict",
+          "timeout",
+          "internal"
+        ]
+      },
+      "ErrorObject": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/ErrorCode"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "retryable": {
+            "type": "boolean"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "required": ["code", "message", "retryable"]
+      },
+      "MapMetadata": {
+        "type": "object",
+        "properties": {
+          "currentZone": {
+            "type": ["string", "null"],
+            "enum": [
+              "lobby",
+              "office",
+              "central-park",
+              "arcade",
+              "meeting",
+              "lounge-cafe",
+              "plaza",
+              "lake",
+              null
+            ]
+          },
+          "zones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ZoneInfo"
+            }
+          },
+          "mapSize": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "tileSize": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": ["width", "height", "tileSize"]
+          }
+        },
+        "required": ["currentZone", "zones", "mapSize"]
+      },
+      "ZoneInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "lobby",
+              "office",
+              "central-park",
+              "arcade",
+              "meeting",
+              "lounge-cafe",
+              "plaza",
+              "lake"
+            ]
+          },
+          "bounds": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "width": {
+                "type": "number"
+              },
+              "height": {
+                "type": "number"
+              }
+            },
+            "required": ["x", "y", "width", "height"]
+          },
+          "entrances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuildingEntrance"
+            }
+          }
+        },
+        "required": ["id", "bounds", "entrances"]
+      },
+      "BuildingEntrance": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "position": {
+            "$ref": "#/components/schemas/Vec2"
+          },
+          "size": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "number"
+              },
+              "height": {
+                "type": "number"
+              }
+            },
+            "required": ["width", "height"]
+          },
+          "zone": {
+            "type": "string",
+            "enum": [
+              "lobby",
+              "office",
+              "central-park",
+              "arcade",
+              "meeting",
+              "lounge-cafe",
+              "plaza",
+              "lake"
+            ]
+          },
+          "direction": {
+            "$ref": "#/components/schemas/EntranceDirection"
+          },
+          "connectsTo": {
+            "type": "string",
+            "enum": [
+              "lobby",
+              "office",
+              "central-park",
+              "arcade",
+              "meeting",
+              "lounge-cafe",
+              "plaza",
+              "lake"
+            ]
+          }
+        },
+        "required": ["id", "name", "position", "size", "zone", "direction", "connectsTo"]
+      },
+      "EntranceDirection": {
+        "type": "string",
+        "enum": ["north", "south", "east", "west"]
+      },
+      "RoomInfo": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "$ref": "#/components/schemas/IdRoom"
+          },
+          "mapId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "tickRate": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60
+          }
+        },
+        "required": ["roomId", "mapId", "tickRate"]
+      },
+      "MoveToResult": {
+        "type": "string",
+        "enum": ["accepted", "rejected", "no_op", "no_path"]
+      },
+      "InteractOutcomeType": {
+        "type": "string",
+        "enum": ["ok", "no_effect", "invalid_action", "too_far"]
+      },
+      "InteractOutcome": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/InteractOutcomeType"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 2000
+          }
+        },
+        "required": ["type"]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "roomId": {
+            "$ref": "#/components/schemas/IdRoom"
+          }
+        },
+        "required": ["name", "roomId"]
       },
       "RegisterResponseData": {
         "type": "object",
-        "required": ["agentId", "roomId", "sessionToken"],
         "properties": {
           "agentId": {
-            "$ref": "#/components/schemas/IdAgent"
+            "$ref": "#/components/schemas/IdEntity"
           },
           "roomId": {
             "$ref": "#/components/schemas/IdRoom"
           },
           "sessionToken": {
             "type": "string",
-            "description": "Session token for subsequent authenticated requests"
+            "pattern": "^[a-zA-Z0-9._-]{8,256}$"
           }
-        }
+        },
+        "required": ["agentId", "roomId", "sessionToken"]
       },
       "UnregisterRequest": {
         "type": "object",
-        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -311,11 +573,11 @@
           "roomId": {
             "$ref": "#/components/schemas/IdRoom"
           }
-        }
+        },
+        "required": ["agentId", "roomId"]
       },
       "UnregisterResponseData": {
         "type": "object",
-        "required": ["agentId", "unregisteredAt"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdEntity"
@@ -323,11 +585,11 @@
           "unregisteredAt": {
             "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["agentId", "unregisteredAt"]
       },
       "ObserveRequest": {
         "type": "object",
-        "required": ["agentId", "roomId", "radius"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -338,28 +600,22 @@
           "radius": {
             "type": "number",
             "minimum": 1,
-            "maximum": 2000,
-            "example": 100
+            "maximum": 2000
           },
           "detail": {
-            "type": "string",
-            "enum": ["lite", "full"],
-            "example": "full"
+            "$ref": "#/components/schemas/ObserveDetailLevel"
           },
           "includeSelf": {
-            "type": "boolean",
-            "default": true
+            "type": "boolean"
           },
           "includeGrid": {
-            "type": "boolean",
-            "default": false,
-            "description": "If true, include grid/tile data in the response"
+            "type": "boolean"
           }
-        }
+        },
+        "required": ["agentId", "roomId", "radius"]
       },
       "ObserveResponseData": {
         "type": "object",
-        "required": ["self", "nearby", "serverTsMs", "room", "facilities"],
         "properties": {
           "self": {
             "$ref": "#/components/schemas/EntityBase"
@@ -368,98 +624,30 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ObservedEntity"
-            }
-          },
-          "serverTsMs": {
-            "$ref": "#/components/schemas/TsMs"
-          },
-          "room": {
-            "type": "object",
-            "required": ["roomId", "mapId", "tickRate"],
-            "properties": {
-              "roomId": {
-                "$ref": "#/components/schemas/IdRoom"
-              },
-              "mapId": {
-                "type": "string"
-              },
-              "tickRate": {
-                "type": "integer",
-                "minimum": 1,
-                "maximum": 60
-              }
-            }
+            },
+            "maxItems": 500
           },
           "facilities": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ObservedFacility"
             },
-            "description": "Facilities visible within the observation radius"
+            "maxItems": 100
+          },
+          "serverTsMs": {
+            "$ref": "#/components/schemas/TsMs"
+          },
+          "room": {
+            "$ref": "#/components/schemas/RoomInfo"
           },
           "mapMetadata": {
             "$ref": "#/components/schemas/MapMetadata"
           }
-        }
-      },
-      "ObservedFacility": {
-        "type": "object",
-        "required": ["id", "type", "pos"],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique facility identifier"
-          },
-          "type": {
-            "type": "string",
-            "description": "Facility type (e.g., door, terminal, vending_machine)"
-          },
-          "pos": {
-            "$ref": "#/components/schemas/TileCoord"
-          },
-          "label": {
-            "type": "string",
-            "maxLength": 128
-          },
-          "interactable": {
-            "type": "boolean"
-          },
-          "meta": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        }
-      },
-      "MapMetadata": {
-        "type": "object",
-        "required": ["mapId", "width", "height"],
-        "properties": {
-          "mapId": {
-            "type": "string"
-          },
-          "width": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "height": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "tileSize": {
-            "type": "integer",
-            "minimum": 1
-          },
-          "layers": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
+        },
+        "required": ["self", "nearby", "facilities", "serverTsMs", "room"]
       },
       "MoveToRequest": {
         "type": "object",
-        "required": ["agentId", "roomId", "txId", "dest"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -475,14 +663,13 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["walk"],
-            "default": "walk"
+            "enum": ["walk"]
           }
-        }
+        },
+        "required": ["agentId", "roomId", "txId", "dest"]
       },
       "MoveToResponseData": {
         "type": "object",
-        "required": ["txId", "applied", "serverTsMs", "result"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -494,14 +681,13 @@
             "$ref": "#/components/schemas/TsMs"
           },
           "result": {
-            "type": "string",
-            "enum": ["accepted", "rejected", "no_op", "no_path"]
+            "$ref": "#/components/schemas/MoveToResult"
           }
-        }
+        },
+        "required": ["txId", "applied", "serverTsMs", "result"]
       },
       "InteractRequest": {
         "type": "object",
-        "required": ["agentId", "roomId", "txId", "targetId", "action"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -518,18 +704,17 @@
           "action": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "read"
+            "maxLength": 64
           },
           "params": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {}
           }
-        }
+        },
+        "required": ["agentId", "roomId", "txId", "targetId", "action"]
       },
       "InteractResponseData": {
         "type": "object",
-        "required": ["txId", "applied", "serverTsMs", "outcome"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -541,24 +726,13 @@
             "$ref": "#/components/schemas/TsMs"
           },
           "outcome": {
-            "type": "object",
-            "required": ["type"],
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": ["ok", "no_effect", "invalid_action", "too_far"]
-              },
-              "message": {
-                "type": "string",
-                "maxLength": 2000
-              }
-            }
+            "$ref": "#/components/schemas/InteractOutcome"
           }
-        }
+        },
+        "required": ["txId", "applied", "serverTsMs", "outcome"]
       },
       "ChatSendRequest": {
         "type": "object",
-        "required": ["agentId", "roomId", "txId", "channel", "message"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -575,14 +749,13 @@
           "message": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 500,
-            "example": "Hello everyone!"
+            "maxLength": 500
           }
-        }
+        },
+        "required": ["agentId", "roomId", "txId", "channel", "message"]
       },
       "ChatSendResponseData": {
         "type": "object",
-        "required": ["txId", "applied", "serverTsMs", "chatMessageId"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -594,14 +767,18 @@
             "$ref": "#/components/schemas/TsMs"
           },
           "chatMessageId": {
-            "type": "string",
-            "pattern": "^msg_[A-Za-z0-9._-]{8,128}$"
+            "$ref": "#/components/schemas/IdMessage"
           }
-        }
+        },
+        "required": ["txId", "applied", "serverTsMs", "chatMessageId"]
+      },
+      "IdMessage": {
+        "type": "string",
+        "pattern": "^msg_[A-Za-z0-9._-]{8,128}$",
+        "example": "msg_abc123def456"
       },
       "ChatObserveRequest": {
         "type": "object",
-        "required": ["agentId", "roomId", "windowSec"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -612,20 +789,35 @@
           "windowSec": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 300,
-            "example": 60
+            "maximum": 300
           },
           "channel": {
             "$ref": "#/components/schemas/ChatChannel"
           }
-        }
+        },
+        "required": ["agentId", "roomId", "windowSec"]
+      },
+      "ChatObserveResponseData": {
+        "type": "object",
+        "properties": {
+          "messages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "maxItems": 500
+          },
+          "serverTsMs": {
+            "$ref": "#/components/schemas/TsMs"
+          }
+        },
+        "required": ["messages", "serverTsMs"]
       },
       "ChatMessage": {
         "type": "object",
-        "required": ["id", "roomId", "channel", "fromEntityId", "fromName", "message", "tsMs"],
         "properties": {
           "id": {
-            "type": "string"
+            "$ref": "#/components/schemas/IdMessage"
           },
           "roomId": {
             "$ref": "#/components/schemas/IdRoom"
@@ -637,34 +829,44 @@
             "$ref": "#/components/schemas/IdEntity"
           },
           "fromName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
           },
           "tsMs": {
             "$ref": "#/components/schemas/TsMs"
-          }
-        }
-      },
-      "ChatObserveResponseData": {
-        "type": "object",
-        "required": ["messages", "serverTsMs"],
-        "properties": {
-          "messages": {
+          },
+          "targetEntityId": {
+            "$ref": "#/components/schemas/IdEntity"
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "meetingRoomId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "emotes": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ChatMessage"
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32
             }
-          },
-          "serverTsMs": {
-            "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["id", "roomId", "channel", "fromEntityId", "fromName", "message", "tsMs"]
       },
       "PollEventsRequest": {
         "type": "object",
-        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -678,16 +880,59 @@
           "limit": {
             "type": "integer",
             "minimum": 1,
-            "maximum": 200,
-            "default": 50
+            "maximum": 200
           },
           "waitMs": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 25000,
-            "default": 0
+            "maximum": 25000
           }
-        }
+        },
+        "required": ["agentId", "roomId"]
+      },
+      "PollEventsResponseData": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventEnvelope"
+            },
+            "maxItems": 200
+          },
+          "nextCursor": {
+            "$ref": "#/components/schemas/Cursor"
+          },
+          "cursorExpired": {
+            "type": "boolean"
+          },
+          "serverTsMs": {
+            "$ref": "#/components/schemas/TsMs"
+          }
+        },
+        "required": ["events", "nextCursor", "cursorExpired", "serverTsMs"]
+      },
+      "EventEnvelope": {
+        "type": "object",
+        "properties": {
+          "cursor": {
+            "$ref": "#/components/schemas/Cursor"
+          },
+          "type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "roomId": {
+            "$ref": "#/components/schemas/IdRoom"
+          },
+          "tsMs": {
+            "$ref": "#/components/schemas/TsMs"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": {}
+          }
+        },
+        "required": ["cursor", "type", "roomId", "tsMs", "payload"]
       },
       "EventType": {
         "type": "string",
@@ -704,68 +949,15 @@
           "npc.state_change",
           "facility.interacted",
           "emote.triggered",
-          "meeting.started",
-          "meeting.ended",
-          "meeting.participant.joined",
-          "meeting.participant.left",
-          "meeting.chat.message",
-          "meeting.chat.history_response",
-          "meeting.state_changed",
-          "meeting.agenda.started",
-          "meeting.agenda.completed",
-          "meeting.agenda.reordered",
+          "meeting.created",
+          "meeting.participant_joined",
+          "meeting.participant_left",
           "meeting.host_transferred",
-          "meeting.recording_started",
-          "meeting.recording_stopped"
+          "meeting.ended"
         ]
-      },
-      "EventEnvelope": {
-        "type": "object",
-        "required": ["cursor", "type", "roomId", "tsMs", "payload"],
-        "properties": {
-          "cursor": {
-            "$ref": "#/components/schemas/Cursor"
-          },
-          "type": {
-            "$ref": "#/components/schemas/EventType"
-          },
-          "roomId": {
-            "$ref": "#/components/schemas/IdRoom"
-          },
-          "tsMs": {
-            "$ref": "#/components/schemas/TsMs"
-          },
-          "payload": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        }
-      },
-      "PollEventsResponseData": {
-        "type": "object",
-        "required": ["events", "nextCursor", "serverTsMs", "cursorExpired"],
-        "properties": {
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EventEnvelope"
-            }
-          },
-          "nextCursor": {
-            "$ref": "#/components/schemas/Cursor"
-          },
-          "serverTsMs": {
-            "$ref": "#/components/schemas/TsMs"
-          },
-          "cursorExpired": {
-            "type": "boolean",
-            "description": "True if the provided sinceCursor was expired and events may have been missed"
-          }
-        }
       },
       "ProfileUpdateRequest": {
         "type": "object",
-        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -778,79 +970,64 @@
           },
           "statusMessage": {
             "type": "string",
-            "maxLength": 200
+            "maxLength": 100
           },
           "title": {
             "type": "string",
-            "maxLength": 128
+            "maxLength": 50
           },
           "department": {
             "type": "string",
-            "maxLength": 128
+            "maxLength": 50
           }
-        }
+        },
+        "required": ["agentId", "roomId"]
       },
       "ProfileUpdateResponseData": {
         "type": "object",
-        "required": ["applied", "profile", "serverTsMs"],
         "properties": {
           "applied": {
-            "type": "boolean",
-            "enum": [true]
+            "type": "boolean"
           },
           "profile": {
-            "$ref": "#/components/schemas/AgentProfile"
+            "type": "object",
+            "properties": {
+              "entityId": {
+                "$ref": "#/components/schemas/IdEntity"
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "status": {
+                "$ref": "#/components/schemas/UserStatus"
+              },
+              "statusMessage": {
+                "type": "string"
+              },
+              "avatarUrl": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "department": {
+                "type": "string"
+              }
+            },
+            "required": ["entityId", "displayName", "status"]
           },
           "serverTsMs": {
             "$ref": "#/components/schemas/TsMs"
           }
-        }
-      },
-      "UserStatus": {
-        "type": "string",
-        "enum": ["online", "away", "focus", "offline"],
-        "description": "User presence/availability status"
-      },
-      "AgentProfile": {
-        "type": "object",
-        "required": ["agentId", "name"],
-        "properties": {
-          "agentId": {
-            "$ref": "#/components/schemas/IdAgent"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 64
-          },
-          "status": {
-            "$ref": "#/components/schemas/UserStatus"
-          },
-          "statusMessage": {
-            "type": "string",
-            "maxLength": 200
-          },
-          "title": {
-            "type": "string",
-            "maxLength": 128
-          },
-          "department": {
-            "type": "string",
-            "maxLength": 128
-          },
-          "updatedAt": {
-            "$ref": "#/components/schemas/TsMs"
-          }
-        }
+        },
+        "required": ["applied", "profile", "serverTsMs"]
       },
       "SkillCategory": {
         "type": "string",
-        "enum": ["movement", "combat", "social", "utility"],
-        "description": "Category of the skill"
+        "enum": ["movement", "combat", "social", "utility"]
       },
       "SkillEffectDefinition": {
         "type": "object",
-        "required": ["id", "durationMs"],
         "properties": {
           "id": {
             "type": "string",
@@ -872,41 +1049,36 @@
               }
             }
           }
-        }
+        },
+        "required": ["id", "durationMs"]
       },
       "SkillAction": {
         "type": "object",
-        "required": ["id", "name", "description"],
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "sprint"
+            "maxLength": 64
           },
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 128,
-            "example": "Sprint"
+            "maxLength": 128
           },
           "description": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 500,
-            "example": "Move faster for a short duration"
+            "maxLength": 500
           },
           "cooldownMs": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 3600000,
-            "example": 5000
+            "maximum": 3600000
           },
           "castTimeMs": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 60000,
-            "example": 1000
+            "maximum": 60000
           },
           "rangeUnits": {
             "type": "number",
@@ -920,37 +1092,31 @@
           },
           "params": {
             "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Parameter schema for this action. Keys are parameter names, values describe the expected type."
+            "additionalProperties": {}
           },
           "effect": {
             "$ref": "#/components/schemas/SkillEffectDefinition"
           }
-        }
+        },
+        "required": ["id", "name", "description"]
       },
       "SkillDefinition": {
         "type": "object",
-        "required": ["id", "name", "description", "category", "actions"],
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "movement_sprint"
+            "maxLength": 64
           },
           "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "Sprint Skill"
+            "maxLength": 64
           },
           "description": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 500,
-            "example": "Allows the agent to move faster"
+            "maxLength": 500
           },
           "category": {
             "$ref": "#/components/schemas/SkillCategory"
@@ -979,7 +1145,8 @@
             },
             "maxItems": 10
           }
-        }
+        },
+        "required": ["id", "name", "description", "category", "actions"]
       },
       "SkillInvokeOutcomeType": {
         "type": "string",
@@ -987,7 +1154,6 @@
       },
       "SkillInvokeOutcome": {
         "type": "object",
-        "required": ["type"],
         "properties": {
           "type": {
             "$ref": "#/components/schemas/SkillInvokeOutcomeType"
@@ -998,13 +1164,16 @@
           },
           "data": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {}
+          },
+          "completionTime": {
+            "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["type"]
       },
       "AgentSkillState": {
         "type": "object",
-        "required": ["skillId", "installedAt", "enabled"],
         "properties": {
           "skillId": {
             "type": "string",
@@ -1023,11 +1192,11 @@
               "type": "string"
             }
           }
-        }
+        },
+        "required": ["skillId", "installedAt", "enabled"]
       },
       "SkillListRequest": {
         "type": "object",
-        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1039,14 +1208,13 @@
             "$ref": "#/components/schemas/SkillCategory"
           },
           "installed": {
-            "type": "boolean",
-            "description": "Filter by installed skills only"
+            "type": "boolean"
           }
-        }
+        },
+        "required": ["agentId", "roomId"]
       },
       "SkillInstallRequest": {
         "type": "object",
-        "required": ["agentId", "roomId", "txId", "skillId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1060,21 +1228,19 @@
           "skillId": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "movement_sprint"
+            "maxLength": 64
           },
           "credentials": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            },
-            "description": "Optional credentials for the skill"
+            }
           }
-        }
+        },
+        "required": ["agentId", "roomId", "txId", "skillId"]
       },
       "SkillInvokeRequest": {
         "type": "object",
-        "required": ["agentId", "roomId", "txId", "skillId", "actionId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1088,28 +1254,25 @@
           "skillId": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "movement_sprint"
+            "maxLength": 64
           },
           "actionId": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 64,
-            "example": "sprint"
+            "maxLength": 64
           },
           "targetId": {
             "$ref": "#/components/schemas/IdEntity"
           },
           "params": {
             "type": "object",
-            "additionalProperties": true,
-            "description": "Runtime parameters for the skill action. Structure depends on the action definition."
+            "additionalProperties": {}
           }
-        }
+        },
+        "required": ["agentId", "roomId", "txId", "skillId", "actionId"]
       },
       "SkillListResponseData": {
         "type": "object",
-        "required": ["skills", "serverTsMs"],
         "properties": {
           "skills": {
             "type": "array",
@@ -1121,11 +1284,11 @@
           "serverTsMs": {
             "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["skills", "serverTsMs"]
       },
       "SkillInstallResponseData": {
         "type": "object",
-        "required": ["skillId", "installed", "alreadyInstalled", "serverTsMs"],
         "properties": {
           "skillId": {
             "type": "string",
@@ -1133,21 +1296,19 @@
             "maxLength": 64
           },
           "installed": {
-            "type": "boolean",
-            "description": "Whether the skill is now installed"
+            "type": "boolean"
           },
           "alreadyInstalled": {
-            "type": "boolean",
-            "description": "True if skill was already installed before this request"
+            "type": "boolean"
           },
           "serverTsMs": {
             "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["skillId", "installed", "alreadyInstalled", "serverTsMs"]
       },
       "SkillInvokeResponseData": {
         "type": "object",
-        "required": ["txId", "outcome", "serverTsMs"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -1158,61 +1319,11 @@
           "serverTsMs": {
             "$ref": "#/components/schemas/TsMs"
           }
-        }
-      },
-      "ResultOk": {
-        "type": "object",
-        "required": ["status", "data"],
-        "properties": {
-          "status": {
-            "type": "string",
-            "const": "ok"
-          },
-          "data": {
-            "type": "object"
-          }
-        }
-      },
-      "ResultError": {
-        "type": "object",
-        "required": ["status", "error"],
-        "properties": {
-          "status": {
-            "type": "string",
-            "const": "error"
-          },
-          "error": {
-            "$ref": "#/components/schemas/ErrorObject"
-          }
-        }
-      },
-      "ChannelInfo": {
-        "type": "object",
-        "required": ["channelId", "maxAgents", "currentAgents", "status"],
-        "properties": {
-          "channelId": {
-            "$ref": "#/components/schemas/IdRoom"
-          },
-          "maxAgents": {
-            "type": "integer",
-            "minimum": 1,
-            "example": 100
-          },
-          "currentAgents": {
-            "type": "integer",
-            "minimum": 0,
-            "example": 12
-          },
-          "status": {
-            "type": "string",
-            "enum": ["open", "full", "closed"],
-            "example": "open"
-          }
-        }
+        },
+        "required": ["txId", "outcome", "serverTsMs"]
       },
       "ReconnectRequest": {
         "type": "object",
-        "required": ["agentId", "sessionToken"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1221,14 +1332,14 @@
             "type": "string",
             "minLength": 8
           }
-        }
+        },
+        "required": ["agentId", "sessionToken"]
       },
       "ReconnectResponseData": {
         "type": "object",
-        "required": ["agentId", "roomId", "sessionToken", "pos"],
         "properties": {
           "agentId": {
-            "$ref": "#/components/schemas/IdAgent"
+            "$ref": "#/components/schemas/IdEntity"
           },
           "roomId": {
             "$ref": "#/components/schemas/IdRoom"
@@ -1242,11 +1353,11 @@
           "tile": {
             "$ref": "#/components/schemas/TileCoord"
           }
-        }
+        },
+        "required": ["agentId", "roomId", "sessionToken", "pos"]
       },
       "HeartbeatRequest": {
         "type": "object",
-        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1254,11 +1365,89 @@
           "roomId": {
             "$ref": "#/components/schemas/IdRoom"
           }
-        }
+        },
+        "required": ["agentId", "roomId"]
+      },
+      "MeetingListRequest": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "$ref": "#/components/schemas/IdAgent"
+          },
+          "roomId": {
+            "$ref": "#/components/schemas/IdRoom"
+          }
+        },
+        "required": ["agentId", "roomId"]
+      },
+      "MeetingJoinRequest": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "$ref": "#/components/schemas/IdAgent"
+          },
+          "roomId": {
+            "$ref": "#/components/schemas/IdRoom"
+          },
+          "meetingId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": ["agentId", "roomId", "meetingId"]
+      },
+      "MeetingLeaveRequest": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "$ref": "#/components/schemas/IdAgent"
+          },
+          "roomId": {
+            "$ref": "#/components/schemas/IdRoom"
+          },
+          "meetingId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": ["agentId", "roomId", "meetingId"]
+      },
+      "AgentProfile": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "$ref": "#/components/schemas/IdAgent"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "status": {
+            "$ref": "#/components/schemas/UserStatus"
+          },
+          "statusMessage": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "department": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "updatedAt": {
+            "$ref": "#/components/schemas/TsMs"
+          }
+        },
+        "required": ["agentId", "name"]
       },
       "HeartbeatResponseData": {
         "type": "object",
-        "required": ["agentId", "serverTsMs", "timeoutMs", "recommendedIntervalMs"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1268,19 +1457,17 @@
           },
           "timeoutMs": {
             "type": "integer",
-            "minimum": 0,
-            "example": 60000
+            "minimum": 0
           },
           "recommendedIntervalMs": {
             "type": "integer",
-            "minimum": 0,
-            "example": 30000
+            "minimum": 0
           }
-        }
+        },
+        "required": ["agentId", "serverTsMs", "timeoutMs", "recommendedIntervalMs"]
       },
       "MeetingInfo": {
         "type": "object",
-        "required": ["meetingId", "name", "hostId", "participantCount", "capacity"],
         "properties": {
           "meetingId": {
             "type": "string",
@@ -1303,52 +1490,26 @@
             "type": "integer",
             "minimum": 1
           }
-        }
-      },
-      "MeetingListRequest": {
-        "type": "object",
-        "required": ["agentId", "roomId"],
-        "properties": {
-          "agentId": {
-            "$ref": "#/components/schemas/IdAgent"
-          },
-          "roomId": {
-            "$ref": "#/components/schemas/IdRoom"
-          }
-        }
+        },
+        "required": ["meetingId", "name", "hostId", "participantCount", "capacity"]
       },
       "MeetingListResponseData": {
         "type": "object",
-        "required": ["meetings"],
         "properties": {
           "meetings": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/MeetingInfo"
             }
-          }
-        }
-      },
-      "MeetingJoinRequest": {
-        "type": "object",
-        "required": ["agentId", "roomId", "meetingId"],
-        "properties": {
-          "agentId": {
-            "$ref": "#/components/schemas/IdAgent"
           },
-          "roomId": {
-            "$ref": "#/components/schemas/IdRoom"
-          },
-          "meetingId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
+          "serverTsMs": {
+            "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["meetings", "serverTsMs"]
       },
       "MeetingJoinResponseData": {
         "type": "object",
-        "required": ["meetingId", "role", "participants"],
         "properties": {
           "meetingId": {
             "type": "string",
@@ -1363,7 +1524,6 @@
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["entityId", "name", "role"],
               "properties": {
                 "entityId": {
                   "$ref": "#/components/schemas/IdEntity"
@@ -1377,31 +1537,18 @@
                   "type": "string",
                   "enum": ["host", "participant"]
                 }
-              }
+              },
+              "required": ["entityId", "name", "role"]
             }
-          }
-        }
-      },
-      "MeetingLeaveRequest": {
-        "type": "object",
-        "required": ["agentId", "roomId", "meetingId"],
-        "properties": {
-          "agentId": {
-            "$ref": "#/components/schemas/IdAgent"
           },
-          "roomId": {
-            "$ref": "#/components/schemas/IdRoom"
-          },
-          "meetingId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
+          "serverTsMs": {
+            "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["meetingId", "role", "participants", "serverTsMs"]
       },
       "MeetingLeaveResponseData": {
         "type": "object",
-        "required": ["meetingId", "leftAt"],
         "properties": {
           "meetingId": {
             "type": "string",
@@ -1410,16 +1557,65 @@
           },
           "leftAt": {
             "$ref": "#/components/schemas/TsMs"
+          },
+          "serverTsMs": {
+            "$ref": "#/components/schemas/TsMs"
           }
-        }
+        },
+        "required": ["meetingId", "leftAt", "serverTsMs"]
+      },
+      "ChannelInfo": {
+        "type": "object",
+        "properties": {
+          "channelId": {
+            "$ref": "#/components/schemas/IdRoom"
+          },
+          "maxAgents": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "currentAgents": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "full", "closed"]
+          }
+        },
+        "required": ["channelId", "maxAgents", "currentAgents", "status"]
+      },
+      "ResultOk": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["ok"]
+          },
+          "data": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": {}
+          }
+        },
+        "required": ["status", "data"]
+      },
+      "ResultError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["error"]
+          },
+          "error": {
+            "$ref": "#/components/schemas/ErrorObject"
+          }
+        },
+        "required": ["status", "error"]
       }
-    }
+    },
+    "parameters": {}
   },
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
   "paths": {
     "/register": {
       "post": {
@@ -1452,12 +1648,13 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/RegisterResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 },
                 "example": {
                   "status": "ok",
@@ -1489,6 +1686,11 @@
         "tags": ["Auth"],
         "summary": "Unregister an AI agent",
         "description": "Gracefully disconnect an AI agent from the server. Removes the agent entity from the game world and emits a presence.leave event.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1513,12 +1715,13 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/UnregisterResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 },
                 "example": {
                   "status": "ok",
@@ -1559,6 +1762,11 @@
         "tags": ["Observation"],
         "summary": "Observe the world around the agent",
         "description": "Returns information about the agent itself and nearby entities within the specified radius.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1586,21 +1794,36 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ObserveResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Agent or room not found"
+            "description": "Agent or room not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1611,6 +1834,11 @@
         "tags": ["Actions"],
         "summary": "Move agent to a destination tile",
         "description": "Initiates movement to the specified tile coordinates. Uses txId for idempotency.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1641,21 +1869,36 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MoveToResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid destination"
+            "description": "Invalid destination",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1666,6 +1909,11 @@
         "tags": ["Actions"],
         "summary": "Interact with a world object",
         "description": "Perform an action on a target entity (e.g., read a sign, use a terminal). Check affordances from observe response.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1694,21 +1942,36 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/InteractResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid action or target"
+            "description": "Invalid action or target",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1719,6 +1982,11 @@
         "tags": ["Chat"],
         "summary": "Send a chat message",
         "description": "Send a message to the specified channel. Use \"proximity\" for nearby entities or \"global\" for the entire room.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1746,21 +2014,36 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ChatSendResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "429": {
-            "description": "Rate limited"
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1771,6 +2054,11 @@
         "tags": ["Chat"],
         "summary": "Get recent chat messages",
         "description": "Retrieve chat messages from the specified time window.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1797,18 +2085,26 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ChatObserveResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1819,6 +2115,11 @@
         "tags": ["Events"],
         "summary": "Poll for world events",
         "description": "Long-poll for events since the given cursor. Returns immediately if events are available, or waits up to waitMs for new events.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1846,18 +2147,26 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/PollEventsResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1868,6 +2177,11 @@
         "tags": ["Auth"],
         "summary": "Update agent profile",
         "description": "Update the agent name or metadata.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1878,10 +2192,9 @@
               "example": {
                 "agentId": "agent_helper",
                 "roomId": "auto",
-                "name": "Super Helper Bot",
-                "meta": {
-                  "level": 5
-                }
+                "status": "focus",
+                "statusMessage": "Working on a task",
+                "title": "Senior Engineer"
               }
             }
           }
@@ -1896,18 +2209,26 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ProfileUpdateResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1918,6 +2239,11 @@
         "tags": ["Skills"],
         "summary": "List available skills",
         "description": "Returns a list of skills available to the agent. Can filter by category or installed status.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1944,12 +2270,13 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/SkillListResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 },
                 "example": {
                   "status": "ok",
@@ -1978,10 +2305,24 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Agent or room not found"
+            "description": "Agent or room not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -1992,6 +2333,11 @@
         "tags": ["Skills"],
         "summary": "Install a skill for an agent",
         "description": "Installs a skill for the agent, making its actions available for use. Uses txId for idempotency.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2018,12 +2364,13 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/SkillInstallResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 },
                 "example": {
                   "status": "ok",
@@ -2038,16 +2385,44 @@
             }
           },
           "400": {
-            "description": "Invalid request parameters"
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized - missing or invalid token"
+            "description": "Unauthorized - missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Agent, room, or skill not found"
+            "description": "Agent, room, or skill not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "503": {
-            "description": "Room or skill service not ready"
+            "description": "Room or skill service not ready",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
@@ -2058,6 +2433,11 @@
         "tags": ["Skills"],
         "summary": "Invoke a skill action",
         "description": "Invokes an action from an installed skill. Subject to cooldown (5s default) and cast time (1s default). Uses txId for idempotency.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2085,12 +2465,13 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/SkillInvokeResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 },
                 "example": {
                   "status": "ok",
@@ -2107,29 +2488,64 @@
             }
           },
           "400": {
-            "description": "Invalid request parameters"
+            "description": "Invalid request parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized - missing or invalid token"
+            "description": "Unauthorized - missing or invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden - skill not installed for this agent"
+            "description": "Forbidden - skill not installed for this agent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Skill or action not found"
+            "description": "Skill or action not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "429": {
-            "description": "Rate limited or skill on cooldown"
+            "description": "Rate limited or skill on cooldown",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
     },
     "/channels": {
       "get": {
+        "tags": ["Connection"],
         "operationId": "channels",
         "summary": "List available channels",
         "description": "Returns all available game channels/rooms that agents can join.",
-        "tags": ["Connection"],
         "security": [],
         "responses": {
           "200": {
@@ -2141,11 +2557,10 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "type": "object",
-                      "required": ["channels"],
                       "properties": {
                         "channels": {
                           "type": "array",
@@ -2153,9 +2568,11 @@
                             "$ref": "#/components/schemas/ChannelInfo"
                           }
                         }
-                      }
+                      },
+                      "required": ["channels"]
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
@@ -2165,10 +2582,15 @@
     },
     "/reconnect": {
       "post": {
+        "tags": ["Connection"],
         "operationId": "reconnect",
         "summary": "Reconnect an agent to an existing session",
         "description": "Allows an agent to reconnect using a previously issued session token.",
-        "tags": ["Connection"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2189,31 +2611,51 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ReconnectResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Invalid or expired session token"
+            "description": "Invalid or expired session token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Agent not found"
+            "description": "Agent not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
     },
     "/heartbeat": {
       "post": {
+        "tags": ["Session Management"],
         "operationId": "heartbeat",
         "summary": "Send a heartbeat to maintain session",
         "description": "Keeps the agent session alive and returns server timing information.",
-        "tags": ["Session Management"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2234,31 +2676,51 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/HeartbeatResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Agent session not found"
+            "description": "Agent session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
     },
     "/meeting/list": {
       "post": {
+        "tags": ["Meeting"],
         "operationId": "meetingList",
         "summary": "List available meetings in the room",
         "description": "Returns all active meetings in the specified room.",
-        "tags": ["Meeting"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2279,28 +2741,41 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MeetingListResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
     },
     "/meeting/join": {
       "post": {
+        "tags": ["Meeting"],
         "operationId": "meetingJoin",
         "summary": "Join a meeting",
         "description": "Joins the specified meeting as a participant or host.",
-        "tags": ["Meeting"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2321,34 +2796,61 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MeetingJoinResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Meeting not found"
+            "description": "Meeting not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "409": {
-            "description": "Already in a meeting"
+            "description": "Already in a meeting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
     },
     "/meeting/leave": {
       "post": {
+        "tags": ["Meeting"],
         "operationId": "meetingLeave",
         "summary": "Leave a meeting",
         "description": "Leaves the specified meeting.",
-        "tags": ["Meeting"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -2369,24 +2871,40 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "const": "ok"
+                      "enum": ["ok"]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MeetingLeaveResponseData"
                     }
-                  }
+                  },
+                  "required": ["status", "data"]
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           },
           "404": {
-            "description": "Meeting not found or not a participant"
+            "description": "Meeting not found or not a participant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultError"
+                }
+              }
+            }
           }
         }
       }
     }
-  }
+  },
+  "webhooks": {}
 }

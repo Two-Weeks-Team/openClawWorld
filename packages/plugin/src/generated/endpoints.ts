@@ -53,9 +53,6 @@ export type IdTarget = string;
  */
 export type IdTx = string;
 
-/**
- * @pattern ^[A-Za-z0-9=_-]{1,256}$
- */
 export type Cursor = string;
 
 /**
@@ -105,39 +102,32 @@ export type ChatChannel = (typeof ChatChannel)[keyof typeof ChatChannel];
 export const ChatChannel = {
   proximity: 'proximity',
   global: 'global',
+  team: 'team',
+  meeting: 'meeting',
+  dm: 'dm',
 } as const;
 
-export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+export type ObserveDetailLevel = (typeof ObserveDetailLevel)[keyof typeof ObserveDetailLevel];
 
-export const ErrorCode = {
-  bad_request: 'bad_request',
-  unauthorized: 'unauthorized',
-  forbidden: 'forbidden',
-  not_found: 'not_found',
-  room_not_ready: 'room_not_ready',
-  agent_not_in_room: 'agent_not_in_room',
-  invalid_destination: 'invalid_destination',
-  collision_blocked: 'collision_blocked',
-  rate_limited: 'rate_limited',
-  conflict: 'conflict',
-  timeout: 'timeout',
-  internal: 'internal',
+export const ObserveDetailLevel = {
+  lite: 'lite',
+  full: 'full',
 } as const;
 
-export type ErrorObjectDetails = { [key: string]: unknown };
+export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
 
-export interface ErrorObject {
-  code: ErrorCode;
-  /** @maxLength 2000 */
-  message: string;
-  retryable: boolean;
-  details?: ErrorObjectDetails;
-}
+export const UserStatus = {
+  online: 'online',
+  focus: 'focus',
+  dnd: 'dnd',
+  afk: 'afk',
+  offline: 'offline',
+} as const;
 
 export type EntityBaseMeta = { [key: string]: unknown };
 
 export interface EntityBase {
-  id: IdEntity;
+  id: IdEntity | string;
   kind: EntityKind;
   /**
    * @minLength 1
@@ -190,23 +180,237 @@ export interface ObservedEntity {
    * @maximum 1000000
    */
   distance: number;
+  /** @maxItems 50 */
   affords: Affordance[];
   object?: ObjectState;
 }
 
-export interface RegisterRequest {
-  roomId: IdRoom;
+export interface ObservedFacility {
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  id: string;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  type: string;
   /**
    * @minLength 1
    * @maxLength 64
    */
   name: string;
+  position: Vec2;
+  /**
+   * @minimum 0
+   * @maximum 1000000
+   */
+  distance: number;
+  /** @maxItems 50 */
+  affords: Affordance[];
+}
+
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+export const ErrorCode = {
+  bad_request: 'bad_request',
+  unauthorized: 'unauthorized',
+  forbidden: 'forbidden',
+  not_found: 'not_found',
+  room_not_ready: 'room_not_ready',
+  agent_not_in_room: 'agent_not_in_room',
+  invalid_destination: 'invalid_destination',
+  collision_blocked: 'collision_blocked',
+  rate_limited: 'rate_limited',
+  conflict: 'conflict',
+  timeout: 'timeout',
+  internal: 'internal',
+} as const;
+
+export type ErrorObjectDetails = { [key: string]: unknown };
+
+export interface ErrorObject {
+  code: ErrorCode;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  message: string;
+  retryable: boolean;
+  details?: ErrorObjectDetails;
+}
+
+/**
+ * @nullable
+ */
+export type MapMetadataCurrentZone =
+  | (typeof MapMetadataCurrentZone)[keyof typeof MapMetadataCurrentZone]
+  | null;
+
+export const MapMetadataCurrentZone = {
+  lobby: 'lobby',
+  office: 'office',
+  'central-park': 'central-park',
+  arcade: 'arcade',
+  meeting: 'meeting',
+  'lounge-cafe': 'lounge-cafe',
+  plaza: 'plaza',
+  lake: 'lake',
+} as const;
+
+export type MapMetadataMapSize = {
+  /** @minimum 1 */
+  width: number;
+  /** @minimum 1 */
+  height: number;
+  /** @minimum 1 */
+  tileSize: number;
+};
+
+export type ZoneInfoId = (typeof ZoneInfoId)[keyof typeof ZoneInfoId];
+
+export const ZoneInfoId = {
+  lobby: 'lobby',
+  office: 'office',
+  'central-park': 'central-park',
+  arcade: 'arcade',
+  meeting: 'meeting',
+  'lounge-cafe': 'lounge-cafe',
+  plaza: 'plaza',
+  lake: 'lake',
+} as const;
+
+export type BuildingEntranceZone = (typeof BuildingEntranceZone)[keyof typeof BuildingEntranceZone];
+
+export const BuildingEntranceZone = {
+  lobby: 'lobby',
+  office: 'office',
+  'central-park': 'central-park',
+  arcade: 'arcade',
+  meeting: 'meeting',
+  'lounge-cafe': 'lounge-cafe',
+  plaza: 'plaza',
+  lake: 'lake',
+} as const;
+
+export type EntranceDirection = (typeof EntranceDirection)[keyof typeof EntranceDirection];
+
+export const EntranceDirection = {
+  north: 'north',
+  south: 'south',
+  east: 'east',
+  west: 'west',
+} as const;
+
+export type BuildingEntranceConnectsTo =
+  (typeof BuildingEntranceConnectsTo)[keyof typeof BuildingEntranceConnectsTo];
+
+export const BuildingEntranceConnectsTo = {
+  lobby: 'lobby',
+  office: 'office',
+  'central-park': 'central-park',
+  arcade: 'arcade',
+  meeting: 'meeting',
+  'lounge-cafe': 'lounge-cafe',
+  plaza: 'plaza',
+  lake: 'lake',
+} as const;
+
+export type BuildingEntranceSize = {
+  width: number;
+  height: number;
+};
+
+export interface BuildingEntrance {
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  id: string;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  name: string;
+  position: Vec2;
+  size: BuildingEntranceSize;
+  zone: BuildingEntranceZone;
+  direction: EntranceDirection;
+  connectsTo: BuildingEntranceConnectsTo;
+}
+
+export type ZoneInfoBounds = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export interface ZoneInfo {
+  id: ZoneInfoId;
+  bounds: ZoneInfoBounds;
+  entrances: BuildingEntrance[];
+}
+
+export interface MapMetadata {
+  /** @nullable */
+  currentZone: MapMetadataCurrentZone;
+  zones: ZoneInfo[];
+  mapSize: MapMetadataMapSize;
+}
+
+export interface RoomInfo {
+  roomId: IdRoom;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  mapId: string;
+  /**
+   * @minimum 1
+   * @maximum 60
+   */
+  tickRate: number;
+}
+
+export type MoveToResult = (typeof MoveToResult)[keyof typeof MoveToResult];
+
+export const MoveToResult = {
+  accepted: 'accepted',
+  rejected: 'rejected',
+  no_op: 'no_op',
+  no_path: 'no_path',
+} as const;
+
+export type InteractOutcomeType = (typeof InteractOutcomeType)[keyof typeof InteractOutcomeType];
+
+export const InteractOutcomeType = {
+  ok: 'ok',
+  no_effect: 'no_effect',
+  invalid_action: 'invalid_action',
+  too_far: 'too_far',
+} as const;
+
+export interface InteractOutcome {
+  type: InteractOutcomeType;
+  /** @maxLength 2000 */
+  message?: string;
+}
+
+export interface RegisterRequest {
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  name: string;
+  roomId: IdRoom;
 }
 
 export interface RegisterResponseData {
-  agentId: IdAgent;
+  agentId: IdEntity;
   roomId: IdRoom;
-  /** Session token for subsequent authenticated requests */
+  /** @pattern ^[a-zA-Z0-9._-]{8,256}$ */
   sessionToken: string;
 }
 
@@ -220,13 +424,6 @@ export interface UnregisterResponseData {
   unregisteredAt: TsMs;
 }
 
-export type ObserveRequestDetail = (typeof ObserveRequestDetail)[keyof typeof ObserveRequestDetail];
-
-export const ObserveRequestDetail = {
-  lite: 'lite',
-  full: 'full',
-} as const;
-
 export interface ObserveRequest {
   agentId: IdAgent;
   roomId: IdRoom;
@@ -235,54 +432,19 @@ export interface ObserveRequest {
    * @maximum 2000
    */
   radius: number;
-  detail?: ObserveRequestDetail;
+  detail?: ObserveDetailLevel;
   includeSelf?: boolean;
-  /** If true, include grid/tile data in the response */
   includeGrid?: boolean;
-}
-
-export type ObserveResponseDataRoom = {
-  roomId: IdRoom;
-  mapId: string;
-  /**
-   * @minimum 1
-   * @maximum 60
-   */
-  tickRate: number;
-};
-
-export type ObservedFacilityMeta = { [key: string]: unknown };
-
-export interface ObservedFacility {
-  /** Unique facility identifier */
-  id: string;
-  /** Facility type (e.g., door, terminal, vending_machine) */
-  type: string;
-  pos: TileCoord;
-  /** @maxLength 128 */
-  label?: string;
-  interactable?: boolean;
-  meta?: ObservedFacilityMeta;
-}
-
-export interface MapMetadata {
-  mapId: string;
-  /** @minimum 1 */
-  width: number;
-  /** @minimum 1 */
-  height: number;
-  /** @minimum 1 */
-  tileSize?: number;
-  layers?: string[];
 }
 
 export interface ObserveResponseData {
   self: EntityBase;
+  /** @maxItems 500 */
   nearby: ObservedEntity[];
-  serverTsMs: TsMs;
-  room: ObserveResponseDataRoom;
-  /** Facilities visible within the observation radius */
+  /** @maxItems 100 */
   facilities: ObservedFacility[];
+  serverTsMs: TsMs;
+  room: RoomInfo;
   mapMetadata?: MapMetadata;
 }
 
@@ -300,21 +462,11 @@ export interface MoveToRequest {
   mode?: MoveToRequestMode;
 }
 
-export type MoveToResponseDataResult =
-  (typeof MoveToResponseDataResult)[keyof typeof MoveToResponseDataResult];
-
-export const MoveToResponseDataResult = {
-  accepted: 'accepted',
-  rejected: 'rejected',
-  no_op: 'no_op',
-  no_path: 'no_path',
-} as const;
-
 export interface MoveToResponseData {
   txId: IdTx;
   applied: boolean;
   serverTsMs: TsMs;
-  result: MoveToResponseDataResult;
+  result: MoveToResult;
 }
 
 export type InteractRequestParams = { [key: string]: unknown };
@@ -332,27 +484,11 @@ export interface InteractRequest {
   params?: InteractRequestParams;
 }
 
-export type InteractResponseDataOutcomeType =
-  (typeof InteractResponseDataOutcomeType)[keyof typeof InteractResponseDataOutcomeType];
-
-export const InteractResponseDataOutcomeType = {
-  ok: 'ok',
-  no_effect: 'no_effect',
-  invalid_action: 'invalid_action',
-  too_far: 'too_far',
-} as const;
-
-export type InteractResponseDataOutcome = {
-  type: InteractResponseDataOutcomeType;
-  /** @maxLength 2000 */
-  message?: string;
-};
-
 export interface InteractResponseData {
   txId: IdTx;
   applied: boolean;
   serverTsMs: TsMs;
-  outcome: InteractResponseDataOutcome;
+  outcome: InteractOutcome;
 }
 
 export interface ChatSendRequest {
@@ -367,12 +503,16 @@ export interface ChatSendRequest {
   message: string;
 }
 
+/**
+ * @pattern ^msg_[A-Za-z0-9._-]{8,128}$
+ */
+export type IdMessage = string;
+
 export interface ChatSendResponseData {
   txId: IdTx;
   applied: boolean;
   serverTsMs: TsMs;
-  /** @pattern ^msg_[A-Za-z0-9._-]{8,128}$ */
-  chatMessageId: string;
+  chatMessageId: IdMessage;
 }
 
 export interface ChatObserveRequest {
@@ -387,16 +527,37 @@ export interface ChatObserveRequest {
 }
 
 export interface ChatMessage {
-  id: string;
+  id: IdMessage;
   roomId: IdRoom;
   channel: ChatChannel;
   fromEntityId: IdEntity;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
   fromName: string;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
   message: string;
   tsMs: TsMs;
+  targetEntityId?: IdEntity;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  teamId?: string;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  meetingRoomId?: string;
+  emotes?: string[];
 }
 
 export interface ChatObserveResponseData {
+  /** @maxItems 500 */
   messages: ChatMessage[];
   serverTsMs: TsMs;
 }
@@ -432,19 +593,11 @@ export const EventType = {
   npcstate_change: 'npc.state_change',
   facilityinteracted: 'facility.interacted',
   emotetriggered: 'emote.triggered',
-  meetingstarted: 'meeting.started',
-  meetingended: 'meeting.ended',
-  meetingparticipantjoined: 'meeting.participant.joined',
-  meetingparticipantleft: 'meeting.participant.left',
-  meetingchatmessage: 'meeting.chat.message',
-  meetingchathistory_response: 'meeting.chat.history_response',
-  meetingstate_changed: 'meeting.state_changed',
-  meetingagendastarted: 'meeting.agenda.started',
-  meetingagendacompleted: 'meeting.agenda.completed',
-  meetingagendareordered: 'meeting.agenda.reordered',
+  meetingcreated: 'meeting.created',
+  meetingparticipant_joined: 'meeting.participant_joined',
+  meetingparticipant_left: 'meeting.participant_left',
   meetinghost_transferred: 'meeting.host_transferred',
-  meetingrecording_started: 'meeting.recording_started',
-  meetingrecording_stopped: 'meeting.recording_stopped',
+  meetingended: 'meeting.ended',
 } as const;
 
 export type EventEnvelopePayload = { [key: string]: unknown };
@@ -458,63 +611,41 @@ export interface EventEnvelope {
 }
 
 export interface PollEventsResponseData {
+  /** @maxItems 200 */
   events: EventEnvelope[];
   nextCursor: Cursor;
-  serverTsMs: TsMs;
-  /** True if the provided sinceCursor was expired and events may have been missed */
   cursorExpired: boolean;
+  serverTsMs: TsMs;
 }
-
-/**
- * User presence/availability status
- */
-export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
-
-export const UserStatus = {
-  online: 'online',
-  away: 'away',
-  focus: 'focus',
-  offline: 'offline',
-} as const;
 
 export interface ProfileUpdateRequest {
   agentId: IdAgent;
   roomId: IdRoom;
   status?: UserStatus;
-  /** @maxLength 200 */
+  /** @maxLength 100 */
   statusMessage?: string;
-  /** @maxLength 128 */
+  /** @maxLength 50 */
   title?: string;
-  /** @maxLength 128 */
+  /** @maxLength 50 */
   department?: string;
 }
 
-export interface AgentProfile {
-  agentId: IdAgent;
-  /**
-   * @minLength 1
-   * @maxLength 64
-   */
-  name: string;
-  status?: UserStatus;
-  /** @maxLength 200 */
+export type ProfileUpdateResponseDataProfile = {
+  entityId: IdEntity;
+  displayName: string;
+  status: UserStatus;
   statusMessage?: string;
-  /** @maxLength 128 */
+  avatarUrl?: string;
   title?: string;
-  /** @maxLength 128 */
   department?: string;
-  updatedAt?: TsMs;
-}
+};
 
 export interface ProfileUpdateResponseData {
   applied: boolean;
-  profile: AgentProfile;
+  profile: ProfileUpdateResponseDataProfile;
   serverTsMs: TsMs;
 }
 
-/**
- * Category of the skill
- */
 export type SkillCategory = (typeof SkillCategory)[keyof typeof SkillCategory];
 
 export const SkillCategory = {
@@ -546,10 +677,7 @@ export interface SkillEffectDefinition {
   statModifiers?: SkillEffectDefinitionStatModifiers;
 }
 
-/**
- * Parameter schema for this action. Keys are parameter names, values describe the expected type.
- */
-export type SkillActionParams = { [key: string]: string };
+export type SkillActionParams = { [key: string]: unknown };
 
 export interface SkillAction {
   /**
@@ -587,7 +715,6 @@ export interface SkillAction {
    * @maximum 10000
    */
   manaCost?: number;
-  /** Parameter schema for this action. Keys are parameter names, values describe the expected type. */
   params?: SkillActionParams;
   effect?: SkillEffectDefinition;
 }
@@ -638,6 +765,7 @@ export interface SkillInvokeOutcome {
   /** @maxLength 500 */
   message?: string;
   data?: SkillInvokeOutcomeData;
+  completionTime?: TsMs;
 }
 
 export type AgentSkillStateCredentials = { [key: string]: string };
@@ -657,13 +785,9 @@ export interface SkillListRequest {
   agentId: IdAgent;
   roomId: IdRoom;
   category?: SkillCategory;
-  /** Filter by installed skills only */
   installed?: boolean;
 }
 
-/**
- * Optional credentials for the skill
- */
 export type SkillInstallRequestCredentials = { [key: string]: string };
 
 export interface SkillInstallRequest {
@@ -675,13 +799,9 @@ export interface SkillInstallRequest {
    * @maxLength 64
    */
   skillId: string;
-  /** Optional credentials for the skill */
   credentials?: SkillInstallRequestCredentials;
 }
 
-/**
- * Runtime parameters for the skill action. Structure depends on the action definition.
- */
 export type SkillInvokeRequestParams = { [key: string]: unknown };
 
 export interface SkillInvokeRequest {
@@ -699,7 +819,6 @@ export interface SkillInvokeRequest {
    */
   actionId: string;
   targetId?: IdEntity;
-  /** Runtime parameters for the skill action. Structure depends on the action definition. */
   params?: SkillInvokeRequestParams;
 }
 
@@ -715,9 +834,7 @@ export interface SkillInstallResponseData {
    * @maxLength 64
    */
   skillId: string;
-  /** Whether the skill is now installed */
   installed: boolean;
-  /** True if skill was already installed before this request */
   alreadyInstalled: boolean;
   serverTsMs: TsMs;
 }
@@ -728,35 +845,6 @@ export interface SkillInvokeResponseData {
   serverTsMs: TsMs;
 }
 
-export type ResultOkData = { [key: string]: unknown };
-
-export interface ResultOk {
-  status: 'ok';
-  data: ResultOkData;
-}
-
-export interface ResultError {
-  status: 'error';
-  error: ErrorObject;
-}
-
-export type ChannelInfoStatus = (typeof ChannelInfoStatus)[keyof typeof ChannelInfoStatus];
-
-export const ChannelInfoStatus = {
-  open: 'open',
-  full: 'full',
-  closed: 'closed',
-} as const;
-
-export interface ChannelInfo {
-  channelId: IdRoom;
-  /** @minimum 1 */
-  maxAgents: number;
-  /** @minimum 0 */
-  currentAgents: number;
-  status: ChannelInfoStatus;
-}
-
 export interface ReconnectRequest {
   agentId: IdAgent;
   /** @minLength 8 */
@@ -764,7 +852,7 @@ export interface ReconnectRequest {
 }
 
 export interface ReconnectResponseData {
-  agentId: IdAgent;
+  agentId: IdEntity;
   roomId: IdRoom;
   sessionToken: string;
   pos: Vec2;
@@ -774,6 +862,48 @@ export interface ReconnectResponseData {
 export interface HeartbeatRequest {
   agentId: IdAgent;
   roomId: IdRoom;
+}
+
+export interface MeetingListRequest {
+  agentId: IdAgent;
+  roomId: IdRoom;
+}
+
+export interface MeetingJoinRequest {
+  agentId: IdAgent;
+  roomId: IdRoom;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  meetingId: string;
+}
+
+export interface MeetingLeaveRequest {
+  agentId: IdAgent;
+  roomId: IdRoom;
+  /**
+   * @minLength 1
+   * @maxLength 128
+   */
+  meetingId: string;
+}
+
+export interface AgentProfile {
+  agentId: IdAgent;
+  /**
+   * @minLength 1
+   * @maxLength 64
+   */
+  name: string;
+  status?: UserStatus;
+  /** @maxLength 200 */
+  statusMessage?: string;
+  /** @maxLength 128 */
+  title?: string;
+  /** @maxLength 128 */
+  department?: string;
+  updatedAt?: TsMs;
 }
 
 export interface HeartbeatResponseData {
@@ -803,23 +933,9 @@ export interface MeetingInfo {
   capacity: number;
 }
 
-export interface MeetingListRequest {
-  agentId: IdAgent;
-  roomId: IdRoom;
-}
-
 export interface MeetingListResponseData {
   meetings: MeetingInfo[];
-}
-
-export interface MeetingJoinRequest {
-  agentId: IdAgent;
-  roomId: IdRoom;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  meetingId: string;
+  serverTsMs: TsMs;
 }
 
 export type MeetingJoinResponseDataRole =
@@ -856,16 +972,7 @@ export interface MeetingJoinResponseData {
   meetingId: string;
   role: MeetingJoinResponseDataRole;
   participants: MeetingJoinResponseDataParticipantsItem[];
-}
-
-export interface MeetingLeaveRequest {
-  agentId: IdAgent;
-  roomId: IdRoom;
-  /**
-   * @minLength 1
-   * @maxLength 128
-   */
-  meetingId: string;
+  serverTsMs: TsMs;
 }
 
 export interface MeetingLeaveResponseData {
@@ -875,100 +982,253 @@ export interface MeetingLeaveResponseData {
    */
   meetingId: string;
   leftAt: TsMs;
+  serverTsMs: TsMs;
 }
 
+export type ChannelInfoStatus = (typeof ChannelInfoStatus)[keyof typeof ChannelInfoStatus];
+
+export const ChannelInfoStatus = {
+  open: 'open',
+  full: 'full',
+  closed: 'closed',
+} as const;
+
+export interface ChannelInfo {
+  channelId: IdRoom;
+  /** @minimum 1 */
+  maxAgents: number;
+  /** @minimum 0 */
+  currentAgents: number;
+  status: ChannelInfoStatus;
+}
+
+export type ResultOkStatus = (typeof ResultOkStatus)[keyof typeof ResultOkStatus];
+
+export const ResultOkStatus = {
+  ok: 'ok',
+} as const;
+
+export type ResultOkData = { [key: string]: unknown };
+
+export interface ResultOk {
+  status: ResultOkStatus;
+  data: ResultOkData;
+}
+
+export type ResultErrorStatus = (typeof ResultErrorStatus)[keyof typeof ResultErrorStatus];
+
+export const ResultErrorStatus = {
+  error: 'error',
+} as const;
+
+export interface ResultError {
+  status: ResultErrorStatus;
+  error: ErrorObject;
+}
+
+export type Register200Status = (typeof Register200Status)[keyof typeof Register200Status];
+
+export const Register200Status = {
+  ok: 'ok',
+} as const;
+
 export type Register200 = {
-  status?: 'ok';
-  data?: RegisterResponseData;
+  status: Register200Status;
+  data: RegisterResponseData;
 };
+
+export type Unregister200Status = (typeof Unregister200Status)[keyof typeof Unregister200Status];
+
+export const Unregister200Status = {
+  ok: 'ok',
+} as const;
 
 export type Unregister200 = {
-  status?: 'ok';
-  data?: UnregisterResponseData;
+  status: Unregister200Status;
+  data: UnregisterResponseData;
 };
+
+export type Observe200Status = (typeof Observe200Status)[keyof typeof Observe200Status];
+
+export const Observe200Status = {
+  ok: 'ok',
+} as const;
 
 export type Observe200 = {
-  status?: 'ok';
-  data?: ObserveResponseData;
+  status: Observe200Status;
+  data: ObserveResponseData;
 };
+
+export type MoveTo200Status = (typeof MoveTo200Status)[keyof typeof MoveTo200Status];
+
+export const MoveTo200Status = {
+  ok: 'ok',
+} as const;
 
 export type MoveTo200 = {
-  status?: 'ok';
-  data?: MoveToResponseData;
+  status: MoveTo200Status;
+  data: MoveToResponseData;
 };
+
+export type Interact200Status = (typeof Interact200Status)[keyof typeof Interact200Status];
+
+export const Interact200Status = {
+  ok: 'ok',
+} as const;
 
 export type Interact200 = {
-  status?: 'ok';
-  data?: InteractResponseData;
+  status: Interact200Status;
+  data: InteractResponseData;
 };
+
+export type ChatSend200Status = (typeof ChatSend200Status)[keyof typeof ChatSend200Status];
+
+export const ChatSend200Status = {
+  ok: 'ok',
+} as const;
 
 export type ChatSend200 = {
-  status?: 'ok';
-  data?: ChatSendResponseData;
+  status: ChatSend200Status;
+  data: ChatSendResponseData;
 };
+
+export type ChatObserve200Status = (typeof ChatObserve200Status)[keyof typeof ChatObserve200Status];
+
+export const ChatObserve200Status = {
+  ok: 'ok',
+} as const;
 
 export type ChatObserve200 = {
-  status?: 'ok';
-  data?: ChatObserveResponseData;
+  status: ChatObserve200Status;
+  data: ChatObserveResponseData;
 };
+
+export type PollEvents200Status = (typeof PollEvents200Status)[keyof typeof PollEvents200Status];
+
+export const PollEvents200Status = {
+  ok: 'ok',
+} as const;
 
 export type PollEvents200 = {
-  status?: 'ok';
-  data?: PollEventsResponseData;
+  status: PollEvents200Status;
+  data: PollEventsResponseData;
 };
+
+export type ProfileUpdate200Status =
+  (typeof ProfileUpdate200Status)[keyof typeof ProfileUpdate200Status];
+
+export const ProfileUpdate200Status = {
+  ok: 'ok',
+} as const;
 
 export type ProfileUpdate200 = {
-  status?: 'ok';
-  data?: ProfileUpdateResponseData;
+  status: ProfileUpdate200Status;
+  data: ProfileUpdateResponseData;
 };
+
+export type SkillList200Status = (typeof SkillList200Status)[keyof typeof SkillList200Status];
+
+export const SkillList200Status = {
+  ok: 'ok',
+} as const;
 
 export type SkillList200 = {
-  status?: 'ok';
-  data?: SkillListResponseData;
+  status: SkillList200Status;
+  data: SkillListResponseData;
 };
+
+export type SkillInstall200Status =
+  (typeof SkillInstall200Status)[keyof typeof SkillInstall200Status];
+
+export const SkillInstall200Status = {
+  ok: 'ok',
+} as const;
 
 export type SkillInstall200 = {
-  status?: 'ok';
-  data?: SkillInstallResponseData;
+  status: SkillInstall200Status;
+  data: SkillInstallResponseData;
 };
 
+export type SkillInvoke200Status = (typeof SkillInvoke200Status)[keyof typeof SkillInvoke200Status];
+
+export const SkillInvoke200Status = {
+  ok: 'ok',
+} as const;
+
 export type SkillInvoke200 = {
-  status?: 'ok';
-  data?: SkillInvokeResponseData;
+  status: SkillInvoke200Status;
+  data: SkillInvokeResponseData;
 };
+
+export type Channels200Status = (typeof Channels200Status)[keyof typeof Channels200Status];
+
+export const Channels200Status = {
+  ok: 'ok',
+} as const;
 
 export type Channels200Data = {
   channels: ChannelInfo[];
 };
 
 export type Channels200 = {
-  status?: 'ok';
-  data?: Channels200Data;
+  status: Channels200Status;
+  data: Channels200Data;
 };
+
+export type Reconnect200Status = (typeof Reconnect200Status)[keyof typeof Reconnect200Status];
+
+export const Reconnect200Status = {
+  ok: 'ok',
+} as const;
 
 export type Reconnect200 = {
-  status?: 'ok';
-  data?: ReconnectResponseData;
+  status: Reconnect200Status;
+  data: ReconnectResponseData;
 };
+
+export type Heartbeat200Status = (typeof Heartbeat200Status)[keyof typeof Heartbeat200Status];
+
+export const Heartbeat200Status = {
+  ok: 'ok',
+} as const;
 
 export type Heartbeat200 = {
-  status?: 'ok';
-  data?: HeartbeatResponseData;
+  status: Heartbeat200Status;
+  data: HeartbeatResponseData;
 };
+
+export type MeetingList200Status = (typeof MeetingList200Status)[keyof typeof MeetingList200Status];
+
+export const MeetingList200Status = {
+  ok: 'ok',
+} as const;
 
 export type MeetingList200 = {
-  status?: 'ok';
-  data?: MeetingListResponseData;
+  status: MeetingList200Status;
+  data: MeetingListResponseData;
 };
+
+export type MeetingJoin200Status = (typeof MeetingJoin200Status)[keyof typeof MeetingJoin200Status];
+
+export const MeetingJoin200Status = {
+  ok: 'ok',
+} as const;
 
 export type MeetingJoin200 = {
-  status?: 'ok';
-  data?: MeetingJoinResponseData;
+  status: MeetingJoin200Status;
+  data: MeetingJoinResponseData;
 };
 
+export type MeetingLeave200Status =
+  (typeof MeetingLeave200Status)[keyof typeof MeetingLeave200Status];
+
+export const MeetingLeave200Status = {
+  ok: 'ok',
+} as const;
+
 export type MeetingLeave200 = {
-  status?: 'ok';
-  data?: MeetingLeaveResponseData;
+  status: MeetingLeave200Status;
+  data: MeetingLeaveResponseData;
 };
 
 /**
@@ -1064,12 +1324,12 @@ export type observeResponse200 = {
 };
 
 export type observeResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type observeResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 
@@ -1108,12 +1368,12 @@ export type moveToResponse200 = {
 };
 
 export type moveToResponse400 = {
-  data: void;
+  data: ResultError;
   status: 400;
 };
 
 export type moveToResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
@@ -1152,12 +1412,12 @@ export type interactResponse200 = {
 };
 
 export type interactResponse400 = {
-  data: void;
+  data: ResultError;
   status: 400;
 };
 
 export type interactResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
@@ -1196,12 +1456,12 @@ export type chatSendResponse200 = {
 };
 
 export type chatSendResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type chatSendResponse429 = {
-  data: void;
+  data: ResultError;
   status: 429;
 };
 
@@ -1240,7 +1500,7 @@ export type chatObserveResponse200 = {
 };
 
 export type chatObserveResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
@@ -1279,7 +1539,7 @@ export type pollEventsResponse200 = {
 };
 
 export type pollEventsResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
@@ -1318,7 +1578,7 @@ export type profileUpdateResponse200 = {
 };
 
 export type profileUpdateResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
@@ -1357,12 +1617,12 @@ export type skillListResponse200 = {
 };
 
 export type skillListResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type skillListResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 
@@ -1401,22 +1661,22 @@ export type skillInstallResponse200 = {
 };
 
 export type skillInstallResponse400 = {
-  data: void;
+  data: ResultError;
   status: 400;
 };
 
 export type skillInstallResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type skillInstallResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 
 export type skillInstallResponse503 = {
-  data: void;
+  data: ResultError;
   status: 503;
 };
 
@@ -1460,27 +1720,27 @@ export type skillInvokeResponse200 = {
 };
 
 export type skillInvokeResponse400 = {
-  data: void;
+  data: ResultError;
   status: 400;
 };
 
 export type skillInvokeResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type skillInvokeResponse403 = {
-  data: void;
+  data: ResultError;
   status: 403;
 };
 
 export type skillInvokeResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 
 export type skillInvokeResponse429 = {
-  data: void;
+  data: ResultError;
   status: 429;
 };
 
@@ -1550,12 +1810,12 @@ export type reconnectResponse200 = {
 };
 
 export type reconnectResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type reconnectResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 
@@ -1594,12 +1854,12 @@ export type heartbeatResponse200 = {
 };
 
 export type heartbeatResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type heartbeatResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 
@@ -1638,7 +1898,7 @@ export type meetingListResponse200 = {
 };
 
 export type meetingListResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
@@ -1677,17 +1937,17 @@ export type meetingJoinResponse200 = {
 };
 
 export type meetingJoinResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type meetingJoinResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 
 export type meetingJoinResponse409 = {
-  data: void;
+  data: ResultError;
   status: 409;
 };
 
@@ -1730,12 +1990,12 @@ export type meetingLeaveResponse200 = {
 };
 
 export type meetingLeaveResponse401 = {
-  data: void;
+  data: ResultError;
   status: 401;
 };
 
 export type meetingLeaveResponse404 = {
-  data: void;
+  data: ResultError;
   status: 404;
 };
 

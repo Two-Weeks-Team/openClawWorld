@@ -13,7 +13,7 @@ import schemathesis
 BASE_URL = os.environ.get("SCHEMATHESIS_BASE_URL", "http://localhost:2567")
 AIC_BASE = f"{BASE_URL}/aic/v0.1"
 
-# Unauthenticated endpoint suffixes (no Bearer token needed)
+# Fallback: unauthenticated endpoint suffixes (used if endpoint security is unavailable)
 _UNAUTHENTICATED_SUFFIXES = ("/channels", "/register", "/reconnect")
 
 # Global credential state populated by setup()
@@ -52,9 +52,16 @@ def before_call(context, case):
         setup()
 
     # Skip auth injection for unauthenticated endpoints
-    path = case.path or ""
-    if any(path.endswith(suffix) for suffix in _UNAUTHENTICATED_SUFFIXES):
-        return
+    # Prefer OpenAPI security definition; fall back to suffix matching
+    endpoint_security = getattr(case, "endpoint", None)
+    if endpoint_security is not None:
+        security = getattr(endpoint_security, "security", None)
+        if security is not None and len(security) == 0:
+            return
+    else:
+        path = case.path or ""
+        if any(path.endswith(suffix) for suffix in _UNAUTHENTICATED_SUFFIXES):
+            return
 
     if _session_token is None:
         return  # setup failed; let the test run without auth

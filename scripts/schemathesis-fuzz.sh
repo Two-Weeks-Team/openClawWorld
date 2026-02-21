@@ -18,7 +18,15 @@ echo "=== OpenClawWorld API Fuzzing ==="
 
 # ── 1. Build workspace packages ──────────────────────────────────────────
 echo "[1/4] Building workspace packages..."
-pnpm -r build 2>&1 | tail -5
+BUILD_LOG=$(mktemp)
+if ! pnpm -r build > "${BUILD_LOG}" 2>&1; then
+  echo "  ERROR: Build failed. Full output:"
+  cat "${BUILD_LOG}"
+  rm -f "${BUILD_LOG}"
+  exit 1
+fi
+echo "  Build succeeded."
+rm -f "${BUILD_LOG}"
 
 # ── 2. Start server in background ────────────────────────────────────────
 echo "[2/4] Starting server on port ${PORT}..."

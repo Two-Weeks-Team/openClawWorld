@@ -177,18 +177,23 @@ jobs:
       - name: Build shared package
         run: pnpm --filter @openclawworld/shared build
 
-      - name: Run code generator
-        run: pnpm generate:tools
-
-      - name: Run command generator
-        run: pnpm generate:commands
+      - name: Run all code generators
+        run: pnpm generate
 
       - name: Format generated files
         run: pnpm format
 
       - name: Check for uncommitted changes
         run: |
-          CHANGED_FILES=$(git status --porcelain packages/plugin/src/generated/ .claude/commands/ocw-tools.md .opencode/command/ .gemini/commands/ .codex/)
+          CHANGED_FILES=""
+          CHANGED_FILES=$(git status --porcelain \
+            "packages/plugin/src/generated/" \
+            "packages/server/src/generated/" \
+            "packages/client/src/generated/" \
+            ".claude/commands/ocw-tools.md" \
+            ".opencode/command/" \
+            ".gemini/commands/" \
+            ".codex/")
           if [[ -n "$CHANGED_FILES" ]]; then
             echo "❌ Generated code is out of sync!"
             echo ""

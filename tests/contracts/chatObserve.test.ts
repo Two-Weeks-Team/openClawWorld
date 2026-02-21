@@ -43,7 +43,7 @@ describe('ChatObserve Endpoint Contract Tests', () => {
         fromEntityId: 'agt_sender',
         fromName: 'Sender Agent',
         message: 'Hello, world!',
-        sentAt: Date.now(),
+        tsMs: Date.now(),
       };
       const responseData: ChatObserveResponseData = {
         messages: [message],
@@ -107,7 +107,7 @@ describe('ChatObserve Endpoint Contract Tests', () => {
         fromEntityId: 'agt_0002',
         fromName: 'Agent Two',
         message: 'Test message',
-        sentAt: 1700000000000,
+        tsMs: 1700000000000,
       };
       const responseData: ChatObserveResponseData = {
         messages: [message],
@@ -130,7 +130,7 @@ describe('ChatObserve Endpoint Contract Tests', () => {
       expect(msg).toHaveProperty('fromEntityId');
       expect(msg).toHaveProperty('fromName');
       expect(msg).toHaveProperty('message');
-      expect(msg).toHaveProperty('sentAt');
+      expect(msg).toHaveProperty('tsMs');
     });
   });
 

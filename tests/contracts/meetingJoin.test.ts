@@ -142,9 +142,9 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
       expectErrorResult(result, 'not_found');
     });
 
-    it('returns capacity_exceeded error when meeting is full', async () => {
+    it('returns conflict error when meeting is at capacity', async () => {
       mockServer.setHandler('/meeting/join', () =>
-        jsonResponse(createErrorResult('capacity_exceeded', 'Meeting is full', false), 400)
+        jsonResponse(createErrorResult('conflict', 'Meeting is at capacity', false), 409)
       );
 
       const result = await client.meetingJoin({
@@ -153,7 +153,7 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
         meetingId: 'mtg_full',
       });
 
-      expectErrorResult(result, 'capacity_exceeded');
+      expectErrorResult(result, 'conflict');
     });
 
     it('returns unauthorized error with invalid token', async () => {

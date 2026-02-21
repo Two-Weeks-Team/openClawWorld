@@ -80,6 +80,26 @@ describe('Observe Endpoint Contract Tests', () => {
       expect(result.status).toBe('ok');
     });
 
+    it('accepts observe request without detail field (detail is optional)', async () => {
+      const responseData: ObserveResponseData = {
+        self: TestData.agent,
+        nearby: [],
+        facilities: [],
+        serverTsMs: TestData.timestamp(),
+        room: TestData.room,
+      };
+
+      mockServer.setHandler('/observe', () => jsonResponse(createOkResult(responseData)));
+
+      const result = await client.observe({
+        agentId: 'test_agent',
+        roomId: 'test_room',
+        radius: 100,
+      });
+
+      expect(result.status).toBe('ok');
+    });
+
     it('accepts observe request with includeSelf false', async () => {
       const responseData: ObserveResponseData = {
         self: TestData.agent,

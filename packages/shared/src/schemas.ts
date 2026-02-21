@@ -155,7 +155,7 @@ export const ObserveRequestSchema = z.object({
   agentId: IdAgentSchema,
   roomId: IdRoomSchema,
   radius: z.number().min(1).max(2000),
-  detail: ObserveDetailSchema,
+  detail: ObserveDetailSchema.optional(),
   includeSelf: z.boolean().optional(),
   includeGrid: z.boolean().optional(),
 });

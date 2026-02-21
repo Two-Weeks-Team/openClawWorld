@@ -1,4 +1,4 @@
-import type { ZoneId } from './types.js';
+import type { ZoneId } from './schemas.js';
 
 export type ZoneBounds = {
   x: number;

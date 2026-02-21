@@ -100,7 +100,7 @@ export async function handleMeetingJoin(req: Request, res: Response): Promise<vo
 
     // Log the event to the meeting's event log
     const meetingEventLog = meetingRoom.getEventLog();
-    meetingEventLog.append('meeting.participant_joined' as never, meetingId, {
+    meetingEventLog.append('meeting.participant_joined', meetingId, {
       meetingId,
       entityId: agentId,
       name: agentEntity.name,
@@ -109,7 +109,7 @@ export async function handleMeetingJoin(req: Request, res: Response): Promise<vo
 
     // Also log to game room's event log so it shows up in pollEvents
     const gameEventLog = gameRoom.getEventLog();
-    gameEventLog.append('meeting.participant_joined' as never, roomId, {
+    gameEventLog.append('meeting.participant_joined', roomId, {
       meetingId,
       entityId: agentId,
       name: agentEntity.name,

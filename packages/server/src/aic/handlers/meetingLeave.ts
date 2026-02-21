@@ -78,7 +78,7 @@ export async function handleMeetingLeave(req: Request, res: Response): Promise<v
 
     // Log events
     const meetingEventLog = meetingRoom.getEventLog();
-    meetingEventLog.append('meeting.participant_left' as never, meetingId, {
+    meetingEventLog.append('meeting.participant_left', meetingId, {
       meetingId,
       entityId: agentId,
       name: participant?.name ?? 'Unknown',
@@ -86,7 +86,7 @@ export async function handleMeetingLeave(req: Request, res: Response): Promise<v
     });
 
     const gameEventLog = gameRoom.getEventLog();
-    gameEventLog.append('meeting.participant_left' as never, roomId, {
+    gameEventLog.append('meeting.participant_left', roomId, {
       meetingId,
       entityId: agentId,
       name: participant?.name ?? 'Unknown',

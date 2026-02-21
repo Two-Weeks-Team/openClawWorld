@@ -319,39 +319,9 @@ export type PluginManifest = {
   tools: ToolDeclaration[];
 };
 
-// ============================================================================
-// Meeting Response Types (no Zod schema equivalents for response data)
-// ============================================================================
-
-export type MeetingInfo = {
-  meetingId: string;
-  name: string;
-  hostId: string;
-  participantCount: number;
-  capacity: number;
-};
-
-export type MeetingListResponseData = {
-  meetings: MeetingInfo[];
-  serverTsMs: number;
-};
-
-export type MeetingJoinResponseData = {
-  meetingId: string;
-  role: string;
-  participants: Array<{
-    entityId: string;
-    name: string;
-    role: string;
-  }>;
-  serverTsMs: number;
-};
-
-export type MeetingLeaveResponseData = {
-  meetingId: string;
-  leftAt: number;
-  serverTsMs: number;
-};
+// Meeting Response Types are now defined as Zod schemas in schemas.ts and
+// re-exported via index.ts. See MeetingInfoSchema, MeetingListResponseDataSchema,
+// MeetingJoinResponseDataSchema, MeetingLeaveResponseDataSchema.
 
 // ============================================================================
 // Map Types (complex domain types without Zod schemas)

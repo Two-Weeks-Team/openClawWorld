@@ -406,11 +406,18 @@ jobs:
 
       - name: Setup Python & Install schemathesis
         run: |
-          # Use brew python on self-hosted macOS runner (actions/setup-python has permission issues)
-          if ! command -v python3 &>/dev/null; then
+          # Ensure Python 3.10+ is available (schemathesis v4 requirement)
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')" 2>/dev/null || echo "0.0")
+          PYTHON_MAJOR=$(echo "$PYTHON_VERSION" | cut -d. -f1)
+          PYTHON_MINOR=$(echo "$PYTHON_VERSION" | cut -d. -f2)
+          if [ "$PYTHON_MAJOR" -lt 3 ] || { [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 10 ]; }; then
+            echo "Python $PYTHON_VERSION too old, installing 3.12 via brew..."
             brew install python@3.12
+            export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
+            echo "$(brew --prefix python@3.12)/libexec/bin" >> $GITHUB_PATH
           fi
-          python3 -m pip install --user schemathesis
+          python3 -m pip install --user --break-system-packages schemathesis 2>/dev/null \
+            || python3 -m pip install --user schemathesis
           echo "$(python3 -m site --user-base)/bin" >> $GITHUB_PATH
 
       - name: Run API fuzzing

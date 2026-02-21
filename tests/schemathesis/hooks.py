@@ -6,6 +6,8 @@ exercise authenticated endpoints with valid credentials.
 Compatible with schemathesis v4.x.
 """
 
+from __future__ import annotations
+
 import os
 import sys
 

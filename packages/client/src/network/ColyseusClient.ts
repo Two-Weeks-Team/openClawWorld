@@ -1,15 +1,14 @@
 import { Client, Room } from '@colyseus/sdk';
 
 import type appConfig from '../../../server/src/app.config.js';
-import type { GameRoom } from '../../../server/src/rooms/GameRoom.js';
-import type { EntitySchema } from '../../../server/src/schemas/EntitySchema.js';
-import type { NPCSchema } from '../../../server/src/schemas/NPCSchema.js';
-import type { RoomState } from '../../../server/src/schemas/RoomState.js';
+import { EntitySchema } from '../generated/schemas/EntitySchema.js';
+import { NPCSchema } from '../generated/schemas/NPCSchema.js';
+import { RoomState } from '../generated/schemas/RoomState.js';
 import type { SkillDefinition, SkillInvokeOutcome, InteractOutcome } from '@openclawworld/shared';
 
 export type Entity = EntitySchema;
 export type NPC = NPCSchema;
-export type { RoomState, GameRoom };
+export type { RoomState };
 
 export type SkillInvokeResult = {
   txId: string;
@@ -57,7 +56,7 @@ function getHttpEndpoint(): string {
 
 export class ColyseusClient {
   private client: Client<typeof appConfig>;
-  private room: Room<GameRoom> | null = null;
+  private room: Room<Record<string, unknown>, RoomState> | null = null;
   private _sessionId: string | null = null;
   private _entityId: string | null = null;
 
@@ -81,9 +80,9 @@ export class ColyseusClient {
     }
   }
 
-  async connect(name: string, roomId: string): Promise<Room<GameRoom>> {
+  async connect(name: string, roomId: string): Promise<Room<Record<string, unknown>, RoomState>> {
     try {
-      this.room = await this.client.joinOrCreate('game', { name, roomId });
+      this.room = await this.client.joinOrCreate<RoomState>('game', { name, roomId }, RoomState);
       this._sessionId = this.room.sessionId;
 
       this.room.onMessage('assignedEntityId', (data: { entityId: string }) => {

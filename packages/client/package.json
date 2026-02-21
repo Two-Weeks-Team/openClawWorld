@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@colyseus/schema": "^4.0.12",
     "@colyseus/sdk": "0.17",
     "@openclawworld/shared": "workspace:*",
     "phaser": "^3.90.0"

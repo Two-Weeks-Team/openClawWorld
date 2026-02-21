@@ -2,7 +2,7 @@
 import Phaser from 'phaser';
 import type { Room } from '@colyseus/sdk';
 import { gameConfig } from './game/config';
-import { gameClient, type GameRoom, type ChannelInfo } from './network/ColyseusClient';
+import { gameClient, type RoomState, type ChannelInfo } from './network/ColyseusClient';
 
 const loginScreen = document.getElementById('login-screen') as HTMLDivElement;
 const channelSelectDiv = document.getElementById('channel-select') as HTMLDivElement;
@@ -116,7 +116,7 @@ joinBtn.addEventListener('click', async () => {
   }
 });
 
-function setupChat(room: Room<GameRoom>) {
+function setupChat(room: Room<Record<string, unknown>, RoomState>) {
   chatInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.isComposing) {
       const message = chatInput.value.trim();

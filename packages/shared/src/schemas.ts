@@ -54,7 +54,8 @@ export const IdTxSchema = z
 
 export const IdMessageSchema = z
   .string()
-  .regex(/^msg_[A-Za-z0-9._-]{8,128}$/, 'Invalid messageId format');
+  .regex(/^msg_[A-Za-z0-9._-]{8,128}$/, 'Invalid messageId format')
+  .openapi('IdMessage', { example: 'msg_abc123def456' });
 
 export const CursorSchema = z
   .union([
@@ -90,7 +91,9 @@ export const EntityKindSchema = z.enum(['human', 'agent', 'object', 'npc']).open
 
 export const FacingSchema = z.enum(['up', 'down', 'left', 'right']).openapi('Facing');
 
-export const ChatChannelSchema = z.enum(['proximity', 'global']).openapi('ChatChannel');
+export const ChatChannelSchema = z
+  .enum(['proximity', 'global', 'team', 'meeting', 'dm'])
+  .openapi('ChatChannel');
 
 export const ObserveDetailSchema = z.enum(['lite', 'full']).openapi('ObserveDetailLevel');
 
@@ -289,7 +292,9 @@ export const ZoneIdSchema = z.enum([
   'lake',
 ]);
 
-export const EntranceDirectionSchema = z.enum(['north', 'south', 'east', 'west']);
+export const EntranceDirectionSchema = z
+  .enum(['north', 'south', 'east', 'west'])
+  .openapi('EntranceDirection');
 
 export const BuildingEntranceSchema = z
   .object({
@@ -591,8 +596,8 @@ export const ReconnectResponseDataSchema = z
     agentId: IdEntitySchema,
     roomId: IdRoomSchema,
     sessionToken: z.string(),
-    pos: z.object({ x: z.number(), y: z.number() }),
-    tile: z.object({ tx: z.number(), ty: z.number() }).optional(),
+    pos: Vec2Schema,
+    tile: TileCoordSchema.optional(),
   })
   .openapi('ReconnectResponseData');
 
@@ -713,8 +718,6 @@ export const FacilityTypeSchema = z.enum([
   'room_door_b',
   'room_door_c',
 ]);
-
-export const ExtendedChatChannelSchema = z.enum(['proximity', 'global', 'team', 'meeting', 'dm']);
 
 export const VoteOptionSchema = z.enum(['yes', 'no', 'abstain']);
 

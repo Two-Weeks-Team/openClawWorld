@@ -163,7 +163,7 @@ export const openApiSpec = {
       },
       ChatChannel: {
         type: 'string',
-        enum: ['proximity', 'global'],
+        enum: ['proximity', 'global', 'team', 'meeting', 'dm'],
       },
       ObserveDetailLevel: {
         type: 'string',
@@ -481,8 +481,7 @@ export const openApiSpec = {
             ],
           },
           direction: {
-            type: 'string',
-            enum: ['north', 'south', 'east', 'west'],
+            $ref: '#/components/schemas/EntranceDirection',
           },
           connectsTo: {
             type: 'string',
@@ -499,6 +498,10 @@ export const openApiSpec = {
           },
         },
         required: ['id', 'name', 'position', 'size', 'zone', 'direction', 'connectsTo'],
+      },
+      EntranceDirection: {
+        type: 'string',
+        enum: ['north', 'south', 'east', 'west'],
       },
       RoomInfo: {
         type: 'object',
@@ -773,11 +776,15 @@ export const openApiSpec = {
             $ref: '#/components/schemas/TsMs',
           },
           chatMessageId: {
-            type: 'string',
-            pattern: '^msg_[A-Za-z0-9._-]{8,128}$',
+            $ref: '#/components/schemas/IdMessage',
           },
         },
         required: ['txId', 'applied', 'serverTsMs', 'chatMessageId'],
+      },
+      IdMessage: {
+        type: 'string',
+        pattern: '^msg_[A-Za-z0-9._-]{8,128}$',
+        example: 'msg_abc123def456',
       },
       ChatObserveRequest: {
         type: 'object',
@@ -819,8 +826,7 @@ export const openApiSpec = {
         type: 'object',
         properties: {
           id: {
-            type: 'string',
-            pattern: '^msg_[A-Za-z0-9._-]{8,128}$',
+            $ref: '#/components/schemas/IdMessage',
           },
           roomId: {
             $ref: '#/components/schemas/IdRoom',
@@ -1351,28 +1357,10 @@ export const openApiSpec = {
             type: 'string',
           },
           pos: {
-            type: 'object',
-            properties: {
-              x: {
-                type: 'number',
-              },
-              y: {
-                type: 'number',
-              },
-            },
-            required: ['x', 'y'],
+            $ref: '#/components/schemas/Vec2',
           },
           tile: {
-            type: 'object',
-            properties: {
-              tx: {
-                type: 'number',
-              },
-              ty: {
-                type: 'number',
-              },
-            },
-            required: ['tx', 'ty'],
+            $ref: '#/components/schemas/TileCoord',
           },
         },
         required: ['agentId', 'roomId', 'sessionToken', 'pos'],

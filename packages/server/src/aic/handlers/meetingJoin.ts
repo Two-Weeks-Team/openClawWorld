@@ -127,6 +127,7 @@ export async function handleMeetingJoin(req: Request, res: Response): Promise<vo
       meetingId,
       role,
       participants,
+      serverTsMs: Date.now(),
     };
 
     console.log(`[MeetingJoinHandler] Agent '${agentId}' joined meeting '${meetingId}' as ${role}`);

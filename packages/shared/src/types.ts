@@ -504,6 +504,7 @@ export type MeetingInfo = {
 
 export type MeetingListResponseData = {
   meetings: MeetingInfo[];
+  serverTsMs: number;
 };
 
 export type MeetingJoinRequest = {
@@ -520,6 +521,7 @@ export type MeetingJoinResponseData = {
     name: string;
     role: string;
   }>;
+  serverTsMs: number;
 };
 
 export type MeetingLeaveRequest = {
@@ -531,6 +533,7 @@ export type MeetingLeaveRequest = {
 export type MeetingLeaveResponseData = {
   meetingId: string;
   leftAt: number;
+  serverTsMs: number;
 };
 
 // ============================================================================

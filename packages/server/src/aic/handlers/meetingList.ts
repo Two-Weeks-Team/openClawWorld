@@ -36,7 +36,7 @@ export async function handleMeetingList(_req: Request, res: Response): Promise<v
       });
     }
 
-    const responseData: MeetingListResponseData = { meetings };
+    const responseData: MeetingListResponseData = { meetings, serverTsMs: Date.now() };
 
     res.status(200).json({
       status: 'ok',

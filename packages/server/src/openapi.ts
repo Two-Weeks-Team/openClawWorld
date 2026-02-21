@@ -814,12 +814,13 @@ The same \`txId\` will return the same result without re-executing the action.
       },
       MeetingListResponseData: {
         type: 'object',
-        required: ['meetings'],
+        required: ['meetings', 'serverTsMs'],
         properties: {
           meetings: {
             type: 'array',
             items: { $ref: '#/components/schemas/MeetingInfo' },
           },
+          serverTsMs: { $ref: '#/components/schemas/TsMs' },
         },
       },
       MeetingJoinRequest: {
@@ -833,7 +834,7 @@ The same \`txId\` will return the same result without re-executing the action.
       },
       MeetingJoinResponseData: {
         type: 'object',
-        required: ['meetingId', 'role', 'participants'],
+        required: ['meetingId', 'role', 'participants', 'serverTsMs'],
         properties: {
           meetingId: { type: 'string', minLength: 1, maxLength: 128 },
           role: { type: 'string', enum: ['host', 'participant'] },
@@ -849,6 +850,7 @@ The same \`txId\` will return the same result without re-executing the action.
               },
             },
           },
+          serverTsMs: { $ref: '#/components/schemas/TsMs' },
         },
       },
       MeetingLeaveRequest: {
@@ -862,10 +864,11 @@ The same \`txId\` will return the same result without re-executing the action.
       },
       MeetingLeaveResponseData: {
         type: 'object',
-        required: ['meetingId', 'leftAt'],
+        required: ['meetingId', 'leftAt', 'serverTsMs'],
         properties: {
           meetingId: { type: 'string', minLength: 1, maxLength: 128 },
           leftAt: { $ref: '#/components/schemas/TsMs' },
+          serverTsMs: { $ref: '#/components/schemas/TsMs' },
         },
       },
     },

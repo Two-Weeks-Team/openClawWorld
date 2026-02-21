@@ -49,7 +49,7 @@ describe('MeetingList Endpoint Contract Tests', () => {
         buildMeeting({ meetingId: 'mtg_001', name: 'Standup' }),
         buildMeeting({ meetingId: 'mtg_002', name: 'Retrospective', participantCount: 8 }),
       ];
-      const responseData: MeetingListResponseData = { meetings };
+      const responseData: MeetingListResponseData = { meetings, serverTsMs: Date.now() };
 
       mockServer.setHandler('/meeting/list', () => jsonResponse(createOkResult(responseData)));
 
@@ -65,7 +65,7 @@ describe('MeetingList Endpoint Contract Tests', () => {
     });
 
     it('returns empty list when no active meetings', async () => {
-      const responseData: MeetingListResponseData = { meetings: [] };
+      const responseData: MeetingListResponseData = { meetings: [], serverTsMs: Date.now() };
 
       mockServer.setHandler('/meeting/list', () => jsonResponse(createOkResult(responseData)));
 
@@ -81,6 +81,7 @@ describe('MeetingList Endpoint Contract Tests', () => {
     it('returns meetings with all required fields', async () => {
       const responseData: MeetingListResponseData = {
         meetings: [buildMeeting()],
+        serverTsMs: Date.now(),
       };
 
       mockServer.setHandler('/meeting/list', () => jsonResponse(createOkResult(responseData)));
@@ -166,7 +167,7 @@ describe('MeetingList Endpoint Contract Tests', () => {
 
   describe('Response Format Validation', () => {
     it('returns AicResult wrapper with status ok', async () => {
-      const responseData: MeetingListResponseData = { meetings: [] };
+      const responseData: MeetingListResponseData = { meetings: [], serverTsMs: Date.now() };
 
       mockServer.setHandler('/meeting/list', () => jsonResponse(createOkResult(responseData)));
 
@@ -180,6 +181,8 @@ describe('MeetingList Endpoint Contract Tests', () => {
       if (result.status === 'ok') {
         expect(result.data).toHaveProperty('meetings');
         expect(Array.isArray(result.data.meetings)).toBe(true);
+        expect(result.data).toHaveProperty('serverTsMs');
+        expect(typeof result.data.serverTsMs).toBe('number');
       }
     });
   });
@@ -191,7 +194,9 @@ describe('MeetingList Endpoint Contract Tests', () => {
         buildMeeting({ meetingId: 'mtg_002', participantCount: 10, capacity: 10 }),
       ];
 
-      mockServer.setHandler('/meeting/list', () => jsonResponse(createOkResult({ meetings })));
+      mockServer.setHandler('/meeting/list', () =>
+        jsonResponse(createOkResult({ meetings, serverTsMs: Date.now() }))
+      );
 
       const result = await client.meetingList({
         agentId: 'agt_0001',

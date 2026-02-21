@@ -39,6 +39,7 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
       const responseData: MeetingLeaveResponseData = {
         meetingId: 'mtg_001',
         leftAt,
+        serverTsMs: leftAt,
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -55,9 +56,11 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
     });
 
     it('leftAt is a valid unix timestamp in ms', async () => {
+      const leftAt = Date.now();
       const responseData: MeetingLeaveResponseData = {
         meetingId: 'mtg_001',
-        leftAt: Date.now(),
+        leftAt,
+        serverTsMs: leftAt,
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -76,9 +79,11 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
 
     it('returns the meetingId that was left', async () => {
       const meetingId = 'mtg_specific';
+      const leftAt = Date.now();
       const responseData: MeetingLeaveResponseData = {
         meetingId,
-        leftAt: Date.now(),
+        leftAt,
+        serverTsMs: leftAt,
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -181,9 +186,11 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
 
   describe('Response Format Validation', () => {
     it('returns AicResult wrapper with status ok', async () => {
+      const leftAt = Date.now();
       const responseData: MeetingLeaveResponseData = {
         meetingId: 'mtg_001',
-        leftAt: Date.now(),
+        leftAt,
+        serverTsMs: leftAt,
       };
 
       mockServer.setHandler('/meeting/leave', () => jsonResponse(createOkResult(responseData)));
@@ -199,6 +206,8 @@ describe('MeetingLeave Endpoint Contract Tests', () => {
       if (result.status === 'ok') {
         expect(result.data).toHaveProperty('meetingId');
         expect(result.data).toHaveProperty('leftAt');
+        expect(result.data).toHaveProperty('serverTsMs');
+        expect(typeof result.data.serverTsMs).toBe('number');
       }
     });
 

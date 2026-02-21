@@ -27,6 +27,9 @@ jobs:
   http-load-test:
     name: HTTP Load Test
     runs-on: [self-hosted, macOS, ARM64]
+    env:
+      HTTP_AGENTS: ${{ github.event.inputs.http_agents }}
+      HTTP_DURATION: ${{ github.event.inputs.http_duration }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -54,11 +57,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm run build
 
       - name: Start server
         run: |
           PORT=2567 NODE_ENV=development pnpm dev:server &
+          echo $! > /tmp/load-test-server.pid
           for i in $(seq 1 30); do
             if curl -sf http://localhost:2567/health > /dev/null 2>&1; then
               echo "Server ready after ${i}s"
@@ -74,12 +78,23 @@ jobs:
       - name: Run HTTP load test
         run: |
           pnpm load-test:http -- \
-            --agents ${{ github.event.inputs.http_agents }} \
-            --duration ${{ github.event.inputs.http_duration }}
+            --agents "$HTTP_AGENTS" \
+            --duration "$HTTP_DURATION"
+
+      - name: Cleanup server
+        if: always()
+        run: |
+          if [ -f /tmp/load-test-server.pid ]; then
+            kill "$(cat /tmp/load-test-server.pid)" 2>/dev/null || true
+            rm -f /tmp/load-test-server.pid
+          fi
 
   ws-load-test:
     name: WebSocket Load Test
     runs-on: [self-hosted, macOS, ARM64]
+    env:
+      WS_CLIENTS: ${{ github.event.inputs.ws_clients }}
+      WS_DURATION: ${{ github.event.inputs.ws_duration }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -107,11 +122,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm run build
 
       - name: Start server
         run: |
           PORT=2567 NODE_ENV=development pnpm dev:server &
+          echo $! > /tmp/load-test-ws-server.pid
           for i in $(seq 1 30); do
             if curl -sf http://localhost:2567/health > /dev/null 2>&1; then
               echo "Server ready after ${i}s"
@@ -127,5 +143,13 @@ jobs:
       - name: Run WebSocket load test
         run: |
           pnpm load-test:ws -- \
-            --clients ${{ github.event.inputs.ws_clients }} \
-            --duration ${{ github.event.inputs.ws_duration }}
+            --clients "$WS_CLIENTS" \
+            --duration "$WS_DURATION"
+
+      - name: Cleanup server
+        if: always()
+        run: |
+          if [ -f /tmp/load-test-ws-server.pid ]; then
+            kill "$(cat /tmp/load-test-ws-server.pid)" 2>/dev/null || true
+            rm -f /tmp/load-test-ws-server.pid
+          fi

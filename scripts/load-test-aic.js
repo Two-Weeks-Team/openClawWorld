@@ -10,7 +10,7 @@
  */
 
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check, sleep, fail } from 'k6';
 
 // k6 randomString polyfill (avoids external import dependency)
 function randomString(length) {
@@ -34,36 +34,42 @@ export const options = {
 const BASE_URL = __ENV.SERVER_URL || 'http://localhost:2567';
 const AIC_BASE = `${BASE_URL}/aic/v0.1`;
 
-/**
- * Setup: register an agent and return credentials for VU iterations.
- * Runs once before the test starts.
- */
-export function setup() {
-  const registerRes = http.post(
-    `${AIC_BASE}/register`,
-    JSON.stringify({
-      name: `k6-agent-${randomString(6)}`,
-      roomId: 'auto',
-    }),
-    { headers: { 'Content-Type': 'application/json' } }
-  );
-
-  check(registerRes, {
-    'register status 200': r => r.status === 200,
-  });
-
-  const body = JSON.parse(registerRes.body);
-  return {
-    token: body.data.sessionToken,
-    agentId: body.data.agentId,
-    roomId: body.data.roomId,
-  };
-}
+// Per-VU agent credentials (populated on first iteration)
+const vuAgents = {};
 
 /**
- * Default function: each VU iteration performs observe -> moveTo -> chatSend.
+ * Default function: each VU registers its own agent on the first iteration,
+ * then performs observe -> moveTo -> chatSend cycles.
  */
-export default function (data) {
+export default function () {
+  // Per-VU registration on first iteration
+  if (!vuAgents[__VU]) {
+    const registerRes = http.post(
+      `${AIC_BASE}/register`,
+      JSON.stringify({
+        name: `k6-agent-vu${__VU}-${randomString(6)}`,
+        roomId: 'auto',
+      }),
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    const registered = check(registerRes, {
+      'register status 200': r => r.status === 200,
+    });
+
+    if (!registered) {
+      fail(`VU ${__VU} registration failed with status ${registerRes.status}: ${registerRes.body}`);
+    }
+
+    const body = JSON.parse(registerRes.body);
+    vuAgents[__VU] = {
+      token: body.data.sessionToken,
+      agentId: body.data.agentId,
+      roomId: body.data.roomId,
+    };
+  }
+
+  const data = vuAgents[__VU];
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${data.token}`,
@@ -130,20 +136,23 @@ export default function (data) {
 }
 
 /**
- * Teardown: unregister the agent after all VUs finish.
+ * Teardown: unregister all per-VU agents after the test finishes.
  */
-export function teardown(data) {
-  http.post(
-    `${AIC_BASE}/unregister`,
-    JSON.stringify({
-      agentId: data.agentId,
-      roomId: data.roomId,
-    }),
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${data.token}`,
-      },
-    }
-  );
+export function teardown() {
+  for (const vu of Object.keys(vuAgents)) {
+    const agent = vuAgents[vu];
+    http.post(
+      `${AIC_BASE}/unregister`,
+      JSON.stringify({
+        agentId: agent.agentId,
+        roomId: agent.roomId,
+      }),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${agent.token}`,
+        },
+      }
+    );
+  }
 }

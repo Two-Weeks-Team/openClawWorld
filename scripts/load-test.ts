@@ -127,7 +127,14 @@ class LoadTestAgent {
   }
 
   async start(cycleDelayMs: number): Promise<void> {
-    await this.register();
+    try {
+      await this.register();
+    } catch (error) {
+      this.metrics.errors++;
+      console.error(`[Agent ${this.agentName}] Registration failed:`, error);
+      return;
+    }
+
     this.running = true;
 
     while (this.running) {
@@ -276,6 +283,9 @@ class LoadTestRunner {
     // Stop all agents (stop cycles + unregister)
     console.log('Stopping and unregistering agents...');
     await Promise.all(this.agents.map(agent => agent.stop()));
+
+    // Await all agent start promises to catch any unhandled rejections
+    await Promise.allSettled(startPromises);
     await sleep(1000);
 
     const exitCode = this.printReport();

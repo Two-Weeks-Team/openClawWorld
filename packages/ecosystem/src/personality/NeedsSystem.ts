@@ -6,7 +6,7 @@
  */
 
 import type { NeedsState } from '../types/agent.types.js';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { chmodSync, existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
 
 const DECAY_PER_TICK: Record<keyof NeedsState, number> = {
@@ -107,8 +107,13 @@ export class NeedsSystem {
   save(): void {
     if (!this.persistPath) return;
     const dir = dirname(this.persistPath);
-    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    writeFileSync(this.persistPath, JSON.stringify(this.state, null, 2));
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
+    // Enforce owner-only permissions on both new and pre-existing directories/files.
+    // chmodSync is called unconditionally because the mode option on mkdirSync/writeFileSync
+    // only applies at creation time and has no effect on existing filesystem objects.
+    chmodSync(dir, 0o700);
+    writeFileSync(this.persistPath, JSON.stringify(this.state, null, 2), { mode: 0o600 });
+    chmodSync(this.persistPath, 0o600);
   }
 
   private load(): void {

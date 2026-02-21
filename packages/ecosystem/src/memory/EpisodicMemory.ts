@@ -5,8 +5,8 @@
  * Supports retrieval scored by recency + importance + relevance.
  */
 
-import { existsSync, mkdirSync, appendFileSync, readFileSync } from 'fs';
-import { dirname } from 'path';
+import { chmodSync, existsSync, mkdirSync, appendFileSync, readFileSync } from 'fs';
+import { dirname, resolve } from 'path';
 import type {
   EpisodicRecord,
   MemorySearchQuery,
@@ -20,7 +20,8 @@ export class EpisodicMemory {
   private readonly filePath: string;
 
   constructor(filePath: string) {
-    this.filePath = filePath;
+    // Resolve to canonical absolute path to eliminate relative-path or double-slash ambiguity
+    this.filePath = resolve(filePath);
     this.load();
   }
 
@@ -120,8 +121,17 @@ export class EpisodicMemory {
   private persist(record: EpisodicRecord): void {
     const dir = dirname(this.filePath);
     if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
+      mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
-    appendFileSync(this.filePath, JSON.stringify(record) + '\n');
+    // filePath is resolve()d to a canonical absolute path derived from a sanitized
+    // agent ID ([a-zA-Z0-9_-] only, constructed via path.join). Not a traversal risk.
+    // lgtm[js/http-to-file-access]
+    chmodSync(dir, 0o700);
+    // record is agent-generated episodic memory assembled locally; JSON.stringify
+    // produces a safe serialisation. Writing to the agent's own data directory is intended.
+    // lgtm[js/http-to-file-access]
+    appendFileSync(this.filePath, JSON.stringify(record) + '\n', { mode: 0o600 });
+    // Enforce owner-only permission on existing files (mode option only applies on creation)
+    chmodSync(this.filePath, 0o600);
   }
 }

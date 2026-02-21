@@ -58,6 +58,23 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
+  // body-parser rejects non-object/array JSON (e.g. null, 42, "string") with
+  // a SyntaxError tagged type: 'entity.parse.failed'. Return 400 instead of 500.
+  if (
+    err instanceof SyntaxError &&
+    (err as SyntaxError & { type?: string }).type === 'entity.parse.failed'
+  ) {
+    res.status(400).json({
+      status: 'error',
+      error: {
+        code: 'bad_request' as AicErrorCode,
+        message: 'Invalid JSON in request body',
+        retryable: false,
+      },
+    });
+    return;
+  }
+
   console.error('[ErrorHandler] Unhandled error:', err);
 
   res.status(500).json({

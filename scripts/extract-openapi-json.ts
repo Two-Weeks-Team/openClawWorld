@@ -12,14 +12,9 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '..');
 
-const { openApiSpec } = await import(
-  resolve(rootDir, 'packages/server/src/openapi.ts')
-);
+const { openApiSpec } = await import(resolve(rootDir, 'packages/server/src/openapi.ts'));
 
-const outputPath = resolve(
-  rootDir,
-  'packages/server/src/generated/openapi.json'
-);
+const outputPath = resolve(rootDir, 'packages/server/src/generated/openapi.json');
 
 mkdirSync(dirname(outputPath), { recursive: true });
 writeFileSync(outputPath, JSON.stringify(openApiSpec, null, 2));

@@ -46,12 +46,7 @@ export function getFetchConfig(): Readonly<CustomFetchConfig> {
 // Retry Helpers
 // ============================================================================
 
-const RETRYABLE_ERROR_CODES = new Set([
-  'room_not_ready',
-  'rate_limited',
-  'timeout',
-  'internal',
-]);
+const RETRYABLE_ERROR_CODES = new Set(['room_not_ready', 'rate_limited', 'timeout', 'internal']);
 
 function isRetryableErrorCode(code: string): boolean {
   return RETRYABLE_ERROR_CODES.has(code);
@@ -81,10 +76,7 @@ function calculateBackoff(attempt: number, baseDelayMs: number): number {
  * - Retry with exponential backoff on retryable AIC errors
  * - Network error recovery
  */
-export async function customFetch<T>(
-  url: string,
-  init?: RequestInit
-): Promise<T> {
+export async function customFetch<T>(url: string, init?: RequestInit): Promise<T> {
   const fullUrl = `${globalConfig.baseUrl.replace(/\/$/, '')}${url}`;
   const maxAttempts = globalConfig.maxAttempts ?? 3;
   const baseDelayMs = globalConfig.baseDelayMs ?? 1000;
@@ -111,8 +103,7 @@ export async function customFetch<T>(
       if (!response.ok) {
         if (responseData.status === 'error' && responseData.error) {
           const retryable =
-            responseData.error.retryable ||
-            isRetryableErrorCode(responseData.error.code);
+            responseData.error.retryable || isRetryableErrorCode(responseData.error.code);
           if (retryable && attempt < maxAttempts) {
             await sleep(calculateBackoff(attempt, baseDelayMs));
             attempt++;
@@ -134,8 +125,7 @@ export async function customFetch<T>(
       // Handle successful HTTP but AIC-level errors (e.g., 200 with status: 'error')
       if (responseData.status === 'error' && responseData.error) {
         const retryable =
-          responseData.error.retryable ||
-          isRetryableErrorCode(responseData.error.code);
+          responseData.error.retryable || isRetryableErrorCode(responseData.error.code);
         if (retryable && attempt < maxAttempts) {
           await sleep(calculateBackoff(attempt, baseDelayMs));
           attempt++;
@@ -161,8 +151,7 @@ export async function customFetch<T>(
         status: 'error',
         error: {
           code: 'internal',
-          message:
-            error instanceof Error ? error.message : 'Unknown error',
+          message: error instanceof Error ? error.message : 'Unknown error',
           retryable: isNetworkError,
         },
       } as T;

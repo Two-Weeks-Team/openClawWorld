@@ -82,8 +82,7 @@ export interface TileCoord {
   ty: number;
 }
 
-export type EntityKind = typeof EntityKind[keyof typeof EntityKind];
-
+export type EntityKind = (typeof EntityKind)[keyof typeof EntityKind];
 
 export const EntityKind = {
   human: 'human',
@@ -92,8 +91,7 @@ export const EntityKind = {
   npc: 'npc',
 } as const;
 
-export type Facing = typeof Facing[keyof typeof Facing];
-
+export type Facing = (typeof Facing)[keyof typeof Facing];
 
 export const Facing = {
   up: 'up',
@@ -102,16 +100,14 @@ export const Facing = {
   right: 'right',
 } as const;
 
-export type ChatChannel = typeof ChatChannel[keyof typeof ChatChannel];
-
+export type ChatChannel = (typeof ChatChannel)[keyof typeof ChatChannel];
 
 export const ChatChannel = {
   proximity: 'proximity',
   global: 'global',
 } as const;
 
-export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
-
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
 
 export const ErrorCode = {
   bad_request: 'bad_request',
@@ -224,8 +220,7 @@ export interface UnregisterResponseData {
   unregisteredAt: TsMs;
 }
 
-export type ObserveRequestDetail = typeof ObserveRequestDetail[keyof typeof ObserveRequestDetail];
-
+export type ObserveRequestDetail = (typeof ObserveRequestDetail)[keyof typeof ObserveRequestDetail];
 
 export const ObserveRequestDetail = {
   lite: 'lite',
@@ -291,8 +286,7 @@ export interface ObserveResponseData {
   mapMetadata?: MapMetadata;
 }
 
-export type MoveToRequestMode = typeof MoveToRequestMode[keyof typeof MoveToRequestMode];
-
+export type MoveToRequestMode = (typeof MoveToRequestMode)[keyof typeof MoveToRequestMode];
 
 export const MoveToRequestMode = {
   walk: 'walk',
@@ -306,8 +300,8 @@ export interface MoveToRequest {
   mode?: MoveToRequestMode;
 }
 
-export type MoveToResponseDataResult = typeof MoveToResponseDataResult[keyof typeof MoveToResponseDataResult];
-
+export type MoveToResponseDataResult =
+  (typeof MoveToResponseDataResult)[keyof typeof MoveToResponseDataResult];
 
 export const MoveToResponseDataResult = {
   accepted: 'accepted',
@@ -338,8 +332,8 @@ export interface InteractRequest {
   params?: InteractRequestParams;
 }
 
-export type InteractResponseDataOutcomeType = typeof InteractResponseDataOutcomeType[keyof typeof InteractResponseDataOutcomeType];
-
+export type InteractResponseDataOutcomeType =
+  (typeof InteractResponseDataOutcomeType)[keyof typeof InteractResponseDataOutcomeType];
 
 export const InteractResponseDataOutcomeType = {
   ok: 'ok',
@@ -423,8 +417,7 @@ export interface PollEventsRequest {
   waitMs?: number;
 }
 
-export type EventType = typeof EventType[keyof typeof EventType];
-
+export type EventType = (typeof EventType)[keyof typeof EventType];
 
 export const EventType = {
   presencejoin: 'presence.join',
@@ -475,8 +468,7 @@ export interface PollEventsResponseData {
 /**
  * User presence/availability status
  */
-export type UserStatus = typeof UserStatus[keyof typeof UserStatus];
-
+export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
 
 export const UserStatus = {
   online: 'online',
@@ -523,8 +515,7 @@ export interface ProfileUpdateResponseData {
 /**
  * Category of the skill
  */
-export type SkillCategory = typeof SkillCategory[keyof typeof SkillCategory];
-
+export type SkillCategory = (typeof SkillCategory)[keyof typeof SkillCategory];
 
 export const SkillCategory = {
   movement: 'movement',
@@ -558,7 +549,7 @@ export interface SkillEffectDefinition {
 /**
  * Parameter schema for this action. Keys are parameter names, values describe the expected type.
  */
-export type SkillActionParams = {[key: string]: string};
+export type SkillActionParams = { [key: string]: string };
 
 export interface SkillAction {
   /**
@@ -630,8 +621,8 @@ export interface SkillDefinition {
   prerequisites?: string[];
 }
 
-export type SkillInvokeOutcomeType = typeof SkillInvokeOutcomeType[keyof typeof SkillInvokeOutcomeType];
-
+export type SkillInvokeOutcomeType =
+  (typeof SkillInvokeOutcomeType)[keyof typeof SkillInvokeOutcomeType];
 
 export const SkillInvokeOutcomeType = {
   ok: 'ok',
@@ -649,7 +640,7 @@ export interface SkillInvokeOutcome {
   data?: SkillInvokeOutcomeData;
 }
 
-export type AgentSkillStateCredentials = {[key: string]: string};
+export type AgentSkillStateCredentials = { [key: string]: string };
 
 export interface AgentSkillState {
   /**
@@ -673,7 +664,7 @@ export interface SkillListRequest {
 /**
  * Optional credentials for the skill
  */
-export type SkillInstallRequestCredentials = {[key: string]: string};
+export type SkillInstallRequestCredentials = { [key: string]: string };
 
 export interface SkillInstallRequest {
   agentId: IdAgent;
@@ -749,8 +740,7 @@ export interface ResultError {
   error: ErrorObject;
 }
 
-export type ChannelInfoStatus = typeof ChannelInfoStatus[keyof typeof ChannelInfoStatus];
-
+export type ChannelInfoStatus = (typeof ChannelInfoStatus)[keyof typeof ChannelInfoStatus];
 
 export const ChannelInfoStatus = {
   open: 'open',
@@ -832,16 +822,16 @@ export interface MeetingJoinRequest {
   meetingId: string;
 }
 
-export type MeetingJoinResponseDataRole = typeof MeetingJoinResponseDataRole[keyof typeof MeetingJoinResponseDataRole];
-
+export type MeetingJoinResponseDataRole =
+  (typeof MeetingJoinResponseDataRole)[keyof typeof MeetingJoinResponseDataRole];
 
 export const MeetingJoinResponseDataRole = {
   host: 'host',
   participant: 'participant',
 } as const;
 
-export type MeetingJoinResponseDataParticipantsItemRole = typeof MeetingJoinResponseDataParticipantsItemRole[keyof typeof MeetingJoinResponseDataParticipantsItemRole];
-
+export type MeetingJoinResponseDataParticipantsItemRole =
+  (typeof MeetingJoinResponseDataParticipantsItemRole)[keyof typeof MeetingJoinResponseDataParticipantsItemRole];
 
 export const MeetingJoinResponseDataParticipantsItemRole = {
   host: 'host',
@@ -986,887 +976,790 @@ export type MeetingLeave200 = {
  * @summary Register a new AI agent
  */
 export type registerResponse200 = {
-  data: Register200
-  status: 200
-}
+  data: Register200;
+  status: 200;
+};
 
 export type registerResponse400 = {
-  data: ResultError
-  status: 400
-}
-
-export type registerResponseSuccess = (registerResponse200) & {
-  headers: Headers;
-};
-export type registerResponseError = (registerResponse400) & {
-  headers: Headers;
+  data: ResultError;
+  status: 400;
 };
 
-export type registerResponse = (registerResponseSuccess | registerResponseError)
+export type registerResponseSuccess = registerResponse200 & {
+  headers: Headers;
+};
+export type registerResponseError = registerResponse400 & {
+  headers: Headers;
+};
+
+export type registerResponse = registerResponseSuccess | registerResponseError;
 
 export const getRegisterUrl = () => {
+  return `/register`;
+};
 
-
-  
-
-  return `/register`
-}
-
-export const register = async (registerRequest: RegisterRequest, options?: RequestInit): Promise<registerResponse> => {
-  
-  return customFetch<registerResponse>(getRegisterUrl(),
-  {      
+export const register = async (
+  registerRequest: RegisterRequest,
+  options?: RequestInit
+): Promise<registerResponse> => {
+  return customFetch<registerResponse>(getRegisterUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      registerRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(registerRequest),
+  });
+};
 
 /**
  * Gracefully disconnect an AI agent from the server. Removes the agent entity from the game world and emits a presence.leave event.
  * @summary Unregister an AI agent
  */
 export type unregisterResponse200 = {
-  data: Unregister200
-  status: 200
-}
+  data: Unregister200;
+  status: 200;
+};
 
 export type unregisterResponse401 = {
-  data: ResultError
-  status: 401
-}
+  data: ResultError;
+  status: 401;
+};
 
 export type unregisterResponse404 = {
-  data: ResultError
-  status: 404
-}
+  data: ResultError;
+  status: 404;
+};
 
-export type unregisterResponseSuccess = (unregisterResponse200) & {
+export type unregisterResponseSuccess = unregisterResponse200 & {
   headers: Headers;
 };
 export type unregisterResponseError = (unregisterResponse401 | unregisterResponse404) & {
   headers: Headers;
 };
 
-export type unregisterResponse = (unregisterResponseSuccess | unregisterResponseError)
+export type unregisterResponse = unregisterResponseSuccess | unregisterResponseError;
 
 export const getUnregisterUrl = () => {
+  return `/unregister`;
+};
 
-
-  
-
-  return `/unregister`
-}
-
-export const unregister = async (unregisterRequest: UnregisterRequest, options?: RequestInit): Promise<unregisterResponse> => {
-  
-  return customFetch<unregisterResponse>(getUnregisterUrl(),
-  {      
+export const unregister = async (
+  unregisterRequest: UnregisterRequest,
+  options?: RequestInit
+): Promise<unregisterResponse> => {
+  return customFetch<unregisterResponse>(getUnregisterUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      unregisterRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(unregisterRequest),
+  });
+};
 
 /**
  * Returns information about the agent itself and nearby entities within the specified radius.
  * @summary Observe the world around the agent
  */
 export type observeResponse200 = {
-  data: Observe200
-  status: 200
-}
+  data: Observe200;
+  status: 200;
+};
 
 export type observeResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type observeResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
-export type observeResponseSuccess = (observeResponse200) & {
+export type observeResponseSuccess = observeResponse200 & {
   headers: Headers;
 };
 export type observeResponseError = (observeResponse401 | observeResponse404) & {
   headers: Headers;
 };
 
-export type observeResponse = (observeResponseSuccess | observeResponseError)
+export type observeResponse = observeResponseSuccess | observeResponseError;
 
 export const getObserveUrl = () => {
+  return `/observe`;
+};
 
-
-  
-
-  return `/observe`
-}
-
-export const observe = async (observeRequest: ObserveRequest, options?: RequestInit): Promise<observeResponse> => {
-  
-  return customFetch<observeResponse>(getObserveUrl(),
-  {      
+export const observe = async (
+  observeRequest: ObserveRequest,
+  options?: RequestInit
+): Promise<observeResponse> => {
+  return customFetch<observeResponse>(getObserveUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      observeRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(observeRequest),
+  });
+};
 
 /**
  * Initiates movement to the specified tile coordinates. Uses txId for idempotency.
  * @summary Move agent to a destination tile
  */
 export type moveToResponse200 = {
-  data: MoveTo200
-  status: 200
-}
+  data: MoveTo200;
+  status: 200;
+};
 
 export type moveToResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type moveToResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
-export type moveToResponseSuccess = (moveToResponse200) & {
+export type moveToResponseSuccess = moveToResponse200 & {
   headers: Headers;
 };
 export type moveToResponseError = (moveToResponse400 | moveToResponse401) & {
   headers: Headers;
 };
 
-export type moveToResponse = (moveToResponseSuccess | moveToResponseError)
+export type moveToResponse = moveToResponseSuccess | moveToResponseError;
 
 export const getMoveToUrl = () => {
+  return `/moveTo`;
+};
 
-
-  
-
-  return `/moveTo`
-}
-
-export const moveTo = async (moveToRequest: MoveToRequest, options?: RequestInit): Promise<moveToResponse> => {
-  
-  return customFetch<moveToResponse>(getMoveToUrl(),
-  {      
+export const moveTo = async (
+  moveToRequest: MoveToRequest,
+  options?: RequestInit
+): Promise<moveToResponse> => {
+  return customFetch<moveToResponse>(getMoveToUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      moveToRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(moveToRequest),
+  });
+};
 
 /**
  * Perform an action on a target entity (e.g., read a sign, use a terminal). Check affordances from observe response.
  * @summary Interact with a world object
  */
 export type interactResponse200 = {
-  data: Interact200
-  status: 200
-}
+  data: Interact200;
+  status: 200;
+};
 
 export type interactResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type interactResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
-export type interactResponseSuccess = (interactResponse200) & {
+export type interactResponseSuccess = interactResponse200 & {
   headers: Headers;
 };
 export type interactResponseError = (interactResponse400 | interactResponse401) & {
   headers: Headers;
 };
 
-export type interactResponse = (interactResponseSuccess | interactResponseError)
+export type interactResponse = interactResponseSuccess | interactResponseError;
 
 export const getInteractUrl = () => {
+  return `/interact`;
+};
 
-
-  
-
-  return `/interact`
-}
-
-export const interact = async (interactRequest: InteractRequest, options?: RequestInit): Promise<interactResponse> => {
-  
-  return customFetch<interactResponse>(getInteractUrl(),
-  {      
+export const interact = async (
+  interactRequest: InteractRequest,
+  options?: RequestInit
+): Promise<interactResponse> => {
+  return customFetch<interactResponse>(getInteractUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      interactRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(interactRequest),
+  });
+};
 
 /**
  * Send a message to the specified channel. Use "proximity" for nearby entities or "global" for the entire room.
  * @summary Send a chat message
  */
 export type chatSendResponse200 = {
-  data: ChatSend200
-  status: 200
-}
+  data: ChatSend200;
+  status: 200;
+};
 
 export type chatSendResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type chatSendResponse429 = {
-  data: void
-  status: 429
-}
+  data: void;
+  status: 429;
+};
 
-export type chatSendResponseSuccess = (chatSendResponse200) & {
+export type chatSendResponseSuccess = chatSendResponse200 & {
   headers: Headers;
 };
 export type chatSendResponseError = (chatSendResponse401 | chatSendResponse429) & {
   headers: Headers;
 };
 
-export type chatSendResponse = (chatSendResponseSuccess | chatSendResponseError)
+export type chatSendResponse = chatSendResponseSuccess | chatSendResponseError;
 
 export const getChatSendUrl = () => {
+  return `/chatSend`;
+};
 
-
-  
-
-  return `/chatSend`
-}
-
-export const chatSend = async (chatSendRequest: ChatSendRequest, options?: RequestInit): Promise<chatSendResponse> => {
-  
-  return customFetch<chatSendResponse>(getChatSendUrl(),
-  {      
+export const chatSend = async (
+  chatSendRequest: ChatSendRequest,
+  options?: RequestInit
+): Promise<chatSendResponse> => {
+  return customFetch<chatSendResponse>(getChatSendUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      chatSendRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(chatSendRequest),
+  });
+};
 
 /**
  * Retrieve chat messages from the specified time window.
  * @summary Get recent chat messages
  */
 export type chatObserveResponse200 = {
-  data: ChatObserve200
-  status: 200
-}
+  data: ChatObserve200;
+  status: 200;
+};
 
 export type chatObserveResponse401 = {
-  data: void
-  status: 401
-}
-
-export type chatObserveResponseSuccess = (chatObserveResponse200) & {
-  headers: Headers;
-};
-export type chatObserveResponseError = (chatObserveResponse401) & {
-  headers: Headers;
+  data: void;
+  status: 401;
 };
 
-export type chatObserveResponse = (chatObserveResponseSuccess | chatObserveResponseError)
+export type chatObserveResponseSuccess = chatObserveResponse200 & {
+  headers: Headers;
+};
+export type chatObserveResponseError = chatObserveResponse401 & {
+  headers: Headers;
+};
+
+export type chatObserveResponse = chatObserveResponseSuccess | chatObserveResponseError;
 
 export const getChatObserveUrl = () => {
+  return `/chatObserve`;
+};
 
-
-  
-
-  return `/chatObserve`
-}
-
-export const chatObserve = async (chatObserveRequest: ChatObserveRequest, options?: RequestInit): Promise<chatObserveResponse> => {
-  
-  return customFetch<chatObserveResponse>(getChatObserveUrl(),
-  {      
+export const chatObserve = async (
+  chatObserveRequest: ChatObserveRequest,
+  options?: RequestInit
+): Promise<chatObserveResponse> => {
+  return customFetch<chatObserveResponse>(getChatObserveUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      chatObserveRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(chatObserveRequest),
+  });
+};
 
 /**
  * Long-poll for events since the given cursor. Returns immediately if events are available, or waits up to waitMs for new events.
  * @summary Poll for world events
  */
 export type pollEventsResponse200 = {
-  data: PollEvents200
-  status: 200
-}
+  data: PollEvents200;
+  status: 200;
+};
 
 export type pollEventsResponse401 = {
-  data: void
-  status: 401
-}
-
-export type pollEventsResponseSuccess = (pollEventsResponse200) & {
-  headers: Headers;
-};
-export type pollEventsResponseError = (pollEventsResponse401) & {
-  headers: Headers;
+  data: void;
+  status: 401;
 };
 
-export type pollEventsResponse = (pollEventsResponseSuccess | pollEventsResponseError)
+export type pollEventsResponseSuccess = pollEventsResponse200 & {
+  headers: Headers;
+};
+export type pollEventsResponseError = pollEventsResponse401 & {
+  headers: Headers;
+};
+
+export type pollEventsResponse = pollEventsResponseSuccess | pollEventsResponseError;
 
 export const getPollEventsUrl = () => {
+  return `/pollEvents`;
+};
 
-
-  
-
-  return `/pollEvents`
-}
-
-export const pollEvents = async (pollEventsRequest: PollEventsRequest, options?: RequestInit): Promise<pollEventsResponse> => {
-  
-  return customFetch<pollEventsResponse>(getPollEventsUrl(),
-  {      
+export const pollEvents = async (
+  pollEventsRequest: PollEventsRequest,
+  options?: RequestInit
+): Promise<pollEventsResponse> => {
+  return customFetch<pollEventsResponse>(getPollEventsUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      pollEventsRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(pollEventsRequest),
+  });
+};
 
 /**
  * Update the agent name or metadata.
  * @summary Update agent profile
  */
 export type profileUpdateResponse200 = {
-  data: ProfileUpdate200
-  status: 200
-}
+  data: ProfileUpdate200;
+  status: 200;
+};
 
 export type profileUpdateResponse401 = {
-  data: void
-  status: 401
-}
-
-export type profileUpdateResponseSuccess = (profileUpdateResponse200) & {
-  headers: Headers;
-};
-export type profileUpdateResponseError = (profileUpdateResponse401) & {
-  headers: Headers;
+  data: void;
+  status: 401;
 };
 
-export type profileUpdateResponse = (profileUpdateResponseSuccess | profileUpdateResponseError)
+export type profileUpdateResponseSuccess = profileUpdateResponse200 & {
+  headers: Headers;
+};
+export type profileUpdateResponseError = profileUpdateResponse401 & {
+  headers: Headers;
+};
+
+export type profileUpdateResponse = profileUpdateResponseSuccess | profileUpdateResponseError;
 
 export const getProfileUpdateUrl = () => {
+  return `/profile/update`;
+};
 
-
-  
-
-  return `/profile/update`
-}
-
-export const profileUpdate = async (profileUpdateRequest: ProfileUpdateRequest, options?: RequestInit): Promise<profileUpdateResponse> => {
-  
-  return customFetch<profileUpdateResponse>(getProfileUpdateUrl(),
-  {      
+export const profileUpdate = async (
+  profileUpdateRequest: ProfileUpdateRequest,
+  options?: RequestInit
+): Promise<profileUpdateResponse> => {
+  return customFetch<profileUpdateResponse>(getProfileUpdateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      profileUpdateRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(profileUpdateRequest),
+  });
+};
 
 /**
  * Returns a list of skills available to the agent. Can filter by category or installed status.
  * @summary List available skills
  */
 export type skillListResponse200 = {
-  data: SkillList200
-  status: 200
-}
+  data: SkillList200;
+  status: 200;
+};
 
 export type skillListResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type skillListResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
-export type skillListResponseSuccess = (skillListResponse200) & {
+export type skillListResponseSuccess = skillListResponse200 & {
   headers: Headers;
 };
 export type skillListResponseError = (skillListResponse401 | skillListResponse404) & {
   headers: Headers;
 };
 
-export type skillListResponse = (skillListResponseSuccess | skillListResponseError)
+export type skillListResponse = skillListResponseSuccess | skillListResponseError;
 
 export const getSkillListUrl = () => {
+  return `/skill/list`;
+};
 
-
-  
-
-  return `/skill/list`
-}
-
-export const skillList = async (skillListRequest: SkillListRequest, options?: RequestInit): Promise<skillListResponse> => {
-  
-  return customFetch<skillListResponse>(getSkillListUrl(),
-  {      
+export const skillList = async (
+  skillListRequest: SkillListRequest,
+  options?: RequestInit
+): Promise<skillListResponse> => {
+  return customFetch<skillListResponse>(getSkillListUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      skillListRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(skillListRequest),
+  });
+};
 
 /**
  * Installs a skill for the agent, making its actions available for use. Uses txId for idempotency.
  * @summary Install a skill for an agent
  */
 export type skillInstallResponse200 = {
-  data: SkillInstall200
-  status: 200
-}
+  data: SkillInstall200;
+  status: 200;
+};
 
 export type skillInstallResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type skillInstallResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type skillInstallResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
 export type skillInstallResponse503 = {
-  data: void
-  status: 503
-}
-
-export type skillInstallResponseSuccess = (skillInstallResponse200) & {
-  headers: Headers;
-};
-export type skillInstallResponseError = (skillInstallResponse400 | skillInstallResponse401 | skillInstallResponse404 | skillInstallResponse503) & {
-  headers: Headers;
+  data: void;
+  status: 503;
 };
 
-export type skillInstallResponse = (skillInstallResponseSuccess | skillInstallResponseError)
+export type skillInstallResponseSuccess = skillInstallResponse200 & {
+  headers: Headers;
+};
+export type skillInstallResponseError = (
+  | skillInstallResponse400
+  | skillInstallResponse401
+  | skillInstallResponse404
+  | skillInstallResponse503
+) & {
+  headers: Headers;
+};
+
+export type skillInstallResponse = skillInstallResponseSuccess | skillInstallResponseError;
 
 export const getSkillInstallUrl = () => {
+  return `/skill/install`;
+};
 
-
-  
-
-  return `/skill/install`
-}
-
-export const skillInstall = async (skillInstallRequest: SkillInstallRequest, options?: RequestInit): Promise<skillInstallResponse> => {
-  
-  return customFetch<skillInstallResponse>(getSkillInstallUrl(),
-  {      
+export const skillInstall = async (
+  skillInstallRequest: SkillInstallRequest,
+  options?: RequestInit
+): Promise<skillInstallResponse> => {
+  return customFetch<skillInstallResponse>(getSkillInstallUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      skillInstallRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(skillInstallRequest),
+  });
+};
 
 /**
  * Invokes an action from an installed skill. Subject to cooldown (5s default) and cast time (1s default). Uses txId for idempotency.
  * @summary Invoke a skill action
  */
 export type skillInvokeResponse200 = {
-  data: SkillInvoke200
-  status: 200
-}
+  data: SkillInvoke200;
+  status: 200;
+};
 
 export type skillInvokeResponse400 = {
-  data: void
-  status: 400
-}
+  data: void;
+  status: 400;
+};
 
 export type skillInvokeResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type skillInvokeResponse403 = {
-  data: void
-  status: 403
-}
+  data: void;
+  status: 403;
+};
 
 export type skillInvokeResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
 export type skillInvokeResponse429 = {
-  data: void
-  status: 429
-}
-
-export type skillInvokeResponseSuccess = (skillInvokeResponse200) & {
-  headers: Headers;
-};
-export type skillInvokeResponseError = (skillInvokeResponse400 | skillInvokeResponse401 | skillInvokeResponse403 | skillInvokeResponse404 | skillInvokeResponse429) & {
-  headers: Headers;
+  data: void;
+  status: 429;
 };
 
-export type skillInvokeResponse = (skillInvokeResponseSuccess | skillInvokeResponseError)
+export type skillInvokeResponseSuccess = skillInvokeResponse200 & {
+  headers: Headers;
+};
+export type skillInvokeResponseError = (
+  | skillInvokeResponse400
+  | skillInvokeResponse401
+  | skillInvokeResponse403
+  | skillInvokeResponse404
+  | skillInvokeResponse429
+) & {
+  headers: Headers;
+};
+
+export type skillInvokeResponse = skillInvokeResponseSuccess | skillInvokeResponseError;
 
 export const getSkillInvokeUrl = () => {
+  return `/skill/invoke`;
+};
 
-
-  
-
-  return `/skill/invoke`
-}
-
-export const skillInvoke = async (skillInvokeRequest: SkillInvokeRequest, options?: RequestInit): Promise<skillInvokeResponse> => {
-  
-  return customFetch<skillInvokeResponse>(getSkillInvokeUrl(),
-  {      
+export const skillInvoke = async (
+  skillInvokeRequest: SkillInvokeRequest,
+  options?: RequestInit
+): Promise<skillInvokeResponse> => {
+  return customFetch<skillInvokeResponse>(getSkillInvokeUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      skillInvokeRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(skillInvokeRequest),
+  });
+};
 
 /**
  * Returns all available game channels/rooms that agents can join.
  * @summary List available channels
  */
 export type channelsResponse200 = {
-  data: Channels200
-  status: 200
-}
+  data: Channels200;
+  status: 200;
+};
 
-export type channelsResponseSuccess = (channelsResponse200) & {
+export type channelsResponseSuccess = channelsResponse200 & {
   headers: Headers;
 };
-;
-
-export type channelsResponse = (channelsResponseSuccess)
+export type channelsResponse = channelsResponseSuccess;
 
 export const getChannelsUrl = () => {
+  return `/channels`;
+};
 
-
-  
-
-  return `/channels`
-}
-
-export const channels = async ( options?: RequestInit): Promise<channelsResponse> => {
-  
-  return customFetch<channelsResponse>(getChannelsUrl(),
-  {      
+export const channels = async (options?: RequestInit): Promise<channelsResponse> => {
+  return customFetch<channelsResponse>(getChannelsUrl(), {
     ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
+    method: 'GET',
+  });
+};
 
 /**
  * Allows an agent to reconnect using a previously issued session token.
  * @summary Reconnect an agent to an existing session
  */
 export type reconnectResponse200 = {
-  data: Reconnect200
-  status: 200
-}
+  data: Reconnect200;
+  status: 200;
+};
 
 export type reconnectResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type reconnectResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
-export type reconnectResponseSuccess = (reconnectResponse200) & {
+export type reconnectResponseSuccess = reconnectResponse200 & {
   headers: Headers;
 };
 export type reconnectResponseError = (reconnectResponse401 | reconnectResponse404) & {
   headers: Headers;
 };
 
-export type reconnectResponse = (reconnectResponseSuccess | reconnectResponseError)
+export type reconnectResponse = reconnectResponseSuccess | reconnectResponseError;
 
 export const getReconnectUrl = () => {
+  return `/reconnect`;
+};
 
-
-  
-
-  return `/reconnect`
-}
-
-export const reconnect = async (reconnectRequest: ReconnectRequest, options?: RequestInit): Promise<reconnectResponse> => {
-  
-  return customFetch<reconnectResponse>(getReconnectUrl(),
-  {      
+export const reconnect = async (
+  reconnectRequest: ReconnectRequest,
+  options?: RequestInit
+): Promise<reconnectResponse> => {
+  return customFetch<reconnectResponse>(getReconnectUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      reconnectRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(reconnectRequest),
+  });
+};
 
 /**
  * Keeps the agent session alive and returns server timing information.
  * @summary Send a heartbeat to maintain session
  */
 export type heartbeatResponse200 = {
-  data: Heartbeat200
-  status: 200
-}
+  data: Heartbeat200;
+  status: 200;
+};
 
 export type heartbeatResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type heartbeatResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
-export type heartbeatResponseSuccess = (heartbeatResponse200) & {
+export type heartbeatResponseSuccess = heartbeatResponse200 & {
   headers: Headers;
 };
 export type heartbeatResponseError = (heartbeatResponse401 | heartbeatResponse404) & {
   headers: Headers;
 };
 
-export type heartbeatResponse = (heartbeatResponseSuccess | heartbeatResponseError)
+export type heartbeatResponse = heartbeatResponseSuccess | heartbeatResponseError;
 
 export const getHeartbeatUrl = () => {
+  return `/heartbeat`;
+};
 
-
-  
-
-  return `/heartbeat`
-}
-
-export const heartbeat = async (heartbeatRequest: HeartbeatRequest, options?: RequestInit): Promise<heartbeatResponse> => {
-  
-  return customFetch<heartbeatResponse>(getHeartbeatUrl(),
-  {      
+export const heartbeat = async (
+  heartbeatRequest: HeartbeatRequest,
+  options?: RequestInit
+): Promise<heartbeatResponse> => {
+  return customFetch<heartbeatResponse>(getHeartbeatUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      heartbeatRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(heartbeatRequest),
+  });
+};
 
 /**
  * Returns all active meetings in the specified room.
  * @summary List available meetings in the room
  */
 export type meetingListResponse200 = {
-  data: MeetingList200
-  status: 200
-}
+  data: MeetingList200;
+  status: 200;
+};
 
 export type meetingListResponse401 = {
-  data: void
-  status: 401
-}
-
-export type meetingListResponseSuccess = (meetingListResponse200) & {
-  headers: Headers;
-};
-export type meetingListResponseError = (meetingListResponse401) & {
-  headers: Headers;
+  data: void;
+  status: 401;
 };
 
-export type meetingListResponse = (meetingListResponseSuccess | meetingListResponseError)
+export type meetingListResponseSuccess = meetingListResponse200 & {
+  headers: Headers;
+};
+export type meetingListResponseError = meetingListResponse401 & {
+  headers: Headers;
+};
+
+export type meetingListResponse = meetingListResponseSuccess | meetingListResponseError;
 
 export const getMeetingListUrl = () => {
+  return `/meeting/list`;
+};
 
-
-  
-
-  return `/meeting/list`
-}
-
-export const meetingList = async (meetingListRequest: MeetingListRequest, options?: RequestInit): Promise<meetingListResponse> => {
-  
-  return customFetch<meetingListResponse>(getMeetingListUrl(),
-  {      
+export const meetingList = async (
+  meetingListRequest: MeetingListRequest,
+  options?: RequestInit
+): Promise<meetingListResponse> => {
+  return customFetch<meetingListResponse>(getMeetingListUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      meetingListRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(meetingListRequest),
+  });
+};
 
 /**
  * Joins the specified meeting as a participant or host.
  * @summary Join a meeting
  */
 export type meetingJoinResponse200 = {
-  data: MeetingJoin200
-  status: 200
-}
+  data: MeetingJoin200;
+  status: 200;
+};
 
 export type meetingJoinResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type meetingJoinResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
 export type meetingJoinResponse409 = {
-  data: void
-  status: 409
-}
-
-export type meetingJoinResponseSuccess = (meetingJoinResponse200) & {
-  headers: Headers;
-};
-export type meetingJoinResponseError = (meetingJoinResponse401 | meetingJoinResponse404 | meetingJoinResponse409) & {
-  headers: Headers;
+  data: void;
+  status: 409;
 };
 
-export type meetingJoinResponse = (meetingJoinResponseSuccess | meetingJoinResponseError)
+export type meetingJoinResponseSuccess = meetingJoinResponse200 & {
+  headers: Headers;
+};
+export type meetingJoinResponseError = (
+  | meetingJoinResponse401
+  | meetingJoinResponse404
+  | meetingJoinResponse409
+) & {
+  headers: Headers;
+};
+
+export type meetingJoinResponse = meetingJoinResponseSuccess | meetingJoinResponseError;
 
 export const getMeetingJoinUrl = () => {
+  return `/meeting/join`;
+};
 
-
-  
-
-  return `/meeting/join`
-}
-
-export const meetingJoin = async (meetingJoinRequest: MeetingJoinRequest, options?: RequestInit): Promise<meetingJoinResponse> => {
-  
-  return customFetch<meetingJoinResponse>(getMeetingJoinUrl(),
-  {      
+export const meetingJoin = async (
+  meetingJoinRequest: MeetingJoinRequest,
+  options?: RequestInit
+): Promise<meetingJoinResponse> => {
+  return customFetch<meetingJoinResponse>(getMeetingJoinUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      meetingJoinRequest,)
-  }
-);}
-  
-
+    body: JSON.stringify(meetingJoinRequest),
+  });
+};
 
 /**
  * Leaves the specified meeting.
  * @summary Leave a meeting
  */
 export type meetingLeaveResponse200 = {
-  data: MeetingLeave200
-  status: 200
-}
+  data: MeetingLeave200;
+  status: 200;
+};
 
 export type meetingLeaveResponse401 = {
-  data: void
-  status: 401
-}
+  data: void;
+  status: 401;
+};
 
 export type meetingLeaveResponse404 = {
-  data: void
-  status: 404
-}
+  data: void;
+  status: 404;
+};
 
-export type meetingLeaveResponseSuccess = (meetingLeaveResponse200) & {
+export type meetingLeaveResponseSuccess = meetingLeaveResponse200 & {
   headers: Headers;
 };
 export type meetingLeaveResponseError = (meetingLeaveResponse401 | meetingLeaveResponse404) & {
   headers: Headers;
 };
 
-export type meetingLeaveResponse = (meetingLeaveResponseSuccess | meetingLeaveResponseError)
+export type meetingLeaveResponse = meetingLeaveResponseSuccess | meetingLeaveResponseError;
 
 export const getMeetingLeaveUrl = () => {
+  return `/meeting/leave`;
+};
 
-
-  
-
-  return `/meeting/leave`
-}
-
-export const meetingLeave = async (meetingLeaveRequest: MeetingLeaveRequest, options?: RequestInit): Promise<meetingLeaveResponse> => {
-  
-  return customFetch<meetingLeaveResponse>(getMeetingLeaveUrl(),
-  {      
+export const meetingLeave = async (
+  meetingLeaveRequest: MeetingLeaveRequest,
+  options?: RequestInit
+): Promise<meetingLeaveResponse> => {
+  return customFetch<meetingLeaveResponse>(getMeetingLeaveUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      meetingLeaveRequest,)
-  }
-);}
+    body: JSON.stringify(meetingLeaveRequest),
+  });
+};

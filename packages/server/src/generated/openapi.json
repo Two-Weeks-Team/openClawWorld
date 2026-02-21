@@ -93,10 +93,7 @@
       },
       "Vec2": {
         "type": "object",
-        "required": [
-          "x",
-          "y"
-        ],
+        "required": ["x", "y"],
         "properties": {
           "x": {
             "type": "number",
@@ -110,10 +107,7 @@
       },
       "TileCoord": {
         "type": "object",
-        "required": [
-          "tx",
-          "ty"
-        ],
+        "required": ["tx", "ty"],
         "properties": {
           "tx": {
             "type": "integer",
@@ -131,28 +125,15 @@
       },
       "EntityKind": {
         "type": "string",
-        "enum": [
-          "human",
-          "agent",
-          "object",
-          "npc"
-        ]
+        "enum": ["human", "agent", "object", "npc"]
       },
       "Facing": {
         "type": "string",
-        "enum": [
-          "up",
-          "down",
-          "left",
-          "right"
-        ]
+        "enum": ["up", "down", "left", "right"]
       },
       "ChatChannel": {
         "type": "string",
-        "enum": [
-          "proximity",
-          "global"
-        ]
+        "enum": ["proximity", "global"]
       },
       "ErrorCode": {
         "type": "string",
@@ -173,11 +154,7 @@
       },
       "ErrorObject": {
         "type": "object",
-        "required": [
-          "code",
-          "message",
-          "retryable"
-        ],
+        "required": ["code", "message", "retryable"],
         "properties": {
           "code": {
             "$ref": "#/components/schemas/ErrorCode"
@@ -197,13 +174,7 @@
       },
       "EntityBase": {
         "type": "object",
-        "required": [
-          "id",
-          "kind",
-          "name",
-          "pos",
-          "roomId"
-        ],
+        "required": ["id", "kind", "name", "pos", "roomId"],
         "properties": {
           "id": {
             "$ref": "#/components/schemas/IdEntity"
@@ -241,10 +212,7 @@
       },
       "Affordance": {
         "type": "object",
-        "required": [
-          "action",
-          "label"
-        ],
+        "required": ["action", "label"],
         "properties": {
           "action": {
             "type": "string",
@@ -266,10 +234,7 @@
       },
       "ObjectState": {
         "type": "object",
-        "required": [
-          "objectType",
-          "state"
-        ],
+        "required": ["objectType", "state"],
         "properties": {
           "objectType": {
             "type": "string",
@@ -284,11 +249,7 @@
       },
       "ObservedEntity": {
         "type": "object",
-        "required": [
-          "entity",
-          "distance",
-          "affords"
-        ],
+        "required": ["entity", "distance", "affords"],
         "properties": {
           "entity": {
             "$ref": "#/components/schemas/EntityBase"
@@ -311,10 +272,7 @@
       },
       "RegisterRequest": {
         "type": "object",
-        "required": [
-          "roomId",
-          "name"
-        ],
+        "required": ["roomId", "name"],
         "properties": {
           "roomId": {
             "$ref": "#/components/schemas/IdRoom"
@@ -329,11 +287,7 @@
       },
       "RegisterResponseData": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "sessionToken"
-        ],
+        "required": ["agentId", "roomId", "sessionToken"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -349,10 +303,7 @@
       },
       "UnregisterRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId"
-        ],
+        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -364,10 +315,7 @@
       },
       "UnregisterResponseData": {
         "type": "object",
-        "required": [
-          "agentId",
-          "unregisteredAt"
-        ],
+        "required": ["agentId", "unregisteredAt"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdEntity"
@@ -379,11 +327,7 @@
       },
       "ObserveRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "radius"
-        ],
+        "required": ["agentId", "roomId", "radius"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -399,10 +343,7 @@
           },
           "detail": {
             "type": "string",
-            "enum": [
-              "lite",
-              "full"
-            ],
+            "enum": ["lite", "full"],
             "example": "full"
           },
           "includeSelf": {
@@ -418,13 +359,7 @@
       },
       "ObserveResponseData": {
         "type": "object",
-        "required": [
-          "self",
-          "nearby",
-          "serverTsMs",
-          "room",
-          "facilities"
-        ],
+        "required": ["self", "nearby", "serverTsMs", "room", "facilities"],
         "properties": {
           "self": {
             "$ref": "#/components/schemas/EntityBase"
@@ -440,11 +375,7 @@
           },
           "room": {
             "type": "object",
-            "required": [
-              "roomId",
-              "mapId",
-              "tickRate"
-            ],
+            "required": ["roomId", "mapId", "tickRate"],
             "properties": {
               "roomId": {
                 "$ref": "#/components/schemas/IdRoom"
@@ -473,11 +404,7 @@
       },
       "ObservedFacility": {
         "type": "object",
-        "required": [
-          "id",
-          "type",
-          "pos"
-        ],
+        "required": ["id", "type", "pos"],
         "properties": {
           "id": {
             "type": "string",
@@ -505,11 +432,7 @@
       },
       "MapMetadata": {
         "type": "object",
-        "required": [
-          "mapId",
-          "width",
-          "height"
-        ],
+        "required": ["mapId", "width", "height"],
         "properties": {
           "mapId": {
             "type": "string"
@@ -536,12 +459,7 @@
       },
       "MoveToRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "txId",
-          "dest"
-        ],
+        "required": ["agentId", "roomId", "txId", "dest"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -557,21 +475,14 @@
           },
           "mode": {
             "type": "string",
-            "enum": [
-              "walk"
-            ],
+            "enum": ["walk"],
             "default": "walk"
           }
         }
       },
       "MoveToResponseData": {
         "type": "object",
-        "required": [
-          "txId",
-          "applied",
-          "serverTsMs",
-          "result"
-        ],
+        "required": ["txId", "applied", "serverTsMs", "result"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -584,24 +495,13 @@
           },
           "result": {
             "type": "string",
-            "enum": [
-              "accepted",
-              "rejected",
-              "no_op",
-              "no_path"
-            ]
+            "enum": ["accepted", "rejected", "no_op", "no_path"]
           }
         }
       },
       "InteractRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "txId",
-          "targetId",
-          "action"
-        ],
+        "required": ["agentId", "roomId", "txId", "targetId", "action"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -629,12 +529,7 @@
       },
       "InteractResponseData": {
         "type": "object",
-        "required": [
-          "txId",
-          "applied",
-          "serverTsMs",
-          "outcome"
-        ],
+        "required": ["txId", "applied", "serverTsMs", "outcome"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -647,18 +542,11 @@
           },
           "outcome": {
             "type": "object",
-            "required": [
-              "type"
-            ],
+            "required": ["type"],
             "properties": {
               "type": {
                 "type": "string",
-                "enum": [
-                  "ok",
-                  "no_effect",
-                  "invalid_action",
-                  "too_far"
-                ]
+                "enum": ["ok", "no_effect", "invalid_action", "too_far"]
               },
               "message": {
                 "type": "string",
@@ -670,13 +558,7 @@
       },
       "ChatSendRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "txId",
-          "channel",
-          "message"
-        ],
+        "required": ["agentId", "roomId", "txId", "channel", "message"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -700,12 +582,7 @@
       },
       "ChatSendResponseData": {
         "type": "object",
-        "required": [
-          "txId",
-          "applied",
-          "serverTsMs",
-          "chatMessageId"
-        ],
+        "required": ["txId", "applied", "serverTsMs", "chatMessageId"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -724,11 +601,7 @@
       },
       "ChatObserveRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "windowSec"
-        ],
+        "required": ["agentId", "roomId", "windowSec"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -749,15 +622,7 @@
       },
       "ChatMessage": {
         "type": "object",
-        "required": [
-          "id",
-          "roomId",
-          "channel",
-          "fromEntityId",
-          "fromName",
-          "message",
-          "tsMs"
-        ],
+        "required": ["id", "roomId", "channel", "fromEntityId", "fromName", "message", "tsMs"],
         "properties": {
           "id": {
             "type": "string"
@@ -784,10 +649,7 @@
       },
       "ChatObserveResponseData": {
         "type": "object",
-        "required": [
-          "messages",
-          "serverTsMs"
-        ],
+        "required": ["messages", "serverTsMs"],
         "properties": {
           "messages": {
             "type": "array",
@@ -802,10 +664,7 @@
       },
       "PollEventsRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId"
-        ],
+        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -862,13 +721,7 @@
       },
       "EventEnvelope": {
         "type": "object",
-        "required": [
-          "cursor",
-          "type",
-          "roomId",
-          "tsMs",
-          "payload"
-        ],
+        "required": ["cursor", "type", "roomId", "tsMs", "payload"],
         "properties": {
           "cursor": {
             "$ref": "#/components/schemas/Cursor"
@@ -890,12 +743,7 @@
       },
       "PollEventsResponseData": {
         "type": "object",
-        "required": [
-          "events",
-          "nextCursor",
-          "serverTsMs",
-          "cursorExpired"
-        ],
+        "required": ["events", "nextCursor", "serverTsMs", "cursorExpired"],
         "properties": {
           "events": {
             "type": "array",
@@ -917,10 +765,7 @@
       },
       "ProfileUpdateRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId"
-        ],
+        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -947,17 +792,11 @@
       },
       "ProfileUpdateResponseData": {
         "type": "object",
-        "required": [
-          "applied",
-          "profile",
-          "serverTsMs"
-        ],
+        "required": ["applied", "profile", "serverTsMs"],
         "properties": {
           "applied": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           },
           "profile": {
             "$ref": "#/components/schemas/AgentProfile"
@@ -969,20 +808,12 @@
       },
       "UserStatus": {
         "type": "string",
-        "enum": [
-          "online",
-          "away",
-          "focus",
-          "offline"
-        ],
+        "enum": ["online", "away", "focus", "offline"],
         "description": "User presence/availability status"
       },
       "AgentProfile": {
         "type": "object",
-        "required": [
-          "agentId",
-          "name"
-        ],
+        "required": ["agentId", "name"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1014,20 +845,12 @@
       },
       "SkillCategory": {
         "type": "string",
-        "enum": [
-          "movement",
-          "combat",
-          "social",
-          "utility"
-        ],
+        "enum": ["movement", "combat", "social", "utility"],
         "description": "Category of the skill"
       },
       "SkillEffectDefinition": {
         "type": "object",
-        "required": [
-          "id",
-          "durationMs"
-        ],
+        "required": ["id", "durationMs"],
         "properties": {
           "id": {
             "type": "string",
@@ -1053,11 +876,7 @@
       },
       "SkillAction": {
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "description"
-        ],
+        "required": ["id", "name", "description"],
         "properties": {
           "id": {
             "type": "string",
@@ -1113,13 +932,7 @@
       },
       "SkillDefinition": {
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "description",
-          "category",
-          "actions"
-        ],
+        "required": ["id", "name", "description", "category", "actions"],
         "properties": {
           "id": {
             "type": "string",
@@ -1170,18 +983,11 @@
       },
       "SkillInvokeOutcomeType": {
         "type": "string",
-        "enum": [
-          "ok",
-          "pending",
-          "cancelled",
-          "error"
-        ]
+        "enum": ["ok", "pending", "cancelled", "error"]
       },
       "SkillInvokeOutcome": {
         "type": "object",
-        "required": [
-          "type"
-        ],
+        "required": ["type"],
         "properties": {
           "type": {
             "$ref": "#/components/schemas/SkillInvokeOutcomeType"
@@ -1198,11 +1004,7 @@
       },
       "AgentSkillState": {
         "type": "object",
-        "required": [
-          "skillId",
-          "installedAt",
-          "enabled"
-        ],
+        "required": ["skillId", "installedAt", "enabled"],
         "properties": {
           "skillId": {
             "type": "string",
@@ -1225,10 +1027,7 @@
       },
       "SkillListRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId"
-        ],
+        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1247,12 +1046,7 @@
       },
       "SkillInstallRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "txId",
-          "skillId"
-        ],
+        "required": ["agentId", "roomId", "txId", "skillId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1280,13 +1074,7 @@
       },
       "SkillInvokeRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "txId",
-          "skillId",
-          "actionId"
-        ],
+        "required": ["agentId", "roomId", "txId", "skillId", "actionId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1321,10 +1109,7 @@
       },
       "SkillListResponseData": {
         "type": "object",
-        "required": [
-          "skills",
-          "serverTsMs"
-        ],
+        "required": ["skills", "serverTsMs"],
         "properties": {
           "skills": {
             "type": "array",
@@ -1340,12 +1125,7 @@
       },
       "SkillInstallResponseData": {
         "type": "object",
-        "required": [
-          "skillId",
-          "installed",
-          "alreadyInstalled",
-          "serverTsMs"
-        ],
+        "required": ["skillId", "installed", "alreadyInstalled", "serverTsMs"],
         "properties": {
           "skillId": {
             "type": "string",
@@ -1367,11 +1147,7 @@
       },
       "SkillInvokeResponseData": {
         "type": "object",
-        "required": [
-          "txId",
-          "outcome",
-          "serverTsMs"
-        ],
+        "required": ["txId", "outcome", "serverTsMs"],
         "properties": {
           "txId": {
             "$ref": "#/components/schemas/IdTx"
@@ -1386,10 +1162,7 @@
       },
       "ResultOk": {
         "type": "object",
-        "required": [
-          "status",
-          "data"
-        ],
+        "required": ["status", "data"],
         "properties": {
           "status": {
             "type": "string",
@@ -1402,10 +1175,7 @@
       },
       "ResultError": {
         "type": "object",
-        "required": [
-          "status",
-          "error"
-        ],
+        "required": ["status", "error"],
         "properties": {
           "status": {
             "type": "string",
@@ -1418,12 +1188,7 @@
       },
       "ChannelInfo": {
         "type": "object",
-        "required": [
-          "channelId",
-          "maxAgents",
-          "currentAgents",
-          "status"
-        ],
+        "required": ["channelId", "maxAgents", "currentAgents", "status"],
         "properties": {
           "channelId": {
             "$ref": "#/components/schemas/IdRoom"
@@ -1440,21 +1205,14 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "open",
-              "full",
-              "closed"
-            ],
+            "enum": ["open", "full", "closed"],
             "example": "open"
           }
         }
       },
       "ReconnectRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "sessionToken"
-        ],
+        "required": ["agentId", "sessionToken"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1467,12 +1225,7 @@
       },
       "ReconnectResponseData": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "sessionToken",
-          "pos"
-        ],
+        "required": ["agentId", "roomId", "sessionToken", "pos"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1493,10 +1246,7 @@
       },
       "HeartbeatRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId"
-        ],
+        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1508,12 +1258,7 @@
       },
       "HeartbeatResponseData": {
         "type": "object",
-        "required": [
-          "agentId",
-          "serverTsMs",
-          "timeoutMs",
-          "recommendedIntervalMs"
-        ],
+        "required": ["agentId", "serverTsMs", "timeoutMs", "recommendedIntervalMs"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1535,13 +1280,7 @@
       },
       "MeetingInfo": {
         "type": "object",
-        "required": [
-          "meetingId",
-          "name",
-          "hostId",
-          "participantCount",
-          "capacity"
-        ],
+        "required": ["meetingId", "name", "hostId", "participantCount", "capacity"],
         "properties": {
           "meetingId": {
             "type": "string",
@@ -1568,10 +1307,7 @@
       },
       "MeetingListRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId"
-        ],
+        "required": ["agentId", "roomId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1583,9 +1319,7 @@
       },
       "MeetingListResponseData": {
         "type": "object",
-        "required": [
-          "meetings"
-        ],
+        "required": ["meetings"],
         "properties": {
           "meetings": {
             "type": "array",
@@ -1597,11 +1331,7 @@
       },
       "MeetingJoinRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "meetingId"
-        ],
+        "required": ["agentId", "roomId", "meetingId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1618,11 +1348,7 @@
       },
       "MeetingJoinResponseData": {
         "type": "object",
-        "required": [
-          "meetingId",
-          "role",
-          "participants"
-        ],
+        "required": ["meetingId", "role", "participants"],
         "properties": {
           "meetingId": {
             "type": "string",
@@ -1631,20 +1357,13 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "host",
-              "participant"
-            ]
+            "enum": ["host", "participant"]
           },
           "participants": {
             "type": "array",
             "items": {
               "type": "object",
-              "required": [
-                "entityId",
-                "name",
-                "role"
-              ],
+              "required": ["entityId", "name", "role"],
               "properties": {
                 "entityId": {
                   "$ref": "#/components/schemas/IdEntity"
@@ -1656,10 +1375,7 @@
                 },
                 "role": {
                   "type": "string",
-                  "enum": [
-                    "host",
-                    "participant"
-                  ]
+                  "enum": ["host", "participant"]
                 }
               }
             }
@@ -1668,11 +1384,7 @@
       },
       "MeetingLeaveRequest": {
         "type": "object",
-        "required": [
-          "agentId",
-          "roomId",
-          "meetingId"
-        ],
+        "required": ["agentId", "roomId", "meetingId"],
         "properties": {
           "agentId": {
             "$ref": "#/components/schemas/IdAgent"
@@ -1689,10 +1401,7 @@
       },
       "MeetingLeaveResponseData": {
         "type": "object",
-        "required": [
-          "meetingId",
-          "leftAt"
-        ],
+        "required": ["meetingId", "leftAt"],
         "properties": {
           "meetingId": {
             "type": "string",
@@ -1715,9 +1424,7 @@
     "/register": {
       "post": {
         "operationId": "register",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Register a new AI agent",
         "description": "Register an AI agent and obtain an authentication token. This endpoint does not require authentication.",
         "security": [],
@@ -1779,9 +1486,7 @@
     "/unregister": {
       "post": {
         "operationId": "unregister",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Unregister an AI agent",
         "description": "Gracefully disconnect an AI agent from the server. Removes the agent entity from the game world and emits a presence.leave event.",
         "requestBody": {
@@ -1851,9 +1556,7 @@
     "/observe": {
       "post": {
         "operationId": "observe",
-        "tags": [
-          "Observation"
-        ],
+        "tags": ["Observation"],
         "summary": "Observe the world around the agent",
         "description": "Returns information about the agent itself and nearby entities within the specified radius.",
         "requestBody": {
@@ -1905,9 +1608,7 @@
     "/moveTo": {
       "post": {
         "operationId": "moveTo",
-        "tags": [
-          "Actions"
-        ],
+        "tags": ["Actions"],
         "summary": "Move agent to a destination tile",
         "description": "Initiates movement to the specified tile coordinates. Uses txId for idempotency.",
         "requestBody": {
@@ -1962,9 +1663,7 @@
     "/interact": {
       "post": {
         "operationId": "interact",
-        "tags": [
-          "Actions"
-        ],
+        "tags": ["Actions"],
         "summary": "Interact with a world object",
         "description": "Perform an action on a target entity (e.g., read a sign, use a terminal). Check affordances from observe response.",
         "requestBody": {
@@ -2017,9 +1716,7 @@
     "/chatSend": {
       "post": {
         "operationId": "chatSend",
-        "tags": [
-          "Chat"
-        ],
+        "tags": ["Chat"],
         "summary": "Send a chat message",
         "description": "Send a message to the specified channel. Use \"proximity\" for nearby entities or \"global\" for the entire room.",
         "requestBody": {
@@ -2071,9 +1768,7 @@
     "/chatObserve": {
       "post": {
         "operationId": "chatObserve",
-        "tags": [
-          "Chat"
-        ],
+        "tags": ["Chat"],
         "summary": "Get recent chat messages",
         "description": "Retrieve chat messages from the specified time window.",
         "requestBody": {
@@ -2121,9 +1816,7 @@
     "/pollEvents": {
       "post": {
         "operationId": "pollEvents",
-        "tags": [
-          "Events"
-        ],
+        "tags": ["Events"],
         "summary": "Poll for world events",
         "description": "Long-poll for events since the given cursor. Returns immediately if events are available, or waits up to waitMs for new events.",
         "requestBody": {
@@ -2172,9 +1865,7 @@
     "/profile/update": {
       "post": {
         "operationId": "profileUpdate",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "summary": "Update agent profile",
         "description": "Update the agent name or metadata.",
         "requestBody": {
@@ -2224,9 +1915,7 @@
     "/skill/list": {
       "post": {
         "operationId": "skillList",
-        "tags": [
-          "Skills"
-        ],
+        "tags": ["Skills"],
         "summary": "List available skills",
         "description": "Returns a list of skills available to the agent. Can filter by category or installed status.",
         "requestBody": {
@@ -2300,9 +1989,7 @@
     "/skill/install": {
       "post": {
         "operationId": "skillInstall",
-        "tags": [
-          "Skills"
-        ],
+        "tags": ["Skills"],
         "summary": "Install a skill for an agent",
         "description": "Installs a skill for the agent, making its actions available for use. Uses txId for idempotency.",
         "requestBody": {
@@ -2368,9 +2055,7 @@
     "/skill/invoke": {
       "post": {
         "operationId": "skillInvoke",
-        "tags": [
-          "Skills"
-        ],
+        "tags": ["Skills"],
         "summary": "Invoke a skill action",
         "description": "Invokes an action from an installed skill. Subject to cooldown (5s default) and cast time (1s default). Uses txId for idempotency.",
         "requestBody": {
@@ -2444,9 +2129,7 @@
         "operationId": "channels",
         "summary": "List available channels",
         "description": "Returns all available game channels/rooms that agents can join.",
-        "tags": [
-          "Connection"
-        ],
+        "tags": ["Connection"],
         "security": [],
         "responses": {
           "200": {
@@ -2462,9 +2145,7 @@
                     },
                     "data": {
                       "type": "object",
-                      "required": [
-                        "channels"
-                      ],
+                      "required": ["channels"],
                       "properties": {
                         "channels": {
                           "type": "array",
@@ -2487,9 +2168,7 @@
         "operationId": "reconnect",
         "summary": "Reconnect an agent to an existing session",
         "description": "Allows an agent to reconnect using a previously issued session token.",
-        "tags": [
-          "Connection"
-        ],
+        "tags": ["Connection"],
         "requestBody": {
           "required": true,
           "content": {
@@ -2534,9 +2213,7 @@
         "operationId": "heartbeat",
         "summary": "Send a heartbeat to maintain session",
         "description": "Keeps the agent session alive and returns server timing information.",
-        "tags": [
-          "Session Management"
-        ],
+        "tags": ["Session Management"],
         "requestBody": {
           "required": true,
           "content": {
@@ -2581,9 +2258,7 @@
         "operationId": "meetingList",
         "summary": "List available meetings in the room",
         "description": "Returns all active meetings in the specified room.",
-        "tags": [
-          "Meeting"
-        ],
+        "tags": ["Meeting"],
         "requestBody": {
           "required": true,
           "content": {
@@ -2625,9 +2300,7 @@
         "operationId": "meetingJoin",
         "summary": "Join a meeting",
         "description": "Joins the specified meeting as a participant or host.",
-        "tags": [
-          "Meeting"
-        ],
+        "tags": ["Meeting"],
         "requestBody": {
           "required": true,
           "content": {
@@ -2675,9 +2348,7 @@
         "operationId": "meetingLeave",
         "summary": "Leave a meeting",
         "description": "Leaves the specified meeting.",
-        "tags": [
-          "Meeting"
-        ],
+        "tags": ["Meeting"],
         "requestBody": {
           "required": true,
           "content": {

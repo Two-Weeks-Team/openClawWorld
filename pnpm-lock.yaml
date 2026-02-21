@@ -180,13 +180,13 @@ importers:
 
   packages/shared:
     dependencies:
+      '@asteasolutions/zod-to-openapi':
+        specifier: ^8.4.1
+        version: 8.4.1(zod@4.3.6)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
     devDependencies:
-      '@asteasolutions/zod-to-openapi':
-        specifier: ^8.4.1
-        version: 8.4.1(zod@4.3.6)
       typescript:
         specifier: ^5.4.0
         version: 5.9.3

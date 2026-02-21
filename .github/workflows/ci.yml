@@ -204,6 +204,27 @@ jobs:
           fi
           echo "✅ Generated code is up to date"
 
+      - name: Check OpenAPI spec is up to date
+        run: |
+          pnpm generate:openapi
+          if ! git diff --exit-code packages/server/src/openapi.ts; then
+            echo "❌ packages/server/src/openapi.ts is out of sync with schemas.ts"
+            echo "Run 'pnpm generate:openapi' and commit the changes."
+            exit 1
+          fi
+          echo "✅ OpenAPI spec is up to date"
+
+      - name: Check Colyseus client schemas are up to date
+        run: |
+          pnpm generate:schemas
+          pnpm exec prettier --write "packages/client/src/generated/schemas/"
+          if ! git diff --exit-code packages/client/src/generated/schemas/; then
+            echo "❌ Colyseus client schemas are out of sync with server schemas"
+            echo "Run 'pnpm generate:schemas' and commit the changes."
+            exit 1
+          fi
+          echo "✅ Colyseus client schemas are up to date"
+
   map-consistency:
     name: Map Consistency
     runs-on: self-hosted
@@ -411,7 +432,9 @@ jobs:
 
       - name: Setup Python ${{ env.PYTHON_VERSION }} & Install schemathesis
         run: |
-          # self-hosted runner requirement: Node 22+, Python 3.10+
+          # Ensure Homebrew is on PATH (ARM64: /opt/homebrew, Intel: /usr/local)
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:$PATH"
+          echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
           # Always use versioned brew Python to avoid macOS Xcode bundle (3.9)
           if ! brew list "python@${{ env.PYTHON_VERSION }}" &>/dev/null; then
             echo "Installing Python ${{ env.PYTHON_VERSION }} via brew..."

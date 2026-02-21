@@ -1,13 +1,19 @@
 #!/usr/bin/env tsx
 /**
- * Load Test Script for OpenClawWorld Server
+ * HTTP Load Test Script for OpenClawWorld Server
  *
  * Simulates multiple agents performing observe/move/chat cycles
- * and reports latency statistics.
+ * using the proper register flow for authentication.
+ *
+ * Each agent:
+ *   1. POST /aic/v0.1/register -> gets sessionToken, agentId, roomId
+ *   2. Runs observe/move/chat cycles using the returned credentials
+ *   3. POST /aic/v0.1/unregister on cleanup
  *
  * Usage:
- *   pnpm load-test
- *   pnpm load-test -- --agents 20 --duration 60
+ *   pnpm load-test:http
+ *   pnpm load-test:http -- --agents 20 --duration 60
+ *   pnpm load-test:http -- --no-threshold
  */
 
 import { randomBytes } from 'crypto';
@@ -18,6 +24,7 @@ interface LoadTestConfig {
   durationSeconds: number;
   roomId: string;
   cycleDelayMs: number;
+  checkThresholds: boolean;
 }
 
 interface LatencyStats {
@@ -35,38 +42,99 @@ interface AgentMetrics {
   errors: number;
 }
 
+interface RegisterResponse {
+  status: string;
+  data: {
+    agentId: string;
+    roomId: string;
+    sessionToken: string;
+  };
+}
+
 class LoadTestAgent {
-  private agentId: string;
-  private roomId: string;
+  private agentName: string;
+  private targetRoomId: string;
   private serverUrl: string;
   private metrics: AgentMetrics;
   private running = false;
-  private cursor: string;
-  private apiKey: string;
+
+  // Set after register()
+  private sessionToken: string | null = null;
+  private registeredAgentId: string | null = null;
+  private registeredRoomId: string | null = null;
 
   constructor(agentIndex: number, config: LoadTestConfig) {
-    this.agentId = `load_test_agent_${agentIndex}_${randomBytes(4).toString('hex')}`;
-    this.roomId = config.roomId;
+    this.agentName = `loadtest-agent-${agentIndex}`;
+    this.targetRoomId = config.roomId;
     this.serverUrl = config.serverUrl;
-    this.apiKey = process.env.AIC_API_KEY ?? 'test-api-key';
     this.metrics = {
       observeLatencies: [],
       moveLatencies: [],
       chatLatencies: [],
       errors: 0,
     };
-    this.cursor = '0';
   }
 
-  getAgentId(): string {
-    return this.agentId;
+  getAgentName(): string {
+    return this.agentName;
   }
 
   getMetrics(): AgentMetrics {
     return { ...this.metrics };
   }
 
+  async register(): Promise<void> {
+    const response = await fetch(`${this.serverUrl}/aic/v0.1/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: this.agentName,
+        roomId: this.targetRoomId,
+      }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Register failed for ${this.agentName}: ${response.status} ${text}`);
+    }
+
+    const body = (await response.json()) as RegisterResponse;
+    this.sessionToken = body.data.sessionToken;
+    this.registeredAgentId = body.data.agentId;
+    this.registeredRoomId = body.data.roomId;
+  }
+
+  async unregister(): Promise<void> {
+    if (!this.sessionToken || !this.registeredAgentId || !this.registeredRoomId) {
+      return;
+    }
+
+    try {
+      await fetch(`${this.serverUrl}/aic/v0.1/unregister`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.sessionToken}`,
+        },
+        body: JSON.stringify({
+          agentId: this.registeredAgentId,
+          roomId: this.registeredRoomId,
+        }),
+      });
+    } catch {
+      // Best-effort cleanup, ignore errors
+    }
+  }
+
   async start(cycleDelayMs: number): Promise<void> {
+    try {
+      await this.register();
+    } catch (error) {
+      this.metrics.errors++;
+      console.error(`[Agent ${this.agentName}] Registration failed:`, error);
+      return;
+    }
+
     this.running = true;
 
     while (this.running) {
@@ -74,15 +142,16 @@ class LoadTestAgent {
         await this.cycle();
       } catch (error) {
         this.metrics.errors++;
-        console.error(`[Agent ${this.agentId}] Error:`, error);
+        console.error(`[Agent ${this.agentName}] Error:`, error);
       }
 
       await sleep(cycleDelayMs);
     }
   }
 
-  stop(): void {
+  async stop(): Promise<void> {
     this.running = false;
+    await this.unregister();
   }
 
   private async cycle(): Promise<void> {
@@ -98,11 +167,11 @@ class LoadTestAgent {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.sessionToken}`,
       },
       body: JSON.stringify({
-        agentId: this.agentId,
-        roomId: this.roomId,
+        agentId: this.registeredAgentId,
+        roomId: this.registeredRoomId,
         radius: 100,
       }),
     });
@@ -126,11 +195,11 @@ class LoadTestAgent {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.sessionToken}`,
       },
       body: JSON.stringify({
-        agentId: this.agentId,
-        roomId: this.roomId,
+        agentId: this.registeredAgentId,
+        roomId: this.registeredRoomId,
         txId,
         dest: { tx, ty },
       }),
@@ -146,7 +215,7 @@ class LoadTestAgent {
 
   private async chat(): Promise<void> {
     const txId = `tx_${Date.now()}_${randomBytes(4).toString('hex')}`;
-    const message = `Hello from ${this.agentId}`;
+    const message = `Hello from ${this.agentName}`;
 
     const start = performance.now();
 
@@ -154,11 +223,11 @@ class LoadTestAgent {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.sessionToken}`,
       },
       body: JSON.stringify({
-        agentId: this.agentId,
-        roomId: this.roomId,
+        agentId: this.registeredAgentId,
+        roomId: this.registeredRoomId,
         txId,
         channel: 'global',
         message,
@@ -177,16 +246,15 @@ class LoadTestAgent {
 class LoadTestRunner {
   private config: LoadTestConfig;
   private agents: LoadTestAgent[] = [];
-  private startTime: number | null = null;
 
   constructor(config: LoadTestConfig) {
     this.config = config;
   }
 
   async run(): Promise<void> {
-    console.log('╔══════════════════════════════════════════════════════════╗');
-    console.log('║        OpenClawWorld Server Load Test                    ║');
-    console.log('╚══════════════════════════════════════════════════════════╝');
+    console.log('==========================================================');
+    console.log('        OpenClawWorld HTTP Load Test');
+    console.log('==========================================================');
     console.log();
     console.log('Configuration:');
     console.log(`  Server URL:      ${this.config.serverUrl}`);
@@ -194,31 +262,37 @@ class LoadTestRunner {
     console.log(`  Duration:        ${this.config.durationSeconds}s`);
     console.log(`  Room ID:         ${this.config.roomId}`);
     console.log(`  Cycle Delay:     ${this.config.cycleDelayMs}ms`);
+    console.log(`  Thresholds:      ${this.config.checkThresholds ? 'enabled' : 'disabled'}`);
     console.log();
 
-    this.startTime = Date.now();
-
-    // Create and start agents
-    console.log('Starting agents...');
+    // Create and start agents (register + begin cycles)
+    console.log('Registering and starting agents...');
+    const startPromises: Promise<void>[] = [];
     for (let i = 0; i < this.config.agentCount; i++) {
       const agent = new LoadTestAgent(i, this.config);
       this.agents.push(agent);
-      void agent.start(this.config.cycleDelayMs);
+      startPromises.push(agent.start(this.config.cycleDelayMs));
     }
 
-    console.log(`✓ ${this.config.agentCount} agents started`);
+    console.log(`  ${this.config.agentCount} agents launched`);
     console.log();
 
+    // Let the test run for the configured duration
     await sleep(this.config.durationSeconds * 1000);
 
-    console.log('Stopping agents...');
-    this.agents.forEach(agent => agent.stop());
+    // Stop all agents (stop cycles + unregister)
+    console.log('Stopping and unregistering agents...');
+    await Promise.all(this.agents.map(agent => agent.stop()));
+
+    // Await all agent start promises to catch any unhandled rejections
+    await Promise.allSettled(startPromises);
     await sleep(1000);
 
-    this.printReport();
+    const exitCode = this.printReport();
+    process.exit(exitCode);
   }
 
-  private printReport(): void {
+  private printReport(): number {
     const allMetrics = this.agents.map(a => a.getMetrics());
 
     const observeLatencies = allMetrics.flatMap(m => m.observeLatencies);
@@ -229,15 +303,16 @@ class LoadTestRunner {
     const totalRequests = observeLatencies.length + moveLatencies.length + chatLatencies.length;
 
     console.log();
-    console.log('╔══════════════════════════════════════════════════════════╗');
-    console.log('║                  Load Test Results                       ║');
-    console.log('╚══════════════════════════════════════════════════════════╝');
+    console.log('==========================================================');
+    console.log('                  Load Test Results');
+    console.log('==========================================================');
     console.log();
 
     console.log('Overall Statistics:');
     console.log(`  Total Requests:  ${totalRequests}`);
     console.log(`  Total Errors:    ${totalErrors}`);
-    console.log(`  Error Rate:      ${((totalErrors / totalRequests) * 100).toFixed(2)}%`);
+    const errorRate = totalRequests > 0 ? totalErrors / totalRequests : 0;
+    console.log(`  Error Rate:      ${(errorRate * 100).toFixed(2)}%`);
     console.log();
 
     console.log('Latency Statistics (ms):');
@@ -255,8 +330,9 @@ class LoadTestRunner {
     console.log();
 
     const allLatencies = [...observeLatencies, ...moveLatencies, ...chatLatencies];
+    const combinedStats = calculateStats(allLatencies);
     console.log('  Combined (All Endpoints):');
-    this.printLatencyStats(calculateStats(allLatencies));
+    this.printLatencyStats(combinedStats);
     console.log();
 
     console.log('Requests per Second:');
@@ -266,6 +342,37 @@ class LoadTestRunner {
     console.log(`  ChatSend: ${(chatLatencies.length / durationSeconds).toFixed(2)} req/s`);
     console.log(`  Total:    ${(totalRequests / durationSeconds).toFixed(2)} req/s`);
     console.log();
+
+    // Threshold checks
+    if (this.config.checkThresholds) {
+      console.log('Threshold Checks:');
+      let failed = false;
+
+      if (combinedStats.p95 > 500) {
+        console.log(`  FAIL: p95 (${combinedStats.p95.toFixed(2)}ms) > 500ms`);
+        failed = true;
+      } else {
+        console.log(`  PASS: p95 (${combinedStats.p95.toFixed(2)}ms) <= 500ms`);
+      }
+
+      if (errorRate > 0.01) {
+        console.log(`  FAIL: error rate (${(errorRate * 100).toFixed(2)}%) > 1%`);
+        failed = true;
+      } else {
+        console.log(`  PASS: error rate (${(errorRate * 100).toFixed(2)}%) <= 1%`);
+      }
+
+      console.log();
+
+      if (failed) {
+        console.log('RESULT: THRESHOLD CHECK FAILED');
+        return 1;
+      }
+
+      console.log('RESULT: ALL THRESHOLDS PASSED');
+    }
+
+    return 0;
   }
 
   private printLatencyStats(stats: LatencyStats): void {
@@ -305,8 +412,9 @@ function parseArgs(): LoadTestConfig {
     serverUrl: process.env.SERVER_URL ?? 'http://localhost:2567',
     agentCount: 15,
     durationSeconds: 30,
-    roomId: 'default',
+    roomId: 'auto',
     cycleDelayMs: 1000,
+    checkThresholds: true,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -348,6 +456,12 @@ function parseArgs(): LoadTestConfig {
           i++;
         }
         break;
+      case '--no-threshold':
+        config.checkThresholds = false;
+        break;
+      case '--threshold':
+        config.checkThresholds = true;
+        break;
       case '--help':
       case '-h':
         printHelp();
@@ -360,39 +474,41 @@ function parseArgs(): LoadTestConfig {
 }
 
 function printHelp(): void {
-  console.log('OpenClawWorld Load Test Script');
+  console.log('OpenClawWorld HTTP Load Test Script');
   console.log();
-  console.log('Usage: pnpm load-test [options]');
+  console.log('Usage: pnpm load-test:http [options]');
   console.log();
   console.log('Options:');
   console.log('  -a, --agents <n>      Number of simulated agents (default: 15)');
   console.log('  -d, --duration <s>    Test duration in seconds (default: 30)');
-  console.log('  -r, --room <id>       Room ID to join (default: default)');
+  console.log('  -r, --room <id>       Room ID to join (default: auto)');
   console.log('  --delay <ms>          Delay between cycles in ms (default: 1000)');
   console.log('  -u, --url <url>       Server URL (default: http://localhost:2567)');
+  console.log('  --no-threshold        Disable threshold checks');
+  console.log('  --threshold           Enable threshold checks (default)');
   console.log('  -h, --help            Show this help message');
   console.log();
   console.log('Environment Variables:');
   console.log('  SERVER_URL            Server base URL');
-  console.log('  AIC_API_KEY           API key for authentication');
+  console.log();
+  console.log('Thresholds (when enabled):');
+  console.log('  p95 latency <= 500ms');
+  console.log('  error rate  <= 1%');
   console.log();
   console.log('Examples:');
-  console.log('  pnpm load-test');
-  console.log('  pnpm load-test --agents 20 --duration 60');
-  console.log('  pnpm load-test -a 30 -d 120 --url http://localhost:3000');
+  console.log('  pnpm load-test:http');
+  console.log('  pnpm load-test:http -- --agents 20 --duration 60');
+  console.log('  pnpm load-test:http -- -a 30 -d 120 --url http://localhost:3000');
+  console.log('  pnpm load-test:http -- --no-threshold');
 }
 
 async function main(): Promise<void> {
   const config = parseArgs();
   const runner = new LoadTestRunner(config);
-
-  try {
-    await runner.run();
-    process.exit(0);
-  } catch (error) {
-    console.error('Load test failed:', error);
-    process.exit(1);
-  }
+  await runner.run();
 }
 
-main();
+main().catch(error => {
+  console.error('Load test failed:', error);
+  process.exit(1);
+});

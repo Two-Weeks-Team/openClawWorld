@@ -1,0 +1,155 @@
+name: Load Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      http_agents:
+        description: 'Number of HTTP load test agents'
+        required: false
+        default: '15'
+      http_duration:
+        description: 'HTTP load test duration (seconds)'
+        required: false
+        default: '30'
+      ws_clients:
+        description: 'Number of WebSocket clients'
+        required: false
+        default: '100'
+      ws_duration:
+        description: 'WebSocket load test duration (seconds)'
+        required: false
+        default: '30'
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  http-load-test:
+    name: HTTP Load Test
+    runs-on: [self-hosted, macOS, ARM64]
+    env:
+      HTTP_AGENTS: ${{ github.event.inputs.http_agents }}
+      HTTP_DURATION: ${{ github.event.inputs.http_duration }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Start server
+        run: |
+          PORT=2567 NODE_ENV=development pnpm dev:server &
+          echo $! > /tmp/load-test-server.pid
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:2567/health > /dev/null 2>&1; then
+              echo "Server ready after ${i}s"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Server failed to start within 30s"
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Run HTTP load test
+        run: |
+          pnpm load-test:http -- \
+            --agents "$HTTP_AGENTS" \
+            --duration "$HTTP_DURATION"
+
+      - name: Cleanup server
+        if: always()
+        run: |
+          if [ -f /tmp/load-test-server.pid ]; then
+            kill "$(cat /tmp/load-test-server.pid)" 2>/dev/null || true
+            rm -f /tmp/load-test-server.pid
+          fi
+
+  ws-load-test:
+    name: WebSocket Load Test
+    runs-on: [self-hosted, macOS, ARM64]
+    env:
+      WS_CLIENTS: ${{ github.event.inputs.ws_clients }}
+      WS_DURATION: ${{ github.event.inputs.ws_duration }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Start server
+        run: |
+          PORT=2567 NODE_ENV=development pnpm dev:server &
+          echo $! > /tmp/load-test-ws-server.pid
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:2567/health > /dev/null 2>&1; then
+              echo "Server ready after ${i}s"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Server failed to start within 30s"
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Run WebSocket load test
+        run: |
+          pnpm load-test:ws -- \
+            --clients "$WS_CLIENTS" \
+            --duration "$WS_DURATION"
+
+      - name: Cleanup server
+        if: always()
+        run: |
+          if [ -f /tmp/load-test-ws-server.pid ]; then
+            kill "$(cat /tmp/load-test-ws-server.pid)" 2>/dev/null || true
+            rm -f /tmp/load-test-ws-server.pid
+          fi

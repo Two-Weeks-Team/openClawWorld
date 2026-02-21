@@ -118,8 +118,8 @@ const allRefs = collectRefs(spec.paths, 'paths');
 // Also check refs inside component schemas themselves (for schema composition)
 allRefs.push(...collectRefs(spec.components, 'components'));
 
-const localRefs = allRefs.filter((ref) => ref.startsWith('#/components/schemas/'));
-const externalRefs = allRefs.filter((ref) => !ref.startsWith('#'));
+const localRefs = allRefs.filter(ref => ref.startsWith('#/components/schemas/'));
+const externalRefs = allRefs.filter(ref => !ref.startsWith('#'));
 
 if (externalRefs.length > 0) {
   warn(`${externalRefs.length} external $ref(s) found (not validated): ${externalRefs.join(', ')}`);
@@ -155,7 +155,7 @@ if (spec.paths && typeof spec.paths === 'object') {
     }
 
     const pathObj = pathItem as AnyObject;
-    const operations = HTTP_METHODS.filter((m) => m in pathObj);
+    const operations = HTTP_METHODS.filter(m => m in pathObj);
 
     if (operations.length === 0) {
       error(`Path "${pathKey}" has no HTTP method operations`);
@@ -183,14 +183,16 @@ if (spec.paths && typeof spec.paths === 'object') {
   }
 
   if (missingOps === 0) {
-    console.log(`  ✅ ${totalOps} operation(s) across ${Object.keys(spec.paths as AnyObject).length} paths`);
+    console.log(
+      `  ✅ ${totalOps} operation(s) across ${Object.keys(spec.paths as AnyObject).length} paths`
+    );
   }
 }
 
 // 5. Security schemes referenced in operations
 console.log('\nChecking security schemes...');
 
-const securitySchemes = ((components.securitySchemes ?? {}) as AnyObject);
+const securitySchemes = (components.securitySchemes ?? {}) as AnyObject;
 const definedSecuritySchemes = new Set(Object.keys(securitySchemes));
 
 const referencedSecuritySchemes = new Set<string>();
@@ -203,7 +205,7 @@ function collectSecurityRefs(obj: unknown): void {
   const record = obj as AnyObject;
   if ('security' in record && Array.isArray(record.security)) {
     for (const secObj of record.security as AnyObject[]) {
-      Object.keys(secObj).forEach((k) => referencedSecuritySchemes.add(k));
+      Object.keys(secObj).forEach(k => referencedSecuritySchemes.add(k));
     }
   }
   Object.values(record).forEach(collectSecurityRefs);
@@ -211,14 +213,18 @@ function collectSecurityRefs(obj: unknown): void {
 collectSecurityRefs(spec);
 
 const unresolvedSecurity = [...referencedSecuritySchemes].filter(
-  (s) => !definedSecuritySchemes.has(s)
+  s => !definedSecuritySchemes.has(s)
 );
 if (unresolvedSecurity.length > 0) {
   for (const name of unresolvedSecurity) {
-    error(`Security scheme "${name}" referenced in operations but not defined in components.securitySchemes`);
+    error(
+      `Security scheme "${name}" referenced in operations but not defined in components.securitySchemes`
+    );
   }
 } else if (referencedSecuritySchemes.size > 0) {
-  console.log(`  ✅ All ${referencedSecuritySchemes.size} security scheme reference(s) resolve correctly`);
+  console.log(
+    `  ✅ All ${referencedSecuritySchemes.size} security scheme reference(s) resolve correctly`
+  );
 } else {
   console.log('  ✅ No security scheme references to validate');
 }
@@ -229,18 +235,20 @@ console.log('\n' + '─'.repeat(60));
 
 if (warnings.length > 0) {
   console.log(`\n⚠️  Warnings (${warnings.length}):`);
-  warnings.forEach((w) => console.log(w));
+  warnings.forEach(w => console.log(w));
 }
 
 if (errors.length > 0) {
   console.error(`\n❌ Validation FAILED — ${errors.length} error(s) found:`);
-  errors.forEach((e) => console.error(e));
+  errors.forEach(e => console.error(e));
   console.error('\nFix the above errors in packages/server/src/openapi.ts');
   process.exit(1);
 }
 
 console.log(`\n✅ OpenAPI spec validation PASSED`);
-console.log(`   Schemas: ${definedSchemas.size} | $refs: ${localRefs.length} | Operations: ${totalOps}`);
+console.log(
+  `   Schemas: ${definedSchemas.size} | $refs: ${localRefs.length} | Operations: ${totalOps}`
+);
 if (warnings.length > 0) {
   console.log(`   Warnings: ${warnings.length} (non-blocking)`);
 }

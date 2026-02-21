@@ -1,16 +1,10 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import type { Request, Response } from 'express';
 import type { AicErrorCode } from '@openclawworld/shared';
 
-function normalizeIpv6(ip: string): string {
-  if (!ip.includes(':')) return ip;
-  return ip.split(':').slice(0, 4).join(':');
-}
-
 function getClientKey(req: Request): string {
   if (req.authToken) return req.authToken;
-  const ip = req.ip ?? 'unknown';
-  return normalizeIpv6(ip);
+  return ipKeyGenerator(req.ip ?? '::1');
 }
 
 export const RateLimits = {

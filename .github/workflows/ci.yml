@@ -213,6 +213,7 @@ jobs:
       - name: Check Colyseus client schemas are up to date
         run: |
           pnpm generate:schemas
+          pnpm exec prettier --write "packages/client/src/generated/schemas/"
           if ! git diff --exit-code packages/client/src/generated/schemas/; then
             echo "❌ Colyseus client schemas are out of sync with server schemas"
             echo "Run 'pnpm generate:schemas' and commit the changes."

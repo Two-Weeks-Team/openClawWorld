@@ -60,7 +60,10 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
 
   // body-parser rejects non-object/array JSON (e.g. null, 42, "string") with
   // a SyntaxError tagged type: 'entity.parse.failed'. Return 400 instead of 500.
-  if (err instanceof SyntaxError && (err as SyntaxError & { type?: string }).type === 'entity.parse.failed') {
+  if (
+    err instanceof SyntaxError &&
+    (err as SyntaxError & { type?: string }).type === 'entity.parse.failed'
+  ) {
     res.status(400).json({
       status: 'error',
       error: {

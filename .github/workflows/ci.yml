@@ -200,6 +200,26 @@ jobs:
           fi
           echo "✅ Generated code is up to date"
 
+      - name: Check OpenAPI spec is up to date
+        run: |
+          pnpm generate:openapi
+          if ! git diff --exit-code packages/server/src/openapi.ts; then
+            echo "❌ packages/server/src/openapi.ts is out of sync with schemas.ts"
+            echo "Run 'pnpm generate:openapi' and commit the changes."
+            exit 1
+          fi
+          echo "✅ OpenAPI spec is up to date"
+
+      - name: Check Colyseus client schemas are up to date
+        run: |
+          pnpm generate:schemas
+          if ! git diff --exit-code packages/client/src/generated/schemas/; then
+            echo "❌ Colyseus client schemas are out of sync with server schemas"
+            echo "Run 'pnpm generate:schemas' and commit the changes."
+            exit 1
+          fi
+          echo "✅ Colyseus client schemas are up to date"
+
   map-consistency:
     name: Map Consistency
     runs-on: self-hosted

@@ -5,8 +5,9 @@ import type { GameRoom } from '../rooms/GameRoom.js';
 
 export interface ChannelInfo {
   channelId: string;
-  occupancy: number;
-  maxOccupancy: number;
+  currentAgents: number;
+  maxAgents: number;
+  status: 'open' | 'full';
 }
 
 export function getChannelList(): ChannelInfo[] {
@@ -15,10 +16,12 @@ export function getChannelList(): ChannelInfo[] {
     .filter(r => r.customRoomId.startsWith(CHANNEL_PREFIX))
     .map(r => {
       const gameRoom = matchMaker.getLocalRoomById(r.colyseusRoomId) as GameRoom | undefined;
+      const currentAgents = gameRoom?.getOccupancy() ?? 0;
       return {
         channelId: r.customRoomId,
-        occupancy: gameRoom?.getOccupancy() ?? 0,
-        maxOccupancy: MAX_CHANNEL_OCCUPANCY,
+        currentAgents,
+        maxAgents: MAX_CHANNEL_OCCUPANCY,
+        status: currentAgents >= MAX_CHANNEL_OCCUPANCY ? 'full' : 'open',
       };
     });
 }
@@ -43,8 +46,8 @@ export async function assignChannel(): Promise<{ channelId: string; colyseusRoom
   try {
     const channels = getChannelList();
     const available = channels
-      .filter(c => c.occupancy < c.maxOccupancy)
-      .sort((a, b) => a.occupancy - b.occupancy);
+      .filter(c => c.currentAgents < c.maxAgents)
+      .sort((a, b) => a.currentAgents - b.currentAgents);
 
     if (available.length > 0) {
       const ch = available[0];
@@ -66,5 +69,5 @@ export function canJoinChannel(channelId: string): boolean {
   if (!colyseusRoomId) return true;
   const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId) as GameRoom | undefined;
   if (!gameRoom) return true;
-  return gameRoom.getOccupancy() < MAX_CHANNEL_OCCUPANCY;
+  return gameRoom.getOccupancy() < MAX_CHANNEL_OCCUPANCY; // canJoinChannel uses raw occupancy, not ChannelInfo
 }

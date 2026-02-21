@@ -58,11 +58,21 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
-  // body-parser rejects non-object/array JSON (e.g. null, 42, "string") with
-  // a SyntaxError tagged type: 'entity.parse.failed'. Return 400 instead of 500.
+  // body-parser wraps parse errors in an HttpError (via http-errors) with a
+  // status code and a 'type' property. The wrapped error is NOT instanceof
+  // SyntaxError, so we must also check the status/type combination.
+  // Relevant types: entity.parse.failed, encoding.unsupported,
+  //                 charset.unsupported, entity.too.large
+  const errAny = err as unknown as { type?: string; status?: number };
+  const BODY_PARSER_TYPES = new Set([
+    'entity.parse.failed',
+    'encoding.unsupported',
+    'charset.unsupported',
+    'entity.too.large',
+  ]);
   if (
-    err instanceof SyntaxError &&
-    (err as SyntaxError & { type?: string }).type === 'entity.parse.failed'
+    (err instanceof SyntaxError && errAny.type === 'entity.parse.failed') ||
+    (errAny.status === 400 && typeof errAny.type === 'string' && BODY_PARSER_TYPES.has(errAny.type))
   ) {
     res.status(400).json({
       status: 'error',

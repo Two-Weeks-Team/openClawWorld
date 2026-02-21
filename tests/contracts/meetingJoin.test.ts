@@ -173,6 +173,20 @@ describe('MeetingJoin Endpoint Contract Tests', () => {
       expectErrorResult(result, 'unauthorized');
     });
 
+    it('returns forbidden error when token agentId does not match body agentId', async () => {
+      mockServer.setHandler('/meeting/join', () =>
+        jsonResponse(createErrorResult('forbidden', 'Token does not match agentId', false), 403)
+      );
+
+      const result = await client.meetingJoin({
+        agentId: 'agt_victim',
+        roomId: 'test_room',
+        meetingId: 'mtg_001',
+      });
+
+      expectErrorResult(result, 'forbidden');
+    });
+
     it('returns internal error on server failure', async () => {
       mockServer.setHandler('/meeting/join', () =>
         jsonResponse(createErrorResult('internal', 'Internal server error', true), 500)

@@ -25,6 +25,11 @@ export async function handleMeetingJoin(req: Request, res: Response): Promise<vo
   const body = req.validatedBody as MeetingJoinRequest;
   const { agentId, roomId, meetingId } = body;
 
+  if (req.authAgentId !== agentId) {
+    res.status(403).json(createErrorResponse('forbidden', 'Token does not match agentId', false));
+    return;
+  }
+
   try {
     // Verify the agent exists in the game room
     const colyseusRoomId = getColyseusRoomId(roomId);

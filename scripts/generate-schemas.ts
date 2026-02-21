@@ -6,8 +6,10 @@
  * Usage: pnpm generate:schemas
  */
 import { execSync } from 'node:child_process';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+import { existsSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '..');
@@ -19,12 +21,21 @@ console.log('Generating Colyseus client schemas...');
 console.log(`  Input: ${input}`);
 console.log(`  Output: ${output}`);
 
-execSync(
-  `npx --package @colyseus/schema@^4.0.12 schema-codegen "${input}" --output "${output}" --ts`,
-  {
-    stdio: 'inherit',
-    cwd: rootDir,
-  }
-);
+// Resolve schema-codegen from the installed @colyseus/schema package
+// to avoid network-dependent npx download on CI runners.
+const req = createRequire(resolve(rootDir, 'packages/server/package.json'));
+const schemaMain = req.resolve('@colyseus/schema');
+let schemaRoot = dirname(schemaMain);
+while (!existsSync(join(schemaRoot, 'package.json'))) {
+  const parent = dirname(schemaRoot);
+  if (parent === schemaRoot) break;
+  schemaRoot = parent;
+}
+const schemaBin = join(schemaRoot, 'bin', 'schema-codegen');
+
+execSync(`node "${schemaBin}" "${input}" --output "${output}" --ts`, {
+  stdio: 'inherit',
+  cwd: rootDir,
+});
 
 console.log('Done! Client schemas generated successfully.');

@@ -889,6 +889,15 @@ export interface MeetingLeaveRequest {
   meetingId: string;
 }
 
+export interface HeartbeatResponseData {
+  agentId: IdAgent;
+  serverTsMs: TsMs;
+  /** @minimum 0 */
+  timeoutMs: number;
+  /** @minimum 0 */
+  recommendedIntervalMs: number;
+}
+
 export interface AgentProfile {
   agentId: IdAgent;
   /**
@@ -904,15 +913,6 @@ export interface AgentProfile {
   /** @maxLength 128 */
   department?: string;
   updatedAt?: TsMs;
-}
-
-export interface HeartbeatResponseData {
-  agentId: IdAgent;
-  serverTsMs: TsMs;
-  /** @minimum 0 */
-  timeoutMs: number;
-  /** @minimum 0 */
-  recommendedIntervalMs: number;
 }
 
 export interface MeetingInfo {

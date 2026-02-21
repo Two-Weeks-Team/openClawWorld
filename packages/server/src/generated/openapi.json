@@ -1414,6 +1414,26 @@
         },
         "required": ["agentId", "roomId", "meetingId"]
       },
+      "HeartbeatResponseData": {
+        "type": "object",
+        "properties": {
+          "agentId": {
+            "$ref": "#/components/schemas/IdAgent"
+          },
+          "serverTsMs": {
+            "$ref": "#/components/schemas/TsMs"
+          },
+          "timeoutMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "recommendedIntervalMs": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "required": ["agentId", "serverTsMs", "timeoutMs", "recommendedIntervalMs"]
+      },
       "AgentProfile": {
         "type": "object",
         "properties": {
@@ -1445,26 +1465,6 @@
           }
         },
         "required": ["agentId", "name"]
-      },
-      "HeartbeatResponseData": {
-        "type": "object",
-        "properties": {
-          "agentId": {
-            "$ref": "#/components/schemas/IdAgent"
-          },
-          "serverTsMs": {
-            "$ref": "#/components/schemas/TsMs"
-          },
-          "timeoutMs": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "recommendedIntervalMs": {
-            "type": "integer",
-            "minimum": 0
-          }
-        },
-        "required": ["agentId", "serverTsMs", "timeoutMs", "recommendedIntervalMs"]
       },
       "MeetingInfo": {
         "type": "object",
@@ -2542,8 +2542,8 @@
     },
     "/channels": {
       "get": {
-        "tags": ["Connection"],
         "operationId": "channels",
+        "tags": ["Connection"],
         "summary": "List available channels",
         "description": "Returns all available game channels/rooms that agents can join.",
         "security": [],
@@ -2582,8 +2582,8 @@
     },
     "/reconnect": {
       "post": {
-        "tags": ["Connection"],
         "operationId": "reconnect",
+        "tags": ["Connection"],
         "summary": "Reconnect an agent to an existing session",
         "description": "Allows an agent to reconnect using a previously issued session token.",
         "security": [
@@ -2647,8 +2647,8 @@
     },
     "/heartbeat": {
       "post": {
-        "tags": ["Session Management"],
         "operationId": "heartbeat",
+        "tags": ["Session Management"],
         "summary": "Send a heartbeat to maintain session",
         "description": "Keeps the agent session alive and returns server timing information.",
         "security": [
@@ -2712,8 +2712,8 @@
     },
     "/meeting/list": {
       "post": {
-        "tags": ["Meeting"],
         "operationId": "meetingList",
+        "tags": ["Meeting"],
         "summary": "List available meetings in the room",
         "description": "Returns all active meetings in the specified room.",
         "security": [
@@ -2767,8 +2767,8 @@
     },
     "/meeting/join": {
       "post": {
-        "tags": ["Meeting"],
         "operationId": "meetingJoin",
+        "tags": ["Meeting"],
         "summary": "Join a meeting",
         "description": "Joins the specified meeting as a participant or host.",
         "security": [
@@ -2842,8 +2842,8 @@
     },
     "/meeting/leave": {
       "post": {
-        "tags": ["Meeting"],
         "operationId": "meetingLeave",
+        "tags": ["Meeting"],
         "summary": "Leave a meeting",
         "description": "Leaves the specified meeting.",
         "security": [

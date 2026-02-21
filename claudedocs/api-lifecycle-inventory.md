@@ -8,32 +8,33 @@
 
 ## REST API 전체 목록 (라이프사이클 순서)
 
-| # | Phase | Method | Path | Handler | OpenAPI | SDK | 계약테스트 |
-|---|-------|--------|------|---------|---------|-----|---------|
-| 1 | 접속 | GET | /channels | channels.ts | ❌ 누락 | ❌ | ❌ |
-| 2 | 접속 | POST | /register | register.ts | ✅ (스키마 불일치) | ✅ | ✅ |
-| 3 | 접속 | POST | /reconnect | reconnect.ts | ❌ 누락 | ❌ | ❌ |
-| 4 | 유지 | POST | /heartbeat | heartbeat.ts | ❌ 누락 | ❌ | ❌ |
-| 5 | 관찰 | POST | /observe | observe.ts | ✅ (스키마 불일치) | ✅ | ✅ |
-| 6 | 관찰 | POST | /chatObserve | chatObserve.ts | ✅ | ✅ | ❌ |
-| 7 | 행동 | POST | /moveTo | moveTo.ts | ✅ (no_path 누락) | ✅ | ✅ |
-| 8 | 행동 | POST | /interact | interact.ts | ✅ | ✅ | ✅ |
-| 9 | 행동 | POST | /chatSend | chatSend.ts | ✅ | ✅ | ✅ |
-| 10 | 스킬 | POST | /skill/list | skillList.ts | ✅ | ❌ | ✅ |
-| 11 | 스킬 | POST | /skill/install | skillInstall.ts | ✅ | ❌ | ✅ |
-| 12 | 스킬 | POST | /skill/invoke | skillInvoke.ts | ✅ (txId 처리 차이) | ❌ | ✅ |
-| 13 | 미팅 | POST | /meeting/list | meetingList.ts | ❌ 누락 | ❌ | ❌ |
-| 14 | 미팅 | POST | /meeting/join | meetingJoin.ts | ❌ 누락 | ❌ | ❌ |
-| 15 | 미팅 | POST | /meeting/leave | meetingLeave.ts | ❌ 누락 | ❌ | ❌ |
-| 16 | 이벤트 | POST | /pollEvents | pollEvents.ts | ✅ (2개 불일치) | ✅ | ✅ |
-| 17 | 종료 | POST | /unregister | unregister.ts | ✅ | ❌ | ❌ |
-| 18 | 종료 | POST | /profile/update | profileUpdate.ts | ✅ (스키마 불일치) | ❌ | ❌ |
+| #   | Phase  | Method | Path            | Handler          | OpenAPI             | SDK | 계약테스트 |
+| --- | ------ | ------ | --------------- | ---------------- | ------------------- | --- | ---------- |
+| 1   | 접속   | GET    | /channels       | channels.ts      | ❌ 누락             | ❌  | ❌         |
+| 2   | 접속   | POST   | /register       | register.ts      | ✅ (스키마 불일치)  | ✅  | ✅         |
+| 3   | 접속   | POST   | /reconnect      | reconnect.ts     | ❌ 누락             | ❌  | ❌         |
+| 4   | 유지   | POST   | /heartbeat      | heartbeat.ts     | ❌ 누락             | ❌  | ❌         |
+| 5   | 관찰   | POST   | /observe        | observe.ts       | ✅ (스키마 불일치)  | ✅  | ✅         |
+| 6   | 관찰   | POST   | /chatObserve    | chatObserve.ts   | ✅                  | ✅  | ❌         |
+| 7   | 행동   | POST   | /moveTo         | moveTo.ts        | ✅ (no_path 누락)   | ✅  | ✅         |
+| 8   | 행동   | POST   | /interact       | interact.ts      | ✅                  | ✅  | ✅         |
+| 9   | 행동   | POST   | /chatSend       | chatSend.ts      | ✅                  | ✅  | ✅         |
+| 10  | 스킬   | POST   | /skill/list     | skillList.ts     | ✅                  | ❌  | ✅         |
+| 11  | 스킬   | POST   | /skill/install  | skillInstall.ts  | ✅                  | ❌  | ✅         |
+| 12  | 스킬   | POST   | /skill/invoke   | skillInvoke.ts   | ✅ (txId 처리 차이) | ❌  | ✅         |
+| 13  | 미팅   | POST   | /meeting/list   | meetingList.ts   | ❌ 누락             | ❌  | ❌         |
+| 14  | 미팅   | POST   | /meeting/join   | meetingJoin.ts   | ❌ 누락             | ❌  | ❌         |
+| 15  | 미팅   | POST   | /meeting/leave  | meetingLeave.ts  | ❌ 누락             | ❌  | ❌         |
+| 16  | 이벤트 | POST   | /pollEvents     | pollEvents.ts    | ✅ (2개 불일치)     | ✅  | ✅         |
+| 17  | 종료   | POST   | /unregister     | unregister.ts    | ✅                  | ❌  | ❌         |
+| 18  | 종료   | POST   | /profile/update | profileUpdate.ts | ✅ (스키마 불일치)  | ❌  | ❌         |
 
 ---
 
 ## 각 엔드포인트 상세 스키마
 
 ### 1. GET /channels (미문서화)
+
 ```
 Request:  (없음, 인증 불필요)
 Response: {
@@ -45,6 +46,7 @@ Response: {
 ```
 
 ### 2. POST /register ⚠️ OpenAPI 불일치
+
 ```
 Request (실제):  { name: string, roomId: string }
 Request (OpenAPI): { agentId: string (required), roomId: string, name: string }  ← D-01
@@ -54,6 +56,7 @@ Response (OpenAPI): { token: string, entityId: string, expiresAt: number }  ← 
 ```
 
 ### 3. POST /reconnect (미문서화)
+
 ```
 Request:  { agentId: string, sessionToken: string }
 Response: {
@@ -66,6 +69,7 @@ Response: {
 ```
 
 ### 4. POST /heartbeat (미문서화)
+
 ```
 Request:  { agentId: string, roomId: string }
 Response: {
@@ -77,6 +81,7 @@ Response: {
 ```
 
 ### 5. POST /observe ⚠️ OpenAPI 불일치
+
 ```
 Request (실제):  {
   agentId: string,
@@ -98,6 +103,7 @@ Response (실제): {
 ```
 
 ### 6. POST /chatObserve
+
 ```
 Request:  { agentId, roomId, windowSec: number, channel?: 'proximity'|'global' }
 Response: {
@@ -107,6 +113,7 @@ Response: {
 ```
 
 ### 7. POST /moveTo ⚠️ no_path 누락
+
 ```
 Request:  { agentId, roomId, txId, dest: {tx, ty}, mode?: 'walk' }
 Response: {
@@ -118,6 +125,7 @@ Response: {
 ```
 
 ### 8. POST /interact
+
 ```
 Request:  { agentId, roomId, txId, targetId, action: string, params?: object }
 Response: {
@@ -129,6 +137,7 @@ Response: {
 ```
 
 ### 9. POST /chatSend
+
 ```
 Request:  { agentId, roomId, txId, channel: 'proximity'|'global', message: string }
 Response: {
@@ -140,18 +149,21 @@ Response: {
 ```
 
 ### 10. POST /skill/list
+
 ```
 Request:  { agentId, roomId, category?: 'movement'|'combat'|'social'|'utility', installed?: boolean }
 Response: { skills: SkillDefinition[], serverTsMs: number }
 ```
 
 ### 11. POST /skill/install
+
 ```
 Request:  { agentId, roomId, txId, skillId: string, credentials?: Record<string,string> }
 Response: { skillId, installed: boolean, alreadyInstalled: boolean, serverTsMs }
 ```
 
 ### 12. POST /skill/invoke
+
 ```
 Request:  { agentId, roomId, txId?, skillId, actionId, targetId?, params? }
           (txId가 없으면 서버에서 uuid 자동 생성)
@@ -163,6 +175,7 @@ Response: {
 ```
 
 ### 13. POST /meeting/list (미문서화)
+
 ```
 Request:  { agentId: string, roomId: string }
 Response: {
@@ -177,6 +190,7 @@ Response: {
 ```
 
 ### 14. POST /meeting/join (미문서화)
+
 ```
 Request:  { agentId, roomId, meetingId: string }
 Response: {
@@ -187,12 +201,14 @@ Response: {
 ```
 
 ### 15. POST /meeting/leave (미문서화)
+
 ```
 Request:  { agentId, roomId, meetingId: string }
 Response: { meetingId: string, leftAt: number }
 ```
 
 ### 16. POST /pollEvents ⚠️ OpenAPI 불일치
+
 ```
 Request (실제):  {
   agentId, roomId,
@@ -210,12 +226,14 @@ Response (실제): {
 ```
 
 ### 17. POST /unregister
+
 ```
 Request:  { agentId: string, roomId: string }
 Response: { agentId: string, unregisteredAt: number }
 ```
 
 ### 18. POST /profile/update ⚠️ OpenAPI 불일치
+
 ```
 Request (실제):  {
   agentId, roomId,

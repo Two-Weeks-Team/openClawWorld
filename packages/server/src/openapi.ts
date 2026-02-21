@@ -62,7 +62,8 @@ The same \`txId\` will return the same result without re-executing the action.
       bearerAuth: {
         type: 'http',
         scheme: 'bearer',
-        description: 'Session token (opaque, format: tok_*) obtained from /register or /reconnect endpoint. Not a JWT.',
+        description:
+          'Session token (opaque, format: tok_*) obtained from /register or /reconnect endpoint. Not a JWT.',
       },
     },
     schemas: {
@@ -84,7 +85,8 @@ The same \`txId\` will return the same result without re-executing the action.
       IdTarget: {
         type: 'string',
         pattern: '^[a-zA-Z][a-zA-Z0-9._-]{0,127}$',
-        description: 'Target ID for interact — supports entity IDs (hum_*, agt_*, obj_*), NPC IDs (npc_*), and facility IDs',
+        description:
+          'Target ID for interact — supports entity IDs (hum_*, agt_*, obj_*), NPC IDs (npc_*), and facility IDs',
         example: 'obj_sign_welcome',
       },
       IdTx: {
@@ -221,7 +223,10 @@ The same \`txId\` will return the same result without re-executing the action.
         properties: {
           agentId: { $ref: '#/components/schemas/IdAgent' },
           roomId: { $ref: '#/components/schemas/IdRoom' },
-          sessionToken: { type: 'string', description: 'Session token for subsequent authenticated requests' },
+          sessionToken: {
+            type: 'string',
+            description: 'Session token for subsequent authenticated requests',
+          },
         },
       },
 
@@ -251,7 +256,11 @@ The same \`txId\` will return the same result without re-executing the action.
           radius: { type: 'number', minimum: 1, maximum: 2000, example: 100 },
           detail: { type: 'string', enum: ['lite', 'full'], example: 'full' },
           includeSelf: { type: 'boolean', default: true },
-          includeGrid: { type: 'boolean', default: false, description: 'If true, include grid/tile data in the response' },
+          includeGrid: {
+            type: 'boolean',
+            default: false,
+            description: 'If true, include grid/tile data in the response',
+          },
         },
       },
       ObserveResponseData: {
@@ -287,7 +296,10 @@ The same \`txId\` will return the same result without re-executing the action.
         required: ['id', 'type', 'pos'],
         properties: {
           id: { type: 'string', description: 'Unique facility identifier' },
-          type: { type: 'string', description: 'Facility type (e.g., door, terminal, vending_machine)' },
+          type: {
+            type: 'string',
+            description: 'Facility type (e.g., door, terminal, vending_machine)',
+          },
           pos: { $ref: '#/components/schemas/TileCoord' },
           label: { type: 'string', maxLength: 128 },
           interactable: { type: 'boolean' },
@@ -480,7 +492,11 @@ The same \`txId\` will return the same result without re-executing the action.
           },
           nextCursor: { $ref: '#/components/schemas/Cursor' },
           serverTsMs: { $ref: '#/components/schemas/TsMs' },
-          cursorExpired: { type: 'boolean', description: 'True if the provided sinceCursor was expired and events may have been missed' },
+          cursorExpired: {
+            type: 'boolean',
+            description:
+              'True if the provided sinceCursor was expired and events may have been missed',
+          },
         },
       },
 

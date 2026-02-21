@@ -100,7 +100,11 @@ export class OpenClawWorldClient {
         }
         return {
           status: 'error',
-          error: { code: 'internal', message: `HTTP ${response.status}: ${response.statusText}`, retryable: true },
+          error: {
+            code: 'internal',
+            message: `HTTP ${response.status}: ${response.statusText}`,
+            retryable: true,
+          },
         };
       }
       return data;

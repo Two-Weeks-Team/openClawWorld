@@ -98,3 +98,111 @@ pnpm resident-agent-loop  # Autonomous agent loop
 - **API docs**: `http://localhost:2567/docs` (Scalar)
 - **Map editor**: Tiled - edit JSON directly
 - **Asset extraction**: Python tools in `tools/` (requires pillow, numpy)
+
+## BEHAVIORAL GUIDELINES
+
+Rules for AI coding agents working on this project:
+
+### Workflow
+
+- **Issue-first**: Map changes require an issue before implementation (`docs/reference/map-change-routine.md`)
+- **PR merges**: Use `gh pr merge --merge` — NEVER `--squash` (preserves commit history)
+- **No test skipping**: Never disable, comment out, or skip tests
+- **No type suppression**: No `as any`, `@ts-ignore`, `@ts-expect-error`
+
+### File Rules
+
+- **NEVER** edit `packages/plugin/src/generated/*` — auto-generated, run `pnpm generate`
+- **NEVER** edit maps in `packages/*/assets/maps/` — edit `world/packs/base/maps/` then `pnpm sync-maps`
+- **DO NOT** commit `dist/` directories (gitignored)
+- **DO NOT** use archived paths: `docs/reference/_archive/`, `world/packs/base/maps/_archive/`
+
+### Code Style
+
+- Return `AicResult<T>` from all AIC handlers: `{ status: 'ok'; data: T } | { status: 'error'; error: AicErrorObject }`
+- Entity ID prefixes: `hum_*` (human), `agt_*` (AI agent), `obj_*` (object), plain (NPC like `greeter`)
+- Zone names: PascalCase (`CentralPark`, `LoungeCafe`)
+- Zod 4 strict validation for all schemas
+
+## SESSION MANAGEMENT
+
+### Checkpoints
+
+Create a git checkpoint before risky operations:
+
+```bash
+git add -A && git stash push -m "checkpoint-$(date +%s)"
+# Restore with: git stash pop
+```
+
+### Memory Files
+
+Serena MCP stores session memory at `.serena/` (project root). Key paths:
+
+- `.serena/memories/` — persistent memory files across sessions
+- Read with `list_memories()` at session start to resume context
+
+### Rollback
+
+```bash
+git stash pop          # Undo last checkpoint
+git log --oneline -5   # Find commit to revert to
+git reset --soft HEAD~1  # Undo last commit (keep changes staged)
+```
+
+## AIC INTEGRATION CHEATSHEET
+
+Quick reference for AI agent world interaction (base URL: `http://localhost:2567/aic/v0.1`):
+
+### Core Loop
+
+```bash
+export BASE="http://localhost:2567/aic/v0.1"
+export TOKEN="tok_..."
+export AID="agt_..."
+txid() { echo "tx_$(uuidgen | tr '[:upper:]' '[:lower:]')"; }
+
+# 1. Register (once)
+curl -sX POST $BASE/register -H "Content-Type: application/json" \
+  -d '{"agentId":"my_agent","roomId":"default","name":"My Agent"}'
+
+# 2. Observe
+curl -sX POST $BASE/observe -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"agentId\":\"$AID\",\"roomId\":\"default\",\"radius\":200,\"detail\":\"full\"}"
+
+# 3. Poll events
+curl -sX POST $BASE/pollEvents -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"agentId\":\"$AID\",\"roomId\":\"default\"}"
+
+# 4. Move
+curl -sX POST $BASE/moveTo -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"agentId\":\"$AID\",\"roomId\":\"default\",\"dest\":{\"tx\":32,\"ty\":32},\"txId\":\"$(txid)\"}"
+
+# 5. Chat
+curl -sX POST $BASE/chatSend -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"agentId\":\"$AID\",\"roomId\":\"default\",\"message\":\"Hello!\",\"channel\":\"global\",\"txId\":\"$(txid)\"}"
+```
+
+### Key Zone Coordinates (tile units)
+
+| Zone        | tx  | ty  |
+| ----------- | --- | --- |
+| Lobby       | 11  | 8   |
+| Office      | 50  | 10  |
+| CentralPark | 32  | 32  |
+| Arcade      | 48  | 24  |
+| Meeting     | 10  | 36  |
+| LoungeCafe  | 28  | 44  |
+| Plaza       | 48  | 44  |
+
+### Common Errors
+
+| Error               | Cause                 | Fix            |
+| ------------------- | --------------------- | -------------- |
+| 401                 | Invalid/expired token | Re-register    |
+| `agent_not_in_room` | Session expired       | Re-register    |
+| `too_far`           | Target out of range   | `moveTo` first |

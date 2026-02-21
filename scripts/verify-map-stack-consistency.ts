@@ -18,7 +18,7 @@ import {
   MAP_CONFIG,
   MAP_LAYERS,
   MAP_TILESETS,
-} from '../packages/shared/dist/index.js';
+} from '../packages/shared/src/index.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = resolve(__dirname, '..');

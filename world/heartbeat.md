@@ -5,7 +5,7 @@
 
 ## Server Status
 
-```
+```bash
 curl http://localhost:2567/health
 ```
 

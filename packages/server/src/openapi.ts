@@ -1963,6 +1963,16 @@ export const openApiSpec = {
               },
             },
           },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '429': {
             description: 'Too many requests',
             content: {
@@ -2047,6 +2057,16 @@ export const openApiSpec = {
               },
             },
           },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '429': {
             description: 'Too many requests',
             content: {
@@ -2122,6 +2142,16 @@ export const openApiSpec = {
           },
           '401': {
             description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
             content: {
               'application/json': {
                 schema: {
@@ -2592,6 +2622,16 @@ export const openApiSpec = {
               },
             },
           },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '429': {
             description: 'Too many requests',
             content: {
@@ -2708,6 +2748,16 @@ export const openApiSpec = {
           },
           '404': {
             description: 'Skill or action not found',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
             content: {
               'application/json': {
                 schema: {

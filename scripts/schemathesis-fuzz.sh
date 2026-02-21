@@ -74,7 +74,6 @@ FUZZ_EXIT=0
 #   not_a_server_error       — no 5xx responses
 #   status_code_conformance  — returned codes match OpenAPI spec
 #   response_schema_conformance — response bodies match OpenAPI schema
-#   negative_data_rejection  — schema-invalid input is rejected (non-2xx)
 #
 # Excluded checks and reasons:
 #   missing_auth      — hooks.py always injects auth; security checks can't probe
@@ -84,8 +83,12 @@ FUZZ_EXIT=0
 #   positive_data_acceptance — /unregister uses an intentional fake token (to
 #                        prevent accidental removal of the test agent), so it
 #                        always returns 401 rather than 2xx.
+#   negative_data_rejection  — hooks.py replaces agentId/roomId with real values
+#                        even when schemathesis generated invalid types, which
+#                        turns intentionally-invalid requests into valid ones.
+#                        The server then accepts them (200) and the check fails.
 schemathesis run "${BASE_URL}/openapi.json" \
-  --checks not_a_server_error,status_code_conformance,response_schema_conformance,negative_data_rejection \
+  --checks not_a_server_error,status_code_conformance,response_schema_conformance \
   --url "${BASE_URL}/aic/v0.1" \
   --max-examples "${MAX_EXAMPLES}" \
   --request-timeout 10000 \

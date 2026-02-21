@@ -1245,10 +1245,15 @@ export type registerResponse400 = {
   status: 400;
 };
 
+export type registerResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type registerResponseSuccess = registerResponse200 & {
   headers: Headers;
 };
-export type registerResponseError = registerResponse400 & {
+export type registerResponseError = (registerResponse400 | registerResponse429) & {
   headers: Headers;
 };
 
@@ -1279,6 +1284,11 @@ export type unregisterResponse200 = {
   status: 200;
 };
 
+export type unregisterResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type unregisterResponse401 = {
   data: ResultError;
   status: 401;
@@ -1289,10 +1299,20 @@ export type unregisterResponse404 = {
   status: 404;
 };
 
+export type unregisterResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type unregisterResponseSuccess = unregisterResponse200 & {
   headers: Headers;
 };
-export type unregisterResponseError = (unregisterResponse401 | unregisterResponse404) & {
+export type unregisterResponseError = (
+  | unregisterResponse400
+  | unregisterResponse401
+  | unregisterResponse404
+  | unregisterResponse429
+) & {
   headers: Headers;
 };
 
@@ -1323,6 +1343,11 @@ export type observeResponse200 = {
   status: 200;
 };
 
+export type observeResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type observeResponse401 = {
   data: ResultError;
   status: 401;
@@ -1333,10 +1358,20 @@ export type observeResponse404 = {
   status: 404;
 };
 
+export type observeResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type observeResponseSuccess = observeResponse200 & {
   headers: Headers;
 };
-export type observeResponseError = (observeResponse401 | observeResponse404) & {
+export type observeResponseError = (
+  | observeResponse400
+  | observeResponse401
+  | observeResponse404
+  | observeResponse429
+) & {
   headers: Headers;
 };
 
@@ -1377,10 +1412,25 @@ export type moveToResponse401 = {
   status: 401;
 };
 
+export type moveToResponse409 = {
+  data: ResultError;
+  status: 409;
+};
+
+export type moveToResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type moveToResponseSuccess = moveToResponse200 & {
   headers: Headers;
 };
-export type moveToResponseError = (moveToResponse400 | moveToResponse401) & {
+export type moveToResponseError = (
+  | moveToResponse400
+  | moveToResponse401
+  | moveToResponse409
+  | moveToResponse429
+) & {
   headers: Headers;
 };
 
@@ -1421,10 +1471,25 @@ export type interactResponse401 = {
   status: 401;
 };
 
+export type interactResponse409 = {
+  data: ResultError;
+  status: 409;
+};
+
+export type interactResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type interactResponseSuccess = interactResponse200 & {
   headers: Headers;
 };
-export type interactResponseError = (interactResponse400 | interactResponse401) & {
+export type interactResponseError = (
+  | interactResponse400
+  | interactResponse401
+  | interactResponse409
+  | interactResponse429
+) & {
   headers: Headers;
 };
 
@@ -1455,9 +1520,19 @@ export type chatSendResponse200 = {
   status: 200;
 };
 
+export type chatSendResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type chatSendResponse401 = {
   data: ResultError;
   status: 401;
+};
+
+export type chatSendResponse409 = {
+  data: ResultError;
+  status: 409;
 };
 
 export type chatSendResponse429 = {
@@ -1468,7 +1543,12 @@ export type chatSendResponse429 = {
 export type chatSendResponseSuccess = chatSendResponse200 & {
   headers: Headers;
 };
-export type chatSendResponseError = (chatSendResponse401 | chatSendResponse429) & {
+export type chatSendResponseError = (
+  | chatSendResponse400
+  | chatSendResponse401
+  | chatSendResponse409
+  | chatSendResponse429
+) & {
   headers: Headers;
 };
 
@@ -1499,15 +1579,29 @@ export type chatObserveResponse200 = {
   status: 200;
 };
 
+export type chatObserveResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type chatObserveResponse401 = {
   data: ResultError;
   status: 401;
 };
 
+export type chatObserveResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type chatObserveResponseSuccess = chatObserveResponse200 & {
   headers: Headers;
 };
-export type chatObserveResponseError = chatObserveResponse401 & {
+export type chatObserveResponseError = (
+  | chatObserveResponse400
+  | chatObserveResponse401
+  | chatObserveResponse429
+) & {
   headers: Headers;
 };
 
@@ -1538,15 +1632,29 @@ export type pollEventsResponse200 = {
   status: 200;
 };
 
+export type pollEventsResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type pollEventsResponse401 = {
   data: ResultError;
   status: 401;
 };
 
+export type pollEventsResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type pollEventsResponseSuccess = pollEventsResponse200 & {
   headers: Headers;
 };
-export type pollEventsResponseError = pollEventsResponse401 & {
+export type pollEventsResponseError = (
+  | pollEventsResponse400
+  | pollEventsResponse401
+  | pollEventsResponse429
+) & {
   headers: Headers;
 };
 
@@ -1577,15 +1685,29 @@ export type profileUpdateResponse200 = {
   status: 200;
 };
 
+export type profileUpdateResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type profileUpdateResponse401 = {
   data: ResultError;
   status: 401;
 };
 
+export type profileUpdateResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type profileUpdateResponseSuccess = profileUpdateResponse200 & {
   headers: Headers;
 };
-export type profileUpdateResponseError = profileUpdateResponse401 & {
+export type profileUpdateResponseError = (
+  | profileUpdateResponse400
+  | profileUpdateResponse401
+  | profileUpdateResponse429
+) & {
   headers: Headers;
 };
 
@@ -1616,6 +1738,11 @@ export type skillListResponse200 = {
   status: 200;
 };
 
+export type skillListResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type skillListResponse401 = {
   data: ResultError;
   status: 401;
@@ -1626,10 +1753,20 @@ export type skillListResponse404 = {
   status: 404;
 };
 
+export type skillListResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type skillListResponseSuccess = skillListResponse200 & {
   headers: Headers;
 };
-export type skillListResponseError = (skillListResponse401 | skillListResponse404) & {
+export type skillListResponseError = (
+  | skillListResponse400
+  | skillListResponse401
+  | skillListResponse404
+  | skillListResponse429
+) & {
   headers: Headers;
 };
 
@@ -1675,6 +1812,16 @@ export type skillInstallResponse404 = {
   status: 404;
 };
 
+export type skillInstallResponse409 = {
+  data: ResultError;
+  status: 409;
+};
+
+export type skillInstallResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type skillInstallResponse503 = {
   data: ResultError;
   status: 503;
@@ -1687,6 +1834,8 @@ export type skillInstallResponseError = (
   | skillInstallResponse400
   | skillInstallResponse401
   | skillInstallResponse404
+  | skillInstallResponse409
+  | skillInstallResponse429
   | skillInstallResponse503
 ) & {
   headers: Headers;
@@ -1739,6 +1888,11 @@ export type skillInvokeResponse404 = {
   status: 404;
 };
 
+export type skillInvokeResponse409 = {
+  data: ResultError;
+  status: 409;
+};
+
 export type skillInvokeResponse429 = {
   data: ResultError;
   status: 429;
@@ -1752,6 +1906,7 @@ export type skillInvokeResponseError = (
   | skillInvokeResponse401
   | skillInvokeResponse403
   | skillInvokeResponse404
+  | skillInvokeResponse409
   | skillInvokeResponse429
 ) & {
   headers: Headers;
@@ -1809,6 +1964,11 @@ export type reconnectResponse200 = {
   status: 200;
 };
 
+export type reconnectResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type reconnectResponse401 = {
   data: ResultError;
   status: 401;
@@ -1819,10 +1979,20 @@ export type reconnectResponse404 = {
   status: 404;
 };
 
+export type reconnectResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type reconnectResponseSuccess = reconnectResponse200 & {
   headers: Headers;
 };
-export type reconnectResponseError = (reconnectResponse401 | reconnectResponse404) & {
+export type reconnectResponseError = (
+  | reconnectResponse400
+  | reconnectResponse401
+  | reconnectResponse404
+  | reconnectResponse429
+) & {
   headers: Headers;
 };
 
@@ -1853,6 +2023,11 @@ export type heartbeatResponse200 = {
   status: 200;
 };
 
+export type heartbeatResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type heartbeatResponse401 = {
   data: ResultError;
   status: 401;
@@ -1866,7 +2041,11 @@ export type heartbeatResponse404 = {
 export type heartbeatResponseSuccess = heartbeatResponse200 & {
   headers: Headers;
 };
-export type heartbeatResponseError = (heartbeatResponse401 | heartbeatResponse404) & {
+export type heartbeatResponseError = (
+  | heartbeatResponse400
+  | heartbeatResponse401
+  | heartbeatResponse404
+) & {
   headers: Headers;
 };
 
@@ -1897,15 +2076,29 @@ export type meetingListResponse200 = {
   status: 200;
 };
 
+export type meetingListResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type meetingListResponse401 = {
   data: ResultError;
   status: 401;
 };
 
+export type meetingListResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type meetingListResponseSuccess = meetingListResponse200 & {
   headers: Headers;
 };
-export type meetingListResponseError = meetingListResponse401 & {
+export type meetingListResponseError = (
+  | meetingListResponse400
+  | meetingListResponse401
+  | meetingListResponse429
+) & {
   headers: Headers;
 };
 
@@ -1936,6 +2129,11 @@ export type meetingJoinResponse200 = {
   status: 200;
 };
 
+export type meetingJoinResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type meetingJoinResponse401 = {
   data: ResultError;
   status: 401;
@@ -1951,13 +2149,20 @@ export type meetingJoinResponse409 = {
   status: 409;
 };
 
+export type meetingJoinResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type meetingJoinResponseSuccess = meetingJoinResponse200 & {
   headers: Headers;
 };
 export type meetingJoinResponseError = (
+  | meetingJoinResponse400
   | meetingJoinResponse401
   | meetingJoinResponse404
   | meetingJoinResponse409
+  | meetingJoinResponse429
 ) & {
   headers: Headers;
 };
@@ -1989,6 +2194,11 @@ export type meetingLeaveResponse200 = {
   status: 200;
 };
 
+export type meetingLeaveResponse400 = {
+  data: ResultError;
+  status: 400;
+};
+
 export type meetingLeaveResponse401 = {
   data: ResultError;
   status: 401;
@@ -1999,10 +2209,20 @@ export type meetingLeaveResponse404 = {
   status: 404;
 };
 
+export type meetingLeaveResponse429 = {
+  data: ResultError;
+  status: 429;
+};
+
 export type meetingLeaveResponseSuccess = meetingLeaveResponse200 & {
   headers: Headers;
 };
-export type meetingLeaveResponseError = (meetingLeaveResponse401 | meetingLeaveResponse404) & {
+export type meetingLeaveResponseError = (
+  | meetingLeaveResponse400
+  | meetingLeaveResponse401
+  | meetingLeaveResponse404
+  | meetingLeaveResponse429
+) & {
   headers: Headers;
 };
 

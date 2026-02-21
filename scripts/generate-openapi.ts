@@ -402,6 +402,7 @@ registry.registerPath({
     },
     '400': errorResponse('Invalid destination'),
     '401': errorResponse('Unauthorized'),
+    '409': errorResponse('Transaction ID already processed with different payload'),
     '429': errorResponse('Too many requests'),
   },
 });
@@ -445,6 +446,7 @@ registry.registerPath({
     },
     '400': errorResponse('Invalid action or target'),
     '401': errorResponse('Unauthorized'),
+    '409': errorResponse('Transaction ID already processed with different payload'),
     '429': errorResponse('Too many requests'),
   },
 });
@@ -487,6 +489,7 @@ registry.registerPath({
     },
     '400': errorResponse('Invalid request'),
     '401': errorResponse('Unauthorized'),
+    '409': errorResponse('Transaction ID already processed with different payload'),
     '429': errorResponse('Rate limited'),
   },
 });
@@ -726,6 +729,7 @@ registry.registerPath({
     '400': errorResponse('Invalid request parameters'),
     '401': errorResponse('Unauthorized - missing or invalid token'),
     '404': errorResponse('Agent, room, or skill not found'),
+    '409': errorResponse('Transaction ID already processed with different payload'),
     '429': errorResponse('Too many requests'),
     '503': errorResponse('Room or skill service not ready'),
   },
@@ -782,6 +786,7 @@ registry.registerPath({
     '401': errorResponse('Unauthorized - missing or invalid token'),
     '403': errorResponse('Forbidden - skill not installed for this agent'),
     '404': errorResponse('Skill or action not found'),
+    '409': errorResponse('Transaction ID already processed with different payload'),
     '429': errorResponse('Rate limited or skill on cooldown'),
   },
 });

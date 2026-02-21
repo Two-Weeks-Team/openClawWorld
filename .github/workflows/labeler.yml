@@ -11,7 +11,7 @@ permissions:
 jobs:
   label:
     name: Label PR
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: self-hosted
 
     steps:
       - name: Checkout

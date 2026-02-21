@@ -738,6 +738,136 @@ The same \`txId\` will return the same result without re-executing the action.
           error: { $ref: '#/components/schemas/ErrorObject' },
         },
       },
+
+      // Connection Schemas
+      ChannelInfo: {
+        type: 'object',
+        required: ['channelId', 'maxAgents', 'currentAgents', 'status'],
+        properties: {
+          channelId: { $ref: '#/components/schemas/IdRoom' },
+          maxAgents: { type: 'integer', minimum: 1, example: 100 },
+          currentAgents: { type: 'integer', minimum: 0, example: 12 },
+          status: {
+            type: 'string',
+            enum: ['open', 'full', 'closed'],
+            example: 'open',
+          },
+        },
+      },
+      ReconnectRequest: {
+        type: 'object',
+        required: ['agentId', 'sessionToken'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          sessionToken: { type: 'string', minLength: 8 },
+        },
+      },
+      ReconnectResponseData: {
+        type: 'object',
+        required: ['agentId', 'roomId', 'sessionToken', 'pos'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+          sessionToken: { type: 'string' },
+          pos: { $ref: '#/components/schemas/Vec2' },
+          tile: { $ref: '#/components/schemas/TileCoord' },
+        },
+      },
+      HeartbeatRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+        },
+      },
+      HeartbeatResponseData: {
+        type: 'object',
+        required: ['agentId', 'serverTsMs', 'timeoutMs', 'recommendedIntervalMs'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          serverTsMs: { $ref: '#/components/schemas/TsMs' },
+          timeoutMs: { type: 'integer', minimum: 0, example: 60000 },
+          recommendedIntervalMs: { type: 'integer', minimum: 0, example: 30000 },
+        },
+      },
+
+      // Meeting Schemas
+      MeetingInfo: {
+        type: 'object',
+        required: ['meetingId', 'name', 'hostId', 'participantCount', 'capacity'],
+        properties: {
+          meetingId: { type: 'string', minLength: 1, maxLength: 128 },
+          name: { type: 'string', minLength: 1, maxLength: 128 },
+          hostId: { $ref: '#/components/schemas/IdEntity' },
+          participantCount: { type: 'integer', minimum: 0 },
+          capacity: { type: 'integer', minimum: 1 },
+        },
+      },
+      MeetingListRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+        },
+      },
+      MeetingListResponseData: {
+        type: 'object',
+        required: ['meetings'],
+        properties: {
+          meetings: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/MeetingInfo' },
+          },
+        },
+      },
+      MeetingJoinRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId', 'meetingId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+          meetingId: { type: 'string', minLength: 1, maxLength: 128 },
+        },
+      },
+      MeetingJoinResponseData: {
+        type: 'object',
+        required: ['meetingId', 'role', 'participants'],
+        properties: {
+          meetingId: { type: 'string', minLength: 1, maxLength: 128 },
+          role: { type: 'string', enum: ['host', 'participant'] },
+          participants: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['entityId', 'name', 'role'],
+              properties: {
+                entityId: { $ref: '#/components/schemas/IdEntity' },
+                name: { type: 'string', minLength: 1, maxLength: 64 },
+                role: { type: 'string', enum: ['host', 'participant'] },
+              },
+            },
+          },
+        },
+      },
+      MeetingLeaveRequest: {
+        type: 'object',
+        required: ['agentId', 'roomId', 'meetingId'],
+        properties: {
+          agentId: { $ref: '#/components/schemas/IdAgent' },
+          roomId: { $ref: '#/components/schemas/IdRoom' },
+          meetingId: { type: 'string', minLength: 1, maxLength: 128 },
+        },
+      },
+      MeetingLeaveResponseData: {
+        type: 'object',
+        required: ['meetingId', 'leftAt'],
+        properties: {
+          meetingId: { type: 'string', minLength: 1, maxLength: 128 },
+          leftAt: { $ref: '#/components/schemas/TsMs' },
+        },
+      },
     },
   },
   security: [{ bearerAuth: [] }],

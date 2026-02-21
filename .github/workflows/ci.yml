@@ -334,10 +334,43 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  openapi-validate:
+    name: OpenAPI Spec Validation
+    runs-on: [self-hosted, macOS, ARM64]
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate OpenAPI spec
+        run: pnpm validate:openapi
+
   all-checks:
     name: All Checks Passed
     runs-on: [self-hosted, macOS, ARM64]
-    needs: [codegen-check, typecheck, lint, build, test, map-consistency]
+    needs: [codegen-check, typecheck, lint, build, test, map-consistency, openapi-validate]
     if: always()
     steps:
       - name: Check all jobs
@@ -347,7 +380,8 @@ jobs:
              [[ "${{ needs.lint.result }}" != "success" ]] || \
              [[ "${{ needs.build.result }}" != "success" ]] || \
              [[ "${{ needs.test.result }}" != "success" ]] || \
-             [[ "${{ needs.map-consistency.result }}" != "success" ]]; then
+             [[ "${{ needs.map-consistency.result }}" != "success" ]] || \
+             [[ "${{ needs.openapi-validate.result }}" != "success" ]]; then
             echo "One or more jobs failed"
             exit 1
           fi

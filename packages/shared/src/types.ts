@@ -97,7 +97,7 @@ export type ObserveRequest = {
   agentId: string;
   roomId: string;
   radius: number;
-  detail: ObserveDetail;
+  detail?: ObserveDetail;
   includeSelf?: boolean;
   /** When true, includes collisionGrid in mapMetadata. Agents should cache this (grid is static). */
   includeGrid?: boolean;

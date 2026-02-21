@@ -86,6 +86,9 @@ export class SemanticMemory {
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
+    // Enforce owner-only permissions on both new and pre-existing directories/files.
+    // chmodSync is called unconditionally because the mode option on mkdirSync/writeFileSync
+    // only applies at creation time and has no effect on existing filesystem objects.
     chmodSync(dir, 0o700);
     writeFileSync(this.filePath, JSON.stringify([...this.entries.values()], null, 2), {
       mode: 0o600,

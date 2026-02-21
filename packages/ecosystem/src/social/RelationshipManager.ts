@@ -159,6 +159,9 @@ export class RelationshipManager {
   save(): void {
     const dir = dirname(this.filePath);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
+    // Enforce owner-only permissions on both new and pre-existing directories/files.
+    // chmodSync is called unconditionally because the mode option on mkdirSync/writeFileSync
+    // only applies at creation time and has no effect on existing filesystem objects.
     chmodSync(dir, 0o700);
     const data = [...this.relationships.values()];
     writeFileSync(this.filePath, JSON.stringify(data, null, 2), { mode: 0o600 });

@@ -185,7 +185,6 @@ jobs:
 
       - name: Check for uncommitted changes
         run: |
-          CHANGED_FILES=""
           CHANGED_FILES=$(git status --porcelain \
             "packages/plugin/src/generated/" \
             "packages/server/src/generated/" \

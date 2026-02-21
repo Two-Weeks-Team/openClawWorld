@@ -118,20 +118,34 @@ export class EpisodicMemory {
     }
   }
 
+  private isValidRecord(record: EpisodicRecord): boolean {
+    return (
+      typeof record.timestamp === 'number' &&
+      Number.isFinite(record.timestamp) &&
+      typeof record.content === 'string' &&
+      record.content.length <= 10000 &&
+      typeof record.type === 'string' &&
+      typeof record.importance === 'number' &&
+      record.importance >= 0 &&
+      record.importance <= 10 &&
+      Array.isArray(record.tags) &&
+      record.tags.every(t => typeof t === 'string' && t.length <= 100) &&
+      Array.isArray(record.participants) &&
+      record.participants.every(p => typeof p === 'string' && p.length <= 100)
+    );
+  }
+
   private persist(record: EpisodicRecord): void {
+    if (!this.isValidRecord(record)) {
+      throw new Error('Invalid EpisodicRecord: validation failed');
+    }
+
     const dir = dirname(this.filePath);
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
-    // filePath is resolve()d to a canonical absolute path derived from a sanitized
-    // agent ID ([a-zA-Z0-9_-] only, constructed via path.join). Not a traversal risk.
-    // lgtm[js/http-to-file-access]
     chmodSync(dir, 0o700);
-    // record is agent-generated episodic memory assembled locally; JSON.stringify
-    // produces a safe serialisation. Writing to the agent's own data directory is intended.
-    // lgtm[js/http-to-file-access]
     appendFileSync(this.filePath, JSON.stringify(record) + '\n', { mode: 0o600 });
-    // Enforce owner-only permission on existing files (mode option only applies on creation)
     chmodSync(this.filePath, 0o600);
   }
 }

@@ -28,7 +28,9 @@
     "clean": "pnpm -r clean && rm -rf node_modules",
     "dev:server": "pnpm --filter @openclawworld/server dev",
     "dev:client": "pnpm --filter @openclawworld/client dev",
-    "load-test": "tsx scripts/load-test.ts",
+    "load-test": "pnpm load-test:http && pnpm load-test:ws",
+    "load-test:http": "tsx scripts/load-test.ts",
+    "load-test:ws": "tsx scripts/load-test-ws.ts",
     "resident-agent-loop": "tsx scripts/resident-agent-loop.ts",
     "extract:assets": "python tools/extract_assets/extract.py --all",
     "generate:openapi-json": "tsx scripts/extract-openapi-json.ts",
@@ -46,6 +48,7 @@
   },
   "devDependencies": {
     "@asteasolutions/zod-to-openapi": "^8.4.1",
+    "@colyseus/sdk": "0.17",
     "@eslint/js": "^10.0.1",
     "@kayahr/tiled": "^0.0.1",
     "@playwright/test": "^1.58.2",

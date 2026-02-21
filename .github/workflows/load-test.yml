@@ -1,0 +1,131 @@
+name: Load Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      http_agents:
+        description: 'Number of HTTP load test agents'
+        required: false
+        default: '15'
+      http_duration:
+        description: 'HTTP load test duration (seconds)'
+        required: false
+        default: '30'
+      ws_clients:
+        description: 'Number of WebSocket clients'
+        required: false
+        default: '100'
+      ws_duration:
+        description: 'WebSocket load test duration (seconds)'
+        required: false
+        default: '30'
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  http-load-test:
+    name: HTTP Load Test
+    runs-on: [self-hosted, macOS, ARM64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: Start server
+        run: |
+          PORT=2567 NODE_ENV=development pnpm dev:server &
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:2567/health > /dev/null 2>&1; then
+              echo "Server ready after ${i}s"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Server failed to start within 30s"
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Run HTTP load test
+        run: |
+          pnpm load-test:http -- \
+            --agents ${{ github.event.inputs.http_agents }} \
+            --duration ${{ github.event.inputs.http_duration }}
+
+  ws-load-test:
+    name: WebSocket Load Test
+    runs-on: [self-hosted, macOS, ARM64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: Start server
+        run: |
+          PORT=2567 NODE_ENV=development pnpm dev:server &
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:2567/health > /dev/null 2>&1; then
+              echo "Server ready after ${i}s"
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Server failed to start within 30s"
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Run WebSocket load test
+        run: |
+          pnpm load-test:ws -- \
+            --clients ${{ github.event.inputs.ws_clients }} \
+            --duration ${{ github.event.inputs.ws_duration }}

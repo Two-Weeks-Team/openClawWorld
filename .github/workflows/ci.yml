@@ -12,6 +12,7 @@ concurrency:
 
 env:
   NODE_VERSION: '22'
+  PYTHON_VERSION: '3.12'
 
 jobs:
   # ─── Group 0: All parallel, no inter-dependencies ──────────────────────────
@@ -404,21 +405,21 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup Python & Install schemathesis
+      - name: Setup Python ${{ env.PYTHON_VERSION }} & Install schemathesis
         run: |
-          # Ensure Python 3.10+ is available (schemathesis v4 requirement)
-          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')" 2>/dev/null || echo "0.0")
-          PYTHON_MAJOR=$(echo "$PYTHON_VERSION" | cut -d. -f1)
-          PYTHON_MINOR=$(echo "$PYTHON_VERSION" | cut -d. -f2)
-          if [ "$PYTHON_MAJOR" -lt 3 ] || { [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 10 ]; }; then
-            echo "Python $PYTHON_VERSION too old, installing 3.12 via brew..."
-            brew install python@3.12
-            export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
-            echo "$(brew --prefix python@3.12)/libexec/bin" >> $GITHUB_PATH
+          # self-hosted runner requirement: Node 22+, Python 3.10+
+          # Always use versioned brew Python to avoid macOS Xcode bundle (3.9)
+          if ! brew list "python@${{ env.PYTHON_VERSION }}" &>/dev/null; then
+            echo "Installing Python ${{ env.PYTHON_VERSION }} via brew..."
+            brew install "python@${{ env.PYTHON_VERSION }}"
           fi
+          BREW_PYTHON_BIN="$(brew --prefix "python@${{ env.PYTHON_VERSION }}")/libexec/bin"
+          export PATH="$BREW_PYTHON_BIN:$PATH"
+          echo "$BREW_PYTHON_BIN" >> "$GITHUB_PATH"
+          python3 --version
           python3 -m pip install --user --break-system-packages schemathesis 2>/dev/null \
             || python3 -m pip install --user schemathesis
-          echo "$(python3 -m site --user-base)/bin" >> $GITHUB_PATH
+          echo "$(python3 -m site --user-base)/bin" >> "$GITHUB_PATH"
 
       - name: Run API fuzzing
         run: bash scripts/schemathesis-fuzz.sh

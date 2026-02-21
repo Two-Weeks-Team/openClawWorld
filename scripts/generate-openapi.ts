@@ -232,6 +232,7 @@ function errorResponse(description: string) {
 registry.registerPath({
   method: 'post',
   path: '/register',
+  operationId: 'register',
   tags: ['Auth'],
   summary: 'Register a new AI agent',
   description:
@@ -276,6 +277,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/unregister',
+  operationId: 'unregister',
   tags: ['Auth'],
   summary: 'Unregister an AI agent',
   description:
@@ -320,6 +322,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/observe',
+  operationId: 'observe',
   tags: ['Observation'],
   summary: 'Observe the world around the agent',
   description:
@@ -360,6 +363,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/moveTo',
+  operationId: 'moveTo',
   tags: ['Actions'],
   summary: 'Move agent to a destination tile',
   description: 'Initiates movement to the specified tile coordinates. Uses txId for idempotency.',
@@ -399,6 +403,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/interact',
+  operationId: 'interact',
   tags: ['Actions'],
   summary: 'Interact with a world object',
   description:
@@ -440,6 +445,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/chatSend',
+  operationId: 'chatSend',
   tags: ['Chat'],
   summary: 'Send a chat message',
   description:
@@ -480,6 +486,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/chatObserve',
+  operationId: 'chatObserve',
   tags: ['Chat'],
   summary: 'Get recent chat messages',
   description: 'Retrieve chat messages from the specified time window.',
@@ -517,6 +524,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/pollEvents',
+  operationId: 'pollEvents',
   tags: ['Events'],
   summary: 'Poll for world events',
   description:
@@ -556,6 +564,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/profile/update',
+  operationId: 'profileUpdate',
   tags: ['Auth'],
   summary: 'Update agent profile',
   description: 'Update the agent name or metadata.',
@@ -594,6 +603,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/skill/list',
+  operationId: 'skillList',
   tags: ['Skills'],
   summary: 'List available skills',
   description:
@@ -656,6 +666,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/skill/install',
+  operationId: 'skillInstall',
   tags: ['Skills'],
   summary: 'Install a skill for an agent',
   description:
@@ -706,6 +717,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/skill/invoke',
+  operationId: 'skillInvoke',
   tags: ['Skills'],
   summary: 'Invoke a skill action',
   description:
@@ -760,6 +772,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'get',
   path: '/channels',
+  operationId: 'channels',
   tags: ['Connection'],
   summary: 'List available channels',
   description: 'Returns all available game channels/rooms that agents can join.',
@@ -784,6 +797,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/reconnect',
+  operationId: 'reconnect',
   tags: ['Connection'],
   summary: 'Reconnect an agent to an existing session',
   description: 'Allows an agent to reconnect using a previously issued session token.',
@@ -816,6 +830,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/heartbeat',
+  operationId: 'heartbeat',
   tags: ['Session Management'],
   summary: 'Send a heartbeat to maintain session',
   description: 'Keeps the agent session alive and returns server timing information.',
@@ -848,6 +863,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/meeting/list',
+  operationId: 'meetingList',
   tags: ['Meeting'],
   summary: 'List available meetings in the room',
   description: 'Returns all active meetings in the specified room.',
@@ -879,6 +895,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/meeting/join',
+  operationId: 'meetingJoin',
   tags: ['Meeting'],
   summary: 'Join a meeting',
   description: 'Joins the specified meeting as a participant or host.',
@@ -912,6 +929,7 @@ registry.registerPath({
 registry.registerPath({
   method: 'post',
   path: '/meeting/leave',
+  operationId: 'meetingLeave',
   tags: ['Meeting'],
   summary: 'Leave a meeting',
   description: 'Leaves the specified meeting.',

@@ -79,6 +79,7 @@ export const Vec2Schema = z
     y: z.number(),
   })
   .openapi('Vec2');
+export type Vec2 = z.infer<typeof Vec2Schema>;
 
 export const TileCoordSchema = z
   .object({
@@ -86,20 +87,25 @@ export const TileCoordSchema = z
     ty: z.int().min(0).max(100000),
   })
   .openapi('TileCoord');
+export type TileCoord = z.infer<typeof TileCoordSchema>;
 
 export const EntityKindSchema = z.enum(['human', 'agent', 'object', 'npc']).openapi('EntityKind');
+export type EntityKind = z.infer<typeof EntityKindSchema>;
 
 export const FacingSchema = z.enum(['up', 'down', 'left', 'right']).openapi('Facing');
+export type Facing = z.infer<typeof FacingSchema>;
 
 export const ChatChannelSchema = z
   .enum(['proximity', 'global', 'team', 'meeting', 'dm'])
   .openapi('ChatChannel');
 
 export const ObserveDetailSchema = z.enum(['lite', 'full']).openapi('ObserveDetailLevel');
+export type ObserveDetail = z.infer<typeof ObserveDetailSchema>;
 
 export const UserStatusSchema = z
   .enum(['online', 'focus', 'dnd', 'afk', 'offline'])
   .openapi('UserStatus');
+export type UserStatus = z.infer<typeof UserStatusSchema>;
 
 export const EntityBaseSchema = z
   .object({
@@ -114,6 +120,7 @@ export const EntityBaseSchema = z
     meta: z.record(z.string(), z.unknown()).optional(),
   })
   .openapi('EntityBase');
+export type EntityBase = z.infer<typeof EntityBaseSchema>;
 
 export const AffordanceSchema = z
   .object({
@@ -122,6 +129,7 @@ export const AffordanceSchema = z
     paramsSchema: z.record(z.string(), z.unknown()).optional(),
   })
   .openapi('Affordance');
+export type Affordance = z.infer<typeof AffordanceSchema>;
 
 export const ObjectStateSchema = z
   .object({
@@ -129,6 +137,7 @@ export const ObjectStateSchema = z
     state: z.record(z.string(), z.unknown()),
   })
   .openapi('ObjectState');
+export type ObjectState = z.infer<typeof ObjectStateSchema>;
 
 export const ObservedEntitySchema = z
   .object({
@@ -138,6 +147,7 @@ export const ObservedEntitySchema = z
     object: ObjectStateSchema.optional(),
   })
   .openapi('ObservedEntity');
+export type ObservedEntity = z.infer<typeof ObservedEntitySchema>;
 
 export const ObservedFacilitySchema = z
   .object({
@@ -170,6 +180,7 @@ export const AicErrorCodeSchema = z
     'internal',
   ])
   .openapi('ErrorCode');
+export type AicErrorCode = z.infer<typeof AicErrorCodeSchema>;
 
 export const AicErrorObjectSchema = z
   .object({
@@ -179,6 +190,7 @@ export const AicErrorObjectSchema = z
     details: z.record(z.string(), z.unknown()).optional(),
   })
   .openapi('ErrorObject');
+export type AicErrorObject = z.infer<typeof AicErrorObjectSchema>;
 
 export function createResultSchema<T extends z.ZodType>(dataSchema: T) {
   return z.union([
@@ -207,6 +219,7 @@ export const ObserveRequestSchema = z
     includeGrid: z.boolean().optional(),
   })
   .openapi('ObserveRequest');
+export type ObserveRequest = z.infer<typeof ObserveRequestSchema>;
 
 export const MoveToRequestSchema = z
   .object({
@@ -217,6 +230,7 @@ export const MoveToRequestSchema = z
     mode: z.literal('walk').optional(),
   })
   .openapi('MoveToRequest');
+export type MoveToRequest = z.infer<typeof MoveToRequestSchema>;
 
 export const InteractRequestSchema = z
   .object({
@@ -228,6 +242,7 @@ export const InteractRequestSchema = z
     params: z.record(z.string(), z.unknown()).optional(),
   })
   .openapi('InteractRequest');
+export type InteractRequest = z.infer<typeof InteractRequestSchema>;
 
 export const ChatSendRequestSchema = z
   .object({
@@ -257,6 +272,7 @@ export const PollEventsRequestSchema = z
     waitMs: z.int().min(0).max(25000).optional(),
   })
   .openapi('PollEventsRequest');
+export type PollEventsRequest = z.infer<typeof PollEventsRequestSchema>;
 
 export const ProfileUpdateRequestSchema = z
   .object({
@@ -268,6 +284,7 @@ export const ProfileUpdateRequestSchema = z
     department: z.string().max(50).optional(),
   })
   .openapi('ProfileUpdateRequest');
+export type ProfileUpdateRequest = z.infer<typeof ProfileUpdateRequestSchema>;
 
 // ============================================================================
 // Response Data Schemas
@@ -280,6 +297,7 @@ export const RoomInfoSchema = z
     tickRate: z.int().min(1).max(60),
   })
   .openapi('RoomInfo');
+export type RoomInfo = z.infer<typeof RoomInfoSchema>;
 
 export const ZoneIdSchema = z.enum([
   'lobby',
@@ -291,10 +309,12 @@ export const ZoneIdSchema = z.enum([
   'plaza',
   'lake',
 ]);
+export type ZoneId = z.infer<typeof ZoneIdSchema>;
 
 export const EntranceDirectionSchema = z
   .enum(['north', 'south', 'east', 'west'])
   .openapi('EntranceDirection');
+export type EntranceDirection = z.infer<typeof EntranceDirectionSchema>;
 
 export const BuildingEntranceSchema = z
   .object({
@@ -307,6 +327,7 @@ export const BuildingEntranceSchema = z
     connectsTo: ZoneIdSchema,
   })
   .openapi('BuildingEntrance');
+export type BuildingEntrance = z.infer<typeof BuildingEntranceSchema>;
 
 export const ZoneInfoSchema = z
   .object({
@@ -320,6 +341,7 @@ export const ZoneInfoSchema = z
     entrances: z.array(BuildingEntranceSchema),
   })
   .openapi('ZoneInfo');
+export type ZoneInfo = z.infer<typeof ZoneInfoSchema>;
 
 export const MapMetadataSchema = z
   .object({
@@ -347,6 +369,7 @@ export const ObserveResponseDataSchema = z
 export const MoveToResultSchema = z
   .enum(['accepted', 'rejected', 'no_op', 'no_path'])
   .openapi('MoveToResult');
+export type MoveToResult = z.infer<typeof MoveToResultSchema>;
 
 export const MoveToResponseDataSchema = z
   .object({
@@ -356,10 +379,12 @@ export const MoveToResponseDataSchema = z
     result: MoveToResultSchema,
   })
   .openapi('MoveToResponseData');
+export type MoveToResponseData = z.infer<typeof MoveToResponseDataSchema>;
 
 export const InteractOutcomeTypeSchema = z
   .enum(['ok', 'no_effect', 'invalid_action', 'too_far'])
   .openapi('InteractOutcomeType');
+export type InteractOutcomeType = z.infer<typeof InteractOutcomeTypeSchema>;
 
 export const InteractOutcomeSchema = z
   .object({
@@ -367,6 +392,7 @@ export const InteractOutcomeSchema = z
     message: z.string().max(2000).optional(),
   })
   .openapi('InteractOutcome');
+export type InteractOutcome = z.infer<typeof InteractOutcomeSchema>;
 
 export const InteractResponseDataSchema = z
   .object({
@@ -376,6 +402,7 @@ export const InteractResponseDataSchema = z
     outcome: InteractOutcomeSchema,
   })
   .openapi('InteractResponseData');
+export type InteractResponseData = z.infer<typeof InteractResponseDataSchema>;
 
 export const ChatSendResponseDataSchema = z
   .object({
@@ -385,6 +412,7 @@ export const ChatSendResponseDataSchema = z
     chatMessageId: IdMessageSchema,
   })
   .openapi('ChatSendResponseData');
+export type ChatSendResponseData = z.infer<typeof ChatSendResponseDataSchema>;
 
 export const ChatMessageSchema = z
   .object({
@@ -479,6 +507,7 @@ export const PresenceJoinPayloadSchema = z.object({
   name: z.string().min(1).max(64),
   kind: EntityKindSchema,
 });
+export type PresenceJoinPayload = z.infer<typeof PresenceJoinPayloadSchema>;
 
 export const PresenceLeavePayloadSchema = z.object({
   entityId: IdEntitySchema,
@@ -486,17 +515,20 @@ export const PresenceLeavePayloadSchema = z.object({
   kind: EntityKindSchema.optional(),
   reason: z.enum(['disconnect', 'kicked', 'room_closed', 'unregister', 'timeout']),
 });
+export type PresenceLeavePayload = z.infer<typeof PresenceLeavePayloadSchema>;
 
 export const ProximityEnterPayloadSchema = z.object({
   subjectId: IdEntitySchema,
   otherId: IdEntitySchema,
   distance: z.number().min(0).max(1000000),
 });
+export type ProximityEnterPayload = z.infer<typeof ProximityEnterPayloadSchema>;
 
 export const ProximityExitPayloadSchema = z.object({
   subjectId: IdEntitySchema,
   otherId: IdEntitySchema,
 });
+export type ProximityExitPayload = z.infer<typeof ProximityExitPayloadSchema>;
 
 export const ChatMessagePayloadSchema = z.object({
   messageId: IdMessageSchema,
@@ -511,6 +543,7 @@ export const JsonPatchOpSchema = z.object({
   path: z.string().min(1).max(256),
   value: z.unknown().optional(),
 });
+export type JsonPatchOp = z.infer<typeof JsonPatchOpSchema>;
 
 export const ObjectStateChangedPayloadSchema = z.object({
   objectId: IdEntitySchema,
@@ -518,6 +551,7 @@ export const ObjectStateChangedPayloadSchema = z.object({
   patch: z.array(JsonPatchOpSchema).min(1).max(100),
   version: z.int().min(1).max(1000000000),
 });
+export type ObjectStateChangedPayload = z.infer<typeof ObjectStateChangedPayloadSchema>;
 
 // ============================================================================
 // Plugin Schemas
@@ -561,6 +595,7 @@ export const RegisterRequestSchema = z
     roomId: IdRoomSchema,
   })
   .openapi('RegisterRequest');
+export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 
 export const RegisterResponseDataSchema = z
   .object({
@@ -569,6 +604,7 @@ export const RegisterResponseDataSchema = z
     sessionToken: z.string().regex(/^[a-zA-Z0-9._-]{8,256}$/, 'Invalid sessionToken format'),
   })
   .openapi('RegisterResponseData');
+export type RegisterResponseData = z.infer<typeof RegisterResponseDataSchema>;
 
 export const UnregisterRequestSchema = z
   .object({
@@ -576,6 +612,7 @@ export const UnregisterRequestSchema = z
     roomId: IdRoomSchema,
   })
   .openapi('UnregisterRequest');
+export type UnregisterRequest = z.infer<typeof UnregisterRequestSchema>;
 
 export const UnregisterResponseDataSchema = z
   .object({
@@ -583,6 +620,7 @@ export const UnregisterResponseDataSchema = z
     unregisteredAt: TsMsSchema,
   })
   .openapi('UnregisterResponseData');
+export type UnregisterResponseData = z.infer<typeof UnregisterResponseDataSchema>;
 
 export const ReconnectRequestSchema = z
   .object({
@@ -590,6 +628,7 @@ export const ReconnectRequestSchema = z
     sessionToken: z.string().min(8),
   })
   .openapi('ReconnectRequest');
+export type ReconnectRequest = z.infer<typeof ReconnectRequestSchema>;
 
 export const ReconnectResponseDataSchema = z
   .object({
@@ -600,6 +639,7 @@ export const ReconnectResponseDataSchema = z
     tile: TileCoordSchema.optional(),
   })
   .openapi('ReconnectResponseData');
+export type ReconnectResponseData = z.infer<typeof ReconnectResponseDataSchema>;
 
 // ============================================================================
 // Heartbeat Schema
@@ -622,6 +662,7 @@ export const StatusRequestSchema = z.object({
   roomId: z.string().optional(),
   agentId: z.string().optional(),
 });
+export type StatusRequest = z.infer<typeof StatusRequestSchema>;
 
 export const StatusResponseDataSchema = z.object({
   serverReachable: z.boolean(),
@@ -630,6 +671,7 @@ export const StatusResponseDataSchema = z.object({
   roomId: z.string().optional(),
   agentId: z.string().optional(),
 });
+export type StatusResponseData = z.infer<typeof StatusResponseDataSchema>;
 
 // ============================================================================
 // Meeting API Schemas
@@ -641,6 +683,7 @@ export const MeetingListRequestSchema = z
     roomId: IdRoomSchema,
   })
   .openapi('MeetingListRequest');
+export type MeetingListRequest = z.infer<typeof MeetingListRequestSchema>;
 
 export const MeetingJoinRequestSchema = z
   .object({
@@ -649,6 +692,7 @@ export const MeetingJoinRequestSchema = z
     meetingId: z.string().min(1).max(128),
   })
   .openapi('MeetingJoinRequest');
+export type MeetingJoinRequest = z.infer<typeof MeetingJoinRequestSchema>;
 
 export const MeetingLeaveRequestSchema = z
   .object({
@@ -657,16 +701,20 @@ export const MeetingLeaveRequestSchema = z
     meetingId: z.string().min(1).max(128),
   })
   .openapi('MeetingLeaveRequest');
+export type MeetingLeaveRequest = z.infer<typeof MeetingLeaveRequestSchema>;
 
 // ============================================================================
 // Work-Life World Schemas
 // ============================================================================
 
 export const OrgRoleSchema = z.enum(['owner', 'admin', 'member', 'guest']);
+export type OrgRole = z.infer<typeof OrgRoleSchema>;
 
 export const MeetingStatusSchema = z.enum(['scheduled', 'in_progress', 'ended', 'cancelled']);
+export type MeetingStatus = z.infer<typeof MeetingStatusSchema>;
 
 export const KanbanColumnSchema = z.enum(['todo', 'doing', 'done']);
+export type KanbanColumn = z.infer<typeof KanbanColumnSchema>;
 
 export const NpcRoleSchema = z.enum([
   'receptionist',
@@ -718,8 +766,10 @@ export const FacilityTypeSchema = z.enum([
   'room_door_b',
   'room_door_c',
 ]);
+export type FacilityType = z.infer<typeof FacilityTypeSchema>;
 
 export const VoteOptionSchema = z.enum(['yes', 'no', 'abstain']);
+export type VoteOption = z.infer<typeof VoteOptionSchema>;
 
 export const StickyNoteColorSchema = z.enum(['yellow', 'blue', 'green', 'pink', 'orange']);
 
@@ -734,6 +784,7 @@ export const VoteStatusSchema = z.enum(['open', 'closed']);
 export const SkillCategorySchema = z
   .enum(['movement', 'combat', 'social', 'utility'])
   .openapi('SkillCategory');
+export type SkillCategory = z.infer<typeof SkillCategorySchema>;
 
 export const SkillEffectDefinitionSchema = z
   .object({
@@ -746,6 +797,7 @@ export const SkillEffectDefinitionSchema = z
       .optional(),
   })
   .openapi('SkillEffectDefinition');
+export type SkillEffectDefinition = z.infer<typeof SkillEffectDefinitionSchema>;
 
 export const SkillActionSchema = z
   .object({
@@ -777,6 +829,7 @@ export const SkillDefinitionSchema = z
 export const SkillInvokeOutcomeTypeSchema = z
   .enum(['ok', 'pending', 'cancelled', 'error'])
   .openapi('SkillInvokeOutcomeType');
+export type SkillInvokeOutcomeType = z.infer<typeof SkillInvokeOutcomeTypeSchema>;
 
 export const SkillInvokeOutcomeSchema = z
   .object({
@@ -786,6 +839,7 @@ export const SkillInvokeOutcomeSchema = z
     completionTime: TsMsSchema.optional(),
   })
   .openapi('SkillInvokeOutcome');
+export type SkillInvokeOutcome = z.infer<typeof SkillInvokeOutcomeSchema>;
 
 export const AgentSkillStateSchema = z
   .object({
@@ -795,6 +849,7 @@ export const AgentSkillStateSchema = z
     credentials: z.record(z.string(), z.string()).optional(),
   })
   .openapi('AgentSkillState');
+export type AgentSkillState = z.infer<typeof AgentSkillStateSchema>;
 
 export const PendingCastSchema = z.object({
   txId: IdTxSchema,
@@ -806,6 +861,7 @@ export const PendingCastSchema = z.object({
   completionTime: TsMsSchema,
   startPosition: Vec2Schema,
 });
+export type PendingCast = z.infer<typeof PendingCastSchema>;
 
 export const ActiveEffectSchema = z.object({
   effectId: z.string().min(1).max(64),
@@ -816,6 +872,7 @@ export const ActiveEffectSchema = z.object({
   speedMultiplier: z.number().min(0).max(10),
   startTime: TsMsSchema.optional(),
 });
+export type ActiveEffect = z.infer<typeof ActiveEffectSchema>;
 
 // ============================================================================
 // Skill System Request Schemas
@@ -829,6 +886,7 @@ export const SkillListRequestSchema = z
     installed: z.boolean().optional(),
   })
   .openapi('SkillListRequest');
+export type SkillListRequest = z.infer<typeof SkillListRequestSchema>;
 
 export const SkillInstallRequestSchema = z
   .object({
@@ -839,6 +897,7 @@ export const SkillInstallRequestSchema = z
     credentials: z.record(z.string(), z.string()).optional(),
   })
   .openapi('SkillInstallRequest');
+export type SkillInstallRequest = z.infer<typeof SkillInstallRequestSchema>;
 
 export const SkillInvokeRequestSchema = z
   .object({
@@ -851,6 +910,7 @@ export const SkillInvokeRequestSchema = z
     params: z.record(z.string(), z.unknown()).optional(),
   })
   .openapi('SkillInvokeRequest');
+export type SkillInvokeRequest = z.infer<typeof SkillInvokeRequestSchema>;
 
 // ============================================================================
 // Skill System Response Schemas
@@ -871,6 +931,7 @@ export const SkillInstallResponseDataSchema = z
     serverTsMs: TsMsSchema,
   })
   .openapi('SkillInstallResponseData');
+export type SkillInstallResponseData = z.infer<typeof SkillInstallResponseDataSchema>;
 
 export const SkillInvokeResponseDataSchema = z
   .object({
@@ -879,6 +940,7 @@ export const SkillInvokeResponseDataSchema = z
     serverTsMs: TsMsSchema,
   })
   .openapi('SkillInvokeResponseData');
+export type SkillInvokeResponseData = z.infer<typeof SkillInvokeResponseDataSchema>;
 
 export const WorkLifeEventTypeSchema = z.enum([
   'org.created',
@@ -991,6 +1053,7 @@ export const TileTypeSchema = z.enum([
   'city_wood_2',
   'city_wood_3',
 ]);
+export type TileType = z.infer<typeof TileTypeSchema>;
 
 export const TilesetTileDefinitionSchema = z.object({
   id: z.number().int().min(0),
@@ -998,6 +1061,7 @@ export const TilesetTileDefinitionSchema = z.object({
   collision: z.boolean(),
   isDoor: z.boolean().optional(),
 });
+export type TilesetTileDefinition = z.infer<typeof TilesetTileDefinitionSchema>;
 
 export const TilesetDefinitionSchema = z.object({
   name: z.string().min(1).max(64),
@@ -1008,3 +1072,4 @@ export const TilesetDefinitionSchema = z.object({
   license: z.string().optional(),
   tiles: z.array(TilesetTileDefinitionSchema).min(1),
 });
+export type TilesetDefinition = z.infer<typeof TilesetDefinitionSchema>;

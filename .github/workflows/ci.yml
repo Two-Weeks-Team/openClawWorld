@@ -404,13 +404,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install schemathesis
-        run: pip install schemathesis
+      - name: Setup Python & Install schemathesis
+        run: |
+          # Use brew python on self-hosted macOS runner (actions/setup-python has permission issues)
+          if ! command -v python3 &>/dev/null; then
+            brew install python@3.12
+          fi
+          python3 -m pip install --user schemathesis
+          echo "$(python3 -m site --user-base)/bin" >> $GITHUB_PATH
 
       - name: Run API fuzzing
         run: bash scripts/schemathesis-fuzz.sh

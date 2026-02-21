@@ -1628,6 +1628,7 @@ export const openApiSpec = {
   paths: {
     '/register': {
       post: {
+        operationId: 'register',
         tags: ['Auth'],
         summary: 'Register a new AI agent',
         description:
@@ -1691,6 +1692,7 @@ export const openApiSpec = {
     },
     '/unregister': {
       post: {
+        operationId: 'unregister',
         tags: ['Auth'],
         summary: 'Unregister an AI agent',
         description:
@@ -1767,6 +1769,7 @@ export const openApiSpec = {
     },
     '/observe': {
       post: {
+        operationId: 'observe',
         tags: ['Observation'],
         summary: 'Observe the world around the agent',
         description:
@@ -1839,6 +1842,7 @@ export const openApiSpec = {
     },
     '/moveTo': {
       post: {
+        operationId: 'moveTo',
         tags: ['Actions'],
         summary: 'Move agent to a destination tile',
         description:
@@ -1914,6 +1918,7 @@ export const openApiSpec = {
     },
     '/interact': {
       post: {
+        operationId: 'interact',
         tags: ['Actions'],
         summary: 'Interact with a world object',
         description:
@@ -1987,6 +1992,7 @@ export const openApiSpec = {
     },
     '/chatSend': {
       post: {
+        operationId: 'chatSend',
         tags: ['Chat'],
         summary: 'Send a chat message',
         description:
@@ -2059,6 +2065,7 @@ export const openApiSpec = {
     },
     '/chatObserve': {
       post: {
+        operationId: 'chatObserve',
         tags: ['Chat'],
         summary: 'Get recent chat messages',
         description: 'Retrieve chat messages from the specified time window.',
@@ -2119,6 +2126,7 @@ export const openApiSpec = {
     },
     '/pollEvents': {
       post: {
+        operationId: 'pollEvents',
         tags: ['Events'],
         summary: 'Poll for world events',
         description:
@@ -2181,6 +2189,7 @@ export const openApiSpec = {
     },
     '/profile/update': {
       post: {
+        operationId: 'profileUpdate',
         tags: ['Auth'],
         summary: 'Update agent profile',
         description: 'Update the agent name or metadata.',
@@ -2242,6 +2251,7 @@ export const openApiSpec = {
     },
     '/skill/list': {
       post: {
+        operationId: 'skillList',
         tags: ['Skills'],
         summary: 'List available skills',
         description:
@@ -2336,6 +2346,7 @@ export const openApiSpec = {
     },
     '/skill/install': {
       post: {
+        operationId: 'skillInstall',
         tags: ['Skills'],
         summary: 'Install a skill for an agent',
         description:
@@ -2436,6 +2447,7 @@ export const openApiSpec = {
     },
     '/skill/invoke': {
       post: {
+        operationId: 'skillInvoke',
         tags: ['Skills'],
         summary: 'Invoke a skill action',
         description:
@@ -2550,6 +2562,7 @@ export const openApiSpec = {
     '/channels': {
       get: {
         tags: ['Connection'],
+        operationId: 'channels',
         summary: 'List available channels',
         description: 'Returns all available game channels/rooms that agents can join.',
         security: [],
@@ -2589,6 +2602,7 @@ export const openApiSpec = {
     '/reconnect': {
       post: {
         tags: ['Connection'],
+        operationId: 'reconnect',
         summary: 'Reconnect an agent to an existing session',
         description: 'Allows an agent to reconnect using a previously issued session token.',
         security: [
@@ -2653,6 +2667,7 @@ export const openApiSpec = {
     '/heartbeat': {
       post: {
         tags: ['Session Management'],
+        operationId: 'heartbeat',
         summary: 'Send a heartbeat to maintain session',
         description: 'Keeps the agent session alive and returns server timing information.',
         security: [
@@ -2717,6 +2732,7 @@ export const openApiSpec = {
     '/meeting/list': {
       post: {
         tags: ['Meeting'],
+        operationId: 'meetingList',
         summary: 'List available meetings in the room',
         description: 'Returns all active meetings in the specified room.',
         security: [
@@ -2771,6 +2787,7 @@ export const openApiSpec = {
     '/meeting/join': {
       post: {
         tags: ['Meeting'],
+        operationId: 'meetingJoin',
         summary: 'Join a meeting',
         description: 'Joins the specified meeting as a participant or host.',
         security: [
@@ -2845,6 +2862,7 @@ export const openApiSpec = {
     '/meeting/leave': {
       post: {
         tags: ['Meeting'],
+        operationId: 'meetingLeave',
         summary: 'Leave a meeting',
         description: 'Leaves the specified meeting.',
         security: [

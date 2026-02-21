@@ -29,6 +29,8 @@ import {
   ZONE_DISPLAY_NAMES,
   DEBUG_COLORS,
   DEFAULT_SPAWN_POINT,
+  MAP_LAYERS,
+  MAP_TILESETS,
 } from '@openclawworld/shared';
 
 interface MapObject {
@@ -187,8 +189,8 @@ export class GameScene extends Phaser.Scene {
   private initializeWorldGrid(): void {
     if (!this.map || !this.tileInterpreter || !this.clientCollision) return;
 
-    const groundLayer = this.map.getLayer('ground');
-    const collisionLayer = this.map.getLayer('collision');
+    const groundLayer = this.map.getLayer(MAP_LAYERS.GROUND);
+    const collisionLayer = this.map.getLayer(MAP_LAYERS.COLLISION);
 
     if (groundLayer?.data && collisionLayer?.data) {
       const groundData: number[] = [];
@@ -438,17 +440,13 @@ export class GameScene extends Phaser.Scene {
   private createMap() {
     this.map = this.make.tilemap({ key: 'village' });
 
-    const tileset = this.map.addTilesetImage('tileset', 'tileset');
-    const urbanTileset = this.map.addTilesetImage('urban_tileset', 'urban_tileset');
-    const tinytownTileset = this.map.addTilesetImage('tinytown_tileset', 'tinytown_tileset');
-    const interiorTileset = this.map.addTilesetImage('interior_tileset', 'interior_tileset');
-    const tilesets = [tileset, urbanTileset, tinytownTileset, interiorTileset].filter(
-      Boolean
-    ) as Phaser.Tilemaps.Tileset[];
+    const tilesets = MAP_TILESETS
+      .map(name => this.map!.addTilesetImage(name, name))
+      .filter(Boolean) as Phaser.Tilemaps.Tileset[];
 
     if (tilesets.length > 0) {
-      this.map.createLayer('ground', tilesets, 0, 0);
-      const collisionLayer = this.map.createLayer('collision', tilesets, 0, 0);
+      this.map.createLayer(MAP_LAYERS.GROUND, tilesets, 0, 0);
+      const collisionLayer = this.map.createLayer(MAP_LAYERS.COLLISION, tilesets, 0, 0);
       if (collisionLayer) {
         collisionLayer.setAlpha(0);
       }
@@ -518,7 +516,7 @@ export class GameScene extends Phaser.Scene {
   private renderMapObjects() {
     if (!this.map) return;
 
-    const objectLayer = this.map.getObjectLayer('objects');
+    const objectLayer = this.map.getObjectLayer(MAP_LAYERS.OBJECTS);
     if (!objectLayer) return;
 
     const objects = (objectLayer as unknown as TiledObjectLayer).objects;
@@ -905,7 +903,7 @@ export class GameScene extends Phaser.Scene {
   private drawDebugCollisionTiles(): void {
     if (!this.map || !this.collisionDebug) return;
 
-    const collisionLayer = this.map.getLayer('collision');
+    const collisionLayer = this.map.getLayer(MAP_LAYERS.COLLISION);
     if (!collisionLayer) return;
 
     let blockedCount = 0;

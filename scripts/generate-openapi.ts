@@ -11,9 +11,11 @@
  */
 
 import { z } from 'zod';
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import { OpenApiGeneratorV31 } from '@asteasolutions/zod-to-openapi';
+import {
+  extendZodWithOpenApi,
+  OpenAPIRegistry,
+  OpenApiGeneratorV31,
+} from '@asteasolutions/zod-to-openapi';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -214,6 +216,7 @@ const MeetingInfoSchema = z
 const MeetingListResponseDataSchema = z
   .object({
     meetings: z.array(MeetingInfoSchema),
+    serverTsMs: TsMsSchema,
   })
   .openapi('MeetingListResponseData');
 
@@ -226,8 +229,9 @@ const MeetingJoinResponseDataSchema = z
         entityId: IdEntitySchema,
         name: z.string().min(1).max(64),
         role: z.enum(['host', 'participant']),
-      }),
+      })
     ),
+    serverTsMs: TsMsSchema,
   })
   .openapi('MeetingJoinResponseData');
 
@@ -235,9 +239,9 @@ const MeetingLeaveResponseDataSchema = z
   .object({
     meetingId: z.string().min(1).max(128),
     leftAt: TsMsSchema,
+    serverTsMs: TsMsSchema,
   })
   .openapi('MeetingLeaveResponseData');
-
 
 const ChannelInfoSchema = z
   .object({
@@ -444,8 +448,7 @@ registry.registerPath({
   path: '/moveTo',
   tags: ['Actions'],
   summary: 'Move agent to a destination tile',
-  description:
-    'Initiates movement to the specified tile coordinates. Uses txId for idempotency.',
+  description: 'Initiates movement to the specified tile coordinates. Uses txId for idempotency.',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
@@ -652,8 +655,9 @@ registry.registerPath({
           example: {
             agentId: 'agent_helper',
             roomId: 'auto',
-            name: 'Super Helper Bot',
-            meta: { level: 5 },
+            status: 'focus',
+            statusMessage: 'Working on a task',
+            title: 'Senior Engineer',
           },
         },
       },
@@ -854,7 +858,7 @@ registry.registerPath({
           schema: resultOk(
             z.object({
               channels: z.array(ChannelInfoSchema),
-            }),
+            })
           ),
         },
       },
@@ -1086,7 +1090,7 @@ The same \`txId\` will return the same result without re-executing the action.`,
 
 const outputPath = path.resolve(
   import.meta.dirname ?? path.dirname(new URL(import.meta.url).pathname),
-  '../packages/server/src/openapi.ts',
+  '../packages/server/src/openapi.ts'
 );
 
 const jsonContent = JSON.stringify(document, null, 2);

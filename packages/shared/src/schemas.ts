@@ -422,6 +422,11 @@ export const EventTypeSchema = z
     'npc.state_change',
     'facility.interacted',
     'emote.triggered',
+    'meeting.created',
+    'meeting.participant_joined',
+    'meeting.participant_left',
+    'meeting.host_transferred',
+    'meeting.ended',
   ])
   .openapi('EventType');
 
@@ -671,9 +676,19 @@ export const NpcRoleSchema = z.enum([
   'quest_giver',
   'meeting_host',
   'arcade_host',
+  'greeter',
+  'ranger',
+  'fountain_keeper',
 ]);
 
-export const NpcStateSchema = z.enum(['idle', 'walking', 'talking', 'working', 'break']);
+export const NpcStateSchema = z.enum([
+  'idle',
+  'walking',
+  'talking',
+  'working',
+  'break',
+  'patrolling',
+]);
 
 export const FacilityTypeSchema = z.enum([
   'reception_desk',

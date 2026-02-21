@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main]
   pull_request:
-    branches: [main, master, develop]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,9 +14,139 @@ env:
   NODE_VERSION: '22'
 
 jobs:
+  # ─── Group 0: All parallel, no inter-dependencies ──────────────────────────
+
+  lint:
+    name: Lint & Format
+    runs-on: self-hosted
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+  typecheck:
+    name: Type Check
+    runs-on: self-hosted
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r build
+
+      - name: Type check
+        run: pnpm typecheck
+
+  test:
+    name: Unit Tests
+    runs-on: self-hosted
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm -r build
+
+      - name: Run tests with coverage
+        run: pnpm test -- --coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: warn
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        continue-on-error: true
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+          verbose: true
+          skip_validation: 'true'
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   codegen-check:
     name: Codegen Freshness
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: self-hosted
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -69,121 +199,10 @@ jobs:
           fi
           echo "✅ Generated code is up to date"
 
-  lint:
-    name: Lint & Format
-    runs-on: [self-hosted, Linux, X64]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Cache node_modules
-        uses: actions/cache@v5
-        with:
-          path: |
-            node_modules
-            packages/*/node_modules
-          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-${{ runner.arch }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Format check
-        run: pnpm format:check
-
-  typecheck:
-    name: Type Check
-    runs-on: [self-hosted, macOS, ARM64]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Cache node_modules
-        uses: actions/cache@v5
-        with:
-          path: |
-            node_modules
-            packages/*/node_modules
-          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-${{ runner.arch }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build workspace packages
-        run: pnpm -r build
-
-      - name: Type check
-        run: pnpm typecheck
-
-  build:
-    name: Build
-    runs-on: [self-hosted, macOS, ARM64]
-    needs: typecheck
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-
-      - name: Cache node_modules
-        uses: actions/cache@v5
-        with:
-          path: |
-            node_modules
-            packages/*/node_modules
-          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            node-modules-${{ runner.os }}-${{ runner.arch }}-
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: build-artifacts
-          path: |
-            packages/*/dist
-            packages/client/dist
-          retention-days: 1
-
   map-consistency:
     name: Map Consistency
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: self-hosted
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -225,7 +244,7 @@ jobs:
             fi
           done
 
-          echo "map_changed=$MAP_CHANGED" >> $GITHUB_OUTPUT
+          echo "map_changed=$MAP_CHANGED" >> "$GITHUB_OUTPUT"
           if [[ "$MAP_CHANGED" == "true" ]]; then
             echo "📍 Map-impacting files detected:"
             echo "$CHANGED_FILES" | grep -E "(world/|maps/|tileset|sync-maps|verify-map)" || true
@@ -280,10 +299,10 @@ jobs:
         if: steps.check-map.outputs.map_changed == 'true'
         run: node scripts/verify-map-stack-consistency.mjs
 
-  test:
-    name: Unit Tests
-    runs-on: [self-hosted, macOS, ARM64]
-    needs: build
+  openapi-validate:
+    name: OpenAPI Spec Validation
+    runs-on: self-hosted
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -313,31 +332,16 @@ jobs:
       - name: Build workspace packages
         run: pnpm -r build
 
-      - name: Run tests with coverage
-        run: pnpm test -- --coverage
+      - name: Validate OpenAPI spec
+        run: pnpm validate:openapi
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v6
-        with:
-          name: coverage-report
-          path: coverage/
-          if-no-files-found: warn
+  # ─── Group 1: Build validation (needs lint + typecheck to pass) ────────────
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
-        continue-on-error: true
-        with:
-          files: ./coverage/lcov.info
-          fail_ci_if_error: false
-          verbose: true
-          skip_validation: 'true'
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  openapi-validate:
-    name: OpenAPI Spec Validation
-    runs-on: [self-hosted, macOS, ARM64]
-    needs: build
+  build:
+    name: Build
+    runs-on: self-hosted
+    timeout-minutes: 15
+    needs: [lint, typecheck]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -364,12 +368,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate OpenAPI spec
-        run: pnpm validate:openapi
+      - name: Build
+        run: pnpm build
+
+  # ─── Final gate ────────────────────────────────────────────────────────────
 
   all-checks:
     name: All Checks Passed
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: self-hosted
+    timeout-minutes: 5
     needs: [codegen-check, typecheck, lint, build, test, map-consistency, openapi-validate]
     if: always()
     steps:

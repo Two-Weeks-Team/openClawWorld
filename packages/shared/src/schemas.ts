@@ -703,6 +703,99 @@ export const MeetingLeaveRequestSchema = z
   .openapi('MeetingLeaveRequest');
 export type MeetingLeaveRequest = z.infer<typeof MeetingLeaveRequestSchema>;
 
+export const HeartbeatResponseDataSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    serverTsMs: TsMsSchema,
+    timeoutMs: z.int().min(0),
+    recommendedIntervalMs: z.int().min(0),
+  })
+  .openapi('HeartbeatResponseData');
+export type HeartbeatResponseData = z.infer<typeof HeartbeatResponseDataSchema>;
+
+export const AgentProfileSchema = z
+  .object({
+    agentId: IdAgentSchema,
+    name: z.string().min(1).max(64),
+    status: UserStatusSchema.optional(),
+    statusMessage: z.string().max(200).optional(),
+    title: z.string().max(128).optional(),
+    department: z.string().max(128).optional(),
+    updatedAt: TsMsSchema.optional(),
+  })
+  .openapi('AgentProfile');
+export type AgentProfile = z.infer<typeof AgentProfileSchema>;
+
+export const MeetingInfoSchema = z
+  .object({
+    meetingId: z.string().min(1).max(128),
+    name: z.string().min(1).max(128),
+    hostId: IdEntitySchema,
+    participantCount: z.int().min(0),
+    capacity: z.int().min(1),
+  })
+  .openapi('MeetingInfo');
+export type MeetingInfo = z.infer<typeof MeetingInfoSchema>;
+
+export const MeetingListResponseDataSchema = z
+  .object({
+    meetings: z.array(MeetingInfoSchema),
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('MeetingListResponseData');
+export type MeetingListResponseData = z.infer<typeof MeetingListResponseDataSchema>;
+
+export const MeetingJoinResponseDataSchema = z
+  .object({
+    meetingId: z.string().min(1).max(128),
+    role: z.enum(['host', 'participant']),
+    participants: z.array(
+      z.object({
+        entityId: IdEntitySchema,
+        name: z.string().min(1).max(64),
+        role: z.enum(['host', 'participant']),
+      })
+    ),
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('MeetingJoinResponseData');
+export type MeetingJoinResponseData = z.infer<typeof MeetingJoinResponseDataSchema>;
+
+export const MeetingLeaveResponseDataSchema = z
+  .object({
+    meetingId: z.string().min(1).max(128),
+    leftAt: TsMsSchema,
+    serverTsMs: TsMsSchema,
+  })
+  .openapi('MeetingLeaveResponseData');
+export type MeetingLeaveResponseData = z.infer<typeof MeetingLeaveResponseDataSchema>;
+
+export const ChannelInfoSchema = z
+  .object({
+    channelId: IdRoomSchema,
+    maxAgents: z.int().min(1),
+    currentAgents: z.int().min(0),
+    status: z.enum(['open', 'full', 'closed']),
+  })
+  .openapi('ChannelInfo');
+export type ChannelInfo = z.infer<typeof ChannelInfoSchema>;
+
+export const ResultOkSchema = z
+  .object({
+    status: z.literal('ok'),
+    data: z.object({}).passthrough(),
+  })
+  .openapi('ResultOk');
+export type ResultOk = z.infer<typeof ResultOkSchema>;
+
+export const ResultErrorSchema = z
+  .object({
+    status: z.literal('error'),
+    error: AicErrorObjectSchema,
+  })
+  .openapi('ResultError');
+export type ResultError = z.infer<typeof ResultErrorSchema>;
+
 // ============================================================================
 // Work-Life World Schemas
 // ============================================================================

@@ -93,6 +93,15 @@ import {
   MeetingListRequestSchema,
   MeetingJoinRequestSchema,
   MeetingLeaveRequestSchema,
+  HeartbeatResponseDataSchema,
+  AgentProfileSchema,
+  MeetingInfoSchema,
+  MeetingListResponseDataSchema,
+  MeetingJoinResponseDataSchema,
+  MeetingLeaveResponseDataSchema,
+  ChannelInfoSchema,
+  ResultOkSchema,
+  ResultErrorSchema,
 } from '../packages/shared/src/schemas.js';
 
 // ─── Registry setup ─────────────────────────────────────────────────────────
@@ -173,103 +182,8 @@ const allSchemas: Array<[string, z.ZodType]> = [
   ['MeetingListRequest', MeetingListRequestSchema],
   ['MeetingJoinRequest', MeetingJoinRequestSchema],
   ['MeetingLeaveRequest', MeetingLeaveRequestSchema],
-];
-
-for (const [refId, schema] of allSchemas) {
-  registry.register(refId, schema);
-}
-
-// ─── Additional OpenAPI-only schemas ────────────────────────────────────────
-// These schemas exist in the OpenAPI spec but not as standalone exports in schemas.ts.
-
-const AgentProfileSchema = z
-  .object({
-    agentId: IdAgentSchema,
-    name: z.string().min(1).max(64),
-    status: UserStatusSchema.optional(),
-    statusMessage: z.string().max(200).optional(),
-    title: z.string().max(128).optional(),
-    department: z.string().max(128).optional(),
-    updatedAt: TsMsSchema.optional(),
-  })
-  .openapi('AgentProfile');
-
-const HeartbeatResponseDataSchema = z
-  .object({
-    agentId: IdAgentSchema,
-    serverTsMs: TsMsSchema,
-    timeoutMs: z.int().min(0),
-    recommendedIntervalMs: z.int().min(0),
-  })
-  .openapi('HeartbeatResponseData');
-
-const MeetingInfoSchema = z
-  .object({
-    meetingId: z.string().min(1).max(128),
-    name: z.string().min(1).max(128),
-    hostId: IdEntitySchema,
-    participantCount: z.int().min(0),
-    capacity: z.int().min(1),
-  })
-  .openapi('MeetingInfo');
-
-const MeetingListResponseDataSchema = z
-  .object({
-    meetings: z.array(MeetingInfoSchema),
-    serverTsMs: TsMsSchema,
-  })
-  .openapi('MeetingListResponseData');
-
-const MeetingJoinResponseDataSchema = z
-  .object({
-    meetingId: z.string().min(1).max(128),
-    role: z.enum(['host', 'participant']),
-    participants: z.array(
-      z.object({
-        entityId: IdEntitySchema,
-        name: z.string().min(1).max(64),
-        role: z.enum(['host', 'participant']),
-      })
-    ),
-    serverTsMs: TsMsSchema,
-  })
-  .openapi('MeetingJoinResponseData');
-
-const MeetingLeaveResponseDataSchema = z
-  .object({
-    meetingId: z.string().min(1).max(128),
-    leftAt: TsMsSchema,
-    serverTsMs: TsMsSchema,
-  })
-  .openapi('MeetingLeaveResponseData');
-
-const ChannelInfoSchema = z
-  .object({
-    channelId: IdRoomSchema,
-    maxAgents: z.int().min(1),
-    currentAgents: z.int().min(0),
-    status: z.enum(['open', 'full', 'closed']),
-  })
-  .openapi('ChannelInfo');
-
-const ResultOkSchema = z
-  .object({
-    status: z.literal('ok'),
-    data: z.object({}).passthrough(),
-  })
-  .openapi('ResultOk');
-
-const ResultErrorSchema = z
-  .object({
-    status: z.literal('error'),
-    error: AicErrorObjectSchema,
-  })
-  .openapi('ResultError');
-
-// Register additional schemas
-const additionalSchemas: Array<[string, z.ZodType]> = [
-  ['AgentProfile', AgentProfileSchema],
   ['HeartbeatResponseData', HeartbeatResponseDataSchema],
+  ['AgentProfile', AgentProfileSchema],
   ['MeetingInfo', MeetingInfoSchema],
   ['MeetingListResponseData', MeetingListResponseDataSchema],
   ['MeetingJoinResponseData', MeetingJoinResponseDataSchema],
@@ -279,7 +193,7 @@ const additionalSchemas: Array<[string, z.ZodType]> = [
   ['ResultError', ResultErrorSchema],
 ];
 
-for (const [refId, schema] of additionalSchemas) {
+for (const [refId, schema] of allSchemas) {
   registry.register(refId, schema);
 }
 

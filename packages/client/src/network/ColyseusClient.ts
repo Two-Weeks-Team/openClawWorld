@@ -56,7 +56,7 @@ function getHttpEndpoint(): string {
 
 export class ColyseusClient {
   private client: Client<typeof appConfig>;
-  private room: Room<any, RoomState> | null = null;
+  private room: Room<Record<string, unknown>, RoomState> | null = null;
   private _sessionId: string | null = null;
   private _entityId: string | null = null;
 
@@ -80,7 +80,7 @@ export class ColyseusClient {
     }
   }
 
-  async connect(name: string, roomId: string): Promise<Room<any, RoomState>> {
+  async connect(name: string, roomId: string): Promise<Room<Record<string, unknown>, RoomState>> {
     try {
       this.room = await this.client.joinOrCreate<RoomState>('game', { name, roomId }, RoomState);
       this._sessionId = this.room.sessionId;

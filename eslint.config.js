@@ -28,6 +28,7 @@ export default tseslint.config(
       '**/dist/**',
       '**/build/**',
       '**/node_modules/**',
+      '**/generated/**',
       '**/*.d.ts',
       'coverage/**',
       'docs/**',

@@ -20,8 +20,11 @@ console.log(`  Input: ${input}`);
 console.log(`  Output: ${output}`);
 
 execSync(
-  `npx --package @colyseus/schema schema-codegen "${input}" --output "${output}" --ts`,
-  { stdio: 'inherit', cwd: rootDir }
+  `npx --package @colyseus/schema@^4.0.12 schema-codegen "${input}" --output "${output}" --ts`,
+  {
+    stdio: 'inherit',
+    cwd: rootDir,
+  }
 );
 
 console.log('Done! Client schemas generated successfully.');

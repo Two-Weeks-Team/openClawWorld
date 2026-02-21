@@ -116,7 +116,7 @@ joinBtn.addEventListener('click', async () => {
   }
 });
 
-function setupChat(room: Room<any, RoomState>) {
+function setupChat(room: Room<Record<string, unknown>, RoomState>) {
   chatInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.isComposing) {
       const message = chatInput.value.trim();

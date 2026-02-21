@@ -38,6 +38,7 @@
     "generate:schemas": "tsx scripts/generate-schemas.ts",
     "generate": "pnpm generate:tools && pnpm generate:commands && pnpm generate:schemas && pnpm generate:client",
     "generate:openapi": "tsx scripts/generate-openapi.ts",
+    "test:fuzz": "bash scripts/schemathesis-fuzz.sh",
     "validate:openapi": "tsx scripts/validate-openapi.ts",
     "ecosystem": "tsx packages/ecosystem/src/index.ts",
     "ecosystem:start": "tsx packages/ecosystem/src/index.ts start",

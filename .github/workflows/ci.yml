@@ -373,6 +373,67 @@ jobs:
 
   # ─── Final gate ────────────────────────────────────────────────────────────
 
+  api-fuzz:
+    name: API Fuzzing (schemathesis)
+    runs-on: [self-hosted, macOS, ARM64]
+    needs: build
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v5
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+          key: node-modules-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            node-modules-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Python & Install schemathesis
+        run: |
+          # Ensure Python 3.10+ is available (schemathesis v4 requirement)
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')" 2>/dev/null || echo "0.0")
+          PYTHON_MAJOR=$(echo "$PYTHON_VERSION" | cut -d. -f1)
+          PYTHON_MINOR=$(echo "$PYTHON_VERSION" | cut -d. -f2)
+          if [ "$PYTHON_MAJOR" -lt 3 ] || { [ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 10 ]; }; then
+            echo "Python $PYTHON_VERSION too old, installing 3.12 via brew..."
+            brew install python@3.12
+            export PATH="$(brew --prefix python@3.12)/libexec/bin:$PATH"
+            echo "$(brew --prefix python@3.12)/libexec/bin" >> $GITHUB_PATH
+          fi
+          python3 -m pip install --user --break-system-packages schemathesis 2>/dev/null \
+            || python3 -m pip install --user schemathesis
+          echo "$(python3 -m site --user-base)/bin" >> $GITHUB_PATH
+
+      - name: Run API fuzzing
+        run: bash scripts/schemathesis-fuzz.sh
+        env:
+          SCHEMATHESIS_PORT: '2567'
+          SCHEMATHESIS_MAX_EXAMPLES: '50'
+
+      - name: Upload fuzzing report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: schemathesis-report
+          path: schemathesis-report.xml
+          if-no-files-found: warn
+
   all-checks:
     name: All Checks Passed
     runs-on: self-hosted

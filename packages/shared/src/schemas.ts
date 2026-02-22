@@ -409,7 +409,8 @@ export const ChatSendResponseDataSchema = z
     txId: IdTxSchema,
     applied: z.boolean(),
     serverTsMs: TsMsSchema,
-    chatMessageId: IdMessageSchema,
+    // undefined when applied is false (invalid channel, message too long, etc.)
+    chatMessageId: IdMessageSchema.optional(),
   })
   .openapi('ChatSendResponseData');
 export type ChatSendResponseData = z.infer<typeof ChatSendResponseDataSchema>;
@@ -775,7 +776,7 @@ export const ChannelInfoSchema = z
     channelId: IdRoomSchema,
     maxAgents: z.int().min(1),
     currentAgents: z.int().min(0),
-    status: z.enum(['open', 'full', 'closed']),
+    status: z.enum(['open', 'full']),
   })
   .openapi('ChannelInfo');
 export type ChannelInfo = z.infer<typeof ChannelInfoSchema>;
@@ -901,7 +902,11 @@ export const SkillActionSchema = z
     castTimeMs: z.number().int().min(0).max(60000).optional(),
     rangeUnits: z.number().min(0).max(10000).optional(),
     manaCost: z.number().int().min(0).max(10000).optional(),
-    params: z.record(z.string(), z.unknown()).optional(),
+    // params can be either a SkillActionParam[] descriptor array or a freeform
+    // key-value record, depending on the skill source (builtin vs plugin).
+    params: z
+      .union([z.array(z.record(z.string(), z.unknown())), z.record(z.string(), z.unknown())])
+      .optional(),
     effect: SkillEffectDefinitionSchema.optional(),
   })
   .openapi('SkillAction');

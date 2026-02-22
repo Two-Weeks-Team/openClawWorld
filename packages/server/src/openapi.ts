@@ -779,7 +779,7 @@ export const openApiSpec = {
             $ref: '#/components/schemas/IdMessage',
           },
         },
-        required: ['txId', 'applied', 'serverTsMs', 'chatMessageId'],
+        required: ['txId', 'applied', 'serverTsMs'],
       },
       IdMessage: {
         type: 'string',
@@ -1100,8 +1100,19 @@ export const openApiSpec = {
             maximum: 10000,
           },
           params: {
-            type: 'object',
-            additionalProperties: {},
+            anyOf: [
+              {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: {},
+                },
+              },
+              {
+                type: 'object',
+                additionalProperties: {},
+              },
+            ],
           },
           effect: {
             $ref: '#/components/schemas/SkillEffectDefinition',
@@ -1589,7 +1600,7 @@ export const openApiSpec = {
           },
           status: {
             type: 'string',
-            enum: ['open', 'full', 'closed'],
+            enum: ['open', 'full'],
           },
         },
         required: ['channelId', 'maxAgents', 'currentAgents', 'status'],
@@ -1687,6 +1698,16 @@ export const openApiSpec = {
               },
             },
           },
+          '429': {
+            description: 'Too many requests',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -1744,6 +1765,16 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized - missing or invalid token',
             content: {
@@ -1756,6 +1787,16 @@ export const openApiSpec = {
           },
           '404': {
             description: 'Agent or room not found',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -1817,6 +1858,16 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
             content: {
@@ -1829,6 +1880,16 @@ export const openApiSpec = {
           },
           '404': {
             description: 'Agent or room not found',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -1913,6 +1974,26 @@ export const openApiSpec = {
               },
             },
           },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -1987,6 +2068,26 @@ export const openApiSpec = {
               },
             },
           },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -2040,8 +2141,28 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
             content: {
               'application/json': {
                 schema: {
@@ -2111,8 +2232,28 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2174,8 +2315,28 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2236,8 +2397,28 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2321,6 +2502,16 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
             content: {
@@ -2333,6 +2524,16 @@ export const openApiSpec = {
           },
           '404': {
             description: 'Agent or room not found',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2424,6 +2625,26 @@ export const openApiSpec = {
           },
           '404': {
             description: 'Agent, room, or skill not found',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2546,6 +2767,16 @@ export const openApiSpec = {
               },
             },
           },
+          '409': {
+            description: 'Transaction ID already processed with different payload',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '429': {
             description: 'Rate limited or skill on cooldown',
             content: {
@@ -2641,6 +2872,16 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Invalid or expired session token',
             content: {
@@ -2653,6 +2894,16 @@ export const openApiSpec = {
           },
           '404': {
             description: 'Agent not found',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2702,6 +2953,16 @@ export const openApiSpec = {
                     },
                   },
                   required: ['status', 'data'],
+                },
+              },
+            },
+          },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
                 },
               },
             },
@@ -2771,8 +3032,28 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2826,6 +3107,16 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
             content: {
@@ -2848,6 +3139,16 @@ export const openApiSpec = {
           },
           '409': {
             description: 'Already in a meeting',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {
@@ -2901,6 +3202,16 @@ export const openApiSpec = {
               },
             },
           },
+          '400': {
+            description: 'Invalid request',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
           '401': {
             description: 'Unauthorized',
             content: {
@@ -2913,6 +3224,16 @@ export const openApiSpec = {
           },
           '404': {
             description: 'Meeting not found or not a participant',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/ResultError',
+                },
+              },
+            },
+          },
+          '429': {
+            description: 'Too many requests',
             content: {
               'application/json': {
                 schema: {

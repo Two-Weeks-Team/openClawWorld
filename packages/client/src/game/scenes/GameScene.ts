@@ -1612,7 +1612,15 @@ export class GameScene extends Phaser.Scene {
         const dy = Math.abs(container.y - prevY);
         const isMoving = dx > 0.1 || dy > 0.1;
         const spriteKey = this.npcSpriteKeys.get(key) ?? 'greeter';
-        updateNPCAnimation(sprite, isMoving, npc.facing, spriteKey);
+        if (sprite.texture.key === CHARACTER_PACK_KEY) {
+          if (npc.facing === 'left') {
+            sprite.setFlipX(true);
+          } else if (npc.facing === 'right') {
+            sprite.setFlipX(false);
+          }
+        } else {
+          updateNPCAnimation(sprite, isMoving, npc.facing, spriteKey);
+        }
       }
     });
   }
@@ -1732,8 +1740,16 @@ export class GameScene extends Phaser.Scene {
           (Math.abs(entity.pos.x - prev.x) > 0.1 || Math.abs(entity.pos.y - prev.y) > 0.1);
         this.entityPrevPos.set(key, { x: entity.pos.x, y: entity.pos.y });
 
-        const entityType = entity.kind === 'agent' ? 'agent' : 'human';
-        updatePlayerAnimation(sprite, isMoving, entity.facing, entityType);
+        if (sprite.texture.key === CHARACTER_PACK_KEY) {
+          if (entity.facing === 'left') {
+            sprite.setFlipX(true);
+          } else if (entity.facing === 'right') {
+            sprite.setFlipX(false);
+          }
+        } else {
+          const entityType = entity.kind === 'agent' ? 'agent' : 'human';
+          updatePlayerAnimation(sprite, isMoving, entity.facing, entityType);
+        }
 
         if (key === gameClient.entityId) {
           sprite.setTint(0xffff00);

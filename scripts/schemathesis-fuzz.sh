@@ -16,6 +16,19 @@ HOOKS_DIR="tests/schemathesis"
 
 echo "=== OpenClawWorld API Fuzzing ==="
 
+# ── 0. Evict any stale server on this port ───────────────────────────────
+# On self-hosted runners, a prior job's tsx/node grandchildren survive when
+# only the top-level pnpm process is killed (pnpm's SIGTERM does not
+# propagate to its spawned tsx → node children).  Kill everything holding
+# the port BEFORE we build so no old code is exercised by schemathesis.
+echo "[0/4] Clearing port ${PORT}..."
+STALE_PIDS=$(lsof -ti tcp:"${PORT}" 2>/dev/null || true)
+if [ -n "${STALE_PIDS}" ]; then
+  echo "  Evicting stale PIDs: ${STALE_PIDS}"
+  echo "${STALE_PIDS}" | xargs kill -9 2>/dev/null || true
+  sleep 1  # Allow the OS to release the port
+fi
+
 # ── 1. Build workspace packages ──────────────────────────────────────────
 echo "[1/4] Building workspace packages..."
 BUILD_LOG=$(mktemp)
@@ -36,6 +49,8 @@ SERVER_PID=$!
 cleanup() {
   echo ""
   echo "[cleanup] Stopping server (PID: ${SERVER_PID})..."
+  # Kill by port to catch tsx/node grandchildren that survive pnpm's SIGTERM
+  lsof -ti tcp:"${PORT}" 2>/dev/null | xargs kill -9 2>/dev/null || true
   kill "${SERVER_PID}" 2>/dev/null || true
   wait "${SERVER_PID}" 2>/dev/null || true
   echo "[cleanup] Done."
@@ -45,6 +60,11 @@ trap cleanup EXIT
 # ── 3. Wait for server readiness ─────────────────────────────────────────
 echo "[3/4] Waiting for server to be ready..."
 for i in $(seq 1 "${MAX_WAIT}"); do
+  # Fail fast if our process already died (e.g., port still in use after eviction)
+  if ! kill -0 "${SERVER_PID}" 2>/dev/null; then
+    echo "  ERROR: Server process (PID ${SERVER_PID}) exited unexpectedly."
+    exit 1
+  fi
   if curl -sf "${BASE_URL}/health" > /dev/null 2>&1; then
     echo "  Server ready after ${i}s"
     break

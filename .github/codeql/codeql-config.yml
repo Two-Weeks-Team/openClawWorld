@@ -1,0 +1,8 @@
+name: CodeQL Configuration
+
+# Exclude auto-generated files from CodeQL analysis.
+# Colyseus schema codegen emits a fixed import line covering all possible
+# types regardless of which are used in a given schema class, causing
+# spurious js/unused-local-variable alerts for every generated file.
+paths-ignore:
+  - 'packages/client/src/generated/**'

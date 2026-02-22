@@ -31,16 +31,18 @@ export function getChannelList(): ChannelInfo[] {
  * display a non-empty selector.  Actual room creation happens later via
  * `assignChannel()` during `/register`.
  */
-export function getChannelListOrDefault(): ChannelInfo[] {
+export function getChannelListOrDefault() {
   const channels = getChannelList();
   if (channels.length > 0) return channels;
-  return [
+  // Return a single bootstrap entry so the lobby UI is never empty.
+  // The channelId matches the first channel assignChannel() would create.
+  return channels.concat([
     {
       channelId: `${CHANNEL_PREFIX}-1`,
       occupancy: 0,
       maxOccupancy: MAX_CHANNEL_OCCUPANCY,
     },
-  ];
+  ]);
 }
 
 /**

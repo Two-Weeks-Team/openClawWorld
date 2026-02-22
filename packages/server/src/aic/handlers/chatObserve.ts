@@ -27,6 +27,13 @@ export async function handleChatObserve(req: Request, res: Response): Promise<vo
   const body = req.validatedBody as ChatObserveRequest;
   const { agentId, roomId, windowSec, channel } = body;
 
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);
 

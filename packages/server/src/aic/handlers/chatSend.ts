@@ -28,6 +28,13 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
   const body = req.validatedBody as ChatSendRequest;
   const { agentId, roomId, txId, channel, message } = body;
 
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   try {
     const idempotencyCheck = chatSendIdempotencyStore.check(agentId, roomId, txId, body);
 

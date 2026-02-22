@@ -140,7 +140,9 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
       const senderPos = agentEntity.pos;
 
       gameRoom.clients.forEach(client => {
-        const clientEntity = gameRoom.state.getEntity(client.sessionId);
+        const entityId = gameRoom.getEntityIdForSession(client.sessionId);
+        if (!entityId) return;
+        const clientEntity = gameRoom.state.getEntity(entityId);
         if (!clientEntity) return;
 
         const dx = clientEntity.pos.x - senderPos.x;

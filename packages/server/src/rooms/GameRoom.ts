@@ -374,6 +374,10 @@ export class GameRoom extends Room<{ state: RoomState }> {
     return this.state.humans.size + this.state.agents.size;
   }
 
+  getEntityIdForSession(sessionId: string): string | undefined {
+    return this.clientEntities.get(sessionId);
+  }
+
   handleInteraction(
     agentId: string,
     targetId: string,

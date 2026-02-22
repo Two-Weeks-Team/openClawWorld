@@ -852,6 +852,9 @@ registry.registerPath({
 });
 
 // 15. POST /heartbeat
+// Note: no 429 — /heartbeat intentionally has no rate limiter in router.ts
+// (heartbeat is the keep-alive mechanism; rate-limiting it would cause false
+//  session timeouts). A 429 would never actually be returned by this endpoint.
 registry.registerPath({
   method: 'post',
   path: '/heartbeat',

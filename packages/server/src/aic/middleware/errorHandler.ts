@@ -69,10 +69,7 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
   const errAny = err as unknown as { type?: string; status?: number };
   const errType = typeof errAny.type === 'string' ? errAny.type : '';
 
-  if (
-    (err instanceof SyntaxError && errType === 'entity.parse.failed') ||
-    BODY_PARSER_400_TYPES.has(errType)
-  ) {
+  if (BODY_PARSER_400_TYPES.has(errType)) {
     res.status(400).json({
       status: 'error',
       error: {

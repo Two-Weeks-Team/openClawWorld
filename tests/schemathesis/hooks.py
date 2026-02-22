@@ -24,7 +24,7 @@ _UNAUTHENTICATED_SUFFIXES = ("/channels", "/register", "/reconnect")
 # Endpoints where we intentionally use an invalid token to prevent destructive side-effects.
 # /unregister would permanently remove the test agent if called with a real token.
 _FAKE_TOKEN_SUFFIXES = ("/unregister",)
-_FAKE_TOKEN = "tok_fuzz_test_invalid_do_not_use"
+_FAKE_TOKEN = "tok_fuzz_test_invalid_do_not_use"  # noqa: S105
 
 # Global credential state populated by setup()
 _session_token: str | None = None
@@ -172,8 +172,8 @@ def _is_safe_header_value(value: str) -> bool:
     The Node.js HTTP parser (llhttp) rejects any request header whose name or
     value contains a byte < 0x20, except for horizontal-tab (0x09 / '\\t').
     When schemathesis fuzzes header values it sometimes generates such bytes
-    (e.g. ESC 0x1b).  Those requests never reach Express – Node drops the
-    connection before it can write a response – which schemathesis then reports
+    (e.g. ESC 0x1b).  Those requests never reach Express - Node drops the
+    connection before it can write a response - which schemathesis then reports
     as a "JSON deserialization error" (empty / non-JSON response body).
 
     Filtering them out in before_call lets all requests reach the application
@@ -262,5 +262,8 @@ def before_call(context, case, kwargs):
                 headers=_auth_headers(_session_token),
                 timeout=5,
             )
-        except Exception:
-            pass  # Best-effort; the leave test will proceed regardless
+        except Exception as exc:  # noqa: BLE001
+            print(
+                f"[hooks] WARNING: Pre-join before /meeting/leave failed: {exc}",
+                file=sys.stderr,
+            )

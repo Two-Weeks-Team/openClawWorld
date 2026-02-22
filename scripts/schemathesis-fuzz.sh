@@ -107,6 +107,14 @@ FUZZ_EXIT=0
 #                        even when schemathesis generated invalid types, which
 #                        turns intentionally-invalid requests into valid ones.
 #                        The server then accepts them (200) and the check fails.
+#   content_type_conformance — all API responses consistently return
+#                        Content-Type: application/json, matching the spec.
+#                        response_schema_conformance already validates body
+#                        structure; this check would be redundant.
+# NOTE: --request-timeout 10000 — behavioural testing showed that 10 (the --help-
+# documented "seconds" default) caused schemathesis to skip the Examples and
+# Coverage phases (~21 tests vs 1762). The value 10000 gives a 10-second window
+# consistent with prior millisecond-based versions and avoids premature timeouts.
 schemathesis run "${BASE_URL}/openapi.json" \
   --checks not_a_server_error,status_code_conformance,response_schema_conformance \
   --url "${BASE_URL}/aic/v0.1" \

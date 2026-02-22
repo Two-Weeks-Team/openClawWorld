@@ -4,7 +4,7 @@ import { MAX_CHANNEL_OCCUPANCY, CHANNEL_PREFIX } from '../constants.js';
 import type { ChannelInfo } from '@openclawworld/shared';
 import type { GameRoom } from '../rooms/GameRoom.js';
 
-export { type ChannelInfo };
+export type { ChannelInfo };
 
 export function getChannelList(): ChannelInfo[] {
   const rooms = listRooms();
@@ -13,13 +13,12 @@ export function getChannelList(): ChannelInfo[] {
     .map(r => {
       const gameRoom = matchMaker.getLocalRoomById(r.colyseusRoomId) as GameRoom | undefined;
       const currentAgents = gameRoom?.getOccupancy() ?? 0;
-      const maxAgents = MAX_CHANNEL_OCCUPANCY;
       return {
         channelId: r.customRoomId,
         currentAgents,
-        maxAgents,
-        status: (currentAgents >= maxAgents ? 'full' : 'open') as 'open' | 'full' | 'closed',
-      };
+        maxAgents: MAX_CHANNEL_OCCUPANCY,
+        status: currentAgents >= MAX_CHANNEL_OCCUPANCY ? 'full' : 'open',
+      } as ChannelInfo;
     });
 }
 

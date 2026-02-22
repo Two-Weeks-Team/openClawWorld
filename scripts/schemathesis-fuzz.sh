@@ -76,7 +76,7 @@ FUZZ_EXIT=0
 #   response_schema_conformance — response bodies match OpenAPI schema
 #
 # Excluded checks and reasons:
-#   missing_auth      — hooks.py always injects auth; security checks can't probe
+#   ignored_auth      — hooks.py always injects auth; security checks can't probe
 #                       unauthenticated behaviour reliably in this harness.
 #   unsupported_method — Express auth middleware fires before method routing, so
 #                        TRACE/etc. on auth-required paths return 401 not 405.
@@ -91,7 +91,7 @@ schemathesis run "${BASE_URL}/openapi.json" \
   --checks not_a_server_error,status_code_conformance,response_schema_conformance \
   --url "${BASE_URL}/aic/v0.1" \
   --max-examples "${MAX_EXAMPLES}" \
-  --request-timeout 10000 \
+  --request-timeout 10 \
   --workers 1 \
   --report junit \
   --report-junit-path schemathesis-report.xml \

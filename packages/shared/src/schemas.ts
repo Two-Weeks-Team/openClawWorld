@@ -776,7 +776,7 @@ export const ChannelInfoSchema = z
     channelId: IdRoomSchema,
     maxAgents: z.int().min(1),
     currentAgents: z.int().min(0),
-    status: z.enum(['open', 'full', 'closed']),
+    status: z.enum(['open', 'full']),
   })
   .openapi('ChannelInfo');
 export type ChannelInfo = z.infer<typeof ChannelInfoSchema>;

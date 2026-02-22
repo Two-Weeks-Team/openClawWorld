@@ -36,6 +36,14 @@ function formatZodError(error: ZodError): Record<string, unknown> {
   };
 }
 
+// body-parser wraps parse errors in an HttpError (via http-errors) with a
+// status code and a 'type' property. Each error type maps to a specific HTTP
+// status: entity.parse.failed → 400, entity.too.large → 413,
+// encoding.unsupported / charset.unsupported → 415.
+const BODY_PARSER_400_TYPES = new Set(['entity.parse.failed']);
+const BODY_PARSER_413_TYPES = new Set(['entity.too.large']);
+const BODY_PARSER_415_TYPES = new Set(['encoding.unsupported', 'charset.unsupported']);
+
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   if (err instanceof ApiError) {
     res.status(err.statusCode).json({
@@ -58,27 +66,42 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
-  // body-parser wraps parse errors in an HttpError (via http-errors) with a
-  // status code and a 'type' property. The wrapped error is NOT instanceof
-  // SyntaxError, so we must also check the status/type combination.
-  // Relevant types: entity.parse.failed, encoding.unsupported,
-  //                 charset.unsupported, entity.too.large
   const errAny = err as unknown as { type?: string; status?: number };
-  const BODY_PARSER_TYPES = new Set([
-    'entity.parse.failed',
-    'encoding.unsupported',
-    'charset.unsupported',
-    'entity.too.large',
-  ]);
+  const errType = typeof errAny.type === 'string' ? errAny.type : '';
+
   if (
-    (err instanceof SyntaxError && errAny.type === 'entity.parse.failed') ||
-    (errAny.status === 400 && typeof errAny.type === 'string' && BODY_PARSER_TYPES.has(errAny.type))
+    (err instanceof SyntaxError && errType === 'entity.parse.failed') ||
+    BODY_PARSER_400_TYPES.has(errType)
   ) {
     res.status(400).json({
       status: 'error',
       error: {
         code: 'bad_request' as AicErrorCode,
         message: 'Invalid JSON in request body',
+        retryable: false,
+      },
+    });
+    return;
+  }
+
+  if (BODY_PARSER_413_TYPES.has(errType)) {
+    res.status(413).json({
+      status: 'error',
+      error: {
+        code: 'bad_request' as AicErrorCode,
+        message: 'Request entity too large',
+        retryable: false,
+      },
+    });
+    return;
+  }
+
+  if (BODY_PARSER_415_TYPES.has(errType)) {
+    res.status(415).json({
+      status: 'error',
+      error: {
+        code: 'bad_request' as AicErrorCode,
+        message: 'Unsupported media type or encoding',
         retryable: false,
       },
     });

@@ -1600,7 +1600,7 @@ export const openApiSpec = {
           },
           status: {
             type: 'string',
-            enum: ['open', 'full', 'closed'],
+            enum: ['open', 'full'],
           },
         },
         required: ['channelId', 'maxAgents', 'currentAgents', 'status'],

@@ -1,13 +1,10 @@
 import { matchMaker } from 'colyseus';
 import { listRooms, getColyseusRoomId } from './roomRegistry.js';
 import { MAX_CHANNEL_OCCUPANCY, CHANNEL_PREFIX } from '../constants.js';
+import type { ChannelInfo } from '@openclawworld/shared';
 import type { GameRoom } from '../rooms/GameRoom.js';
 
-export interface ChannelInfo {
-  channelId: string;
-  occupancy: number;
-  maxOccupancy: number;
-}
+export { type ChannelInfo };
 
 export function getChannelList(): ChannelInfo[] {
   const rooms = listRooms();
@@ -15,10 +12,13 @@ export function getChannelList(): ChannelInfo[] {
     .filter(r => r.customRoomId.startsWith(CHANNEL_PREFIX))
     .map(r => {
       const gameRoom = matchMaker.getLocalRoomById(r.colyseusRoomId) as GameRoom | undefined;
+      const currentAgents = gameRoom?.getOccupancy() ?? 0;
+      const maxAgents = MAX_CHANNEL_OCCUPANCY;
       return {
         channelId: r.customRoomId,
-        occupancy: gameRoom?.getOccupancy() ?? 0,
-        maxOccupancy: MAX_CHANNEL_OCCUPANCY,
+        currentAgents,
+        maxAgents,
+        status: (currentAgents >= maxAgents ? 'full' : 'open') as 'open' | 'full' | 'closed',
       };
     });
 }
@@ -31,18 +31,19 @@ export function getChannelList(): ChannelInfo[] {
  * display a non-empty selector.  Actual room creation happens later via
  * `assignChannel()` during `/register`.
  */
-export function getChannelListOrDefault() {
+export function getChannelListOrDefault(): ChannelInfo[] {
   const channels = getChannelList();
   if (channels.length > 0) return channels;
   // Return a single bootstrap entry so the lobby UI is never empty.
   // The channelId matches the first channel assignChannel() would create.
-  return channels.concat([
+  return [
     {
       channelId: `${CHANNEL_PREFIX}-1`,
-      occupancy: 0,
-      maxOccupancy: MAX_CHANNEL_OCCUPANCY,
+      currentAgents: 0,
+      maxAgents: MAX_CHANNEL_OCCUPANCY,
+      status: 'open' as const,
     },
-  ]);
+  ];
 }
 
 /**
@@ -65,8 +66,8 @@ export async function assignChannel(): Promise<{ channelId: string; colyseusRoom
   try {
     const channels = getChannelList();
     const available = channels
-      .filter(c => c.occupancy < c.maxOccupancy)
-      .sort((a, b) => a.occupancy - b.occupancy);
+      .filter(c => c.currentAgents < c.maxAgents)
+      .sort((a, b) => a.currentAgents - b.currentAgents);
 
     if (available.length > 0) {
       const ch = available[0];

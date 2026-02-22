@@ -26,11 +26,8 @@ export type InstalledSkill = {
   enabled: boolean;
 };
 
-export interface ChannelInfo {
-  channelId: string;
-  occupancy: number;
-  maxOccupancy: number;
-}
+import type { ChannelInfo } from '@openclawworld/shared';
+export type { ChannelInfo };
 
 function getServerHostname(): string {
   return typeof window !== 'undefined' ? window.location.hostname : 'localhost';

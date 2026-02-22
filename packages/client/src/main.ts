@@ -36,8 +36,8 @@ async function loadChannels() {
   for (const ch of channels) {
     const btn = document.createElement('button');
     btn.className = 'channel-btn';
-    btn.textContent = `${ch.channelId}  (${ch.occupancy}/${ch.maxOccupancy})`;
-    const full = ch.occupancy >= ch.maxOccupancy;
+    btn.textContent = `${ch.channelId}  (${ch.currentAgents}/${ch.maxAgents})`;
+    const full = ch.currentAgents >= ch.maxAgents;
     btn.disabled = full;
     btn.addEventListener('click', () =>
       selectChannel(ch.channelId, btn.textContent ?? ch.channelId)

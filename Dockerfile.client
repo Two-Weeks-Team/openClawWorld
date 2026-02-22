@@ -1,0 +1,39 @@
+FROM node:22-alpine
+
+RUN apk add --no-cache wget
+RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+
+# Create non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy package manifests for all workspace members so pnpm can honour the
+# lockfile correctly (pnpm install --frozen-lockfile requires them all present).
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/client/package.json ./packages/client/
+COPY packages/plugin/package.json ./packages/plugin/
+COPY packages/ecosystem/package.json ./packages/ecosystem/
+COPY tests/package.json ./tests/
+
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+RUN pnpm install --frozen-lockfile
+
+# Only shared and client source are needed; server is not a client dependency.
+COPY packages/shared ./packages/shared
+COPY packages/client ./packages/client
+COPY world ./world
+
+RUN pnpm --filter @openclawworld/shared build
+
+WORKDIR /app/packages/client
+
+EXPOSE 5173
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=5 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5173/ || exit 1
+
+CMD ["pnpm", "exec", "vite", "--host", "0.0.0.0", "--port", "5173", "--config", "/app/packages/client/vite.config.container.mjs"]

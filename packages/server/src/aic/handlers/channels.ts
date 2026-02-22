@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
-import { getChannelList } from '../channelManager.js';
+import { getChannelListOrDefault } from '../channelManager.js';
 
 export function handleChannels(_req: Request, res: Response): void {
-  const channels = getChannelList();
-  res.json({ status: 'ok', data: { channels } });
+  res.json({ status: 'ok', data: { channels: getChannelListOrDefault() } });
 }

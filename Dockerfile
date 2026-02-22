@@ -13,6 +13,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY packages/shared ./packages/shared
 COPY packages/server ./packages/server
+COPY world ./world
 
 RUN pnpm --filter @openclawworld/shared build && \
     pnpm --filter @openclawworld/server build
@@ -37,6 +38,7 @@ COPY --from=builder /app/packages/server/dist ./packages/server/dist
 RUN pnpm install --frozen-lockfile --prod
 
 COPY --from=builder /app/packages/server/assets ./assets
+COPY --from=builder /app/world ./world
 
 RUN chown -R nodejs:nodejs /app
 

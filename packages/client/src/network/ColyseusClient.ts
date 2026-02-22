@@ -4,7 +4,12 @@ import type appConfig from '../../../server/src/app.config.js';
 import { EntitySchema } from '../generated/schemas/EntitySchema.js';
 import { NPCSchema } from '../generated/schemas/NPCSchema.js';
 import { RoomState } from '../generated/schemas/RoomState.js';
-import type { SkillDefinition, SkillInvokeOutcome, InteractOutcome } from '@openclawworld/shared';
+import type {
+  SkillDefinition,
+  SkillInvokeOutcome,
+  InteractOutcome,
+  ChannelInfo,
+} from '@openclawworld/shared';
 
 export type Entity = EntitySchema;
 export type NPC = NPCSchema;
@@ -26,12 +31,7 @@ export type InstalledSkill = {
   enabled: boolean;
 };
 
-export interface ChannelInfo {
-  channelId: string;
-  currentAgents: number;
-  maxAgents: number;
-  status: 'open' | 'full';
-}
+export type { ChannelInfo };
 
 function getServerHostname(): string {
   return typeof window !== 'undefined' ? window.location.hostname : 'localhost';

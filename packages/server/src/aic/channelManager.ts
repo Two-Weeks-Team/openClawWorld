@@ -1,14 +1,10 @@
 import { matchMaker } from 'colyseus';
 import { listRooms, getColyseusRoomId } from './roomRegistry.js';
 import { MAX_CHANNEL_OCCUPANCY, CHANNEL_PREFIX } from '../constants.js';
+import type { ChannelInfo } from '@openclawworld/shared';
 import type { GameRoom } from '../rooms/GameRoom.js';
 
-export interface ChannelInfo {
-  channelId: string;
-  currentAgents: number;
-  maxAgents: number;
-  status: 'open' | 'full';
-}
+export type { ChannelInfo };
 
 export function getChannelList(): ChannelInfo[] {
   const rooms = listRooms();
@@ -22,8 +18,31 @@ export function getChannelList(): ChannelInfo[] {
         currentAgents,
         maxAgents: MAX_CHANNEL_OCCUPANCY,
         status: currentAgents >= MAX_CHANNEL_OCCUPANCY ? 'full' : 'open',
-      };
+      } as ChannelInfo;
     });
+}
+
+/**
+ * Returns the channel list for the lobby UI, falling back to a single
+ * bootstrap channel when no rooms have been registered yet.
+ *
+ * The bootstrap entry (`channel-1`) is informational — the client uses it to
+ * display a non-empty selector.  Actual room creation happens later via
+ * `assignChannel()` during `/register`.
+ */
+export function getChannelListOrDefault(): ChannelInfo[] {
+  const channels = getChannelList();
+  if (channels.length > 0) return channels;
+  // Return a single bootstrap entry so the lobby UI is never empty.
+  // The channelId matches the first channel assignChannel() would create.
+  return [
+    {
+      channelId: `${CHANNEL_PREFIX}-1`,
+      currentAgents: 0,
+      maxAgents: MAX_CHANNEL_OCCUPANCY,
+      status: 'open' as const,
+    },
+  ];
 }
 
 /**
@@ -69,5 +88,5 @@ export function canJoinChannel(channelId: string): boolean {
   if (!colyseusRoomId) return true;
   const gameRoom = matchMaker.getLocalRoomById(colyseusRoomId) as GameRoom | undefined;
   if (!gameRoom) return true;
-  return gameRoom.getOccupancy() < MAX_CHANNEL_OCCUPANCY; // canJoinChannel uses raw occupancy, not ChannelInfo
+  return gameRoom.getOccupancy() < MAX_CHANNEL_OCCUPANCY;
 }

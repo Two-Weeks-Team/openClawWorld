@@ -148,14 +148,17 @@ import type {
   MoveToResponseData,
   InteractResponseData,
   ChatSendResponseData,
+  SkillInstallResponseData,
 } from '@openclawworld/shared';
 
 export const moveToIdempotencyStore = new IdempotencyStore<MoveToResponseData>();
 export const interactIdempotencyStore = new IdempotencyStore<InteractResponseData>();
 export const chatSendIdempotencyStore = new IdempotencyStore<ChatSendResponseData>();
+export const skillInstallIdempotencyStore = new IdempotencyStore<SkillInstallResponseData>();
 
 export function disposeAllIdempotencyStores(): void {
   moveToIdempotencyStore.dispose();
   interactIdempotencyStore.dispose();
   chatSendIdempotencyStore.dispose();
+  skillInstallIdempotencyStore.dispose();
 }

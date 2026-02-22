@@ -96,6 +96,13 @@ export async function handlePollEvents(req: Request, res: Response): Promise<voi
   const body = req.validatedBody as PollEventsRequest;
   const { agentId, roomId, sinceCursor, limit = 50, waitMs = 0 } = body;
 
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);
 

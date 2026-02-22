@@ -24,6 +24,13 @@ export async function handleInteract(req: Request, res: Response): Promise<void>
   const body = req.validatedBody as InteractRequest;
   const { agentId, roomId, txId, targetId, action } = body;
 
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   try {
     const idempotencyCheck = interactIdempotencyStore.check(agentId, roomId, txId, body);
 

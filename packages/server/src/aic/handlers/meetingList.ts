@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { matchMaker } from 'colyseus';
-import type { MeetingListResponseData, AicErrorObject } from '@openclawworld/shared';
+import type { MeetingListRequest, MeetingListResponseData, AicErrorObject } from '@openclawworld/shared';
 import { getAllMeetingIds, getColyseusRoomIdForMeeting } from '../meetingRegistry.js';
 import type { MeetingRoom } from '../../rooms/MeetingRoom.js';
 
@@ -15,7 +15,17 @@ function createErrorResponse(
   };
 }
 
-export async function handleMeetingList(_req: Request, res: Response): Promise<void> {
+export async function handleMeetingList(req: Request, res: Response): Promise<void> {
+  const body = req.validatedBody as MeetingListRequest;
+  const { agentId } = body;
+
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   try {
     const meetingIds = getAllMeetingIds();
     const meetings: MeetingListResponseData['meetings'] = [];

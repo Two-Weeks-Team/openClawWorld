@@ -27,6 +27,13 @@ export async function handleProfileUpdate(req: Request, res: Response): Promise<
   const body = req.validatedBody as ProfileUpdateRequest;
   const { agentId, roomId, status, statusMessage, title, department } = body;
 
+  if (req.authAgentId !== agentId) {
+    res
+      .status(403)
+      .json(createErrorResponse('forbidden', 'Agent ID mismatch with auth token', false));
+    return;
+  }
+
   try {
     const colyseusRoomId = getColyseusRoomId(roomId);
 

@@ -1797,7 +1797,10 @@ export class GameScene extends Phaser.Scene {
           (Math.abs(entity.pos.x - prev.x) > 0.1 || Math.abs(entity.pos.y - prev.y) > 0.1);
         this.entityPrevPos.set(key, { x: entity.pos.x, y: entity.pos.y });
 
-        if (avatar instanceof Phaser.GameObjects.Sprite && avatar.texture.key !== CHARACTER_PACK_KEY) {
+        if (
+          avatar instanceof Phaser.GameObjects.Sprite &&
+          avatar.texture.key !== CHARACTER_PACK_KEY
+        ) {
           const entityType = entity.kind === 'agent' ? 'agent' : 'human';
           updatePlayerAnimation(avatar, isMoving, entity.facing, entityType);
         } else {

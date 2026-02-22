@@ -14,7 +14,7 @@ import { ClientCollisionSystem } from '../../systems/CollisionSystem';
 import { AudioManager, AudioKeys } from '../../systems/AudioManager';
 import { SkillBar, type SkillSlot } from '../../ui/SkillBar';
 import { CastBar } from '../../ui/CastBar';
-import { skinTintFromId, createHeadSprite, CHARACTER_PACK_KEY } from '../CharacterPack';
+import { skinTintFromId, createCharacter, CHARACTER_PACK_KEY } from '../CharacterPack';
 import { EmoteDisplay } from '../../ui/EmoteDisplay';
 import {
   createWalkAnimations,
@@ -1274,9 +1274,9 @@ export class GameScene extends Phaser.Scene {
     }
     effects.add(effectType);
 
-    const sprite = container.list[0] as Phaser.GameObjects.Sprite;
+    const avatar = container.list[0] as Phaser.GameObjects.GameObject;
     if (effectType === 'slowed') {
-      sprite.setTint(0x6688ff);
+      this.setAvatarTint(avatar, 0x6688ff);
     }
 
     // Play a particle burst when an effect is applied
@@ -1350,13 +1350,13 @@ export class GameScene extends Phaser.Scene {
       effects.delete(effectType);
     }
 
-    const sprite = container.list[0] as Phaser.GameObjects.Sprite;
+    const avatar = container.list[0] as Phaser.GameObjects.GameObject;
     const remainingEffects = effects?.size ?? 0;
     if (remainingEffects === 0) {
       if (entityId === gameClient.entityId) {
-        sprite.setTint(0xffff00);
+        this.setAvatarTint(avatar, 0xffff00);
       } else {
-        sprite.clearTint();
+        this.clearAvatarTint(avatar);
       }
     }
   }
@@ -1467,15 +1467,18 @@ export class GameScene extends Phaser.Scene {
     // Use the modular character pack for avatar variety: each entity gets a
     // deterministic skin tint derived from its ID, falling back to the legacy
     // players atlas when the character_pack texture is unavailable.
-    let sprite: Phaser.GameObjects.Sprite;
+    let avatar: Phaser.GameObjects.GameObject;
     if (this.textures.exists(CHARACTER_PACK_KEY)) {
       const tint = skinTintFromId(key);
-      sprite = createHeadSprite(this, tint);
+      const assembledCharacter = createCharacter(this, tint, 0, 0);
+      assembledCharacter.setPosition(0, -12);
+      avatar = assembledCharacter;
     } else {
       let frame = 'player-human';
       if (type === 'agent') frame = 'player-agent';
-      sprite = this.add.sprite(0, 0, 'players', frame);
+      const sprite = this.add.sprite(0, 0, 'players', frame);
       sprite.setOrigin(0.5, 0.5);
+      avatar = sprite;
     }
 
     const text = this.add.text(0, -20, entity.name, {
@@ -1489,7 +1492,7 @@ export class GameScene extends Phaser.Scene {
     const statusCircle = this.add.circle(text.width / 2 + 6, -20, 4, 0x00ff00);
     statusCircle.setName('statusIndicator');
 
-    container.add([sprite, text, statusCircle]);
+    container.add([avatar, text, statusCircle]);
     this.entities.set(key, container);
     this.entityData.set(key, entity);
 
@@ -1548,19 +1551,23 @@ export class GameScene extends Phaser.Scene {
     const spriteKey = getNPCSpriteKey(npc.definitionId || '', npc.role);
     this.npcSpriteKeys.set(key, spriteKey);
 
-    let sprite: Phaser.GameObjects.Sprite;
+    let avatar: Phaser.GameObjects.GameObject;
     if (this.textures.getFrame('npcs', spriteKey)) {
-      sprite = this.add.sprite(0, 0, 'npcs', spriteKey);
+      const sprite = this.add.sprite(0, 0, 'npcs', spriteKey);
       sprite.setOrigin(0.5, 0.5);
+      avatar = sprite;
     } else if (this.textures.exists(CHARACTER_PACK_KEY)) {
       // NPC avatars fall back to the character pack with a deterministic tint
       // from the NPC's definition ID.
       const tint = skinTintFromId(npc.definitionId || key);
-      sprite = createHeadSprite(this, tint);
+      const assembledCharacter = createCharacter(this, tint, 0, 0);
+      assembledCharacter.setPosition(0, -12);
+      avatar = assembledCharacter;
     } else {
-      sprite = this.add.sprite(0, 0, 'players', 'player-human');
+      const sprite = this.add.sprite(0, 0, 'players', 'player-human');
       sprite.setOrigin(0.5, 0.5);
       sprite.setTint(0x66dd66);
+      avatar = sprite;
     }
 
     const nameTag = this.add.text(0, -24, npc.name, {
@@ -1577,7 +1584,7 @@ export class GameScene extends Phaser.Scene {
     });
     roleTag.setOrigin(0.5, 0.5);
 
-    container.add([sprite, nameTag, roleTag]);
+    container.add([avatar, nameTag, roleTag]);
     this.npcContainers.set(key, container);
     this.npcData.set(key, npc);
   }
@@ -1607,19 +1614,19 @@ export class GameScene extends Phaser.Scene {
         container.y = Phaser.Math.Linear(container.y, npc.y, t);
         container.setDepth(container.y);
 
-        const sprite = container.list[0] as Phaser.GameObjects.Sprite;
+        const avatar = container.list[0] as Phaser.GameObjects.GameObject;
         const dx = Math.abs(container.x - prevX);
         const dy = Math.abs(container.y - prevY);
         const isMoving = dx > 0.1 || dy > 0.1;
         const spriteKey = this.npcSpriteKeys.get(key) ?? 'greeter';
-        if (sprite.texture.key === CHARACTER_PACK_KEY) {
-          if (npc.facing === 'left') {
-            sprite.setFlipX(true);
-          } else if (npc.facing === 'right') {
-            sprite.setFlipX(false);
+        if (avatar instanceof Phaser.GameObjects.Sprite) {
+          if (avatar.texture.key === CHARACTER_PACK_KEY) {
+            this.setAvatarFacing(avatar, npc.facing);
+          } else {
+            updateNPCAnimation(avatar, isMoving, npc.facing, spriteKey);
           }
         } else {
-          updateNPCAnimation(sprite, isMoving, npc.facing, spriteKey);
+          this.setAvatarFacing(avatar, npc.facing);
         }
       }
     });
@@ -1723,6 +1730,56 @@ export class GameScene extends Phaser.Scene {
     this.minimap.updateViewport(this.cameras.main);
   }
 
+  private setAvatarFacing(avatar: Phaser.GameObjects.GameObject, facing: string): void {
+    if (avatar instanceof Phaser.GameObjects.Sprite) {
+      if (facing === 'left') {
+        avatar.setFlipX(true);
+      } else if (facing === 'right') {
+        avatar.setFlipX(false);
+      }
+      return;
+    }
+
+    if (avatar instanceof Phaser.GameObjects.Container) {
+      const scaleX = Math.abs(avatar.scaleX);
+      if (facing === 'left') {
+        avatar.setScale(-scaleX, avatar.scaleY);
+      } else if (facing === 'right') {
+        avatar.setScale(scaleX, avatar.scaleY);
+      }
+    }
+  }
+
+  private setAvatarTint(avatar: Phaser.GameObjects.GameObject, tint: number): void {
+    if (avatar instanceof Phaser.GameObjects.Sprite) {
+      avatar.setTint(tint);
+      return;
+    }
+
+    if (avatar instanceof Phaser.GameObjects.Container) {
+      for (const child of avatar.list) {
+        if (child instanceof Phaser.GameObjects.Sprite) {
+          child.setTint(tint);
+        }
+      }
+    }
+  }
+
+  private clearAvatarTint(avatar: Phaser.GameObjects.GameObject): void {
+    if (avatar instanceof Phaser.GameObjects.Sprite) {
+      avatar.clearTint();
+      return;
+    }
+
+    if (avatar instanceof Phaser.GameObjects.Container) {
+      for (const child of avatar.list) {
+        if (child instanceof Phaser.GameObjects.Sprite) {
+          child.clearTint();
+        }
+      }
+    }
+  }
+
   private interpolateEntities() {
     this.entityData.forEach((entity, key) => {
       const container = this.entities.get(key);
@@ -1732,7 +1789,7 @@ export class GameScene extends Phaser.Scene {
         container.y = Phaser.Math.Linear(container.y, entity.pos.y, t);
         container.setDepth(container.y);
 
-        const sprite = container.list[0] as Phaser.GameObjects.Sprite;
+        const avatar = container.list[0] as Phaser.GameObjects.GameObject;
 
         const prev = this.entityPrevPos.get(key);
         const isMoving =
@@ -1740,19 +1797,15 @@ export class GameScene extends Phaser.Scene {
           (Math.abs(entity.pos.x - prev.x) > 0.1 || Math.abs(entity.pos.y - prev.y) > 0.1);
         this.entityPrevPos.set(key, { x: entity.pos.x, y: entity.pos.y });
 
-        if (sprite.texture.key === CHARACTER_PACK_KEY) {
-          if (entity.facing === 'left') {
-            sprite.setFlipX(true);
-          } else if (entity.facing === 'right') {
-            sprite.setFlipX(false);
-          }
-        } else {
+        if (avatar instanceof Phaser.GameObjects.Sprite && avatar.texture.key !== CHARACTER_PACK_KEY) {
           const entityType = entity.kind === 'agent' ? 'agent' : 'human';
-          updatePlayerAnimation(sprite, isMoving, entity.facing, entityType);
+          updatePlayerAnimation(avatar, isMoving, entity.facing, entityType);
+        } else {
+          this.setAvatarFacing(avatar, entity.facing);
         }
 
         if (key === gameClient.entityId) {
-          sprite.setTint(0xffff00);
+          this.setAvatarTint(avatar, 0xffff00);
         }
       }
     });

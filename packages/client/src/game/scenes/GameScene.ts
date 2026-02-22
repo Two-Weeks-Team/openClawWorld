@@ -1274,7 +1274,8 @@ export class GameScene extends Phaser.Scene {
     }
     effects.add(effectType);
 
-    const avatar = container.list[0] as Phaser.GameObjects.GameObject;
+    const avatar = container.list[0] as Phaser.GameObjects.GameObject | undefined;
+    if (!avatar) return;
     if (effectType === 'slowed') {
       this.setAvatarTint(avatar, 0x6688ff);
     }
@@ -1350,7 +1351,8 @@ export class GameScene extends Phaser.Scene {
       effects.delete(effectType);
     }
 
-    const avatar = container.list[0] as Phaser.GameObjects.GameObject;
+    const avatar = container.list[0] as Phaser.GameObjects.GameObject | undefined;
+    if (!avatar) return;
     const remainingEffects = effects?.size ?? 0;
     if (remainingEffects === 0) {
       if (entityId === gameClient.entityId) {
@@ -1808,7 +1810,13 @@ export class GameScene extends Phaser.Scene {
         }
 
         if (key === gameClient.entityId) {
-          this.setAvatarTint(avatar, 0xffff00);
+          // Only apply the local-player highlight if no effects are currently
+          // active.  Effect visuals (e.g. 'slowed' → blue tint) would otherwise
+          // be overwritten on every frame.
+          const activeEffects = this.entityEffects.get(key);
+          if (!activeEffects || activeEffects.size === 0) {
+            this.setAvatarTint(avatar, 0xffff00);
+          }
         }
       }
     });

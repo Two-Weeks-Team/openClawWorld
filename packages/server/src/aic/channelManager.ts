@@ -24,6 +24,26 @@ export function getChannelList(): ChannelInfo[] {
 }
 
 /**
+ * Returns the channel list for the lobby UI, falling back to a single
+ * bootstrap channel when no rooms have been registered yet.
+ *
+ * The bootstrap entry (`channel-1`) is informational — the client uses it to
+ * display a non-empty selector.  Actual room creation happens later via
+ * `assignChannel()` during `/register`.
+ */
+export function getChannelListOrDefault(): ChannelInfo[] {
+  const channels = getChannelList();
+  if (channels.length > 0) return channels;
+  return [
+    {
+      channelId: `${CHANNEL_PREFIX}-1`,
+      occupancy: 0,
+      maxOccupancy: MAX_CHANNEL_OCCUPANCY,
+    },
+  ];
+}
+
+/**
  * Mutex for channel creation to prevent TOCTOU race conditions.
  * Multiple concurrent requests checking "all channels full" simultaneously
  * would otherwise all try to create the same new channel ID.

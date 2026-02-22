@@ -23,3 +23,5 @@ node_modules
 packages/client
 packages/plugin
 .github
+!packages/client
+!packages/client/**

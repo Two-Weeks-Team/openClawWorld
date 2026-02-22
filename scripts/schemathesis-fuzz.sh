@@ -91,7 +91,7 @@ schemathesis run "${BASE_URL}/openapi.json" \
   --checks not_a_server_error,status_code_conformance,response_schema_conformance \
   --url "${BASE_URL}/aic/v0.1" \
   --max-examples "${MAX_EXAMPLES}" \
-  --request-timeout 10 \
+  --request-timeout 10000 \
   --workers 1 \
   --report junit \
   --report-junit-path schemathesis-report.xml \

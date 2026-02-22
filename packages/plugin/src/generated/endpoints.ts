@@ -990,7 +990,6 @@ export type ChannelInfoStatus = (typeof ChannelInfoStatus)[keyof typeof ChannelI
 export const ChannelInfoStatus = {
   open: 'open',
   full: 'full',
-  closed: 'closed',
 } as const;
 
 export interface ChannelInfo {

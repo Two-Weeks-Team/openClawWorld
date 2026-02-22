@@ -52,16 +52,15 @@ export async function handleChatSend(req: Request, res: Response): Promise<void>
     }
 
     if (!VALID_CHANNELS.includes(channel as (typeof VALID_CHANNELS)[number])) {
-      const responseData: ChatSendResponseData = {
-        txId,
-        applied: false,
-        serverTsMs: Date.now(),
-      };
-      chatSendIdempotencyStore.save(agentId, roomId, txId, body, responseData);
-      res.status(200).json({
-        status: 'ok',
-        data: responseData,
-      });
+      res
+        .status(400)
+        .json(
+          createErrorResponse(
+            'bad_request',
+            `Channel '${channel}' is not supported. Supported channels: ${VALID_CHANNELS.join(', ')}`,
+            false
+          )
+        );
       return;
     }
 

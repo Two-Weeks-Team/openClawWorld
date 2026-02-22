@@ -1,7 +1,12 @@
 import type { Request, Response } from 'express';
 import { matchMaker } from 'colyseus';
-import type { SkillInstallRequest, AicErrorObject } from '@openclawworld/shared';
+import type {
+  SkillInstallRequest,
+  SkillInstallResponseData,
+  AicErrorObject,
+} from '@openclawworld/shared';
 import type { GameRoom } from '../../rooms/GameRoom.js';
+import { skillInstallIdempotencyStore } from '../idempotency.js';
 import { getColyseusRoomId } from '../roomRegistry.js';
 
 function createErrorResponse(
@@ -21,7 +26,7 @@ function createErrorResponse(
 
 export async function handleSkillInstall(req: Request, res: Response): Promise<void> {
   const body = req.validatedBody as SkillInstallRequest;
-  const { agentId, roomId, skillId, credentials } = body;
+  const { agentId, roomId, txId, skillId, credentials } = body;
 
   if (req.authAgentId !== agentId) {
     res
@@ -31,6 +36,21 @@ export async function handleSkillInstall(req: Request, res: Response): Promise<v
   }
 
   try {
+    const idempotencyCheck = skillInstallIdempotencyStore.check(agentId, roomId, txId, body);
+
+    if (idempotencyCheck.status === 'conflict') {
+      res.status(409).json(createErrorResponse('conflict', idempotencyCheck.error.message, false));
+      return;
+    }
+
+    if (idempotencyCheck.status === 'replay') {
+      res.status(200).json({
+        status: 'ok',
+        data: idempotencyCheck.result,
+      });
+      return;
+    }
+
     const colyseusRoomId = getColyseusRoomId(roomId);
 
     if (!colyseusRoomId) {
@@ -78,15 +98,14 @@ export async function handleSkillInstall(req: Request, res: Response): Promise<v
     }
 
     if (skillService.hasSkillInstalled(agentId, skillId)) {
-      res.status(200).json({
-        status: 'ok',
-        data: {
-          skillId,
-          installed: true,
-          alreadyInstalled: true,
-          serverTsMs: Date.now(),
-        },
-      });
+      const responseData: SkillInstallResponseData = {
+        skillId,
+        installed: true,
+        alreadyInstalled: true,
+        serverTsMs: Date.now(),
+      };
+      skillInstallIdempotencyStore.save(agentId, roomId, txId, body, responseData);
+      res.status(200).json({ status: 'ok', data: responseData });
       return;
     }
 
@@ -99,15 +118,14 @@ export async function handleSkillInstall(req: Request, res: Response): Promise<v
       return;
     }
 
-    res.status(200).json({
-      status: 'ok',
-      data: {
-        skillId,
-        installed: true,
-        alreadyInstalled: false,
-        serverTsMs: Date.now(),
-      },
-    });
+    const responseData: SkillInstallResponseData = {
+      skillId,
+      installed: true,
+      alreadyInstalled: false,
+      serverTsMs: Date.now(),
+    };
+    skillInstallIdempotencyStore.save(agentId, roomId, txId, body, responseData);
+    res.status(200).json({ status: 'ok', data: responseData });
   } catch (error) {
     console.error(`[SkillInstallHandler] Error processing skillInstall request:`, error);
     res

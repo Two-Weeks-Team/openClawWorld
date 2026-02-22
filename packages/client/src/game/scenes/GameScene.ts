@@ -1466,19 +1466,24 @@ export class GameScene extends Phaser.Scene {
     const container = this.add.container(entity.pos.x, entity.pos.y);
     container.setDepth(entity.pos.y);
 
-    // Use the modular character pack for avatar variety: each entity gets a
-    // deterministic skin tint derived from its ID, falling back to the legacy
-    // players atlas when the character_pack texture is unavailable.
+    // Use the canonical Kenney players atlas for consistent avatar rendering.
+    // player-human for human entities, player-agent for AI agents.
+    // Falls back to the character_pack modular system when the players atlas
+    // is unavailable.
     let avatar: Phaser.GameObjects.GameObject;
-    if (this.textures.exists(CHARACTER_PACK_KEY)) {
+    if (this.textures.exists('players')) {
+      const frame = type === 'agent' ? 'player-agent' : 'player-human';
+      const sprite = this.add.sprite(0, 0, 'players', frame);
+      sprite.setOrigin(0.5, 0.5);
+      avatar = sprite;
+    } else if (this.textures.exists(CHARACTER_PACK_KEY)) {
       const tint = skinTintFromId(key);
       const assembledCharacter = createCharacter(this, tint, 0, 0);
       assembledCharacter.setPosition(0, -12);
       avatar = assembledCharacter;
     } else {
-      let frame = 'player-human';
-      if (type === 'agent') frame = 'player-agent';
-      const sprite = this.add.sprite(0, 0, 'players', frame);
+      const frame = type === 'agent' ? 'player-agent' : 'player-human';
+      const sprite = this.add.sprite(0, 0, 'characters', frame);
       sprite.setOrigin(0.5, 0.5);
       avatar = sprite;
     }
@@ -1555,17 +1560,12 @@ export class GameScene extends Phaser.Scene {
 
     let avatar: Phaser.GameObjects.GameObject;
     if (this.textures.getFrame('npcs', spriteKey)) {
+      // Primary: canonical Kenney NPC sprites with walk animations
       const sprite = this.add.sprite(0, 0, 'npcs', spriteKey);
       sprite.setOrigin(0.5, 0.5);
       avatar = sprite;
-    } else if (this.textures.exists(CHARACTER_PACK_KEY)) {
-      // NPC avatars fall back to the character pack with a deterministic tint
-      // from the NPC's definition ID.
-      const tint = skinTintFromId(npc.definitionId || key);
-      const assembledCharacter = createCharacter(this, tint, 0, 0);
-      assembledCharacter.setPosition(0, -12);
-      avatar = assembledCharacter;
     } else {
+      // Fallback: players atlas with green tint to distinguish NPC from player
       const sprite = this.add.sprite(0, 0, 'players', 'player-human');
       sprite.setOrigin(0.5, 0.5);
       sprite.setTint(0x66dd66);

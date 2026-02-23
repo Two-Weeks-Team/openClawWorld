@@ -25,3 +25,10 @@ packages/plugin
 .github
 !packages/client
 !packages/client/**
+!packages/plugin
+!packages/plugin/**
+packages/client/node_modules
+packages/client/**/node_modules
+packages/plugin/node_modules
+packages/plugin/**/node_modules
+!tests/package.json

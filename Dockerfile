@@ -1,7 +1,7 @@
 # Build stage
 FROM node:25-alpine AS builder
 
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN npm install -g pnpm@9.0.0
 
 WORKDIR /app
 
@@ -21,7 +21,7 @@ RUN pnpm --filter @openclawworld/shared build && \
 # Production stage
 FROM node:25-alpine AS production
 
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN npm install -g pnpm@9.0.0
 
 RUN apk add --no-cache wget && \
     addgroup -g 1001 -S nodejs && \

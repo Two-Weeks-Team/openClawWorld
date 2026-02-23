@@ -1,7 +1,7 @@
 FROM node:25-alpine
 
 RUN apk add --no-cache wget
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN npm install -g pnpm@9.0.0
 
 # Create non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup

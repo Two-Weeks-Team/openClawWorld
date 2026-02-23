@@ -76,7 +76,7 @@ export async function assignChannel(): Promise<{ channelId: string; colyseusRoom
     // All channels full — create next one
     const nextNum = channels.length + 1;
     const newChannelId = `${CHANNEL_PREFIX}-${nextNum}`;
-    const roomRef = await matchMaker.createRoom('game', { roomId: newChannelId });
+    const roomRef = await matchMaker.createRoom('game', { channelId: newChannelId });
     return { channelId: newChannelId, colyseusRoomId: roomRef.roomId };
   } finally {
     releaseLock();

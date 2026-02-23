@@ -100,12 +100,12 @@ export class GameRoom extends Room<{ state: RoomState }> {
   }
 
   override onCreate(options: {
-    roomId?: string;
+    channelId?: string;
     mapId?: string;
     tickRate?: number;
     packPath?: string;
   }): void {
-    const roomId = options.roomId ?? 'default';
+    const roomId = options.channelId ?? 'default';
     const tickRate = options.tickRate ?? 20;
     const packPath = options.packPath ?? DEFAULT_WORLD_PACK_PATH;
 
@@ -143,7 +143,7 @@ export class GameRoom extends Room<{ state: RoomState }> {
     }
 
     this.setState(new RoomState(roomId, mapId, tickRate, gameMap));
-    this.setMetadata({ roomId });
+    this.setMetadata({ channelId: roomId });
     registerRoom(roomId, this.roomId);
     this.facilityService = new FacilityService(this.state);
     registerAllFacilityHandlers(this.facilityService);

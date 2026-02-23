@@ -3372,7 +3372,9 @@ class ResidentAgentLoop {
 
   private async checkServerHealth(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.config.serverUrl}/health`);
+      const response = await fetch(`${this.config.serverUrl}/health`, {
+        signal: AbortSignal.timeout(5000),
+      });
       return response.ok;
     } catch {
       return false;
@@ -3389,6 +3391,7 @@ class ResidentAgentLoop {
         return true;
       }
       if (attempt < HEALTH_CHECK_MAX_RETRIES) {
+        // Backoff delays: 2s, 4s, 8s, 16s (no sleep after final attempt)
         const delayMs = HEALTH_CHECK_INITIAL_DELAY_MS * Math.pow(2, attempt - 1);
         console.warn(
           `⚠️ Server not reachable (attempt ${attempt}/${HEALTH_CHECK_MAX_RETRIES}). Retrying in ${delayMs}ms...`

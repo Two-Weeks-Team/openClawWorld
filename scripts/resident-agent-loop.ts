@@ -43,6 +43,7 @@ interface Config {
   roomId: string;
   cycleDelayMs: number;
   issueCheckIntervalMs: number;
+  allowStale: boolean;
 }
 
 interface AgentState {
@@ -213,6 +214,16 @@ const REREGISTER_MAX_ATTEMPTS = 3;
 const REREGISTER_RETRY_DELAY_MS = 500;
 const RECOVERABLE_UNREGISTER_STATUS_CODES = new Set([401, 403, 404]);
 const AUTH_ERROR_STATUS_CODES = new Set([401]);
+/** Endpoints where HTTP 404 signals lost registration (e.g. after server restart), not a missing resource. */
+const REGISTRATION_LOSS_ON_404_ENDPOINTS = new Set([
+  'Observe',
+  'Move',
+  'Chat',
+  'ChatObserve',
+  'PollEvents',
+  'ProfileUpdate',
+  'Interact',
+]);
 const MAX_CONSECUTIVE_AUTH_ERRORS = 3;
 
 const HIGH_ERROR_RATE_ROLLING_WINDOW = 50;
@@ -962,9 +973,10 @@ class GitHubIssueReporter {
           };
         }
 
-        const existingArea = existingIssue.labels?.find(
-          (l: string) => l.toLowerCase() === issue.area.toLowerCase()
-        );
+        const existingArea = existingIssue.labels?.find((l: string | { name?: string }) => {
+          const name = typeof l === 'string' ? l : l?.name;
+          return name?.toLowerCase() === issue.area.toLowerCase();
+        });
 
         if (existingArea) {
           const similarity = this.calculateSimilarity(normalizedTitle, existingNormalized);
@@ -2366,15 +2378,18 @@ class ResidentAgent {
     if (!(error instanceof Error)) return false;
 
     const message = error.message;
-    // Pattern: "Observe failed: 401", "Move failed: 401"
-    const statusMatch = message.match(/failed:\s*(\d{3})/i);
+    // Pattern: "Observe failed: 401", "Move failed: 404"
+    const statusMatch = message.match(/^(\w+)\s+failed:\s*(\d{3})/i);
     if (statusMatch) {
-      const statusCode = parseInt(statusMatch[1], 10);
-      return AUTH_ERROR_STATUS_CODES.has(statusCode);
+      const endpoint = statusMatch[1];
+      const statusCode = parseInt(statusMatch[2], 10);
+      if (AUTH_ERROR_STATUS_CODES.has(statusCode)) return true;
+      // Treat 404 as auth error only for endpoints where it signals lost registration
+      if (statusCode === 404 && REGISTRATION_LOSS_ON_404_ENDPOINTS.has(endpoint)) {
+        return true;
+      }
     }
 
-    // Only rely on status code matching; avoid broad string patterns
-    // that could false-positive on unrelated error messages
     return false;
   }
 
@@ -3376,7 +3391,14 @@ class ResidentAgentLoop {
       return true;
     }
 
-    const reason = `Resident loop running stale commit (${runningSha}); latest tracked origin/main is ${trackedMainSha}. Please restart loop from latest main.`;
+    if (this.config.allowStale) {
+      console.warn(
+        `⚠️ Running stale commit (${runningSha}) vs origin/main (${trackedMainSha}). Continuing due to --allow-stale flag.`
+      );
+      return true;
+    }
+
+    const reason = `Resident loop running stale commit (${runningSha}); latest tracked origin/main is ${trackedMainSha}. Please restart loop from latest main or use --allow-stale.`;
     console.error(`❌ ${reason}`);
     await this.reportDeployIssue(reason);
     return false;
@@ -3526,6 +3548,7 @@ function parseArgs(): Config {
     roomId: 'auto',
     cycleDelayMs: 2000,
     issueCheckIntervalMs: 10000,
+    allowStale: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -3583,6 +3606,9 @@ function parseArgs(): Config {
           i++;
         }
         break;
+      case '--allow-stale':
+        config.allowStale = true;
+        break;
       case '--help':
       case '-h':
         printHelp();
@@ -3607,6 +3633,9 @@ function printHelp(): void {
   console.log('  -r, --room <id>       Room ID (default: default)');
   console.log('  -u, --url <url>       Server URL (default: http://localhost:2567)');
   console.log('  --delay <ms>          Cycle delay in ms (default: 2000)');
+  console.log(
+    '  --allow-stale         Skip stale-commit guard (allow running from non-main branch)'
+  );
   console.log('  -h, --help            Show this help message');
   console.log();
   console.log('Environment Variables:');

@@ -22,7 +22,7 @@
   "dependencies": {
     "@openclawworld/plugin": "workspace:*",
     "@openclawworld/shared": "workspace:*",
-    "@anthropic-ai/sdk": "^0.39.0"
+    "@anthropic-ai/sdk": "^0.78.0"
   },
   "devDependencies": {
     "typescript": "^5.4.0",

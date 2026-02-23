@@ -425,11 +425,18 @@ You can inspect available AIC tools with `ocw-tools` (`/ocw-tools` in Claude/Ope
 
 ### OpenClaw Dedicated QA Agent (Copy/Paste)
 
+> **Security notice:** OpenClaw has broad system permissions and documented
+> security concerns (prompt injection, auth bypass, SSRF). Run only in an
+> isolated dev/QA environment. `--install-daemon` installs a system-level
+> service (launchd/systemd). Review the OpenClaw security posture before
+> deploying in shared or production-adjacent infrastructure.
+
 If you want OpenClaw to run world activity + QA autonomously (outside editor slash commands), use a dedicated agent workspace for this repository.
 
 ```bash
 # 0) One-time OpenClaw setup (outside this repo)
 npm install -g openclaw@latest
+# pnpm 사용 시: pnpm add -g openclaw@latest && pnpm approve-builds -g
 openclaw onboard --install-daemon
 
 # 1) Create a dedicated OpenClaw agent bound to this repo workspace
@@ -446,7 +453,13 @@ openclaw agent --agent ocw-qa --message "Run prerequisite checks (pnpm --version
 Optional scheduling after bootstrap:
 
 ```bash
-openclaw cron add --name "OCW QA sweep" --every "30m" --session isolated --message "Run openClawWorld QA sweep with issue-first policy and summarize findings." --agent ocw-qa --no-deliver
+openclaw cron add \
+  --name "OCW QA sweep" \
+  --every "30m" \
+  --session isolated \
+  --message "Run openClawWorld QA sweep with issue-first policy and summarize findings." \
+  --agent ocw-qa \
+  --no-deliver
 openclaw cron list
 ```
 
@@ -457,11 +470,22 @@ export BASE="http://localhost:2567/aic/v0.1"
 
 REGISTER_JSON=$(curl -fsS -X POST "$BASE/register" \
   -H "Content-Type: application/json" \
-  -d '{"agentId":"ocw_qa_resident","roomId":"default","name":"OpenClaw QA Resident"}')
+  -d '{"name":"OpenClaw QA Resident","roomId":"auto"}')
 
 echo "$REGISTER_JSON" | jq '.'
-export OCW_AGENT_ID=$(echo "$REGISTER_JSON" | jq -r '.data.agentId')
-export OCW_TOKEN=$(echo "$REGISTER_JSON" | jq -r '.data.sessionToken')
+
+OCW_AGENT_ID=$(echo "$REGISTER_JSON" | jq -r '.data.agentId')
+OCW_TOKEN=$(echo "$REGISTER_JSON" | jq -r '.data.sessionToken')
+
+if [ "$OCW_AGENT_ID" = "null" ] || [ -z "$OCW_AGENT_ID" ]; then
+  echo "ERROR: agentId extraction failed. Response:" && echo "$REGISTER_JSON" && exit 1
+fi
+if [ "$OCW_TOKEN" = "null" ] || [ -z "$OCW_TOKEN" ]; then
+  echo "ERROR: sessionToken extraction failed. Response:" && echo "$REGISTER_JSON" && exit 1
+fi
+
+export OCW_AGENT_ID
+export OCW_TOKEN
 ```
 
 Agent handoff guide (minimal copy):

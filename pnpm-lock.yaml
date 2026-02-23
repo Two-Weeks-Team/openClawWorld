@@ -139,8 +139,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       '@scalar/express-api-reference':
-        specifier: ^0.8.40
-        version: 0.8.40
+        specifier: ^0.8.44
+        version: 0.8.44
       colyseus:
         specifier: ^0.17.8
         version: 0.17.8(@colyseus/auth@0.17.6(@colyseus/core@0.17.35(@colyseus/better-call@1.3.1(zod@4.3.6))(@colyseus/schema@4.0.14(typescript@5.9.3))(@colyseus/ws-transport@0.17.9(@colyseus/core@0.17.35)(express@5.2.1))(@pm2/io@6.1.0)(express@5.2.1)(zod@4.3.6))(express@5.2.1))(@colyseus/better-call@1.3.1(zod@4.3.6))(@colyseus/core@0.17.35(@colyseus/better-call@1.3.1(zod@4.3.6))(@colyseus/schema@4.0.14(typescript@5.9.3))(@colyseus/ws-transport@0.17.9(@colyseus/core@0.17.35)(express@5.2.1))(@pm2/io@6.1.0)(express@5.2.1)(zod@4.3.6))(@colyseus/redis-driver@0.17.6(@colyseus/better-call@1.3.1(zod@4.3.6))(@colyseus/schema@4.0.14(typescript@5.9.3))(@colyseus/ws-transport@0.17.9(@colyseus/core@0.17.35)(express@5.2.1))(@pm2/io@6.1.0)(express@5.2.1)(zod@4.3.6))(@colyseus/redis-presence@0.17.6(@colyseus/better-call@1.3.1(zod@4.3.6))(@colyseus/schema@4.0.14(typescript@5.9.3))(@colyseus/ws-transport@0.17.9(@colyseus/core@0.17.35)(express@5.2.1))(@pm2/io@6.1.0)(express@5.2.1)(zod@4.3.6))(@colyseus/schema@4.0.14(typescript@5.9.3))(@colyseus/uwebsockets-transport@0.17.16(@colyseus/core@0.17.35(@colyseus/better-call@1.3.1(zod@4.3.6))(@colyseus/schema@4.0.14(typescript@5.9.3))(@colyseus/ws-transport@0.17.9(@colyseus/core@0.17.35)(express@5.2.1))(@pm2/io@6.1.0)(express@5.2.1)(zod@4.3.6)))(@colyseus/ws-transport@0.17.9(@colyseus/core@0.17.35)(express@5.2.1))(@pm2/io@6.1.0)(express@5.2.1)(zod@4.3.6)
@@ -804,16 +804,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@scalar/core@0.3.37':
-    resolution: {integrity: sha512-cQWMHsGD9jCiYHi91acR3tOsj+qGk+dRQ2W+N5+au1NZ/GkUNT5TUEufekn/sj1S8af+lOnn3y0xXoTI34jCog==}
+  '@scalar/core@0.3.41':
+    resolution: {integrity: sha512-IPgiHOSGBDfBcJELbev0lo+ZHc8Q/vA82neX0Ax1iHNGtf/munH+qN5I+p9rGRS60IRQAwABlUo31Y3Gw1c0EA==}
     engines: {node: '>=20'}
 
-  '@scalar/express-api-reference@0.8.40':
-    resolution: {integrity: sha512-3u7iekCDqgseCN3DequWpyoHSOm/tPBmEV2D1e3wFiKe47em6/b1mDKtYXAS1IPXeGXXpbZTDzteYEqy6U13Cw==}
-    engines: {node: '>=20'}
-
-  '@scalar/helpers@0.2.11':
-    resolution: {integrity: sha512-Y7DLt1bIZF9dvHzJwSJTcC1lpSr1Tbf4VBhHOCRIHu23Rr7/lhQnddRxFmPV1tZXwEQKz7F7yRrubwCfKPCucw==}
+  '@scalar/express-api-reference@0.8.44':
+    resolution: {integrity: sha512-T1rfrtCv8R83iSyhIIhJQLDEOXgylV4T1GxkmlfUQvptGbA7LVcFInTB4eBHae17OiQzx5xoCoDr/1GAVhEoxg==}
     engines: {node: '>=20'}
 
   '@scalar/helpers@0.2.15':
@@ -836,8 +832,8 @@ packages:
     resolution: {integrity: sha512-2xuYLLs0fBadLIk4I1ObjMiCnOyLPEMPf24A1HtHQvhKGDnGlvT63F2rU2Xw8lxCjgHnzveMPnOJEbwIy64RCg==}
     engines: {node: '>=20'}
 
-  '@scalar/types@0.6.2':
-    resolution: {integrity: sha512-VWfY/z9R5NT8PpKVmvmIj6QSh56MMcl8x3JsGiNxR+w7txGQEq+QzEl35aU56uSBFmLfPk1oyInoaHhkosKooA==}
+  '@scalar/types@0.6.6':
+    resolution: {integrity: sha512-nr3m23p5MnGy4Wb4JFT7aA+jzvYSs/AS40NUEoQMBE1IwtuvG5gtLL0uu6kWpDq4UAfrWGntlAQNX7G8X9D4sg==}
     engines: {node: '>=20'}
 
   '@sec-ant/readable-stream@0.4.1':
@@ -2981,15 +2977,13 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.57.1':
     optional: true
 
-  '@scalar/core@0.3.37':
+  '@scalar/core@0.3.41':
     dependencies:
-      '@scalar/types': 0.6.2
+      '@scalar/types': 0.6.6
 
-  '@scalar/express-api-reference@0.8.40':
+  '@scalar/express-api-reference@0.8.44':
     dependencies:
-      '@scalar/core': 0.3.37
-
-  '@scalar/helpers@0.2.11': {}
+      '@scalar/core': 0.3.41
 
   '@scalar/helpers@0.2.15': {}
 
@@ -3020,9 +3014,9 @@ snapshots:
     dependencies:
       '@scalar/openapi-types': 0.5.3
 
-  '@scalar/types@0.6.2':
+  '@scalar/types@0.6.6':
     dependencies:
-      '@scalar/helpers': 0.2.11
+      '@scalar/helpers': 0.2.15
       nanoid: 5.1.6
       type-fest: 5.4.4
       zod: 4.3.6

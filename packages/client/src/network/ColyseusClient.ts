@@ -81,9 +81,12 @@ export class ColyseusClient {
     }
   }
 
-  async connect(name: string, roomId: string): Promise<Room<Record<string, unknown>, RoomState>> {
+  async connect(
+    name: string,
+    channelId: string
+  ): Promise<Room<Record<string, unknown>, RoomState>> {
     try {
-      this.room = await this.client.joinOrCreate<RoomState>('game', { name, roomId }, RoomState);
+      this.room = await this.client.joinOrCreate<RoomState>('game', { name, channelId }, RoomState);
       this._sessionId = this.room.sessionId;
 
       this.room.onMessage('assignedEntityId', (data: { entityId: string }) => {

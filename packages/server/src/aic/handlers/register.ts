@@ -76,7 +76,7 @@ export async function handleRegister(req: Request, res: Response): Promise<void>
       if (!colyseusRoomId) {
         console.log(`[RegisterHandler] No room found for '${targetRoomId}', creating new room`);
         try {
-          const roomRef = await matchMaker.createRoom('game', { roomId: targetRoomId });
+          const roomRef = await matchMaker.createRoom('game', { channelId: targetRoomId });
           colyseusRoomId = roomRef.roomId;
           console.log(`[RegisterHandler] Created room ${colyseusRoomId} for '${targetRoomId}'`);
         } catch (createError) {

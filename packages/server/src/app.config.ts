@@ -36,7 +36,7 @@ function getCorsOrigin(): string[] | false {
 
 const server = defineServer({
   rooms: {
-    game: defineRoom(GameRoom).filterBy(['roomId']),
+    game: defineRoom(GameRoom).filterBy(['channelId']),
     meeting: defineRoom(MeetingRoom),
   },
 

@@ -1,94 +1,130 @@
 name: Code Scanning → GitHub Issues
 
-# Triggers when CodeQL finds a new alert or an existing alert appears in a branch.
-# Note: actionlint may warn about 'code_scanning_alert' — this is a known false positive
-# as actionlint's event database does not yet include this valid GitHub webhook event.
-# See: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#code_scanning_alert
+# Triggers after CodeQL analysis completes on main branch.
+# Previously used `code_scanning_alert` event, which caused phantom failures
+# on every push because GitHub Actions validates all workflow files at push time
+# but cannot process webhook-only events during validation.
 
 on:
-  code_scanning_alert:
-    types: [created, appeared_in_branch]
+  workflow_run:
+    workflows: ['CodeQL']
+    types: [completed]
+    branches: [main]
 
 permissions:
   issues: write
   security-events: read
+  actions: read
 
 jobs:
-  create-issue:
-    name: Create issue for alert
+  create-issues:
+    name: Create issues for new alerts
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Create GitHub Issue
+      - name: Fetch alerts and create issues
         uses: actions/github-script@v7
         with:
           script: |
-            const alert = context.payload.alert;
-            const rule   = alert.rule;
-            const inst   = alert.most_recent_instance;
-            const loc    = inst.location;
+            // Fetch open code scanning alerts for the default branch
+            let alerts;
+            try {
+              const resp = await github.rest.codeScanning.listAlertsForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                ref: 'refs/heads/main',
+                per_page: 100,
+              });
+              alerts = resp.data;
+            } catch (error) {
+              if (error.status === 404) {
+                core.info('Code scanning not enabled or no alerts found.');
+                return;
+              }
+              throw error;
+            }
 
-            const severityEmoji = {
-              critical: '🔴',
-              high:     '🟠',
-              medium:   '🟡',
-              low:      '🔵',
-              note:     '⚪',
-              warning:  '🟡',
-            }[rule.severity] ?? '⚪';
+            if (alerts.length === 0) {
+              core.info('No open code scanning alerts.');
+              return;
+            }
 
-            const lineRef = loc.end_line && loc.end_line !== loc.start_line
-              ? `${loc.start_line}-${loc.end_line}`
-              : `${loc.start_line}`;
-
-            const title = `[CodeQL] ${severityEmoji} ${rule.description} — ${loc.path}:${lineRef}`;
-
-            // Skip if an issue with this exact title already exists (de-duplicate)
+            // Fetch existing open issues with 'codeql' label for deduplication
             const existing = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
-              repo:  context.repo.repo,
+              repo: context.repo.repo,
               state: 'open',
               labels: 'codeql',
               per_page: 100,
             });
-            if (existing.data.some(i => i.title === title)) {
-              core.info(`Issue already exists for: ${title}`);
-              return;
+            const existingTitles = new Set(existing.data.map(i => i.title));
+
+            let created = 0;
+            for (const alert of alerts) {
+              const rule = alert.rule;
+              const inst = alert.most_recent_instance;
+              const loc = inst.location;
+
+              const severityEmoji = {
+                critical: '🔴',
+                high:     '🟠',
+                medium:   '🟡',
+                low:      '🔵',
+                note:     '⚪',
+                warning:  '🟡',
+              }[rule.severity] ?? '⚪';
+
+              const lineRef = loc.end_line && loc.end_line !== loc.start_line
+                ? `${loc.start_line}-${loc.end_line}`
+                : `${loc.start_line}`;
+
+              const title = `[CodeQL] ${severityEmoji} ${rule.description} — ${loc.path}:${lineRef}`;
+
+              if (existingTitles.has(title)) {
+                core.info(`Issue already exists: ${title}`);
+                continue;
+              }
+
+              const body = [
+                `## ${severityEmoji} Code Scanning Alert`,
+                '',
+                `| 항목 | 값 |`,
+                `|------|-----|`,
+                `| **Rule** | \`${rule.id}\` |`,
+                `| **Severity** | \`${rule.severity}\` |`,
+                `| **File** | \`${loc.path}\` (line ${lineRef}) |`,
+                `| **State** | \`${alert.state}\` |`,
+                `| **Alert URL** | [#${alert.number}](${alert.html_url}) |`,
+                '',
+                `### 설명`,
+                rule.full_description || rule.description,
+                '',
+                `### 재현 위치`,
+                '```',
+                `${loc.path}:${lineRef}`,
+                '```',
+                '',
+                `> 이 이슈는 CodeQL 코드 스캐닝 결과로 자동 생성되었습니다.`,
+                `> 해당 [CodeQL alert](${alert.html_url})를 직접 확인하려면 링크를 클릭하세요.`,
+              ].join('\n');
+
+              const labels = ['security', 'codeql'];
+              if (['critical', 'high'].includes(rule.severity)) {
+                labels.push('priority: high');
+              }
+
+              const { data: issue } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels,
+              });
+
+              existingTitles.add(title);
+              created++;
+              core.notice(`Created issue #${issue.number}: ${issue.html_url}`);
             }
 
-            const body = [
-              `## ${severityEmoji} Code Scanning Alert`,
-              '',
-              `| 항목 | 값 |`,
-              `|------|-----|`,
-              `| **Rule** | \`${rule.id}\` |`,
-              `| **Severity** | \`${rule.severity}\` |`,
-              `| **File** | \`${loc.path}\` (line ${lineRef}) |`,
-              `| **State** | \`${alert.state}\` |`,
-              `| **Alert URL** | [#${alert.number}](${alert.html_url}) |`,
-              '',
-              `### 설명`,
-              rule.full_description || rule.description,
-              '',
-              `### 재현 위치`,
-              '```',
-              `${loc.path}:${lineRef}`,
-              '```',
-              '',
-              `> 이 이슈는 CodeQL 코드 스캐닝 결과로 자동 생성되었습니다.`,
-              `> 해당 [CodeQL alert](${alert.html_url})를 직접 확인하려면 링크를 클릭하세요.`,
-            ].join('\n');
-
-            const labels = ['security', 'codeql'];
-            if (['critical', 'high'].includes(rule.severity)) {
-              labels.push('priority: high');
-            }
-
-            const { data: issue } = await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo:  context.repo.repo,
-              title,
-              body,
-              labels,
-            });
-
-            core.notice(`Created issue #${issue.number}: ${issue.html_url}`);
+            core.info(`Done. Created ${created} new issue(s) from ${alerts.length} open alert(s).`);

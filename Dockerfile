@@ -1,5 +1,5 @@
 # Build stage
-FROM node:22-alpine AS builder
+FROM node:25-alpine AS builder
 
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 
@@ -19,7 +19,7 @@ RUN pnpm --filter @openclawworld/shared build && \
     pnpm --filter @openclawworld/server build
 
 # Production stage
-FROM node:22-alpine AS production
+FROM node:25-alpine AS production
 
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 

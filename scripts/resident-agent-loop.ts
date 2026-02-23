@@ -212,6 +212,8 @@ const INTERACTION_HISTORY_MAX_LENGTH = 50;
 const ACTION_LOG_MAX_LENGTH = 20;
 const REREGISTER_MAX_ATTEMPTS = 3;
 const REREGISTER_RETRY_DELAY_MS = 500;
+const HEALTH_CHECK_MAX_RETRIES = 5;
+const HEALTH_CHECK_INITIAL_DELAY_MS = 2000;
 const RECOVERABLE_UNREGISTER_STATUS_CODES = new Set([401, 403, 404]);
 const AUTH_ERROR_STATUS_CODES = new Set([401]);
 /** Endpoints where HTTP 404 signals lost registration (e.g. after server restart), not a missing resource. */
@@ -2317,8 +2319,15 @@ class ResidentAgent {
 
       const result = await response.json();
       if (result.status === 'ok') {
-        this.state.agentId = result.data.agentId;
-        this.state.sessionToken = result.data.sessionToken;
+        const agentId = result.data?.agentId;
+        const sessionToken = result.data?.sessionToken;
+        if (!agentId || !sessionToken) {
+          throw new Error(
+            `Register succeeded but response missing credentials: agentId=${agentId ?? 'null'}, sessionToken=${sessionToken ? '***' : 'null'}`
+          );
+        }
+        this.state.agentId = agentId;
+        this.state.sessionToken = sessionToken;
         console.log(`  ✓ Registered ${this.state.role}: ${this.state.agentId}`);
         return true;
       }
@@ -3312,13 +3321,25 @@ class ResidentAgentLoop {
       return;
     }
 
-    if (!(await this.checkServerHealth())) {
-      console.error('❌ Server not reachable. Please start the server first.');
-      await this.reportDeployIssue('Server unreachable');
+    if (!(await this.waitForServerHealth())) {
+      console.error(
+        `❌ Server not reachable at ${this.config.serverUrl} after ${HEALTH_CHECK_MAX_RETRIES} retries. Please start the server first.`
+      );
+      await this.reportDeployIssue(
+        `Server unreachable at ${this.config.serverUrl} after ${HEALTH_CHECK_MAX_RETRIES} retries`
+      );
       return;
     }
 
     await this.initializeAgents();
+
+    if (this.agents.length === 0) {
+      console.error('❌ No agents registered successfully. Cannot start loop.');
+      await this.reportDeployIssue(
+        'All agent registrations failed — server may be accepting connections but rejecting registrations'
+      );
+      return;
+    }
 
     console.log('\n🚀 Starting agent behaviors...');
     for (const agent of this.agents) {
@@ -3356,6 +3377,26 @@ class ResidentAgentLoop {
     } catch {
       return false;
     }
+  }
+
+  private async waitForServerHealth(): Promise<boolean> {
+    for (let attempt = 1; attempt <= HEALTH_CHECK_MAX_RETRIES; attempt++) {
+      console.log(
+        `🏥 Health check attempt ${attempt}/${HEALTH_CHECK_MAX_RETRIES}: ${this.config.serverUrl}/health`
+      );
+      if (await this.checkServerHealth()) {
+        console.log('✅ Server is healthy.');
+        return true;
+      }
+      if (attempt < HEALTH_CHECK_MAX_RETRIES) {
+        const delayMs = HEALTH_CHECK_INITIAL_DELAY_MS * Math.pow(2, attempt - 1);
+        console.warn(
+          `⚠️ Server not reachable (attempt ${attempt}/${HEALTH_CHECK_MAX_RETRIES}). Retrying in ${delayMs}ms...`
+        );
+        await sleep(delayMs);
+      }
+    }
+    return false;
   }
 
   private async reportDeployIssue(reason: string): Promise<void> {

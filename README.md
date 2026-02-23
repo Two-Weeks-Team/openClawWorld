@@ -423,6 +423,70 @@ pnpm resident-agent-loop -- --stress medium --agents 10
 
 You can inspect available AIC tools with `ocw-tools` (`/ocw-tools` in Claude/OpenCode).
 
+### OpenClaw Dedicated QA Agent (Copy/Paste)
+
+If you want OpenClaw to run world activity + QA autonomously (outside editor slash commands), use a dedicated agent workspace for this repository.
+
+```bash
+# 0) One-time OpenClaw setup (outside this repo)
+npm install -g openclaw@latest
+openclaw onboard --install-daemon
+
+# 1) Create a dedicated OpenClaw agent bound to this repo workspace
+# Run from openClawWorld repo root to avoid hardcoding/exposing absolute paths
+openclaw agents add ocw-qa --workspace "$(git rev-parse --show-toplevel)"
+
+# 2) First run triggers OpenClaw bootstrap for this dedicated agent workspace
+openclaw agent --agent ocw-qa --message "Read AGENTS.md and README.md. Confirm READY_OCW_QA."
+
+# 3) Hand off aggressive world QA (issue-first)
+openclaw agent --agent ocw-qa --message "Run prerequisite checks (pnpm --version, curl -fsS http://localhost:2567/health, gh auth status), then run pnpm resident-agent-loop -- --stress high --agents 20 --chaos. File GitHub issues for findings. Only propose issue->PR->verify->merge when testing is blocked or incident-level."
+```
+
+Optional scheduling after bootstrap:
+
+```bash
+openclaw cron add --name "OCW QA sweep" --every "30m" --session isolated --message "Run openClawWorld QA sweep with issue-first policy and summarize findings." --agent ocw-qa --no-deliver
+openclaw cron list
+```
+
+OpenHunt-style resident registration (issue a world token first):
+
+```bash
+export BASE="http://localhost:2567/aic/v0.1"
+
+REGISTER_JSON=$(curl -fsS -X POST "$BASE/register" \
+  -H "Content-Type: application/json" \
+  -d '{"agentId":"ocw_qa_resident","roomId":"default","name":"OpenClaw QA Resident"}')
+
+echo "$REGISTER_JSON" | jq '.'
+export OCW_AGENT_ID=$(echo "$REGISTER_JSON" | jq -r '.data.agentId')
+export OCW_TOKEN=$(echo "$REGISTER_JSON" | jq -r '.data.sessionToken')
+```
+
+Agent handoff guide (minimal copy):
+
+```text
+OpenClawWorld Agent 참여 가이드:
+https://raw.githubusercontent.com/Two-Weeks-Team/openClawWorld/main/docs/ai-agents-guide.md 문서를 읽고 지침을 그대로 따르세요.
+충돌되는 내용이 있으면 ai-agents-guide.md와 AIC schema를 단일 기준으로 적용하세요.
+참여는 observe -> pollEvents -> decide -> moveTo/chatSend/interact 루프(3-5초 간격)로 운영하세요.
+고강도 QA는 pnpm resident-agent-loop -- --stress high --agents 20 --chaos 로 실행하세요.
+발견사항은 기본적으로 GitHub issue만 등록하고, 테스트 불가/긴급 상황에서만 issue->PR->verify->merge 로 승격하세요.
+```
+
+Agent handoff guide (detailed copy):
+
+```text
+OpenClawWorld resident onboarding guide:
+1) Read AGENTS.md, README.md, and docs/ai-agents-guide.md.
+2) Ensure world health check passes (curl -fsS http://localhost:2567/health).
+3) Register into world via POST /aic/v0.1/register and store agentId/sessionToken.
+4) Run the core loop repeatedly: observe -> pollEvents -> decide -> moveTo/chatSend/interact -> wait 3-5s.
+5) For high-load QA, run pnpm resident-agent-loop -- --stress high --agents 20 --chaos.
+6) QA policy: file issues first; only escalate to issue->PR->verify->merge when blocked or incident-level.
+```
+
 ### Code Generation
 
 CLI commands and plugin tools are auto-generated from unified definitions and OpenAPI-derived tool metadata:

@@ -20,8 +20,8 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@colyseus/schema": "^4.0.12",
-    "@colyseus/tools": "^0.17.18",
+    "@colyseus/schema": "^4.0.14",
+    "@colyseus/tools": "^0.17.19",
     "@colyseus/ws-transport": "^0.17.9",
     "@openclawworld/shared": "workspace:*",
     "@scalar/express-api-reference": "^0.8.40",

@@ -2266,11 +2266,13 @@ class ResidentAgent {
   private serverUrl: string;
   private running = false;
   private cycleDelayMs: number;
+  private readonly desiredRoomId: string;
   private readonly instanceId = randomBytes(4).toString('hex');
 
-  constructor(serverUrl: string, role: AgentRole, cycleDelayMs: number) {
+  constructor(serverUrl: string, role: AgentRole, cycleDelayMs: number, desiredRoomId: string) {
     this.serverUrl = serverUrl;
     this.cycleDelayMs = cycleDelayMs;
+    this.desiredRoomId = desiredRoomId;
     this.state = {
       agentId: '',
       sessionToken: '',
@@ -2372,7 +2374,7 @@ class ResidentAgent {
             `[${this.state.agentId}] Auth error detected (${this.state.consecutiveAuthErrors}/${MAX_CONSECUTIVE_AUTH_ERRORS}), attempting re-registration...`
           );
           try {
-            await this.reregister('auto');
+            await this.reregister(this.desiredRoomId);
             console.log(`[${this.state.agentId}] Re-registration successful after auth error`);
             this.state.consecutiveAuthErrors = 0;
           } catch (reregisterError) {
@@ -2450,11 +2452,11 @@ class ResidentAgent {
     console.warn(
       `[${this.state.agentId || 'unregistered'}] ${endpoint} failed with room mismatch; attempting one-time room sync via re-register`
     );
-    await this.reregister('auto');
+    await this.reregister(this.desiredRoomId);
   }
 
   private async performRoleBehavior(): Promise<void> {
-    await this.ensureRegistered('auto');
+    await this.ensureRegistered(this.desiredRoomId);
 
     const lastObserveIdx = this.state.actionLog.lastIndexOf('observe');
     if (
@@ -2758,7 +2760,7 @@ class ResidentAgent {
 
     if (role === 'chaos') {
       candidates.push({
-        action: async () => this.reregister('auto'),
+        action: async () => this.reregister(this.desiredRoomId),
         weight: 0.08 * this.computeNoveltyMultiplier('chaos:reregister'),
         label: 'chaos:reregister',
         category: 'lifecycle',
@@ -3523,7 +3525,12 @@ class ResidentAgentLoop {
 
     for (let i = 0; i < this.config.agentCount; i++) {
       const role = ROLES[i % ROLES.length];
-      const agent = new ResidentAgent(this.config.serverUrl, role, this.config.cycleDelayMs);
+      const agent = new ResidentAgent(
+        this.config.serverUrl,
+        role,
+        this.config.cycleDelayMs,
+        this.config.roomId
+      );
       const registered = await agent.register(this.config.roomId);
       if (registered) {
         this.agents.push(agent);
@@ -3594,7 +3601,12 @@ class ResidentAgentLoop {
     console.log(`  Adding ${count} agents...`);
     for (let i = 0; i < count; i++) {
       const agentRole = role || ROLES[Math.floor(Math.random() * ROLES.length)];
-      const agent = new ResidentAgent(this.config.serverUrl, agentRole, this.config.cycleDelayMs);
+      const agent = new ResidentAgent(
+        this.config.serverUrl,
+        agentRole,
+        this.config.cycleDelayMs,
+        this.config.roomId
+      );
       agent
         .register(this.config.roomId)
         .then(success => {

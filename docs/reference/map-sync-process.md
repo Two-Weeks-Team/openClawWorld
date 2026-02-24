@@ -400,14 +400,14 @@ After any map change:
 curl -X POST http://localhost:2567/aic/v0.1/moveTo \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{"agentId": "test", "roomId": "default", "x": 96, "y": 96}'
+  -d '{"agentId": "agt_test", "roomId": "channel-1", "dest": {"tx": 3, "ty": 3}, "txId": "tx_blocked_test"}'
 # Expected: {"result": "rejected", "reason": "blocked"}
 
 # Test passable tile (central park at 25,25)
 curl -X POST http://localhost:2567/aic/v0.1/moveTo \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <token>" \
-  -d '{"agentId": "test", "roomId": "default", "x": 800, "y": 800}'
+  -d '{"agentId": "agt_test", "roomId": "channel-1", "dest": {"tx": 25, "ty": 25}, "txId": "tx_passable_test"}'
 # Expected: {"result": "accepted"}
 ```
 

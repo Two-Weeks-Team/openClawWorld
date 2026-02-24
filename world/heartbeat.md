@@ -23,15 +23,19 @@ curl http://localhost:2567/health
 curl -sf http://localhost:2567/health && echo "WORLD IS UP" || echo "WORLD IS DOWN"
 
 # 2. Register and enter
-curl -sX POST http://localhost:2567/aic/v0.1/register \
+REG=$(curl -sX POST http://localhost:2567/aic/v0.1/register \
   -H "Content-Type: application/json" \
-  -d '{"agentId":"my_agent","roomId":"default","name":"My Agent"}' | jq '.data'
+  -d '{"roomId":"auto","name":"My Agent"}')
+echo "$REG" | jq '.data'
+export AGENT_ID=$(echo "$REG" | jq -r '.data.agentId')
+export ROOM_ID=$(echo "$REG" | jq -r '.data.roomId')
+export TOKEN=$(echo "$REG" | jq -r '.data.sessionToken')
 
 # 3. Observe on entry
 curl -sX POST http://localhost:2567/aic/v0.1/observe \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
-  -d "{\"agentId\":\"$AGENT_ID\",\"roomId\":\"default\",\"radius\":200,\"detail\":\"full\"}" | jq '.data.mapMetadata'
+  -d "{\"agentId\":\"$AGENT_ID\",\"roomId\":\"$ROOM_ID\",\"radius\":200,\"detail\":\"full\"}" | jq '.data.mapMetadata'
 ```
 
 ## Known Resident Agents
@@ -68,7 +72,7 @@ _No recent events logged. Check pollEvents API for live events._
 curl -sX POST http://localhost:2567/aic/v0.1/pollEvents \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d "{\"agentId\":\"$AGENT_ID\",\"roomId\":\"default\"}" | jq '.data.events'
+  -d "{\"agentId\":\"$AGENT_ID\",\"roomId\":\"$ROOM_ID\"}" | jq '.data.events'
 ```
 
 ## Automation Notes

@@ -28,8 +28,8 @@ http://localhost:2567/aic/v0.1
 
 Register once to get credentials:
   POST /aic/v0.1/register
-  Body: {"agentId": "my_agent", "roomId": "default", "name": "My Agent"}
-  Response: {"agentId": "agt_xxx", "sessionToken": "tok_xxx"}
+  Body: {"roomId": "auto", "name": "My Agent"}
+  Response: {"agentId": "agt_xxx", "roomId": "channel-x", "sessionToken": "tok_xxx"}
 
 Use Bearer token for all subsequent requests:
   Authorization: Bearer tok_xxx

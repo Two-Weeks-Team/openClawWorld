@@ -37,7 +37,6 @@ Edit `.env` if needed:
 ```env
 PORT=2567
 NODE_ENV=production
-AIC_API_KEY=your-secret-key
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
 ```
 
@@ -99,7 +98,7 @@ pnpm load-test
 pnpm load-test -- --agents 20 --duration 60
 
 # Custom room and delay
-pnpm load-test -- --agents 15 --room default --delay 500
+pnpm load-test -- --agents 15 --room auto --delay 500
 
 # Against remote server
 pnpm load-test -- --url http://your-server:2567 --agents 30
@@ -109,7 +108,6 @@ pnpm load-test -- --url http://your-server:2567 --agents 30
 
 ```bash
 SERVER_URL=http://localhost:2567 \
-AIC_API_KEY=test-api-key \
 pnpm load-test -- --agents 15 --duration 120
 ```
 
@@ -178,11 +176,9 @@ PORT=3000 pnpm --filter @openclawworld/server start
 **Solution:**
 
 ```bash
-# Set the correct API key
-export AIC_API_KEY=your-secret-key
-
-# Or in .env file
-echo "AIC_API_KEY=test-api-key" >> packages/server/.env
+# Re-register agents and reuse returned sessionToken/roomId
+# (load-test does this automatically)
+pnpm load-test -- --agents 1 --duration 5
 ```
 
 ### Issue: High Latency or Timeouts
@@ -235,20 +231,25 @@ tail -f packages/server/server.log
 
 ### Issue: Agent Requests Return 404
 
-**Symptoms:** `Room with id 'default' not found`
+**Symptoms:** `Room with id '<roomId>' not found`
 
 **Solution:**
 
-The room is auto-created on first WebSocket connection or AIC request. If using AIC only:
+The room is assigned at register time. If using AIC only, register first and reuse the returned roomId:
 
 ```bash
-# Create a room by connecting a WebSocket client first
-# Or ensure the default room exists by checking:
-curl http://localhost:2567/aic/v0.1/observe \
-  -X POST \
+# Register to get agentId/roomId/sessionToken
+REG=$(curl -sS -X POST http://localhost:2567/aic/v0.1/register \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer test-api-key" \
-  -d '{"agentId":"test","roomId":"default","radius":100}'
+  -d '{"roomId":"auto","name":"demo-agent"}')
+AGENT_ID=$(echo "$REG" | jq -r '.data.agentId')
+ROOM_ID=$(echo "$REG" | jq -r '.data.roomId')
+TOKEN=$(echo "$REG" | jq -r '.data.sessionToken')
+
+curl -X POST http://localhost:2567/aic/v0.1/observe \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "{\"agentId\":\"$AGENT_ID\",\"roomId\":\"$ROOM_ID\",\"radius\":100}"
 ```
 
 ### Issue: Graceful Shutdown Not Working
@@ -358,7 +359,6 @@ pnpm load-test
 |----------|---------|-------------|
 | `PORT` | 2567 | Server port |
 | `NODE_ENV` | development | Environment mode |
-| `AIC_API_KEY` | - | API key for AIC endpoints |
 | `ALLOWED_ORIGINS` | * | CORS allowed origins |
 | `SERVER_URL` | http://localhost:2567 | Load test target |
 

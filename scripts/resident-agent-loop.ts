@@ -2851,8 +2851,12 @@ class ResidentAgent {
         };
 
         if (allowRoomSyncRetry && this.canRecoverFromRoomMismatch(response.status, errorBody)) {
+          this.recordApiCall('observe', startMs, false, {
+            httpStatusCode: response.status,
+            errorMessage: errorBody,
+            errorCode: this.classifyErrorCode(response.status),
+          });
           await this.recoverRoomMismatch('Observe');
-          await this.observe(false);
           return;
         }
 
@@ -3058,7 +3062,7 @@ class ResidentAgent {
       if (waitMs > 0) {
         requestBody.waitMs = Math.min(waitMs, 1000);
       }
-      console.error(
+      console.debug(
         `[${this.state.agentId}] eventCursor value: ${JSON.stringify(this.state.eventCursor)}, type: ${typeof this.state.eventCursor}`
       );
 
@@ -3089,6 +3093,11 @@ class ResidentAgent {
         console.error(`[${this.state.agentId}] Request body sent: ${JSON.stringify(requestBody)}`);
 
         if (allowRoomSyncRetry && this.canRecoverFromRoomMismatch(response.status, errorBody)) {
+          this.recordApiCall('pollEvents', startMs, false, {
+            httpStatusCode: response.status,
+            errorMessage: errorBody,
+            errorCode: this.classifyErrorCode(response.status),
+          });
           await this.recoverRoomMismatch('PollEvents');
           await this.pollEvents(waitMs, false);
           return;
@@ -3251,7 +3260,7 @@ class ResidentAgent {
   }
 
   private async unregister(): Promise<void> {
-    if (!this.state.agentId || !this.state.sessionToken) {
+    if (!this.state.agentId || !this.state.sessionToken || !this.state.roomId) {
       return;
     }
 

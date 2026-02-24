@@ -49,6 +49,7 @@ interface Config {
 interface AgentState {
   agentId: string;
   sessionToken: string;
+  roomId: string;
   role: AgentRole;
   position: { x: number; y: number };
   lastAction: string;
@@ -2273,6 +2274,7 @@ class ResidentAgent {
     this.state = {
       agentId: '',
       sessionToken: '',
+      roomId: '',
       role,
       position: { x: 0, y: 0 },
       lastAction: 'init',
@@ -2321,14 +2323,18 @@ class ResidentAgent {
       if (result.status === 'ok') {
         const agentId = result.data?.agentId;
         const sessionToken = result.data?.sessionToken;
-        if (!agentId || !sessionToken) {
+        const assignedRoomId = result.data?.roomId;
+        if (!agentId || !sessionToken || !assignedRoomId) {
           throw new Error(
-            `Register succeeded but response missing credentials: agentId=${agentId ?? 'null'}, sessionToken=${sessionToken ? '***' : 'null'}`
+            `Register succeeded but response missing credentials: agentId=${agentId ?? 'null'}, roomId=${assignedRoomId ?? 'null'}, sessionToken=${sessionToken ? '***' : 'null'}`
           );
         }
         this.state.agentId = agentId;
         this.state.sessionToken = sessionToken;
-        console.log(`  ✓ Registered ${this.state.role}: ${this.state.agentId}`);
+        this.state.roomId = assignedRoomId;
+        console.log(
+          `  ✓ Registered ${this.state.role}: ${this.state.agentId} in room ${this.state.roomId}`
+        );
         return true;
       }
       throw new Error(result.error?.message || 'Unknown error');
@@ -2418,6 +2424,33 @@ class ResidentAgent {
 
   setChaosBehavior(): void {
     this.state.role = 'chaos';
+  }
+
+  private getActiveRoomId(): string {
+    if (!this.state.roomId) {
+      throw new Error('Room ID missing from agent state. Re-register is required.');
+    }
+    return this.state.roomId;
+  }
+
+  private canRecoverFromRoomMismatch(httpStatus: number | undefined, errorBody: string): boolean {
+    if (httpStatus !== 404) {
+      return false;
+    }
+
+    const normalized = errorBody.toLowerCase();
+    return (
+      normalized.includes('agent_not_in_room') ||
+      normalized.includes('room with id') ||
+      normalized.includes('not found in room')
+    );
+  }
+
+  private async recoverRoomMismatch(endpoint: string): Promise<void> {
+    console.warn(
+      `[${this.state.agentId || 'unregistered'}] ${endpoint} failed with room mismatch; attempting one-time room sync via re-register`
+    );
+    await this.reregister('auto');
   }
 
   private async performRoleBehavior(): Promise<void> {
@@ -2783,26 +2816,48 @@ class ResidentAgent {
     }
   }
 
-  private async observe(): Promise<void> {
+  private async observe(allowRoomSyncRetry = true): Promise<void> {
     const startMs = Date.now();
     let httpStatus: number | undefined;
     try {
+      const requestBody = {
+        agentId: this.state.agentId,
+        roomId: this.getActiveRoomId(),
+        radius: 200,
+        detail: 'full',
+      };
+
       const response = await fetch(`${this.serverUrl}/aic/v0.1/observe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.state.sessionToken}`,
         },
-        body: JSON.stringify({
-          agentId: this.state.agentId,
-          roomId: 'auto',
-          radius: 200,
-          detail: 'full',
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       httpStatus = response.status;
-      if (!response.ok) throw new Error(`Observe failed: ${response.status}`);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        this.state.lastError = {
+          endpoint: 'observe',
+          httpStatusCode: response.status,
+          errorCode:
+            response.status >= 400 && response.status < 500 ? 'client_error' : 'server_error',
+          errorMessage: errorBody,
+          requestBody: JSON.stringify(requestBody),
+          responseBody: errorBody,
+          timestamp: Date.now(),
+        };
+
+        if (allowRoomSyncRetry && this.canRecoverFromRoomMismatch(response.status, errorBody)) {
+          await this.recoverRoomMismatch('Observe');
+          await this.observe(false);
+          return;
+        }
+
+        throw new Error(`Observe failed: ${response.status}`);
+      }
 
       const result = await response.json();
       if (result.status === 'ok') {
@@ -2857,7 +2912,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           txId: generateTxId(),
           dest: { tx, ty },
         }),
@@ -2885,7 +2940,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           txId: generateTxId(),
           channel,
           message,
@@ -2914,7 +2969,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           windowSec: 60,
         }),
       });
@@ -2962,7 +3017,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           txId: generateTxId(),
           targetId,
           action,
@@ -2988,13 +3043,13 @@ class ResidentAgent {
     }
   }
 
-  private async pollEvents(waitMs = 0): Promise<void> {
+  private async pollEvents(waitMs = 0, allowRoomSyncRetry = true): Promise<void> {
     const startMs = Date.now();
     let httpStatus: number | undefined;
     try {
       const requestBody: Record<string, unknown> = {
         agentId: this.state.agentId,
-        roomId: 'auto',
+        roomId: this.getActiveRoomId(),
         limit: 50,
       };
       if (this.state.eventCursor) {
@@ -3032,6 +3087,13 @@ class ResidentAgent {
         this.state.lastError = errorDetail;
         console.error(`[${this.state.agentId}] PollEvents error body: ${errorBody}`);
         console.error(`[${this.state.agentId}] Request body sent: ${JSON.stringify(requestBody)}`);
+
+        if (allowRoomSyncRetry && this.canRecoverFromRoomMismatch(response.status, errorBody)) {
+          await this.recoverRoomMismatch('PollEvents');
+          await this.pollEvents(waitMs, false);
+          return;
+        }
+
         throw new Error(`PollEvents failed: ${response.status}`);
       }
 
@@ -3066,7 +3128,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           ...fields,
         }),
       });
@@ -3099,7 +3161,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           ...(category && { category }),
         }),
       });
@@ -3133,7 +3195,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           txId: generateTxId(),
           skillId,
         }),
@@ -3169,7 +3231,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
           txId: generateTxId(),
           skillId,
           actionId,
@@ -3204,7 +3266,7 @@ class ResidentAgent {
         },
         body: JSON.stringify({
           agentId: this.state.agentId,
-          roomId: 'auto',
+          roomId: this.getActiveRoomId(),
         }),
       });
 
@@ -3233,6 +3295,7 @@ class ResidentAgent {
   private clearRegistrationState(): void {
     this.state.sessionToken = '';
     this.state.agentId = '';
+    this.state.roomId = '';
     this.state.eventCursor = null;
   }
 
@@ -3275,7 +3338,7 @@ class ResidentAgent {
       const registered = await this.register(roomId);
       if (registered) {
         this.resetAfterReregister();
-        await this.observe();
+        await this.observe(false);
         return;
       }
 
@@ -3674,7 +3737,7 @@ function printHelp(): void {
   console.log('  -s, --stress <level>  Stress level: low, medium, high (default: medium)');
   console.log('  --chaos               Enable chaos behaviors from start');
   console.log('  --dry-run             Simulate issue creation without GitHub');
-  console.log('  -r, --room <id>       Room ID (default: default)');
+  console.log('  -r, --room <id>       Room ID (default: auto)');
   console.log('  -u, --url <url>       Server URL (default: http://localhost:2567)');
   console.log('  --delay <ms>          Cycle delay in ms (default: 2000)');
   console.log(

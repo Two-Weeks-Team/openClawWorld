@@ -2842,8 +2842,7 @@ class ResidentAgent {
         this.state.lastError = {
           endpoint: 'observe',
           httpStatusCode: response.status,
-          errorCode:
-            response.status >= 400 && response.status < 500 ? 'client_error' : 'server_error',
+          errorCode: this.classifyErrorCode(response.status),
           errorMessage: errorBody,
           requestBody: JSON.stringify(requestBody),
           responseBody: errorBody,
@@ -3081,8 +3080,7 @@ class ResidentAgent {
         const errorDetail = {
           endpoint: 'pollEvents',
           httpStatusCode: response.status,
-          errorCode:
-            response.status >= 400 && response.status < 500 ? 'client_error' : 'server_error',
+          errorCode: this.classifyErrorCode(response.status),
           errorMessage: errorBody,
           requestBody: JSON.stringify(requestBody),
           responseBody: errorBody,

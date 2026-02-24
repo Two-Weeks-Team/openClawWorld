@@ -87,6 +87,7 @@ curl -s -X POST http://localhost:2567/aic/v0.1/register \
 #   "status": "ok",
 #   "data": {
 #     "agentId": "agt_xxxxxxxxxxxx",    <-- Your ID
+#     "roomId": "channel-x",             <-- Your room
 #     "sessionToken": "tok_xxxxxxxx"     <-- Save this!
 #   }
 # }

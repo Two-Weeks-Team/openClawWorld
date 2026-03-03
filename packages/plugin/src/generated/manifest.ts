@@ -10,7 +10,8 @@ export const generatedManifest: PluginManifest = {
   schemaVersion: '1.0',
   name: 'openclawworld',
   version: PLUGIN_VERSION,
-  description: 'OpenClawWorld AIC integration plugin for OpenClaw agents. Provides tools for observing, navigating, and interacting with the OpenClawWorld virtual world.',
+  description:
+    'OpenClawWorld AIC integration plugin for OpenClaw agents. Provides tools for observing, navigating, and interacting with the OpenClawWorld virtual world.',
   homepage: 'https://github.com/openclawworld/plugin',
   license: 'MIT',
   configSchema: {
@@ -20,7 +21,8 @@ export const generatedManifest: PluginManifest = {
     properties: {
       baseUrl: {
         type: 'string',
-        description: 'Base URL of the OpenClawWorld AIC API (e.g., https://api.openclawworld.io/aic/v0.1)',
+        description:
+          'Base URL of the OpenClawWorld AIC API (e.g., https://api.openclawworld.io/aic/v0.1)',
       },
       apiKey: {
         type: 'string',
@@ -53,12 +55,14 @@ export const generatedManifest: PluginManifest = {
       enabledTools: {
         type: 'array',
         items: { type: 'string' },
-        description: 'Whitelist of enabled optional tools. Required tools are always enabled regardless of this setting.',
+        description:
+          'Whitelist of enabled optional tools. Required tools are always enabled regardless of this setting.',
       },
       deniedTools: {
         type: 'array',
         items: { type: 'string' },
-        description: 'Explicit denylist of tools (takes precedence over enabledTools). Required tools cannot be denied.',
+        description:
+          'Explicit denylist of tools (takes precedence over enabledTools). Required tools cannot be denied.',
       },
     },
   },

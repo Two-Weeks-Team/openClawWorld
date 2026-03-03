@@ -126,7 +126,10 @@
             "type": "number"
           }
         },
-        "required": ["x", "y"]
+        "required": [
+          "x",
+          "y"
+        ]
       },
       "TileCoord": {
         "type": "object",
@@ -142,27 +145,55 @@
             "maximum": 100000
           }
         },
-        "required": ["tx", "ty"]
+        "required": [
+          "tx",
+          "ty"
+        ]
       },
       "EntityKind": {
         "type": "string",
-        "enum": ["human", "agent", "object", "npc"]
+        "enum": [
+          "human",
+          "agent",
+          "object",
+          "npc"
+        ]
       },
       "Facing": {
         "type": "string",
-        "enum": ["up", "down", "left", "right"]
+        "enum": [
+          "up",
+          "down",
+          "left",
+          "right"
+        ]
       },
       "ChatChannel": {
         "type": "string",
-        "enum": ["proximity", "global", "team", "meeting", "dm"]
+        "enum": [
+          "proximity",
+          "global",
+          "team",
+          "meeting",
+          "dm"
+        ]
       },
       "ObserveDetailLevel": {
         "type": "string",
-        "enum": ["lite", "full"]
+        "enum": [
+          "lite",
+          "full"
+        ]
       },
       "UserStatus": {
         "type": "string",
-        "enum": ["online", "focus", "dnd", "afk", "offline"]
+        "enum": [
+          "online",
+          "focus",
+          "dnd",
+          "afk",
+          "offline"
+        ]
       },
       "EntityBase": {
         "type": "object",
@@ -208,7 +239,13 @@
             "additionalProperties": {}
           }
         },
-        "required": ["id", "kind", "name", "roomId", "pos"]
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "roomId",
+          "pos"
+        ]
       },
       "Affordance": {
         "type": "object",
@@ -228,7 +265,10 @@
             "additionalProperties": {}
           }
         },
-        "required": ["action", "label"]
+        "required": [
+          "action",
+          "label"
+        ]
       },
       "ObjectState": {
         "type": "object",
@@ -243,7 +283,10 @@
             "additionalProperties": {}
           }
         },
-        "required": ["objectType", "state"]
+        "required": [
+          "objectType",
+          "state"
+        ]
       },
       "ObservedEntity": {
         "type": "object",
@@ -267,7 +310,11 @@
             "$ref": "#/components/schemas/ObjectState"
           }
         },
-        "required": ["entity", "distance", "affords"]
+        "required": [
+          "entity",
+          "distance",
+          "affords"
+        ]
       },
       "ObservedFacility": {
         "type": "object",
@@ -303,7 +350,14 @@
             "maxItems": 50
           }
         },
-        "required": ["id", "type", "name", "position", "distance", "affords"]
+        "required": [
+          "id",
+          "type",
+          "name",
+          "position",
+          "distance",
+          "affords"
+        ]
       },
       "ErrorCode": {
         "type": "string",
@@ -341,13 +395,20 @@
             "additionalProperties": {}
           }
         },
-        "required": ["code", "message", "retryable"]
+        "required": [
+          "code",
+          "message",
+          "retryable"
+        ]
       },
       "MapMetadata": {
         "type": "object",
         "properties": {
           "currentZone": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "enum": [
               "lobby",
               "office",
@@ -382,10 +443,18 @@
                 "minimum": 1
               }
             },
-            "required": ["width", "height", "tileSize"]
+            "required": [
+              "width",
+              "height",
+              "tileSize"
+            ]
           }
         },
-        "required": ["currentZone", "zones", "mapSize"]
+        "required": [
+          "currentZone",
+          "zones",
+          "mapSize"
+        ]
       },
       "ZoneInfo": {
         "type": "object",
@@ -419,7 +488,12 @@
                 "type": "number"
               }
             },
-            "required": ["x", "y", "width", "height"]
+            "required": [
+              "x",
+              "y",
+              "width",
+              "height"
+            ]
           },
           "entrances": {
             "type": "array",
@@ -428,7 +502,11 @@
             }
           }
         },
-        "required": ["id", "bounds", "entrances"]
+        "required": [
+          "id",
+          "bounds",
+          "entrances"
+        ]
       },
       "BuildingEntrance": {
         "type": "object",
@@ -456,7 +534,10 @@
                 "type": "number"
               }
             },
-            "required": ["width", "height"]
+            "required": [
+              "width",
+              "height"
+            ]
           },
           "zone": {
             "type": "string",
@@ -488,11 +569,24 @@
             ]
           }
         },
-        "required": ["id", "name", "position", "size", "zone", "direction", "connectsTo"]
+        "required": [
+          "id",
+          "name",
+          "position",
+          "size",
+          "zone",
+          "direction",
+          "connectsTo"
+        ]
       },
       "EntranceDirection": {
         "type": "string",
-        "enum": ["north", "south", "east", "west"]
+        "enum": [
+          "north",
+          "south",
+          "east",
+          "west"
+        ]
       },
       "RoomInfo": {
         "type": "object",
@@ -511,15 +605,29 @@
             "maximum": 60
           }
         },
-        "required": ["roomId", "mapId", "tickRate"]
+        "required": [
+          "roomId",
+          "mapId",
+          "tickRate"
+        ]
       },
       "MoveToResult": {
         "type": "string",
-        "enum": ["accepted", "rejected", "no_op", "no_path"]
+        "enum": [
+          "accepted",
+          "rejected",
+          "no_op",
+          "no_path"
+        ]
       },
       "InteractOutcomeType": {
         "type": "string",
-        "enum": ["ok", "no_effect", "invalid_action", "too_far"]
+        "enum": [
+          "ok",
+          "no_effect",
+          "invalid_action",
+          "too_far"
+        ]
       },
       "InteractOutcome": {
         "type": "object",
@@ -532,7 +640,9 @@
             "maxLength": 2000
           }
         },
-        "required": ["type"]
+        "required": [
+          "type"
+        ]
       },
       "RegisterRequest": {
         "type": "object",
@@ -546,7 +656,10 @@
             "$ref": "#/components/schemas/IdRoom"
           }
         },
-        "required": ["name", "roomId"]
+        "required": [
+          "name",
+          "roomId"
+        ]
       },
       "RegisterResponseData": {
         "type": "object",
@@ -562,7 +675,11 @@
             "pattern": "^[a-zA-Z0-9._-]{8,256}$"
           }
         },
-        "required": ["agentId", "roomId", "sessionToken"]
+        "required": [
+          "agentId",
+          "roomId",
+          "sessionToken"
+        ]
       },
       "UnregisterRequest": {
         "type": "object",
@@ -574,7 +691,10 @@
             "$ref": "#/components/schemas/IdRoom"
           }
         },
-        "required": ["agentId", "roomId"]
+        "required": [
+          "agentId",
+          "roomId"
+        ]
       },
       "UnregisterResponseData": {
         "type": "object",
@@ -586,7 +706,10 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["agentId", "unregisteredAt"]
+        "required": [
+          "agentId",
+          "unregisteredAt"
+        ]
       },
       "ObserveRequest": {
         "type": "object",
@@ -612,7 +735,11 @@
             "type": "boolean"
           }
         },
-        "required": ["agentId", "roomId", "radius"]
+        "required": [
+          "agentId",
+          "roomId",
+          "radius"
+        ]
       },
       "ObserveResponseData": {
         "type": "object",
@@ -644,7 +771,13 @@
             "$ref": "#/components/schemas/MapMetadata"
           }
         },
-        "required": ["self", "nearby", "facilities", "serverTsMs", "room"]
+        "required": [
+          "self",
+          "nearby",
+          "facilities",
+          "serverTsMs",
+          "room"
+        ]
       },
       "MoveToRequest": {
         "type": "object",
@@ -663,10 +796,17 @@
           },
           "mode": {
             "type": "string",
-            "enum": ["walk"]
+            "enum": [
+              "walk"
+            ]
           }
         },
-        "required": ["agentId", "roomId", "txId", "dest"]
+        "required": [
+          "agentId",
+          "roomId",
+          "txId",
+          "dest"
+        ]
       },
       "MoveToResponseData": {
         "type": "object",
@@ -684,7 +824,12 @@
             "$ref": "#/components/schemas/MoveToResult"
           }
         },
-        "required": ["txId", "applied", "serverTsMs", "result"]
+        "required": [
+          "txId",
+          "applied",
+          "serverTsMs",
+          "result"
+        ]
       },
       "InteractRequest": {
         "type": "object",
@@ -711,7 +856,13 @@
             "additionalProperties": {}
           }
         },
-        "required": ["agentId", "roomId", "txId", "targetId", "action"]
+        "required": [
+          "agentId",
+          "roomId",
+          "txId",
+          "targetId",
+          "action"
+        ]
       },
       "InteractResponseData": {
         "type": "object",
@@ -729,7 +880,12 @@
             "$ref": "#/components/schemas/InteractOutcome"
           }
         },
-        "required": ["txId", "applied", "serverTsMs", "outcome"]
+        "required": [
+          "txId",
+          "applied",
+          "serverTsMs",
+          "outcome"
+        ]
       },
       "ChatSendRequest": {
         "type": "object",
@@ -752,7 +908,13 @@
             "maxLength": 500
           }
         },
-        "required": ["agentId", "roomId", "txId", "channel", "message"]
+        "required": [
+          "agentId",
+          "roomId",
+          "txId",
+          "channel",
+          "message"
+        ]
       },
       "ChatSendResponseData": {
         "type": "object",
@@ -770,7 +932,11 @@
             "$ref": "#/components/schemas/IdMessage"
           }
         },
-        "required": ["txId", "applied", "serverTsMs"]
+        "required": [
+          "txId",
+          "applied",
+          "serverTsMs"
+        ]
       },
       "IdMessage": {
         "type": "string",
@@ -795,7 +961,11 @@
             "$ref": "#/components/schemas/ChatChannel"
           }
         },
-        "required": ["agentId", "roomId", "windowSec"]
+        "required": [
+          "agentId",
+          "roomId",
+          "windowSec"
+        ]
       },
       "ChatObserveResponseData": {
         "type": "object",
@@ -811,7 +981,10 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["messages", "serverTsMs"]
+        "required": [
+          "messages",
+          "serverTsMs"
+        ]
       },
       "ChatMessage": {
         "type": "object",
@@ -863,7 +1036,15 @@
             }
           }
         },
-        "required": ["id", "roomId", "channel", "fromEntityId", "fromName", "message", "tsMs"]
+        "required": [
+          "id",
+          "roomId",
+          "channel",
+          "fromEntityId",
+          "fromName",
+          "message",
+          "tsMs"
+        ]
       },
       "PollEventsRequest": {
         "type": "object",
@@ -888,7 +1069,10 @@
             "maximum": 25000
           }
         },
-        "required": ["agentId", "roomId"]
+        "required": [
+          "agentId",
+          "roomId"
+        ]
       },
       "PollEventsResponseData": {
         "type": "object",
@@ -910,7 +1094,12 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["events", "nextCursor", "cursorExpired", "serverTsMs"]
+        "required": [
+          "events",
+          "nextCursor",
+          "cursorExpired",
+          "serverTsMs"
+        ]
       },
       "EventEnvelope": {
         "type": "object",
@@ -932,7 +1121,13 @@
             "additionalProperties": {}
           }
         },
-        "required": ["cursor", "type", "roomId", "tsMs", "payload"]
+        "required": [
+          "cursor",
+          "type",
+          "roomId",
+          "tsMs",
+          "payload"
+        ]
       },
       "EventType": {
         "type": "string",
@@ -981,7 +1176,10 @@
             "maxLength": 50
           }
         },
-        "required": ["agentId", "roomId"]
+        "required": [
+          "agentId",
+          "roomId"
+        ]
       },
       "ProfileUpdateResponseData": {
         "type": "object",
@@ -1014,17 +1212,30 @@
                 "type": "string"
               }
             },
-            "required": ["entityId", "displayName", "status"]
+            "required": [
+              "entityId",
+              "displayName",
+              "status"
+            ]
           },
           "serverTsMs": {
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["applied", "profile", "serverTsMs"]
+        "required": [
+          "applied",
+          "profile",
+          "serverTsMs"
+        ]
       },
       "SkillCategory": {
         "type": "string",
-        "enum": ["movement", "combat", "social", "utility"]
+        "enum": [
+          "movement",
+          "combat",
+          "social",
+          "utility"
+        ]
       },
       "SkillEffectDefinition": {
         "type": "object",
@@ -1050,7 +1261,10 @@
             }
           }
         },
-        "required": ["id", "durationMs"]
+        "required": [
+          "id",
+          "durationMs"
+        ]
       },
       "SkillAction": {
         "type": "object",
@@ -1109,7 +1323,11 @@
             "$ref": "#/components/schemas/SkillEffectDefinition"
           }
         },
-        "required": ["id", "name", "description"]
+        "required": [
+          "id",
+          "name",
+          "description"
+        ]
       },
       "SkillDefinition": {
         "type": "object",
@@ -1157,11 +1375,22 @@
             "maxItems": 10
           }
         },
-        "required": ["id", "name", "description", "category", "actions"]
+        "required": [
+          "id",
+          "name",
+          "description",
+          "category",
+          "actions"
+        ]
       },
       "SkillInvokeOutcomeType": {
         "type": "string",
-        "enum": ["ok", "pending", "cancelled", "error"]
+        "enum": [
+          "ok",
+          "pending",
+          "cancelled",
+          "error"
+        ]
       },
       "SkillInvokeOutcome": {
         "type": "object",
@@ -1181,7 +1410,9 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["type"]
+        "required": [
+          "type"
+        ]
       },
       "AgentSkillState": {
         "type": "object",
@@ -1204,7 +1435,11 @@
             }
           }
         },
-        "required": ["skillId", "installedAt", "enabled"]
+        "required": [
+          "skillId",
+          "installedAt",
+          "enabled"
+        ]
       },
       "SkillListRequest": {
         "type": "object",
@@ -1222,7 +1457,10 @@
             "type": "boolean"
           }
         },
-        "required": ["agentId", "roomId"]
+        "required": [
+          "agentId",
+          "roomId"
+        ]
       },
       "SkillInstallRequest": {
         "type": "object",
@@ -1248,7 +1486,12 @@
             }
           }
         },
-        "required": ["agentId", "roomId", "txId", "skillId"]
+        "required": [
+          "agentId",
+          "roomId",
+          "txId",
+          "skillId"
+        ]
       },
       "SkillInvokeRequest": {
         "type": "object",
@@ -1280,7 +1523,13 @@
             "additionalProperties": {}
           }
         },
-        "required": ["agentId", "roomId", "txId", "skillId", "actionId"]
+        "required": [
+          "agentId",
+          "roomId",
+          "txId",
+          "skillId",
+          "actionId"
+        ]
       },
       "SkillListResponseData": {
         "type": "object",
@@ -1296,7 +1545,10 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["skills", "serverTsMs"]
+        "required": [
+          "skills",
+          "serverTsMs"
+        ]
       },
       "SkillInstallResponseData": {
         "type": "object",
@@ -1316,7 +1568,12 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["skillId", "installed", "alreadyInstalled", "serverTsMs"]
+        "required": [
+          "skillId",
+          "installed",
+          "alreadyInstalled",
+          "serverTsMs"
+        ]
       },
       "SkillInvokeResponseData": {
         "type": "object",
@@ -1331,7 +1588,11 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["txId", "outcome", "serverTsMs"]
+        "required": [
+          "txId",
+          "outcome",
+          "serverTsMs"
+        ]
       },
       "ReconnectRequest": {
         "type": "object",
@@ -1344,7 +1605,10 @@
             "minLength": 8
           }
         },
-        "required": ["agentId", "sessionToken"]
+        "required": [
+          "agentId",
+          "sessionToken"
+        ]
       },
       "ReconnectResponseData": {
         "type": "object",
@@ -1365,7 +1629,12 @@
             "$ref": "#/components/schemas/TileCoord"
           }
         },
-        "required": ["agentId", "roomId", "sessionToken", "pos"]
+        "required": [
+          "agentId",
+          "roomId",
+          "sessionToken",
+          "pos"
+        ]
       },
       "HeartbeatRequest": {
         "type": "object",
@@ -1377,7 +1646,10 @@
             "$ref": "#/components/schemas/IdRoom"
           }
         },
-        "required": ["agentId", "roomId"]
+        "required": [
+          "agentId",
+          "roomId"
+        ]
       },
       "MeetingListRequest": {
         "type": "object",
@@ -1389,7 +1661,10 @@
             "$ref": "#/components/schemas/IdRoom"
           }
         },
-        "required": ["agentId", "roomId"]
+        "required": [
+          "agentId",
+          "roomId"
+        ]
       },
       "MeetingJoinRequest": {
         "type": "object",
@@ -1406,7 +1681,11 @@
             "maxLength": 128
           }
         },
-        "required": ["agentId", "roomId", "meetingId"]
+        "required": [
+          "agentId",
+          "roomId",
+          "meetingId"
+        ]
       },
       "MeetingLeaveRequest": {
         "type": "object",
@@ -1423,7 +1702,11 @@
             "maxLength": 128
           }
         },
-        "required": ["agentId", "roomId", "meetingId"]
+        "required": [
+          "agentId",
+          "roomId",
+          "meetingId"
+        ]
       },
       "HeartbeatResponseData": {
         "type": "object",
@@ -1443,7 +1726,12 @@
             "minimum": 0
           }
         },
-        "required": ["agentId", "serverTsMs", "timeoutMs", "recommendedIntervalMs"]
+        "required": [
+          "agentId",
+          "serverTsMs",
+          "timeoutMs",
+          "recommendedIntervalMs"
+        ]
       },
       "AgentProfile": {
         "type": "object",
@@ -1475,7 +1763,10 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["agentId", "name"]
+        "required": [
+          "agentId",
+          "name"
+        ]
       },
       "MeetingInfo": {
         "type": "object",
@@ -1502,7 +1793,13 @@
             "minimum": 1
           }
         },
-        "required": ["meetingId", "name", "hostId", "participantCount", "capacity"]
+        "required": [
+          "meetingId",
+          "name",
+          "hostId",
+          "participantCount",
+          "capacity"
+        ]
       },
       "MeetingListResponseData": {
         "type": "object",
@@ -1517,7 +1814,10 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["meetings", "serverTsMs"]
+        "required": [
+          "meetings",
+          "serverTsMs"
+        ]
       },
       "MeetingJoinResponseData": {
         "type": "object",
@@ -1529,7 +1829,10 @@
           },
           "role": {
             "type": "string",
-            "enum": ["host", "participant"]
+            "enum": [
+              "host",
+              "participant"
+            ]
           },
           "participants": {
             "type": "array",
@@ -1546,17 +1849,29 @@
                 },
                 "role": {
                   "type": "string",
-                  "enum": ["host", "participant"]
+                  "enum": [
+                    "host",
+                    "participant"
+                  ]
                 }
               },
-              "required": ["entityId", "name", "role"]
+              "required": [
+                "entityId",
+                "name",
+                "role"
+              ]
             }
           },
           "serverTsMs": {
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["meetingId", "role", "participants", "serverTsMs"]
+        "required": [
+          "meetingId",
+          "role",
+          "participants",
+          "serverTsMs"
+        ]
       },
       "MeetingLeaveResponseData": {
         "type": "object",
@@ -1573,7 +1888,11 @@
             "$ref": "#/components/schemas/TsMs"
           }
         },
-        "required": ["meetingId", "leftAt", "serverTsMs"]
+        "required": [
+          "meetingId",
+          "leftAt",
+          "serverTsMs"
+        ]
       },
       "ChannelInfo": {
         "type": "object",
@@ -1591,17 +1910,27 @@
           },
           "status": {
             "type": "string",
-            "enum": ["open", "full"]
+            "enum": [
+              "open",
+              "full"
+            ]
           }
         },
-        "required": ["channelId", "maxAgents", "currentAgents", "status"]
+        "required": [
+          "channelId",
+          "maxAgents",
+          "currentAgents",
+          "status"
+        ]
       },
       "ResultOk": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["ok"]
+            "enum": [
+              "ok"
+            ]
           },
           "data": {
             "type": "object",
@@ -1609,20 +1938,28 @@
             "additionalProperties": {}
           }
         },
-        "required": ["status", "data"]
+        "required": [
+          "status",
+          "data"
+        ]
       },
       "ResultError": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["error"]
+            "enum": [
+              "error"
+            ]
           },
           "error": {
             "$ref": "#/components/schemas/ErrorObject"
           }
         },
-        "required": ["status", "error"]
+        "required": [
+          "status",
+          "error"
+        ]
       }
     },
     "parameters": {}
@@ -1631,7 +1968,9 @@
     "/register": {
       "post": {
         "operationId": "register",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Register a new AI agent",
         "description": "Register an AI agent and obtain an authentication token. This endpoint does not require authentication.",
         "security": [],
@@ -1659,13 +1998,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/RegisterResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 },
                 "example": {
                   "status": "ok",
@@ -1704,7 +2048,9 @@
     "/unregister": {
       "post": {
         "operationId": "unregister",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Unregister an AI agent",
         "description": "Gracefully disconnect an AI agent from the server. Removes the agent entity from the game world and emits a presence.leave event.",
         "security": [
@@ -1736,13 +2082,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/UnregisterResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 },
                 "example": {
                   "status": "ok",
@@ -1800,7 +2151,9 @@
     "/observe": {
       "post": {
         "operationId": "observe",
-        "tags": ["Observation"],
+        "tags": [
+          "Observation"
+        ],
         "summary": "Observe the world around the agent",
         "description": "Returns information about the agent itself and nearby entities within the specified radius.",
         "security": [
@@ -1835,13 +2188,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ObserveResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1892,7 +2250,9 @@
     "/moveTo": {
       "post": {
         "operationId": "moveTo",
-        "tags": ["Actions"],
+        "tags": [
+          "Actions"
+        ],
         "summary": "Move agent to a destination tile",
         "description": "Initiates movement to the specified tile coordinates. Uses txId for idempotency.",
         "security": [
@@ -1930,13 +2290,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MoveToResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -1987,7 +2352,9 @@
     "/interact": {
       "post": {
         "operationId": "interact",
-        "tags": ["Actions"],
+        "tags": [
+          "Actions"
+        ],
         "summary": "Interact with a world object",
         "description": "Perform an action on a target entity (e.g., read a sign, use a terminal). Check affordances from observe response.",
         "security": [
@@ -2023,13 +2390,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/InteractResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2080,7 +2452,9 @@
     "/chatSend": {
       "post": {
         "operationId": "chatSend",
-        "tags": ["Chat"],
+        "tags": [
+          "Chat"
+        ],
         "summary": "Send a chat message",
         "description": "Send a message to the specified channel. Use \"proximity\" for nearby entities or \"global\" for the entire room.",
         "security": [
@@ -2115,13 +2489,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ChatSendResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2172,7 +2551,9 @@
     "/chatObserve": {
       "post": {
         "operationId": "chatObserve",
-        "tags": ["Chat"],
+        "tags": [
+          "Chat"
+        ],
         "summary": "Get recent chat messages",
         "description": "Retrieve chat messages from the specified time window.",
         "security": [
@@ -2206,13 +2587,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ChatObserveResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2253,7 +2639,9 @@
     "/pollEvents": {
       "post": {
         "operationId": "pollEvents",
-        "tags": ["Events"],
+        "tags": [
+          "Events"
+        ],
         "summary": "Poll for world events",
         "description": "Long-poll for events since the given cursor. Returns immediately if events are available, or waits up to waitMs for new events.",
         "security": [
@@ -2288,13 +2676,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/PollEventsResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2335,7 +2728,9 @@
     "/profile/update": {
       "post": {
         "operationId": "profileUpdate",
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Update agent profile",
         "description": "Update the agent name or metadata.",
         "security": [
@@ -2370,13 +2765,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ProfileUpdateResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2417,7 +2817,9 @@
     "/skill/list": {
       "post": {
         "operationId": "skillList",
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "List available skills",
         "description": "Returns a list of skills available to the agent. Can filter by category or installed status.",
         "security": [
@@ -2451,13 +2853,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/SkillListResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 },
                 "example": {
                   "status": "ok",
@@ -2531,7 +2938,9 @@
     "/skill/install": {
       "post": {
         "operationId": "skillInstall",
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "Install a skill for an agent",
         "description": "Installs a skill for the agent, making its actions available for use. Uses txId for idempotency.",
         "security": [
@@ -2565,13 +2974,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/SkillInstallResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 },
                 "example": {
                   "status": "ok",
@@ -2651,7 +3065,9 @@
     "/skill/invoke": {
       "post": {
         "operationId": "skillInvoke",
-        "tags": ["Skills"],
+        "tags": [
+          "Skills"
+        ],
         "summary": "Invoke a skill action",
         "description": "Invokes an action from an installed skill. Subject to cooldown (5s default) and cast time (1s default). Uses txId for idempotency.",
         "security": [
@@ -2686,13 +3102,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/SkillInvokeResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 },
                 "example": {
                   "status": "ok",
@@ -2774,7 +3195,9 @@
     "/channels": {
       "get": {
         "operationId": "channels",
-        "tags": ["Connection"],
+        "tags": [
+          "Connection"
+        ],
         "summary": "List available channels",
         "description": "Returns all available game channels/rooms that agents can join.",
         "security": [],
@@ -2788,7 +3211,9 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "type": "object",
@@ -2800,10 +3225,15 @@
                           }
                         }
                       },
-                      "required": ["channels"]
+                      "required": [
+                        "channels"
+                      ]
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2814,7 +3244,9 @@
     "/reconnect": {
       "post": {
         "operationId": "reconnect",
-        "tags": ["Connection"],
+        "tags": [
+          "Connection"
+        ],
         "summary": "Reconnect an agent to an existing session",
         "description": "Allows an agent to reconnect using a previously issued session token.",
         "security": [
@@ -2842,13 +3274,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/ReconnectResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2899,7 +3336,9 @@
     "/heartbeat": {
       "post": {
         "operationId": "heartbeat",
-        "tags": ["Session Management"],
+        "tags": [
+          "Session Management"
+        ],
         "summary": "Send a heartbeat to maintain session",
         "description": "Keeps the agent session alive and returns server timing information.",
         "security": [
@@ -2927,13 +3366,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/HeartbeatResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -2974,7 +3418,9 @@
     "/meeting/list": {
       "post": {
         "operationId": "meetingList",
-        "tags": ["Meeting"],
+        "tags": [
+          "Meeting"
+        ],
         "summary": "List available meetings in the room",
         "description": "Returns all active meetings in the specified room.",
         "security": [
@@ -3002,13 +3448,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MeetingListResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -3049,7 +3500,9 @@
     "/meeting/join": {
       "post": {
         "operationId": "meetingJoin",
-        "tags": ["Meeting"],
+        "tags": [
+          "Meeting"
+        ],
         "summary": "Join a meeting",
         "description": "Joins the specified meeting as a participant or host.",
         "security": [
@@ -3077,13 +3530,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MeetingJoinResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }
@@ -3144,7 +3602,9 @@
     "/meeting/leave": {
       "post": {
         "operationId": "meetingLeave",
-        "tags": ["Meeting"],
+        "tags": [
+          "Meeting"
+        ],
         "summary": "Leave a meeting",
         "description": "Leaves the specified meeting.",
         "security": [
@@ -3172,13 +3632,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": ["ok"]
+                      "enum": [
+                        "ok"
+                      ]
                     },
                     "data": {
                       "$ref": "#/components/schemas/MeetingLeaveResponseData"
                     }
                   },
-                  "required": ["status", "data"]
+                  "required": [
+                    "status",
+                    "data"
+                  ]
                 }
               }
             }

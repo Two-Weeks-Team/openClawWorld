@@ -17,8 +17,8 @@ importers:
   .:
     devDependencies:
       '@asteasolutions/zod-to-openapi':
-        specifier: ^8.4.1
-        version: 8.4.1(zod@4.3.6)
+        specifier: ^8.4.3
+        version: 8.4.3(zod@4.3.6)
       '@colyseus/sdk':
         specifier: '0.17'
         version: 0.17.34(@colyseus/core@0.17.35(@colyseus/better-call@1.3.1(zod@4.3.6))(@colyseus/schema@4.0.15(typescript@5.9.3))(@colyseus/ws-transport@0.17.9)(@pm2/io@6.1.0)(express@5.2.1)(zod@4.3.6))(typescript@5.9.3)(zod@4.3.6)
@@ -186,8 +186,8 @@ importers:
   packages/shared:
     dependencies:
       '@asteasolutions/zod-to-openapi':
-        specifier: ^8.4.1
-        version: 8.4.1(zod@4.3.6)
+        specifier: ^8.4.3
+        version: 8.4.3(zod@4.3.6)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -226,8 +226,8 @@ packages:
       zod:
         optional: true
 
-  '@asteasolutions/zod-to-openapi@8.4.1':
-    resolution: {integrity: sha512-WmJUsFINbnWxGvHSd16aOjgKf+5GsfdxruO2YDLcgplsidakCauik1lhlk83YDH06265Yd1XtUyF24o09uygpw==}
+  '@asteasolutions/zod-to-openapi@8.4.3':
+    resolution: {integrity: sha512-lwfMTN7kDbFDwMniYZUebiGGHxVGBw9ZSI4IBYjm6Ey22Kd5z/fsQb2k+Okr8WMbCCC553vi/ZM9utl5/XcvuQ==}
     peerDependencies:
       zod: ^4.0.0
 
@@ -2427,7 +2427,7 @@ snapshots:
     optionalDependencies:
       zod: 4.3.6
 
-  '@asteasolutions/zod-to-openapi@8.4.1(zod@4.3.6)':
+  '@asteasolutions/zod-to-openapi@8.4.3(zod@4.3.6)':
     dependencies:
       openapi3-ts: 4.5.0
       zod: 4.3.6

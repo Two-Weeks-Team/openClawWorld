@@ -52,7 +52,7 @@
     "ecosystem:status": "tsx packages/ecosystem/src/index.ts status"
   },
   "devDependencies": {
-    "@asteasolutions/zod-to-openapi": "^8.4.1",
+    "@asteasolutions/zod-to-openapi": "^8.4.3",
     "@colyseus/sdk": "0.17",
     "@eslint/js": "^10.0.1",
     "@kayahr/tiled": "^0.0.1",

@@ -61,7 +61,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
-    "orval": "^8.5.1",
+    "orval": "^8.5.3",
     "prettier": "^3.0.0",
     "tsx": "^4.7.0",
     "typescript": "~5.9.0",

@@ -16,9 +16,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 1300,
     rollupOptions: {
       output: {
-        manualChunks: {
-          phaser: ['phaser'],
-          colyseus: ['@colyseus/sdk'],
+        manualChunks(id) {
+          if (id.includes('node_modules/phaser')) return 'phaser';
+          if (id.includes('node_modules/@colyseus/sdk')) return 'colyseus';
         },
       },
     },

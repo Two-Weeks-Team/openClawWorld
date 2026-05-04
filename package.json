@@ -57,15 +57,15 @@
     "@eslint/js": "^10.0.1",
     "@kayahr/tiled": "^0.0.1",
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.3.3",
+    "@types/node": "^25.6.0",
     "@vitest/coverage-v8": "^4.1.5",
     "eslint": "^10.0.3",
     "eslint-config-prettier": "^10.1.8",
     "orval": "^8.5.3",
     "prettier": "^3.0.0",
     "tsx": "^4.7.0",
-    "typescript": "~5.9.0",
-    "typescript-eslint": "^8.56.1",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.59.1",
     "vitest": "^4.1.5",
     "zod": "^4.3.6"
   }

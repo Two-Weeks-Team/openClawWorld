@@ -12,8 +12,16 @@
 
 import { randomBytes } from 'crypto';
 import { execFileSync, execSync } from 'child_process';
-import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
-import { homedir } from 'os';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  writeFileSync,
+  readFileSync,
+  unlinkSync,
+  rmSync,
+} from 'fs';
+import { homedir, tmpdir } from 'os';
 import { join } from 'path';
 
 // ============================================================================
@@ -293,25 +301,6 @@ const ROLES: AgentRole[] = [
   'chaos',
   'spammer',
 ];
-
-const ISSUE_AREAS = [
-  'Deploy',
-  'Sync',
-  'Movement',
-  'Collision',
-  'Chat',
-  'Social',
-  'NPC',
-  'Skills',
-  'Interactables',
-  'AIC',
-  'UI',
-  'Persistence',
-  'Performance',
-  'Docs',
-  'Behavior',
-  'Coverage',
-] as const;
 
 const EXPECTED_ENDPOINTS = [
   'register',
@@ -782,7 +771,6 @@ const ROLE_MISSIONS: Record<AgentRole, RoleMission[]> = {
 
 const STATE_DIR = join(homedir(), '.openclaw-resident-agent');
 const STATE_FILE = join(STATE_DIR, 'state.json');
-const ARTIFACTS_DIR = join(process.cwd(), 'artifacts', 'resident-agent');
 
 // ============================================================================
 // Utility Functions
@@ -854,11 +842,8 @@ function checkForUpdatesAndPull(): boolean {
 function restartProcess(): never {
   console.log('\n🔄 Restarting with updated code...\n');
   const args = process.argv.slice(1);
-  // Use execSync (already imported) to restart the process
-  // We use process.execPath (node/tsx) and pass all original arguments
-  execSync(`"${process.execPath}" ${args.map(a => `"${a}"`).join(' ')}`, {
+  execFileSync(process.execPath, args, {
     stdio: 'inherit',
-    shell: true,
   });
   process.exit(0);
 }
@@ -1041,9 +1026,9 @@ class GitHubIssueReporter {
     try {
       const labels = ['resident-agent', issue.area.toLowerCase(), issue.severity.toLowerCase()];
 
-      // Create issue body file if needed
-      const bodyFile = `/tmp/issue-body-${Date.now()}.md`;
-      writeFileSync(bodyFile, body);
+      const bodyDir = mkdtempSync(join(tmpdir(), 'issue-body-'));
+      const bodyFile = join(bodyDir, 'body.md');
+      writeFileSync(bodyFile, body, { mode: 0o600 });
 
       const result = execFileSync(
         'gh',
@@ -1051,9 +1036,9 @@ class GitHubIssueReporter {
         { encoding: 'utf-8' }
       );
 
-      // Clean up temp file
       try {
-        require('fs').unlinkSync(bodyFile);
+        unlinkSync(bodyFile);
+        rmSync(bodyDir, { recursive: true, force: true });
       } catch {}
 
       const issueUrl = result.trim();

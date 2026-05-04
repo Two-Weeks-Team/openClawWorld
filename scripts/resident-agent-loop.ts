@@ -12,7 +12,15 @@
 
 import { randomBytes } from 'crypto';
 import { execFileSync, execSync } from 'child_process';
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync, readFileSync, unlinkSync, rmSync } from 'fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  writeFileSync,
+  readFileSync,
+  unlinkSync,
+  rmSync,
+} from 'fs';
 import { homedir, tmpdir } from 'os';
 import { join } from 'path';
 

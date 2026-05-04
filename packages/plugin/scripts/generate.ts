@@ -367,7 +367,7 @@ function generateManifestFile(tools: ToolMapping[]): string {
     lines.push(`    {`);
     lines.push(`      name: '${tool.toolName}',`);
     lines.push(`      required: ${required},`);
-    lines.push(`      description: '${(tool.summary || tool.description).replace(/'/g, "\\'")}',`);
+    lines.push(`      description: ${JSON.stringify(tool.summary || tool.description)},`);
     lines.push(`      sideEffects: '${sideEffects}',`);
     lines.push(`      defaultEnabled: ${defaultEnabled},`);
     lines.push(`      inputSchema: {`);

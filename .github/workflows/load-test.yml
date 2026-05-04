@@ -38,7 +38,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -103,7 +102,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6

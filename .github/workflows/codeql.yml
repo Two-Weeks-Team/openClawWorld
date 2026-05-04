@@ -37,7 +37,11 @@ jobs:
           node-version: '22'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4

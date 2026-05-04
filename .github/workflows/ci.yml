@@ -31,7 +31,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         uses: actions/cache@v5
@@ -66,7 +70,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         uses: actions/cache@v5
@@ -101,7 +109,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         uses: actions/cache@v5
@@ -155,7 +167,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         uses: actions/cache@v5
@@ -282,7 +298,11 @@ jobs:
 
       - name: Setup pnpm
         if: steps.check-map.outputs.map_changed == 'true'
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         if: steps.check-map.outputs.map_changed == 'true'
@@ -334,7 +354,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         uses: actions/cache@v5
@@ -372,7 +396,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         uses: actions/cache@v5
@@ -407,7 +435,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        run: |
+          corepack enable pnpm
+          corepack prepare pnpm@9.0.0 --activate
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
       - name: Cache node_modules
         uses: actions/cache@v5

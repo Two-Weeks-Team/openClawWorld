@@ -1,5 +1,5 @@
 # Build stage
-FROM node:25-alpine AS builder
+FROM node:26-alpine AS builder
 
 RUN npm install -g pnpm@9.0.0
 
@@ -19,7 +19,7 @@ RUN pnpm --filter @openclawworld/shared build && \
     pnpm --filter @openclawworld/server build
 
 # Production stage
-FROM node:25-alpine AS production
+FROM node:26-alpine AS production
 
 RUN npm install -g pnpm@9.0.0
 

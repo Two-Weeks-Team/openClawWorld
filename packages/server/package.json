@@ -24,7 +24,7 @@
     "@colyseus/tools": "^0.17.19",
     "@colyseus/ws-transport": "^0.17.13",
     "@openclawworld/shared": "workspace:*",
-    "@scalar/express-api-reference": "^0.9.13",
+    "@scalar/express-api-reference": "^0.9.19",
     "colyseus": "^0.17.10",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",

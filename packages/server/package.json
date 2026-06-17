@@ -20,7 +20,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@colyseus/schema": "^4.0.21",
+    "@colyseus/schema": "^4.0.25",
     "@colyseus/tools": "^0.17.19",
     "@colyseus/ws-transport": "^0.17.13",
     "@openclawworld/shared": "workspace:*",
